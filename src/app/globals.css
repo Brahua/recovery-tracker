@@ -1,0 +1,251 @@
+@import "tailwindcss";
+@source not "../../playwright/.chrome-profile";
+
+:root {
+  --background: #f5f3ea;
+  --background-strong: #fbfaf4;
+  --surface: rgba(255, 252, 245, 0.84);
+  --surface-strong: #fffdf8;
+  --surface-muted: #f2f4ec;
+  --border: rgba(88, 102, 76, 0.14);
+  --border-strong: rgba(64, 81, 54, 0.2);
+  --foreground: #18201a;
+  --muted: #5a6858;
+  --accent: #254131;
+  --accent-soft: #8cb46c;
+  --accent-warm: #caa46a;
+  --success-bg: #edf6e8;
+  --success-border: #c8ddbc;
+  --error-bg: #fff1ec;
+  --error-border: #e4c1b6;
+  --shadow-soft: 0 22px 60px rgba(43, 58, 34, 0.08);
+  --shadow-card: 0 18px 40px rgba(42, 57, 34, 0.06);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slow-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(0, -8px, 0) scale(1.01);
+  }
+}
+
+@keyframes success-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(140, 180, 108, 0.18);
+  }
+
+  50% {
+    box-shadow: 0 0 0 10px rgba(140, 180, 108, 0);
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  min-height: 100vh;
+  overflow-x: clip;
+  background-image:
+    radial-gradient(circle at top left, rgba(204, 176, 122, 0.16), transparent 28%),
+    radial-gradient(circle at top right, rgba(137, 182, 109, 0.16), transparent 24%),
+    linear-gradient(180deg, #f7f4ec 0%, #f2f4ea 100%);
+}
+
+::selection {
+  background: rgba(202, 164, 106, 0.28);
+}
+
+.app-shell {
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+}
+
+.app-shell::before,
+.app-shell::after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: auto;
+  z-index: -1;
+  filter: blur(10px);
+  animation: slow-drift 14s ease-in-out infinite;
+}
+
+.app-shell::before {
+  top: 32px;
+  right: 4%;
+  width: 180px;
+  height: 180px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(140, 180, 108, 0.22), transparent 68%);
+}
+
+.app-shell::after {
+  bottom: 6%;
+  left: 3%;
+  width: 220px;
+  height: 220px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(202, 164, 106, 0.14), transparent 68%);
+  animation-delay: -4s;
+}
+
+.page-frame {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 248, 0.92) 0%, rgba(251, 251, 245, 0.88) 100%),
+    var(--surface-strong);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(14px);
+}
+
+.section-card {
+  border-color: var(--border);
+  box-shadow: var(--shadow-card);
+}
+
+.soft-panel {
+  background:
+    linear-gradient(180deg, rgba(248, 249, 242, 0.9) 0%, rgba(255, 255, 255, 0.96) 100%);
+}
+
+.hero-panel {
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.18), transparent 30%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent 55%);
+}
+
+.section-kicker {
+  color: #53735a;
+  letter-spacing: 0.18em;
+}
+
+.status-chip {
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(8px);
+}
+
+.primary-button,
+.secondary-button {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.primary-button:hover,
+.secondary-button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-button:focus-visible,
+.secondary-button:focus-visible,
+.ritual-form input:focus-visible,
+.ritual-form select:focus-visible,
+.ritual-form textarea:focus-visible {
+  outline: 2px solid rgba(202, 164, 106, 0.7);
+  outline-offset: 2px;
+}
+
+.primary-button {
+  box-shadow: 0 14px 28px rgba(30, 48, 29, 0.16);
+}
+
+.success-banner,
+.error-banner,
+.completion-panel {
+  animation: rise-in 260ms ease-out;
+}
+
+.success-banner {
+  border-color: var(--success-border);
+  background:
+    linear-gradient(135deg, rgba(140, 180, 108, 0.12) 0%, rgba(255, 255, 255, 0.92) 100%);
+}
+
+.success-banner strong::before {
+  content: "Completado ";
+}
+
+.error-banner {
+  border-color: var(--error-border);
+  background:
+    linear-gradient(135deg, rgba(223, 157, 133, 0.12) 0%, rgba(255, 255, 255, 0.92) 100%);
+}
+
+.completion-panel {
+  position: relative;
+}
+
+.completion-panel::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  animation: success-glow 2.4s ease-in-out infinite;
+}
+
+.ritual-form input:not([type="checkbox"]):not([type="radio"]),
+.ritual-form select,
+.ritual-form textarea {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.metric-panel {
+  background:
+    linear-gradient(180deg, rgba(244, 247, 241, 0.96) 0%, rgba(255, 255, 255, 0.92) 100%);
+}
+
+.report-grid,
+.dashboard-grid,
+.today-grid {
+  animation: rise-in 360ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

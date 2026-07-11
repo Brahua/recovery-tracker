@@ -1,0 +1,2 @@
+-- Intentionally empty for now.
+-- Keep this file present so `supabase db reset` works without extra setup.

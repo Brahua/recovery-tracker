@@ -1,0 +1,52 @@
+{
+  "name": "recovery-tracker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "supabase:start": "npx supabase start",
+    "supabase:stop": "npx supabase stop",
+    "supabase:status": "npx supabase status",
+    "supabase:env:local": "node scripts/sync-supabase-local-env.mjs",
+    "supabase:login": "npx supabase login",
+    "supabase:reset": "npx supabase db reset",
+    "supabase:push": "npx supabase db push",
+    "supabase:push:linked": "npx supabase db push --linked",
+    "supabase:push:dry": "npx supabase db push --linked --dry-run",
+    "supabase:link": "npx supabase link",
+    "supabase:types": "npx supabase gen types typescript --local > src/types/database.generated.ts",
+    "e2e": "playwright test",
+    "e2e:auth": "playwright test tests/e2e/auth.setup.ts --project=setup",
+    "e2e:critical": "playwright test tests/e2e/post-therapy-check-in.spec.ts tests/e2e/nightly-closeout.spec.ts --project=chromium",
+    "e2e:headed": "playwright test --headed",
+    "test": "vitest run",
+    "test:unit": "vitest run",
+    "test:recovery": "vitest run src/lib/recovery-calculations.test.ts src/lib/recovery-insights.test.ts",
+    "test:validation": "vitest run src/lib/validation/recovery.test.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.109.0",
+    "next": "16.2.10",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.10",
+    "jsdom": "^29.1.1",
+    "tailwindcss": "^4",
+    "typescript": "^5",
+    "vitest": "^4.1.10"
+  }
+}

@@ -306,7 +306,7 @@ Validation belongs at the boundary:
 
 - Mobile-first, because logging happens near therapy and at night.
 - Use rich interaction where it improves motivation or speed.
-- Iterate important screen designs with Google Stitch before or during UI implementation.
+- Iterate important screen designs with Claude Design before or during UI implementation.
 - Avoid generic purple-gradient AI-app styling.
 - Use progress states and achievements for consistency, not performance intensity.
 - Prefer chips, sliders, steppers, and recent shortcuts over long forms.
@@ -353,4 +353,4 @@ Initial testing should focus on calculation correctness and core flows:
 
 1. What does the doctor/fisio usually ask that the app should prepare?
 2. Which exact Spanish labels should be used for the main navigation and ritual actions?
-3. What Google Stitch design outputs should be treated as source of truth: screenshots, exported code, or only visual direction?
+3. What Claude Design outputs should be treated as source of truth: screenshots, exported code, or only visual direction?

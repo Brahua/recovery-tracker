@@ -97,6 +97,9 @@ Notes:
 - Product direction: `docs/ideas/recovery-ritual.md`
 - Deferred ideas and design backlog: `docs/ideas/recovery-ritual-backlog.md`
 - MVP spec: `docs/specs/recovery-ritual-mvp-spec.md`
+- UX redesign spec and Claude Design prompt pack: `docs/specs/recovery-ritual-ux-redesign-spec.md`
+- Implemented Claude Design inventory and recorded deviations: `docs/design/claude-design-reference.md`
+- Current field-trial handoff: `docs/specs/session-handoff-2026-07-16.md`
 - Implementation plan: `tasks/plan.md`
 - Task list: `tasks/todo.md`
 
@@ -115,11 +118,19 @@ The project now has:
 - Initial SQL schema with RLS for rehab sessions, session exercises, and nightly closeouts
 - Spanish post-therapy check-in flow with real persistence and recent-session history
 - Spanish nightly closeout flow with real persistence and recent-closeout history
-- Home / Today screen that prioritizes the next useful action, shows recent status, and rewards logging consistency
+- Signed-out landing with stronger product framing and clearer auth entry
+- Development-only anonymous test entry preserved in the signed-out flow for local auth-safe validation
+- Authenticated app shell with mobile-first navigation for `Hoy`, `Registrar`, `Insights`, and `Reporte`
+- Home / Today screen that prioritizes the next useful action, shows recent status, and keeps insights/report as secondary previews
+- Current-week strip ordered Monday through Sunday with `Hoy` on the actual weekday
+- Recovery calendar comparisons normalized to `America/Lima` while persisted timestamps remain in UTC
+- Dedicated `Registrar` route with session and nightly closeout modes instead of embedding both forms in `/`
 - Pure recovery calculations for pain trend, weekly load, rebound, sleep vs pain, and weekly story text
-- Dashboard UI with mobile-first trend cards, lightweight charts, empty states, and observational weekly summary
-- Medical report UI with 7- and 30-day windows, observational summaries, and conservative appointment prompts
+- Dedicated `Insights` route with mobile-first trend cards, lightweight charts, empty states, and observational weekly summary
+- Dedicated `Reporte` route with 7- and 30-day windows, observational summaries, and conservative appointment prompts
+- Route-local success states after saving session and nightly closeout, with next-step CTAs
 - Visual system pass with atmospheric backgrounds, richer surfaces, subtle motion, and reduced-motion-safe completion feedback
+- Browser-reviewed mobile layout pass for the new multi-route flow, including shell compaction and navigation-density cleanup
 - Focused regression coverage for calculations, report summaries, validation edges, and reusable test scripts
 - Playwright E2E coverage for auth bootstrap, post-therapy save flow, and nightly closeout save flow
 - Manual browser verification with Chrome DevTools MCP for signed-out, empty, partial, and complete Today states
@@ -139,10 +150,17 @@ Latest verified commands:
 - `npm run test:recovery`
 - `npm run build`
 - `npm run e2e:auth`
+- `npm run e2e` (`5 passed` against a clean anonymous staging context)
+
+Latest redesign verification also included:
+
+- Playwright-driven mobile screenshots for landing, `Hoy`, `Registrar`, `Insights`, and `Reporte`
+- Manual review of generated screenshots followed by mobile shell cleanup
+- Desktop and mobile browser verification of the Monday-to-Sunday current-week strip
 
 ## Current Milestone
 
-Tasks `1-12` in the MVP checklist are complete. The next decision is whether to move into production-readiness work, backlog prioritization, or a final spec/launch pass.
+The MVP and UX redesign checklists are complete. All selected Claude Design references are implemented and browser-reviewed, regression coverage is green, and the staging database was reset before field validation. The current milestone is a one-week real-use trial beginning 2026-07-16; findings will be documented and prioritized after the observation window instead of adding speculative functionality during the trial.
 
 ## Documentation Practice
 

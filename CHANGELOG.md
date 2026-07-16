@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 The format is based on Keep a Changelog and this project currently follows Semantic Versioning for tagged releases.
 
+## [Unreleased]
+
+### Added
+- Multi-screen authenticated product structure with dedicated `Hoy`, `Registrar`, `Insights`, and `Reporte` routes.
+- Responsive Claude Design implementation for the shared system, landing, ritual forms, completion states, insights, and medical report.
+- Data-driven success states, report range controls, selectable appointment questions, native PDF printing, and share fallback.
+- Deterministic view models and regression tests for auth callback errors, registrar state, form progress, Today state, insights, and reports.
+- Project-owned rehabilitation hero image and a canonical inventory of the 17 implemented design references.
+
+### Changed
+- Moved session and nightly closeout forms out of the former one-page home into a focused registration flow.
+- Reworked auth callback errors and safe redirect URL handling.
+- Expanded responsive, accessibility, contrast, focus, empty-state, and reduced-motion behavior across the redesigned product.
+- Updated the current-week strip to display Monday through Sunday and mark `Hoy` on its calendar weekday.
+
+### Fixed
+- Prevented open redirects and surfaced callback failures through a dedicated auth error state.
+- Corrected the weekly strip, which previously rendered a rolling seven-day window ending on today.
+- Unified recovery calendar dates in `America/Lima` so evening sessions and closeouts remain on the correct local day.
+
 ## [0.1.0] - 2026-07-10
 ### Added
 - Initial Recovery Ritual MVP built with Next.js, React, and Supabase.

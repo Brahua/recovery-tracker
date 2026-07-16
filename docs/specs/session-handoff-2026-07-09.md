@@ -19,7 +19,7 @@
 - Use Supabase directly for MVP persistence.
 - Use Google login via Supabase Auth from the MVP.
 - Keep the MVP responsive-web first; PWA is deferred.
-- Use Google Stitch to iterate key visual directions before final UI polish.
+- Use Claude Design to iterate key visual directions before final UI polish.
 
 ## Testing Direction
 

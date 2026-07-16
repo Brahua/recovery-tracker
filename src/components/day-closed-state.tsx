@@ -1,0 +1,134 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+import type { RitualSuccessConfig } from "@/lib/registrar-flow";
+import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+
+const limaTimeZone = "America/Lima";
+
+function formatContext(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Cierre nocturno";
+
+  const parts = new Intl.DateTimeFormat("es-PE", {
+    day: "numeric",
+    month: "long",
+    timeZone: limaTimeZone,
+    weekday: "long",
+  }).formatToParts(date);
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((item) => item.type === type)?.value;
+
+  return `${part("weekday")} ${part("day")} de ${part("month")} · ${formatTime(value)}`;
+}
+
+function formatTime(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "--:--";
+
+  return new Intl.DateTimeFormat("es-PE", {
+    hour: "2-digit",
+    hourCycle: "h23",
+    minute: "2-digit",
+    timeZone: limaTimeZone,
+  }).format(date);
+}
+
+interface DayClosedStateProps extends RitualSuccessConfig {
+  closeout: NightlyCloseout;
+  session?: RehabSession;
+  streak: number;
+}
+
+export function DayClosedState({
+  body,
+  closeout,
+  primaryHref,
+  primaryLabel,
+  secondaryHref,
+  secondaryLabel,
+  session,
+  streak,
+  title,
+}: DayClosedStateProps) {
+  const [ringComplete, setRingComplete] = useState(false);
+  const dayComplete = Boolean(session);
+  const visibleStreak = Math.max(1, streak);
+
+  useEffect(() => {
+    if (!dayComplete) return;
+
+    const timeout = window.setTimeout(() => setRingComplete(true), 400);
+    return () => window.clearTimeout(timeout);
+  }, [dayComplete]);
+
+  return (
+    <section className={`rr-day-closed ${dayComplete ? "is-complete" : "is-partial"}`}>
+      <div aria-hidden="true" className="rr-day-closed-glow" />
+      <div className="rr-day-closed-content">
+        <p className="rr-day-closed-context">{formatContext(closeout.createdAt)}</p>
+
+        <div
+          aria-label={`${dayComplete ? 2 : 1} de 2 rituales completados`}
+          className="rr-day-closed-ring"
+          role="img"
+        >
+          <svg aria-hidden="true" viewBox="0 0 136 136">
+            <circle className="rr-day-closed-ring-track" cx="68" cy="68" r="60" />
+            <circle
+              className="rr-day-closed-ring-value"
+              cx="68"
+              cy="68"
+              r="60"
+              style={{
+                strokeDashoffset: dayComplete && ringComplete ? 0 : 188.5,
+              }}
+            />
+          </svg>
+          <span aria-hidden="true">☾</span>
+        </div>
+
+        <h1>{title}</h1>
+        <p className="rr-day-closed-summary">{body}</p>
+
+        <div className="rr-day-closed-details">
+          <section aria-label="Rituales registrados" className="rr-day-closed-card">
+            {session ? (
+              <div className="rr-day-closed-row">
+                <span aria-hidden="true">✓</span>
+                <strong>Sesion de ejercicios</strong>
+                <small>
+                  {formatTime(session.occurredAt)} · {session.exercises.length} ejercicio
+                  {session.exercises.length === 1 ? "" : "s"}
+                </small>
+              </div>
+            ) : null}
+            <div className="rr-day-closed-row">
+              <span aria-hidden="true">✓</span>
+              <strong>Cierre nocturno</strong>
+              <small>{formatTime(closeout.createdAt)} · dolor {closeout.endOfDayPain}</small>
+            </div>
+          </section>
+
+          <p className="rr-day-closed-streak">
+            Racha de <strong>{visibleStreak} dia{visibleStreak === 1 ? "" : "s"}</strong>
+            {" · manana seguimos"}
+          </p>
+        </div>
+
+        <div className="rr-day-closed-actions">
+          <Link className="rr-day-closed-primary" href={primaryHref}>
+            {primaryLabel}
+          </Link>
+          {secondaryHref && secondaryLabel ? (
+            <Link className="rr-day-closed-secondary" href={secondaryHref}>
+              {secondaryLabel}
+            </Link>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}

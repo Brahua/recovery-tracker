@@ -1,412 +1,280 @@
+import Link from "next/link";
+
 import {
   calculatePainTrend,
   calculateRecentExerciseFrequency,
   calculateReboundSummary,
   calculateSleepPainComparison,
-  calculateWeeklyLoad,
+  filterCloseoutsByRange,
+  filterSessionsByRange,
+  getDateRangeForLastDays,
+  type PainTrendPoint,
 } from "@/lib/recovery-calculations";
 import {
   buildPainTrendInsight,
   buildReboundInsight,
   buildSleepPainInsight,
-  buildWeeklyLoadInsight,
-  buildWeeklyRecoveryStory,
 } from "@/lib/recovery-insights";
+import {
+  buildFourWeekSessionCounts,
+  buildReboundDistribution,
+} from "@/lib/insights-view-model";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
-const shortDateFormatter = new Intl.DateTimeFormat("es-PE", {
-  day: "2-digit",
-  month: "short",
-});
+type InsightsRange = "four-weeks" | "all";
 
-function formatDateLabel(value: string) {
-  const date = new Date(`${value}T00:00:00`);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return shortDateFormatter.format(date);
+function formatNumber(value?: number) {
+  return typeof value === "number"
+    ? new Intl.NumberFormat("es-PE", { maximumFractionDigits: 1 }).format(value)
+    : "--";
 }
 
-function PainTrendChart({
-  points,
-}: {
-  points: Array<{ date: string; pain: number }>;
-}) {
-  if (points.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-[#cdd8c8] bg-white/70 p-5 text-sm leading-7 text-[#5d6b5f]">
-        Todavia no hay cierres suficientes para dibujar la tendencia.
-      </div>
+function buildPolyline(
+  values: number[],
+  width: number,
+  height: number,
+  minimum: number,
+  maximum: number,
+) {
+  if (values.length === 1) {
+    const normalized = Math.min(
+      1,
+      Math.max(0, (values[0]! - minimum) / (maximum - minimum)),
     );
+    const y = (height - normalized * height).toFixed(1);
+    return `0,${y} ${width},${y}`;
   }
 
-  const width = 320;
-  const height = 132;
-  const padding = 16;
-  const stepX = points.length > 1 ? (width - padding * 2) / (points.length - 1) : 0;
-  const pointPath = points
-    .map((point, index) => {
-      const x = padding + index * stepX;
-      const y = height - padding - (point.pain / 10) * (height - padding * 2);
-      return `${index === 0 ? "M" : "L"} ${x} ${y}`;
+  return values
+    .map((value, index) => {
+      const x = (index / (values.length - 1)) * width;
+      const normalized = Math.min(1, Math.max(0, (value - minimum) / (maximum - minimum)));
+      const y = height - normalized * height;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
     })
     .join(" ");
+}
+
+function EmptyChart({ children }: { children: React.ReactNode }) {
+  return <div className="rr-insights-empty">{children}</div>;
+}
+
+function PainChart({ points }: { points: PainTrendPoint[] }) {
+  if (points.length === 0) {
+    return <EmptyChart>Registra cierres nocturnos para ver la tendencia.</EmptyChart>;
+  }
+
+  const width = 920;
+  const height = 130;
+  const polyline = buildPolyline(points.map((point) => point.pain), width, height, 0, 6);
+  const area = `0,${height} ${polyline} ${width},${height}`;
+  const lastPoint = polyline.split(" ").at(-1)?.split(",") ?? [width, height];
 
   return (
-    <div className="rounded-[24px] border border-[#dfe5d8] bg-white p-4">
-      <svg
-        aria-label="Grafico de tendencia de dolor"
-        className="h-[132px] w-full"
-        role="img"
-        viewBox={`0 0 ${width} ${height}`}
-      >
-        {[0, 5, 10].map((value) => {
-          const y = height - padding - (value / 10) * (height - padding * 2);
-          return (
-            <g key={value}>
-              <line
-                stroke="#dbe5d4"
-                strokeDasharray="3 5"
-                strokeWidth="1"
-                x1={padding}
-                x2={width - padding}
-                y1={y}
-                y2={y}
-              />
-              <text
-                fill="#6a7f6f"
-                fontSize="10"
-                textAnchor="end"
-                x={padding - 4}
-                y={y + 3}
-              >
-                {value}
-              </text>
-            </g>
-          );
-        })}
-        <path
-          d={pointPath}
-          fill="none"
-          stroke="#244b30"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="3"
+    <div className="rr-pain-chart">
+      <svg aria-label="Tendencia del dolor medio" preserveAspectRatio="none" role="img" viewBox="0 0 920 130">
+        <defs>
+          <linearGradient id="rr-pain-area" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0" stopColor="var(--rr-accent)" stopOpacity="0.35" />
+            <stop offset="1" stopColor="var(--rr-accent)" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <polygon fill="url(#rr-pain-area)" points={area} />
+        <polyline className="rr-chart-accent-line" fill="none" points={polyline} />
+        <circle
+          cx={lastPoint[0]}
+          cy={lastPoint[1]}
+          fill="var(--rr-ink)"
+          r="4.5"
+          stroke="var(--rr-accent)"
+          strokeWidth="2.5"
         />
-        {points.map((point, index) => {
-          const x = padding + index * stepX;
-          const y = height - padding - (point.pain / 10) * (height - padding * 2);
-
-          return (
-            <g key={point.date}>
-              <circle cx={x} cy={y} fill="#9cc37d" r="4.5" stroke="#244b30" strokeWidth="2" />
-              <text
-                fill="#5d6b5f"
-                fontSize="10"
-                textAnchor="middle"
-                x={x}
-                y={height - 2}
-              >
-                {formatDateLabel(point.date)}
-              </text>
-            </g>
-          );
-        })}
       </svg>
+      <div className="rr-pain-chart-axis" aria-hidden="true">
+        <span>Sem 1</span><span>Sem 2</span><span>Sem 3</span><span>Sem 4</span>
+      </div>
     </div>
   );
 }
 
-function WeeklyLoadBars({
-  sessions,
-}: {
-  sessions: RehabSession[];
-}) {
-  if (sessions.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-[#cdd8c8] bg-white/70 p-5 text-sm leading-7 text-[#5d6b5f]">
-        Aun no hay sesiones de esta semana para visualizar la carga.
-      </div>
-    );
-  }
-
-  const totals = new Map<string, number>();
-
-  for (const session of sessions) {
-    const date = session.occurredAt.slice(0, 10);
-    totals.set(date, (totals.get(date) ?? 0) + session.perceivedLoad);
-  }
-
-  const maxValue = Math.max(...totals.values(), 1);
-  const entries = [...totals.entries()].sort(([left], [right]) =>
-    left.localeCompare(right),
-  );
+function WeeklyLoadChart({ sessions, now }: { sessions: RehabSession[]; now: string }) {
+  const weeks = buildFourWeekSessionCounts(sessions, now);
+  const maximum = Math.max(...weeks.map((week) => week.count), 1);
+  const current = weeks.at(-1)?.count ?? 0;
 
   return (
-    <div className="grid gap-3">
-      {entries.map(([date, total]) => (
-        <div className="grid gap-1" key={date}>
-          <div className="flex items-center justify-between text-sm text-[#445546]">
-            <span>{formatDateLabel(date)}</span>
-            <span>{total} pts</span>
+    <div>
+      <div className="rr-load-bars" aria-label="Sesiones registradas por semana">
+        {weeks.map((week, index) => (
+          <div key={week.label}>
+            <span className={index === weeks.length - 1 ? "is-current" : ""} style={{ height: `${Math.max(5, (week.count / maximum) * 100)}%` }} />
+            <small>{week.label}</small>
           </div>
-          <div className="h-3 overflow-hidden rounded-full bg-[#e6ede1]">
-            <div
-              className="h-full rounded-full bg-[linear-gradient(90deg,#264f31_0%,#89b66d_100%)]"
-              style={{ width: `${(total / maxValue) * 100}%` }}
-            />
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
+      <p className="rr-insights-caption">
+        <strong>{current} sesion{current === 1 ? "" : "es"}</strong> esta semana
+      </p>
     </div>
   );
 }
 
-function ExerciseFrequencyBars({
-  items,
-}: {
-  items: Array<{ name: string; count: number }>;
-}) {
+function ReboundChart({ closeouts }: { closeouts: NightlyCloseout[] }) {
+  const distribution = buildReboundDistribution(closeouts);
+
+  return (
+    <div>
+      <div className="rr-rebound-bars">
+        {distribution.map((item) => (
+          <div key={item.label}>
+            <p><span>{item.label}</span><strong>{item.percentage}%</strong></p>
+            <span><i className={`is-${item.tone}`} style={{ width: `${item.percentage}%` }} /></span>
+          </div>
+        ))}
+      </div>
+      <p className="rr-insights-caption">
+        <strong>{distribution[0]?.count ?? 0} de {closeouts.length}</strong> cierres sin rebote
+      </p>
+    </div>
+  );
+}
+
+function SleepPainChart({ closeouts }: { closeouts: NightlyCloseout[] }) {
+  if (closeouts.length < 2) {
+    return <EmptyChart>Se necesitan al menos dos cierres para comparar sueño y dolor.</EmptyChart>;
+  }
+
+  const ordered = [...closeouts].sort((left, right) => left.date.localeCompare(right.date));
+  const sleepLine = buildPolyline(ordered.map((item) => item.sleepHours), 420, 90, 5, 9);
+  const painLine = buildPolyline(ordered.map((item) => item.endOfDayPain), 420, 90, 0, 5);
+
+  return (
+    <svg aria-label="Comparacion entre horas de sueño y dolor" className="rr-sleep-chart" preserveAspectRatio="none" role="img" viewBox="0 0 420 90">
+      <polyline className="rr-chart-sleep-line" fill="none" points={sleepLine} />
+      <polyline className="rr-chart-accent-line" fill="none" points={painLine} />
+    </svg>
+  );
+}
+
+function ExerciseBars({ items }: { items: Array<{ name: string; count: number }> }) {
   if (items.length === 0) {
-    return (
-      <div className="rounded-2xl border border-dashed border-[#cdd8c8] bg-white/70 p-5 text-sm leading-7 text-[#5d6b5f]">
-        Aun no hay ejercicios suficientes para detectar repeticiones utiles.
-      </div>
-    );
+    return <EmptyChart>Las sesiones registradas todavía no incluyen ejercicios.</EmptyChart>;
   }
 
-  const topItems = items.slice(0, 5);
-  const maxCount = Math.max(...topItems.map((item) => item.count), 1);
+  const visible = items.slice(0, 5);
+  const maximum = Math.max(...visible.map((item) => item.count), 1);
 
   return (
-    <div className="grid gap-3">
-      {topItems.map((item) => (
-        <div className="grid gap-1" key={item.name}>
-          <div className="flex items-center justify-between gap-4 text-sm text-[#263b29]">
-            <span className="truncate">{item.name}</span>
-            <span>{item.count}</span>
-          </div>
-          <div className="h-3 overflow-hidden rounded-full bg-[#e6ede1]">
-            <div
-              className="h-full rounded-full bg-[#587f4a]"
-              style={{ width: `${(item.count / maxCount) * 100}%` }}
-            />
-          </div>
+    <div className="rr-exercise-frequency">
+      {visible.map((item, index) => (
+        <div key={item.name}>
+          <span title={item.name}>{item.name}</span>
+          <i><b className={index === 0 ? "is-leading" : ""} style={{ width: `${(item.count / maximum) * 100}%` }} /></i>
+          <strong>{item.count}</strong>
         </div>
       ))}
     </div>
   );
 }
 
-function DashboardCard({
-  eyebrow,
-  title,
-  body,
+function InsightCard({
   children,
+  title,
 }: {
-  eyebrow: string;
-  title: string;
-  body: string;
   children: React.ReactNode;
+  title: string;
 }) {
   return (
-    <article className="section-card soft-panel rounded-[28px] border border-[#dfe5d8] p-6 sm:p-8">
-      <div className="space-y-2">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#53735a]">
-          {eyebrow}
-        </p>
-        <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#162117]">
-          {title}
-        </h3>
-        <p className="text-sm leading-7 text-[#526154]">{body}</p>
-      </div>
-      <div className="mt-6">{children}</div>
+    <article className="rr-insight-card">
+      <h2>{title}</h2>
+      {children}
     </article>
   );
 }
 
 interface RecoveryDashboardProps {
+  now: string;
+  range: InsightsRange;
   recentSessions: RehabSession[];
   recentCloseouts: NightlyCloseout[];
 }
 
 export function RecoveryDashboard({
+  now,
+  range,
   recentSessions,
   recentCloseouts,
 }: RecoveryDashboardProps) {
-  const pain7 = calculatePainTrend(recentCloseouts, 7);
-  const pain14 = calculatePainTrend(recentCloseouts, 14);
-  const pain30 = calculatePainTrend(recentCloseouts, 30);
-  const weeklySessions = recentSessions.filter((session) => {
-    const date = new Date();
-    date.setDate(date.getDate() - 6);
-    return session.occurredAt.slice(0, 10) >= date.toISOString().slice(0, 10);
-  });
-  const weeklyLoad = calculateWeeklyLoad(recentSessions, 7);
-  const rebound = calculateReboundSummary(recentSessions, recentCloseouts, 7);
-  const sleepPain = calculateSleepPainComparison(recentCloseouts, 14);
-  const exercises = calculateRecentExerciseFrequency(recentSessions, 30);
-  const weeklyStory = buildWeeklyRecoveryStory({
-    painTrend: pain7,
-    weeklyLoad,
-    rebound,
-    sleepPain,
-  });
+  const rangeDays = range === "all" ? 36_500 : 28;
+  const selectedWindow = getDateRangeForLastDays(rangeDays, now);
+  const selectedSessions = filterSessionsByRange(recentSessions, selectedWindow);
+  const selectedCloseouts = filterCloseoutsByRange(recentCloseouts, selectedWindow);
+  const pain = calculatePainTrend(selectedCloseouts, rangeDays, now);
+  const sleepWindow = getDateRangeForLastDays(14, now);
+  const sleepCloseouts = filterCloseoutsByRange(selectedCloseouts, sleepWindow);
+  const sleepPain = calculateSleepPainComparison(selectedCloseouts, 14, now);
+  const exercises = calculateRecentExerciseFrequency(selectedSessions, rangeDays, now);
+  const weeklyStory = [
+    buildPainTrendInsight(calculatePainTrend(recentCloseouts, 7, now)),
+    buildReboundInsight(
+      calculateReboundSummary(recentSessions, recentCloseouts, 7, now),
+    ),
+    buildSleepPainInsight(sleepPain),
+  ].join(" ");
+  const delta = pain.delta;
 
   return (
-    <section className="dashboard-grid grid gap-6" id="dashboard">
-      <div className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#53735a]">
-          Dashboard
-        </p>
-        <h2 className="text-3xl font-semibold tracking-[-0.02em] text-[#162117] sm:text-4xl">
-          Patrones recientes sin ruido clinico.
-        </h2>
-        <p className="max-w-3xl text-sm leading-7 text-[#526154] sm:text-base">
-          Este bloque responde las preguntas practicas del MVP: si el dolor cambia,
-          cuanta carga hubo, si aparece rebote, como se cruza el sueno con el dolor
-          y que ejercicios se repiten mas.
-        </p>
+    <div className="rr-insights">
+      <header className="rr-insights-header">
+        <Link aria-label="Volver a Hoy" className="rr-insights-back" href="/">‹</Link>
+        <div>
+          <p>{range === "all" ? "Historial completo" : "Ultimas 4 semanas"}</p>
+          <h1>Insights</h1>
+        </div>
+        <nav aria-label="Rango de Insights" className="rr-insights-range">
+          <Link aria-current={range === "four-weeks" ? "page" : undefined} className={range === "four-weeks" ? "is-active" : ""} href="/insights">4 sem</Link>
+          <Link aria-current={range === "all" ? "page" : undefined} className={range === "all" ? "is-active" : ""} href="/insights?range=all">Todo</Link>
+        </nav>
+      </header>
+
+      <div className="rr-insights-main">
+        <section className="rr-insights-summary">
+          <p>Resumen · {range === "all" ? "historial" : "4 semanas"}</p>
+          <strong>{weeklyStory}</strong>
+        </section>
+
+        <section className="rr-insights-grid">
+          <InsightCard title="Dolor medio">
+            <div className="rr-pain-metric">
+              <strong>{formatNumber(pain.averagePain)}</strong>
+              {typeof delta === "number" ? (
+                <span className={delta > 0 ? "is-rising" : ""}>
+                  {delta > 0 ? "▲" : delta < 0 ? "▼" : "="} {formatNumber(Math.abs(delta))} en {range === "all" ? "el historial" : "4 sem"}
+                </span>
+              ) : null}
+            </div>
+            <PainChart points={pain.points} />
+          </InsightCard>
+
+          <InsightCard title="Carga semanal">
+            <WeeklyLoadChart now={now} sessions={recentSessions} />
+          </InsightCard>
+
+          <InsightCard title="Rebote">
+            <ReboundChart closeouts={selectedCloseouts} />
+          </InsightCard>
+
+          <InsightCard title="Sueño y dolor">
+            <div className="rr-sleep-legend"><span>● Sueño</span><span>● Dolor</span></div>
+            <SleepPainChart closeouts={sleepCloseouts} />
+            <p className="rr-insights-caption">{buildSleepPainInsight(sleepPain)}</p>
+          </InsightCard>
+
+          <InsightCard title="Ejercicios mas frecuentes">
+            <ExerciseBars items={exercises} />
+          </InsightCard>
+        </section>
       </div>
-
-      <div className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-        <DashboardCard
-          body={buildPainTrendInsight(pain7)}
-          eyebrow="Dolor"
-          title="Tendencia de dolor de cierre"
-        >
-          <div className="grid gap-5">
-            <div className="grid gap-3 sm:grid-cols-3">
-              {[
-                { label: "7 dias", summary: pain7 },
-                { label: "14 dias", summary: pain14 },
-                { label: "30 dias", summary: pain30 },
-              ].map(({ label, summary }) => (
-                <div
-                  className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4"
-                  key={label}
-                >
-                  <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-                    {label}
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-[#18201a]">
-                    {summary.averagePain ?? "--"}
-                  </p>
-                  <p className="mt-1 text-sm text-[#526154]">
-                    {summary.direction === "DOWN"
-                      ? "Bajando"
-                      : summary.direction === "UP"
-                        ? "Subiendo"
-                        : summary.direction === "STABLE"
-                          ? "Estable"
-                          : "Sin datos"}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <PainTrendChart points={pain30.points} />
-          </div>
-        </DashboardCard>
-
-        <DashboardCard
-          body="Una lectura corta que junta dolor, carga, rebote y sueno sin convertir esto en una conclusion medica."
-          eyebrow="Historia semanal"
-          title="Resumen observacional"
-        >
-          <div className="rounded-[24px] border border-[#d8e1d3] bg-[linear-gradient(180deg,#f3f7ef_0%,#ffffff_100%)] p-5 text-sm leading-7 text-[#263b29]">
-            {weeklyStory}
-          </div>
-        </DashboardCard>
-      </div>
-
-      <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-4">
-        <DashboardCard
-          body={buildWeeklyLoadInsight(weeklyLoad)}
-          eyebrow="Carga"
-          title="Carga semanal"
-        >
-          <div className="mb-4 flex items-end justify-between gap-4 rounded-2xl bg-[#f7f8f3] p-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-                Total 7 dias
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-[#18201a]">
-                {weeklyLoad.totalLoad}
-              </p>
-            </div>
-            <p className="text-sm text-[#526154]">
-              {weeklyLoad.sessionCount} sesion{weeklyLoad.sessionCount === 1 ? "" : "es"}
-            </p>
-          </div>
-          <WeeklyLoadBars sessions={weeklySessions} />
-        </DashboardCard>
-
-        <DashboardCard
-          body={buildSleepPainInsight(sleepPain)}
-          eyebrow="Sueno vs dolor"
-          title="Relacion reciente"
-        >
-          <div className="grid gap-3">
-            <div className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-                Menos de 6 h
-              </p>
-              <p className="mt-2 text-2xl font-semibold text-[#18201a]">
-                {sleepPain.lowSleepPainAverage ?? "--"}
-              </p>
-              <p className="mt-1 text-sm text-[#526154]">
-                dolor final promedio
-              </p>
-            </div>
-            <div className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-                6 h o mas
-              </p>
-              <p className="mt-2 text-2xl font-semibold text-[#18201a]">
-                {sleepPain.adequateSleepPainAverage ?? "--"}
-              </p>
-              <p className="mt-1 text-sm text-[#526154]">
-                dolor final promedio
-              </p>
-            </div>
-          </div>
-        </DashboardCard>
-
-        <DashboardCard
-          body={buildReboundInsight(rebound)}
-          eyebrow="Rebote"
-          title="Despues de la sesion"
-        >
-          <div className="grid gap-3">
-            <div className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-                Sesiones observadas
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-[#18201a]">
-                {rebound.sessionCount}
-              </p>
-            </div>
-            <div className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-                Cierres con rebote
-              </p>
-              <p className="mt-2 text-3xl font-semibold text-[#18201a]">
-                {rebound.reboundCount}
-              </p>
-            </div>
-          </div>
-        </DashboardCard>
-
-        <DashboardCard
-          body="La idea no es premiar intensidad, sino ver que se repite para luego contrastarlo con carga y rebote."
-          eyebrow="Ejercicios"
-          title="Mas frecuentes"
-        >
-          <ExerciseFrequencyBars items={exercises} />
-        </DashboardCard>
-      </div>
-    </section>
+    </div>
   );
 }

@@ -76,9 +76,14 @@ export async function createNightlyCloseoutAction(formData: FormData) {
         ? error.message
         : "No se pudo guardar el cierre. Revisa los datos e intenta otra vez.";
 
-    redirect(`/?nightlyError=${encodeURIComponent(message)}`);
+    redirect(`/registrar?mode=closeout&nightlyError=${encodeURIComponent(message)}`);
   }
 
   revalidatePath("/");
-  redirect(`/?nightlySaved=1&nightlySummary=${encodeURIComponent(summary)}`);
+  revalidatePath("/registrar");
+  revalidatePath("/insights");
+  revalidatePath("/reporte");
+  redirect(
+    `/registrar?mode=closeout&nightlySaved=1&nightlySummary=${encodeURIComponent(summary)}`,
+  );
 }

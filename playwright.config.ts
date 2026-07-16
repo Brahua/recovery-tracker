@@ -1,5 +1,3 @@
-import { existsSync } from "node:fs";
-
 import { defineConfig, devices } from "@playwright/test";
 
 const authFile = "playwright/.auth/user.json";
@@ -22,7 +20,7 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        storageState: existsSync(authFile) ? authFile : undefined,
+        storageState: authFile,
       },
       dependencies: ["setup"],
     },

@@ -1,55 +1,49 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function ensureAuthenticated(page: Page) {
-  await page.goto("/");
-
-  if (await page.getByRole("button", { name: "Entrar anonimo para pruebas" }).isVisible()) {
-    await page.getByRole("button", { name: "Entrar anonimo para pruebas" }).click();
-  }
-
-  await expect(
-    page.getByRole("heading", { name: "Registra como termino el dia" }),
-  ).toBeVisible();
+  await page.goto("/registrar?mode=closeout");
+  await expect(page.getByRole("heading", { name: "Registrar" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Cierre" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
 }
 
 test.describe("nightly closeout", () => {
   test("saves a closeout and keeps it visible after reload", async ({ page }) => {
     await ensureAuthenticated(page);
-    const recentStatus = page.locator("#recent-status");
+    await page.getByRole("slider", { name: "Dolor" }).fill("3");
+    await page.getByText("Alta", { exact: true }).click();
+    await page.getByText("Leve", { exact: true }).click();
+    await page.getByText("Buena", { exact: true }).click();
+    await page
+      .getByPlaceholder("Lo que quieras dejar escrito antes de dormir...")
+      .fill(`Cierre automatizado ${Date.now()}`);
 
-    const uniqueNote = `Cierre automatizado ${Date.now()}`;
+    await page.getByRole("button", { name: "Cerrar el dia" }).click();
 
-    await page.getByLabel("Dolor final del dia").selectOption("3");
-    await page.getByLabel("Energia").selectOption("4");
-    await page.getByLabel("Horas de sueno").fill("7.5");
-    await page.getByLabel("Calidad de sueno").selectOption("4");
-    await page.getByLabel("Rebote desde la ultima sesion").selectOption("MILD");
-    await page.getByLabel("Nota opcional").fill(uniqueNote);
-
-    await page.getByRole("button", { name: "Guardar cierre" }).click();
-
-    await expect(page.getByText("Cierre guardado.")).toBeVisible();
-    await expect(recentStatus.getByText("Rebote: Leve")).toBeVisible();
-    await expect(recentStatus.getByText("Sueno: 7.5 h")).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /^(Dia cerrado|Cierre guardado)\.$/ }),
+    ).toBeVisible();
+    await expect(page.getByText("Cierre nocturno")).toBeVisible();
+    await expect(page.getByText("dolor 3")).toBeVisible();
 
     await page.reload();
 
-    await expect(recentStatus.getByText("Rebote: Leve")).toBeVisible();
-    await expect(recentStatus.getByText("Sueno: 7.5 h")).toBeVisible();
+    await expect(page.getByText("Cierre nocturno")).toBeVisible();
+    await expect(page.getByText("dolor 3")).toBeVisible();
   });
 
-  test("shows validation error for invalid sleep hours", async ({ page }) => {
+  test("keeps save disabled until every required closeout step is complete", async ({ page }) => {
     await ensureAuthenticated(page);
 
-    await page.getByLabel("Dolor final del dia").selectOption("4");
-    await page.getByLabel("Energia").selectOption("2");
-    await page.getByLabel("Horas de sueno").fill("25");
-    await page.getByLabel("Calidad de sueno").selectOption("2");
-    await page.getByLabel("Rebote desde la ultima sesion").selectOption("NONE");
-    await page.getByLabel("Nota opcional").fill("Debe fallar por horas invalidas.");
-
-    await page.getByRole("button", { name: "Guardar cierre" }).click();
-
-    await expect(page.getByText("No se guardo el cierre.")).toBeVisible();
+    const saveButton = page.getByRole("button", { name: "Cerrar el dia" });
+    await expect(saveButton).toBeDisabled();
+    await page.getByRole("slider", { name: "Dolor" }).fill("4");
+    await page.getByText("Baja", { exact: true }).click();
+    await page.getByText("Nada", { exact: true }).click();
+    await expect(saveButton).toBeDisabled();
+    await page.getByText("Mala", { exact: true }).click();
+    await expect(saveButton).toBeEnabled();
   });
 });

@@ -1,318 +1,278 @@
+import Link from "next/link";
+
+import {
+  buildRecentWeek,
+  calculateLoggingStreak,
+  getTodayRitualState,
+  type RecentWeekDay,
+} from "@/lib/today-view-model";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import { getRecoveryDateKey, recoveryTimeZone } from "@/lib/recovery-date";
 
-const weekdayFormatter = new Intl.DateTimeFormat("es-PE", {
+const dateFormatter = new Intl.DateTimeFormat("es-PE", {
   weekday: "long",
-  day: "2-digit",
-  month: "short",
+  day: "numeric",
+  month: "long",
+  timeZone: recoveryTimeZone,
 });
 
-const sessionTimeFormatter = new Intl.DateTimeFormat("es-PE", {
-  day: "2-digit",
-  month: "short",
-  hour: "2-digit",
-  minute: "2-digit",
-});
-
-const closeoutDateFormatter = new Intl.DateTimeFormat("es-PE", {
-  day: "2-digit",
+const shortDateFormatter = new Intl.DateTimeFormat("es-PE", {
+  day: "numeric",
   month: "short",
 });
 
 const reboundLabels: Record<NightlyCloseout["reboundPainLevel"], string> = {
-  NONE: "Sin rebote",
-  MILD: "Leve",
-  MODERATE: "Moderado",
-  STRONG: "Fuerte",
+  NONE: "sin rebote",
+  MILD: "rebote leve",
+  MODERATE: "rebote moderado",
+  STRONG: "rebote fuerte",
 };
 
-const sessionTypeLabels: Record<RehabSession["sessionType"], string> = {
-  HOME: "Casa",
-  PHYSIOTHERAPY: "Fisioterapia",
-  HYDROTHERAPY: "Hidroterapia",
-  GYM: "Gym",
-  WALK: "Caminata",
-  OTHER: "Otro",
-};
-
-function toDateKey(value: Date) {
-  return value.toISOString().slice(0, 10);
+function capitalize(value: string) {
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function normalizeSessionDateKey(value: RehabSession["occurredAt"]) {
-  return value.slice(0, 10);
+function getFirstName(email?: string | null) {
+  const localPart = email?.trim().split("@")[0] || "tu";
+  const firstName = localPart.split(/[._-]/)[0] ?? localPart;
+  return capitalize(firstName);
 }
 
-function formatWeekday(value: Date) {
-  const formatted = weekdayFormatter.format(value);
-  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+function sessionDateKey(session: RehabSession) {
+  return getRecoveryDateKey(session.occurredAt);
 }
 
-function formatSessionMoment(value: string) {
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return sessionTimeFormatter.format(date);
-}
-
-function formatCloseoutDate(value: string) {
-  const date = new Date(`${value}T00:00:00`);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return closeoutDateFormatter.format(date);
-}
-
-function buildLoggedDayKeys(
-  recentSessions: RehabSession[],
-  recentCloseouts: NightlyCloseout[],
-) {
-  const keys = new Set<string>();
-
-  for (const session of recentSessions) {
-    keys.add(normalizeSessionDateKey(session.occurredAt));
-  }
-
-  for (const closeout of recentCloseouts) {
-    keys.add(closeout.date);
-  }
-
-  return keys;
-}
-
-function calculateLoggingStreak(
-  recentSessions: RehabSession[],
-  recentCloseouts: NightlyCloseout[],
-) {
-  const loggedDayKeys = buildLoggedDayKeys(recentSessions, recentCloseouts);
-  let streak = 0;
-  const cursor = new Date();
-
-  while (loggedDayKeys.has(toDateKey(cursor))) {
-    streak += 1;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-
-  return streak;
-}
-
-function buildTodayStatus(
-  recentSessions: RehabSession[],
-  recentCloseouts: NightlyCloseout[],
-) {
-  const todayKey = toDateKey(new Date());
-  const hasSessionToday = recentSessions.some(
-    (session) => normalizeSessionDateKey(session.occurredAt) === todayKey,
+function WeekStrip({ days }: { days: RecentWeekDay[] }) {
+  return (
+    <div className="rr-week" aria-label="Semana actual, de lunes a domingo">
+      {days.map((day) => (
+        <div className="rr-week-day" key={day.key}>
+          <span
+            className={`rr-week-mark ${day.completed ? "is-complete" : ""} ${
+              day.isToday ? "is-today" : ""
+            }`}
+          >
+            {day.completed ? "✓" : day.isToday ? "·" : ""}
+          </span>
+          <span className={day.isToday ? "is-today" : ""}>
+            {day.isToday ? "Hoy" : day.label}
+          </span>
+        </div>
+      ))}
+    </div>
   );
-  const hasCloseoutToday = recentCloseouts.some(
-    (closeout) => closeout.date === todayKey,
+}
+
+function ProgressRing({ progress }: { progress: 0 | 50 | 100 }) {
+  const radius = 41;
+  const circumference = 2 * Math.PI * radius;
+  const visibleProgress = Math.max(progress, 3);
+  const offset = circumference * (1 - visibleProgress / 100);
+
+  return (
+    <div className="rr-progress-ring" aria-label={`${progress}% de los rituales de hoy`}>
+      <svg aria-hidden="true" viewBox="0 0 96 96">
+        <circle cx="48" cy="48" fill="none" r={radius} strokeWidth="6" />
+        <circle
+          className="rr-progress-ring-value"
+          cx="48"
+          cy="48"
+          fill="none"
+          r={radius}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeWidth="6"
+        />
+      </svg>
+      <span>
+        <strong>{progress}</strong><small>%</small>
+        <em>hoy</em>
+      </span>
+    </div>
   );
+}
 
-  if (!hasSessionToday) {
-    return {
-      eyebrow: "Siguiente paso",
-      title: "Toca registrar la sesion de hoy.",
-      body: "Deja la respuesta inmediata de la rodilla antes de que se mezcle con el resto del dia.",
-      primaryHref: "#post-therapy",
-      primaryLabel: "Registrar sesion",
-      secondaryHref: "#nightly-closeout",
-      secondaryLabel: "Ver cierre nocturno",
-      progressLabel: "0 de 2 rituales de hoy listos",
-    };
-  }
-
-  if (!hasCloseoutToday) {
-    return {
-      eyebrow: "Buen avance",
-      title: "La sesion ya esta guardada; falta cerrar el dia.",
-      body: "Cuando termine la noche, registra dolor final, energia, sueno y si aparecio rebote.",
-      primaryHref: "#nightly-closeout",
-      primaryLabel: "Registrar cierre nocturno",
-      secondaryHref: "#post-therapy",
-      secondaryLabel: "Revisar sesion",
-      progressLabel: "1 de 2 rituales de hoy listo",
-    };
-  }
-
-  return {
-    eyebrow: "Dia completo",
-    title: "Los dos rituales de hoy ya quedaron guardados.",
-    body: "Puedes revisar el estado reciente o volver a registrar algo si hubo un cambio mas tarde.",
-    primaryHref: "#recent-status",
-    primaryLabel: "Revisar estado reciente",
-    secondaryHref: "#post-therapy",
-    secondaryLabel: "Abrir sesion",
-    progressLabel: "2 de 2 rituales de hoy listos",
-  };
+function PreviewLink({
+  glyph,
+  href,
+  title,
+  subtitle,
+}: {
+  glyph: string;
+  href: string;
+  title: string;
+  subtitle: string;
+}) {
+  return (
+    <Link className="rr-preview-link" href={href}>
+      <span aria-hidden="true">{glyph}</span>
+      <span>
+        <strong>{title}</strong>
+        <small>{subtitle}</small>
+      </span>
+      <b aria-hidden="true">›</b>
+    </Link>
+  );
 }
 
 interface TodayOverviewProps {
   recentSessions: RehabSession[];
   recentCloseouts: NightlyCloseout[];
+  userEmail?: string | null;
 }
 
 export function TodayOverview({
   recentSessions,
   recentCloseouts,
+  userEmail,
 }: TodayOverviewProps) {
-  const today = new Date();
+  const now = new Date();
+  const todayKey = getRecoveryDateKey(now);
+  const hasSessionToday = recentSessions.some(
+    (session) => sessionDateKey(session) === todayKey,
+  );
+  const hasCloseoutToday = recentCloseouts.some(
+    (closeout) => closeout.date === todayKey,
+  );
+  const state = getTodayRitualState(hasSessionToday, hasCloseoutToday);
+  const week = buildRecentWeek(recentSessions, recentCloseouts, now);
+  const streak = calculateLoggingStreak(recentSessions, recentCloseouts, now);
+  const loggedDays = week.filter((day) => day.completed).length;
+  const milestoneProgress = Math.round((loggedDays / 30) * 100);
   const latestSession = recentSessions[0];
   const latestCloseout = recentCloseouts[0];
-  const streak = calculateLoggingStreak(recentSessions, recentCloseouts);
-  const todayStatus = buildTodayStatus(recentSessions, recentCloseouts);
+  const firstName = getFirstName(userEmail);
 
   return (
-    <section className="today-grid grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-      <div className="hero-panel overflow-hidden rounded-[30px] border border-[#dfe5d8] bg-[linear-gradient(135deg,#17331f_0%,#2f5a3c_54%,#9cc37d_100%)] p-6 text-white shadow-sm sm:p-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-3">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/70">
-              {todayStatus.eyebrow}
-            </p>
-            <p className="inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm text-white/85">
-              Hoy · {formatWeekday(today)}
-            </p>
-          </div>
-          <div className="rounded-2xl border border-white/18 bg-white/10 px-4 py-3 text-right">
-            <p className="text-xs uppercase tracking-[0.16em] text-white/65">
-              Consistencia
-            </p>
-            <p className="mt-1 text-3xl font-semibold tracking-[-0.04em]">
-              {streak} dia{streak === 1 ? "" : "s"}
-            </p>
-            <p className="mt-1 text-sm text-white/70">racha de registro</p>
-          </div>
+    <div className="rr-today">
+      <header className="rr-today-header">
+        <div>
+          <p>{capitalize(dateFormatter.format(now))}</p>
+          <h1>Hola, {firstName}</h1>
         </div>
+        <span className="rr-mobile-avatar" aria-hidden="true">
+          {firstName.charAt(0)}
+        </span>
+        <div className="rr-desktop-week">
+          <WeekStrip days={week} />
+        </div>
+      </header>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="space-y-4">
-            <h1 className="max-w-2xl text-3xl font-semibold leading-tight tracking-[-0.03em] sm:text-5xl">
-              {todayStatus.title}
-            </h1>
-            <p className="max-w-2xl text-base leading-7 text-white/78 sm:text-lg">
-              {todayStatus.body}
-            </p>
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <a
-                className="rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[#18311f] transition hover:bg-[#eff7ec]"
-                href={todayStatus.primaryHref}
-              >
-                {todayStatus.primaryLabel}
-              </a>
-              <a
-                className="rounded-2xl border border-white/22 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/16"
-                href={todayStatus.secondaryHref}
-              >
-                {todayStatus.secondaryLabel}
-              </a>
+      <section className="rr-mobile-momentum">
+        <WeekStrip days={week} />
+        <p>
+          <strong>{streak} dias seguidos.</strong> La constancia tambien cuenta.
+        </p>
+      </section>
+
+      <div className="rr-today-layout">
+        <section className="rr-today-hero rr-card rr-card--hero">
+          <div className="rr-hero-heading">
+            <ProgressRing progress={state.progress} />
+            <div>
+              <p>{state.eyebrow}</p>
+              <h2>{state.title}</h2>
+              <span>{state.body}</span>
             </div>
           </div>
 
-          <div className="grid gap-3 rounded-[24px] border border-white/12 bg-white/8 p-4 backdrop-blur-sm">
-            <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
-              <p className="text-xs uppercase tracking-[0.16em] text-white/60">
-                Ritual de hoy
-              </p>
-              <p className="mt-2 text-lg font-semibold">{todayStatus.progressLabel}</p>
-              <p className="mt-2 text-sm leading-6 text-white/72">
-                La app premia constancia y observacion, no mas carga ni mas tolerancia al dolor.
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <article className="rounded-2xl border border-white/10 bg-white/10 p-4">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/60">
-                  Dolor reciente
-                </p>
-                <p className="mt-2 text-2xl font-semibold">
-                  {latestSession ? `${latestSession.painAfter}/10` : "--"}
-                </p>
-                <p className="mt-2 text-sm text-white/72">
-                  {latestSession
-                    ? `Ultima sesion: ${formatSessionMoment(latestSession.occurredAt)}`
-                    : "Todavia no hay sesiones registradas."}
-                </p>
-              </article>
-              <article className="rounded-2xl border border-white/10 bg-white/10 p-4">
-                <p className="text-xs uppercase tracking-[0.16em] text-white/60">
-                  Cierre reciente
-                </p>
-                <p className="mt-2 text-2xl font-semibold">
-                  {latestCloseout ? `${latestCloseout.endOfDayPain}/10` : "--"}
-                </p>
-                <p className="mt-2 text-sm text-white/72">
-                  {latestCloseout
-                    ? `Ultimo cierre: ${formatCloseoutDate(latestCloseout.date)}`
-                    : "Todavia no hay cierres guardados."}
-                </p>
-              </article>
-            </div>
+          <div className="rr-ritual-list">
+            <article className={hasSessionToday ? "is-complete" : "is-current"}>
+              <span className="rr-ritual-dot">{hasSessionToday ? "✓" : ""}</span>
+              <div>
+                <strong>Sesion de ejercicios</strong>
+                <small>
+                  {hasSessionToday
+                    ? "Completada hoy"
+                    : "Registra dolor, carga y ejercicios"}
+                </small>
+              </div>
+              <b>{hasSessionToday ? "Hecha" : "Ahora"}</b>
+            </article>
+
+            <article className={hasCloseoutToday ? "is-complete" : "is-pending"}>
+              <span className="rr-ritual-dot">{hasCloseoutToday ? "✓" : ""}</span>
+              <div>
+                <strong>Cierre nocturno</strong>
+                <small>Dolor, energia, sueno y rebote</small>
+              </div>
+              <b>{hasCloseoutToday ? "Hecho" : "Esta noche"}</b>
+            </article>
           </div>
-        </div>
+
+          <div className="rr-hero-actions">
+            <Link className="rr-button rr-button--primary" href={state.primaryHref}>
+              <span>{state.primaryLabel}</span>
+              <span>
+                <small>{state.primaryMeta}</small>
+                <b aria-hidden="true">→</b>
+              </span>
+            </Link>
+            <Link
+              className="rr-button rr-button--secondary"
+              href={state.secondaryHref}
+            >
+              {state.secondaryLabel}
+            </Link>
+          </div>
+        </section>
+
+        <aside className="rr-today-rail">
+          <section className="rr-milestone-card">
+            <div>
+              <strong>Proximo hito: 30 dias de registro</strong>
+              <b>{30 - loggedDays} dias</b>
+            </div>
+            <span><i style={{ width: `${milestoneProgress}%` }} /></span>
+            <p>{loggedDays} de 30 dias recientes con actividad registrada</p>
+          </section>
+
+          <section className="rr-recent-card">
+            <p>Lo mas reciente</p>
+            <article>
+              <small>Ultima sesion</small>
+              <strong>
+                {latestSession
+                  ? shortDateFormatter.format(new Date(latestSession.occurredAt))
+                  : "Sin sesiones"}
+              </strong>
+              <span>
+                {latestSession
+                  ? `${latestSession.exercises.length} ejercicios · dolor ${latestSession.painAfter}/10`
+                  : "Tu primera sesion aparecera aqui."}
+              </span>
+            </article>
+            <article>
+              <small>Ultimo cierre</small>
+              <strong>
+                {latestCloseout
+                  ? shortDateFormatter.format(new Date(`${latestCloseout.date}T00:00:00`))
+                  : "Sin cierres"}
+              </strong>
+              <span>
+                {latestCloseout
+                  ? `Dolor ${latestCloseout.endOfDayPain}/10 · ${reboundLabels[latestCloseout.reboundPainLevel]}`
+                  : "Tu primer cierre aparecera aqui."}
+              </span>
+            </article>
+          </section>
+
+          <PreviewLink
+            glyph="IN"
+            href="/insights"
+            subtitle="Revisa dolor, carga, sueno y rebote"
+            title="Insights"
+          />
+          <PreviewLink
+            glyph="RP"
+            href="/reporte"
+            subtitle="Prepara una conversacion con tu especialista"
+            title="Reporte para consulta"
+          />
+        </aside>
       </div>
 
-      <aside
-        className="section-card soft-panel grid gap-4 rounded-[30px] border p-6 sm:p-8"
-        id="recent-status"
-      >
-        <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#53735a]">
-            Estado reciente
-          </p>
-          <h2 className="text-2xl font-semibold tracking-[-0.02em] text-[#162117]">
-            Vista rapida de hoy
-          </h2>
-          <p className="text-sm leading-7 text-[#526154]">
-            Una lectura compacta para saber que ya registraste y como vienen dolor,
-            carga, sueno y rebote.
-          </p>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-          <article className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4">
-            <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-              Ultima sesion
-            </p>
-            {latestSession ? (
-              <div className="mt-3 grid gap-2 text-sm text-[#263b29]">
-                <p className="font-semibold text-[#18201a]">
-                  {formatSessionMoment(latestSession.occurredAt)}
-                </p>
-                <p>Tipo: {sessionTypeLabels[latestSession.sessionType]}</p>
-                <p>Dolor despues: {latestSession.painAfter}/10</p>
-                <p>Carga: {latestSession.perceivedLoad}/5</p>
-              </div>
-            ) : (
-              <p className="mt-3 text-sm leading-7 text-[#5d6b5f]">
-                Aun no hay una sesion para resumir.
-              </p>
-            )}
-          </article>
-
-          <article className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4">
-            <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-              Ultimo cierre
-            </p>
-            {latestCloseout ? (
-              <div className="mt-3 grid gap-2 text-sm text-[#263b29]">
-                <p className="font-semibold text-[#18201a]">
-                  {formatCloseoutDate(latestCloseout.date)}
-                </p>
-                <p>Dolor final: {latestCloseout.endOfDayPain}/10</p>
-                <p>Sueno: {latestCloseout.sleepHours} h</p>
-                <p>Rebote: {reboundLabels[latestCloseout.reboundPainLevel]}</p>
-              </div>
-            ) : (
-              <p className="mt-3 text-sm leading-7 text-[#5d6b5f]">
-                Aun no hay un cierre para resumir.
-              </p>
-            )}
-          </article>
-        </div>
-      </aside>
-    </section>
+      <footer className="rr-today-footer">Un dia a la vez. Vas bien.</footer>
+    </div>
   );
 }

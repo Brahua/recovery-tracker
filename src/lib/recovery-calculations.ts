@@ -1,4 +1,5 @@
 import type { NightlyCloseout, RehabSession, ReboundLevel } from "@/types/recovery";
+import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 
 export type TrendDirection = "UP" | "DOWN" | "STABLE" | "NO_DATA";
 export type SleepPainRelationship =
@@ -61,22 +62,6 @@ export interface ExerciseFrequency {
   count: number;
 }
 
-function toDateKey(date: Date) {
-  return date.toISOString().slice(0, 10);
-}
-
-function parseReferenceDate(referenceDate?: Date | string) {
-  if (referenceDate instanceof Date) {
-    return referenceDate;
-  }
-
-  if (typeof referenceDate === "string") {
-    return new Date(referenceDate);
-  }
-
-  return new Date();
-}
-
 function average(values: number[]) {
   if (values.length === 0) {
     return undefined;
@@ -94,7 +79,7 @@ function roundToOneDecimal(value: number | undefined) {
 }
 
 function getSessionDateKey(session: RehabSession) {
-  return session.occurredAt.slice(0, 10);
+  return getRecoveryDateKey(session.occurredAt);
 }
 
 function inRange(dateKey: string, range: DateRangeWindow) {
@@ -105,14 +90,11 @@ export function getDateRangeForLastDays(
   days: number,
   referenceDate?: Date | string,
 ): DateRangeWindow {
-  const reference = parseReferenceDate(referenceDate);
-  const end = new Date(reference);
-  const start = new Date(reference);
-  start.setUTCDate(start.getUTCDate() - (days - 1));
+  const end = getRecoveryDateKey(referenceDate ?? new Date());
 
   return {
-    from: toDateKey(start),
-    to: toDateKey(end),
+    from: addRecoveryDays(end, -(days - 1)),
+    to: end,
   };
 }
 

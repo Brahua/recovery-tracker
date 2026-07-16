@@ -1,93 +1,55 @@
-import { existsSync } from "node:fs";
-
 import { expect, test, type Page } from "@playwright/test";
 
-function uniqueLabel(prefix: string) {
-  return `${prefix} ${Date.now()}`;
-}
-
 async function ensureAuthenticated(page: Page) {
-  await page.goto("/");
-
-  if (await page.getByRole("button", { name: "Entrar anonimo para pruebas" }).isVisible()) {
-    await page.getByRole("button", { name: "Entrar anonimo para pruebas" }).click();
-  }
-
-  await expect(
-    page.getByRole("heading", { name: "Registra como respondio la rodilla hoy" }),
-  ).toBeVisible();
+  await page.goto("/registrar?mode=session");
+  await expect(page.getByRole("heading", { name: "Registrar" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sesion" })).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
 }
 
 test.describe("post-therapy check-in", () => {
-  test.skip(
-    !existsSync("playwright/.auth/user.json"),
-    "Missing authenticated Playwright storage state. Run `npm run e2e` once so setup can create it.",
-  );
-
-  test("saves a session with shortcuts and keeps it visible after reload", async ({
-    page,
-  }) => {
+  test("saves a session and keeps its summary visible after reload", async ({ page }) => {
     await ensureAuthenticated(page);
 
-    const customName = uniqueLabel("Prensa");
-
-    await page.getByLabel("Dolor antes").selectOption("4");
-    await page.getByLabel("Dolor durante").selectOption("5");
-    await page.getByLabel("Dolor despues").selectOption("3");
-    await page.getByLabel("Carga percibida").selectOption("3");
-    await page.getByLabel("Bicicleta 5-10 min").check();
-    await page.getByLabel("Step-up").check();
-    await page.getByLabel("Como terminaste").selectOption("BETTER");
-    await page.getByLabel("Nota corta opcional").fill("Sesion automatizada con shortcuts.");
-
-    await page.getByRole("button", { name: "Guardar sesion" }).click();
-
-    await expect(page.getByText("Sesion guardada.")).toBeVisible();
-    await expect(page.getByText("Bicicleta 5-10 min, Step-up")).toBeVisible();
-
-    await page.reload();
-
-    await expect(page.getByText("Bicicleta 5-10 min, Step-up")).toBeVisible();
-
-    await page.getByLabel("Dolor antes").selectOption("2");
-    await page.getByLabel("Dolor durante").selectOption("");
-    await page.getByLabel("Dolor despues").selectOption("2");
-    await page.getByLabel("Carga percibida").selectOption("2");
-    await page.getByLabel("Bicicleta 5-10 min").uncheck();
-    await page.getByLabel("Step-up").uncheck();
-    await page.getByLabel("Nombre").fill(customName);
-    await page.getByLabel("Series").fill("3");
-    await page.getByLabel("Reps").fill("12");
-    await page.getByRole("spinbutton", { name: "Peso" }).fill("20");
-    await page.getByLabel("Como terminaste").selectOption("SAME");
-    await page.getByLabel("Nota corta opcional").fill("Sesion automatizada con ejercicio libre.");
+    await page.getByRole("slider", { name: "Antes" }).fill("4");
+    await page.getByRole("slider", { name: "Durante" }).fill("5");
+    await page.getByRole("slider", { name: "Despues" }).fill("3");
+    await page.getByText("Media", { exact: true }).click();
+    await page.getByText("Bicicleta 5-10 min", { exact: true }).click();
+    await page.getByText("Step-up", { exact: true }).click();
+    await page.getByText("Mejor que antes", { exact: true }).click();
+    await page.getByRole("button", { name: "Añadir nota" }).click();
+    await page
+      .getByPlaceholder("Algo que quieras recordar...")
+      .fill("Sesion automatizada con shortcuts.");
 
     await page.getByRole("button", { name: "Guardar sesion" }).click();
 
-    await expect(page.getByText("Sesion guardada.")).toBeVisible();
-    await expect(page.getByText(customName)).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sesion hecha." })).toBeVisible();
+    const summary = page.getByLabel("Resumen de la sesion");
+    await expect(summary.getByText("Fisio guiada")).toBeVisible();
+    await expect(summary.getByText("4", { exact: true })).toBeVisible();
+    await expect(summary.getByText("4 → 3")).toBeVisible();
 
     await page.reload();
 
-    await expect(page.getByText(customName)).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sesion hecha." })).toBeVisible();
+    await expect(page.getByLabel("Resumen de la sesion").getByText("4 → 3")).toBeVisible();
   });
 
-  test("shows a validation error when no exercise is selected", async ({ page }) => {
+  test("keeps save disabled until every required session step is complete", async ({ page }) => {
     await ensureAuthenticated(page);
 
-    await page.getByLabel("Dolor antes").selectOption("3");
-    await page.getByLabel("Dolor durante").selectOption("");
-    await page.getByLabel("Dolor despues").selectOption("3");
-    await page.getByLabel("Carga percibida").selectOption("2");
-    await page.getByLabel("Como terminaste").selectOption("SAME");
-    await page.getByLabel("Nota corta opcional").fill("Debe fallar sin ejercicios.");
-    await page.getByLabel("Nombre").fill("");
-    await page.getByLabel("Series").fill("");
-    await page.getByLabel("Reps").fill("");
-    await page.getByRole("spinbutton", { name: "Peso" }).fill("");
-
-    await page.getByRole("button", { name: "Guardar sesion" }).click();
-
-    await expect(page.getByText("No se guardo la sesion.")).toBeVisible();
+    const saveButton = page.getByRole("button", { name: "Guardar sesion" });
+    await expect(saveButton).toBeDisabled();
+    await page.getByRole("slider", { name: "Durante" }).fill("3");
+    await page.getByRole("slider", { name: "Despues" }).fill("3");
+    await page.getByText("Igual", { exact: true }).click();
+    await page.getByText("Sentadilla espanola", { exact: true }).click();
+    await page.getByText("TKE", { exact: true }).click();
+    await expect(saveButton).toBeDisabled();
+    await expect(saveButton).toContainText("faltan 1");
   });
 });

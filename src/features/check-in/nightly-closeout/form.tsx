@@ -1,256 +1,325 @@
-import { createNightlyCloseoutAction } from "@/features/check-in/nightly-closeout/actions";
-import type { NightlyCloseout } from "@/types/recovery";
+"use client";
 
-const painScale = Array.from({ length: 11 }, (_, value) => value);
-const ratingScale = [1, 2, 3, 4, 5] as const;
-const reboundOptions = [
+import Link from "next/link";
+import { useState, type CSSProperties } from "react";
+import { useFormStatus } from "react-dom";
+
+import { RitualPainSlider } from "@/components/ritual-pain-slider";
+import { createNightlyCloseoutAction } from "@/features/check-in/nightly-closeout/actions";
+import { getCloseoutFormProgress } from "@/lib/closeout-form-state";
+import type {
+  NightlyCloseout,
+  PainScore,
+  Rating1To5,
+  RehabSession,
+  ReboundLevel,
+} from "@/types/recovery";
+
+const energyOptions: Array<{ value: Rating1To5; label: string }> = [
+  { value: 1, label: "Muy baja" },
+  { value: 2, label: "Baja" },
+  { value: 3, label: "Media" },
+  { value: 4, label: "Alta" },
+  { value: 5, label: "Muy alta" },
+];
+
+const sleepQualityOptions: Array<{ value: Rating1To5; label: string }> = [
+  { value: 1, label: "Muy mala" },
+  { value: 2, label: "Mala" },
+  { value: 3, label: "Regular" },
+  { value: 4, label: "Buena" },
+  { value: 5, label: "Muy buena" },
+];
+
+const reboundOptions: Array<{ value: ReboundLevel; label: string }> = [
   { value: "NONE", label: "Nada" },
   { value: "MILD", label: "Leve" },
   { value: "MODERATE", label: "Moderado" },
   { value: "STRONG", label: "Fuerte" },
-] as const;
+];
 
-function toDateValue(date: Date) {
+function toDateValue(value: string) {
+  const date = new Date(value);
   const year = date.getFullYear();
   const month = `${date.getMonth() + 1}`.padStart(2, "0");
   const day = `${date.getDate()}`.padStart(2, "0");
-
   return `${year}-${month}-${day}`;
 }
 
-function formatDate(value: string) {
-  const date = new Date(`${value}T00:00:00`);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return new Intl.DateTimeFormat("es-PE", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
+function formatHeaderContext(value: string) {
+  const date = new Date(value);
+  const day = new Intl.DateTimeFormat("es-PE", {
+    day: "numeric",
+    month: "long",
+    weekday: "long",
   }).format(date);
+  const time = new Intl.DateTimeFormat("es-PE", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+  return `${day} · ${time}`;
 }
 
-function reboundLabel(value: NightlyCloseout["reboundPainLevel"]) {
-  return reboundOptions.find((option) => option.value === value)?.label ?? value;
+function formatRecentDay(value: string) {
+  const date = new Date(`${value}T00:00:00`);
+  if (Number.isNaN(date.getTime())) return value;
+
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const key = date.toDateString();
+
+  if (key === today.toDateString()) return "Hoy";
+  if (key === yesterday.toDateString()) return "Anoche";
+  return new Intl.DateTimeFormat("es-PE", { weekday: "long" }).format(date);
+}
+
+function ratingLabel(
+  value: Rating1To5,
+  options: Array<{ value: Rating1To5; label: string }>,
+) {
+  return options.find((option) => option.value === value)?.label ?? `${value}/5`;
+}
+
+function formatSleepHours(value: number) {
+  return Number.isInteger(value) ? `${value}` : value.toFixed(1).replace(".", ",");
+}
+
+function CloseoutSectionHeader({
+  complete,
+  desktopTitle,
+  hint,
+  title,
+}: {
+  complete: boolean;
+  desktopTitle: string;
+  hint?: string;
+  title: string;
+}) {
+  return (
+    <div className="rr-closeout-section-heading">
+      <span aria-hidden="true" className={`rr-step-badge ${complete ? "is-complete" : ""}`}>
+        {complete ? "✓" : ""}
+      </span>
+      <h2><span>{title}</span><span>{desktopTitle}</span></h2>
+      {hint ? <small>{hint}</small> : null}
+    </div>
+  );
+}
+
+function CloseoutSaveButton({
+  isComplete,
+  missingSteps,
+}: {
+  isComplete: boolean;
+  missingSteps: number;
+}) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      className={`rr-closeout-save ${isComplete ? "is-ready" : ""}`}
+      disabled={!isComplete || pending}
+      type="submit"
+    >
+      <span>{pending ? "Guardando..." : "Cerrar el dia"}</span>
+      <span>
+        <small>{isComplete ? "1 min" : `faltan ${missingSteps}`}</small>
+        <b aria-hidden="true">☾</b>
+      </span>
+    </button>
+  );
 }
 
 interface NightlyCloseoutFormProps {
+  defaultOccurredAt: string;
   errorMessage?: string;
-  successMessage?: string;
+  latestSession?: RehabSession;
   recentCloseouts: NightlyCloseout[];
 }
 
 export function NightlyCloseoutForm({
+  defaultOccurredAt,
   errorMessage,
-  successMessage,
+  latestSession,
   recentCloseouts,
 }: NightlyCloseoutFormProps) {
+  const [endOfDayPain, setEndOfDayPain] = useState<PainScore | null>(null);
+  const [energy, setEnergy] = useState<Rating1To5 | null>(null);
+  const [reboundPainLevel, setReboundPainLevel] = useState<ReboundLevel | null>(null);
+  const [sleepHours, setSleepHours] = useState(7.5);
+  const [sleepQuality, setSleepQuality] = useState<Rating1To5 | null>(null);
+  const [showNote, setShowNote] = useState(false);
+  const progress = getCloseoutFormProgress({
+    endOfDayPain,
+    energy,
+    reboundPainLevel,
+    sleepQuality,
+  });
+  const stateComplete = energy !== null && reboundPainLevel !== null;
+  const progressStyle = {
+    "--rr-closeout-progress": `${(progress.completedSteps / progress.totalSteps) * 100}%`,
+  } as CSSProperties;
+
+  function changeSleepHours(delta: number) {
+    setSleepHours((current) => Math.min(24, Math.max(0, current + delta)));
+  }
+
   return (
-    <section className="grid gap-6 lg:grid-cols-[1fr_0.85fr]">
-      <div className="section-card soft-panel rounded-[28px] border border-[#dfe5d8] p-6 sm:p-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#53735a]">
-              Cierre nocturno
-            </p>
-            <h2 className="text-2xl font-semibold tracking-[-0.02em] text-[#162117] sm:text-3xl">
-              Registra como termino el dia
-            </h2>
-            <p className="max-w-2xl text-sm leading-7 text-[#526154] sm:text-base">
-              Este cierre captura dolor final, energia, sueno y rebote tardio
-              sin convertir el ritual en un formulario largo.
-            </p>
+    <form action={createNightlyCloseoutAction} className="rr-closeout-form">
+      <div aria-hidden="true" className="rr-closeout-glow" />
+      <header className="rr-registrar-header rr-closeout-header">
+        <div className="rr-registrar-title">
+          <Link aria-label="Volver a Hoy" href="/"><span aria-hidden="true">‹</span></Link>
+          <div>
+            <p>{formatHeaderContext(defaultOccurredAt)}</p>
+            <h1>Registrar</h1>
           </div>
-          <div className="rounded-full border border-[#dfe5d8] bg-[#f7f8f3] px-3 py-1 text-sm text-[#5d6b5f]">
-            Menos de 1 minuto
-          </div>
+          <span>☾ Hoy · {formatHeaderContext(defaultOccurredAt).split(" · ")[1]}</span>
         </div>
 
-        {successMessage ? (
-          <div className="success-banner mt-6 rounded-2xl border p-4 text-sm leading-7 text-[#29412d]">
-            <strong>Cierre guardado.</strong> {successMessage}
+        <div className="rr-registrar-controls">
+          <nav aria-label="Tipo de registro" className="rr-mode-switch">
+            <Link href="/registrar?mode=session">Sesion</Link>
+            <Link aria-current="page" className="is-active" href="/registrar?mode=closeout">Cierre</Link>
+          </nav>
+          <div className="rr-closeout-progress" aria-live="polite" style={progressStyle}>
+            <span><i /><em aria-hidden="true">☾</em></span>
+            <b className={progress.isComplete ? "is-complete" : ""}>
+              {progress.isComplete ? "Listo para cerrar" : `${progress.completedSteps} de ${progress.totalSteps}`}
+            </b>
           </div>
-        ) : null}
+        </div>
+      </header>
 
-        {errorMessage ? (
-          <div className="error-banner mt-6 rounded-2xl border p-4 text-sm leading-7 text-[#6b3024]">
-            <strong>No se guardo el cierre.</strong> {errorMessage}
-          </div>
-        ) : null}
+      {errorMessage ? (
+        <div className="rr-session-error" role="alert">
+          <strong>No se guardo el cierre.</strong> {errorMessage}
+        </div>
+      ) : null}
 
-        <form
-          action={createNightlyCloseoutAction}
-          className="ritual-form mt-8 grid gap-8"
-          noValidate
-        >
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Fecha
-              <input
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue={toDateValue(new Date())}
-                name="date"
-                required
-                type="date"
-              />
-            </label>
+      <p className="rr-closeout-intro">Un minuto antes de dormir. ¿Como queda la rodilla hoy?</p>
 
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Rebote desde la ultima sesion
-              <select
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue="NONE"
-                name="reboundPainLevel"
-                required
-              >
-                {reboundOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
+      <section className="rr-closeout-recap">
+        <span aria-hidden="true">☾</span>
+        <div>
+          <strong>El dia ya esta hecho.</strong>
+          <p>
+            {latestSession
+              ? `Sesion completada · ${latestSession.exercises.length} ejercicios · dolor ${latestSession.painBefore}→${latestSession.painAfter}. Solo queda cerrarlo.`
+              : "Puedes cerrar el dia aunque hoy no hayas registrado una sesion."}
+          </p>
+        </div>
+      </section>
 
-          <div className="grid gap-5 md:grid-cols-4">
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Dolor final del dia
-              <select
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue="3"
-                name="endOfDayPain"
-                required
-              >
-                {painScale.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Energia
-              <select
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue="3"
-                name="energy"
-                required
-              >
-                {ratingScale.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Horas de sueno
-              <input
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue="7.5"
-                max="24"
-                min="0"
-                name="sleepHours"
-                required
-                step="0.5"
-                type="number"
-              />
-            </label>
-
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Calidad de sueno
-              <select
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue="3"
-                name="sleepQuality"
-                required
-              >
-                {ratingScale.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-            Nota opcional
-            <textarea
-              className="min-h-[112px] rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-              name="notes"
-              placeholder="Ej. el dolor subio al caminar en la noche, energia mejor que ayer, sin rigidez extra."
+      <div className="rr-closeout-grid">
+        <div className="rr-closeout-questions">
+          <section className="rr-closeout-question rr-closeout-pain-question">
+            <CloseoutSectionHeader
+              complete={endOfDayPain !== null}
+              desktopTitle="¿Como queda la rodilla?"
+              hint="dolor · 0 a 10"
+              title="Dolor al final del dia"
             />
-          </label>
+            <RitualPainSlider
+              label="Dolor"
+              name="endOfDayPain"
+              onChange={setEndOfDayPain}
+              value={endOfDayPain}
+            />
+          </section>
 
-          <div className="flex flex-col gap-3 border-t border-[#e4eadf] pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="max-w-xl text-sm leading-6 text-[#5d6b5f]">
-              El rebote solo se registra como dolor tardio; no estamos mezclando
-              rigidez o inflamacion en este cierre.
-            </p>
-            <button
-              className="primary-button rounded-2xl bg-[#18201a] px-5 py-3 text-sm font-semibold text-white hover:bg-[#243026]"
-              type="submit"
-            >
-              Guardar cierre
-            </button>
-          </div>
-        </form>
+          <section className="rr-closeout-question rr-closeout-state-question">
+            <CloseoutSectionHeader
+              complete={stateComplete}
+              desktopTitle="¿Con cuanta energia terminas?"
+              title="Como estas"
+            />
+            <div className="rr-closeout-field-group">
+              <h3>Energia hoy</h3>
+              <div className="rr-closeout-choice-row rr-five-choice-row" role="group" aria-label="Energia al final del dia">
+                {energyOptions.map((option) => (
+                  <label className={energy === option.value ? "is-selected" : ""} key={option.value}>
+                    <input checked={energy === option.value} name="energy" onChange={() => setEnergy(option.value)} type="radio" value={option.value} />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+            <div className="rr-closeout-field-group rr-rebound-field">
+              <h3>¿Se resintio la rodilla despues de la sesion?</h3>
+              <div className="rr-closeout-choice-row rr-rebound-choice-row" role="group" aria-label="Nivel de rebote">
+                {reboundOptions.map((option) => (
+                  <label className={reboundPainLevel === option.value ? "is-selected" : ""} key={option.value}>
+                    <input checked={reboundPainLevel === option.value} name="reboundPainLevel" onChange={() => setReboundPainLevel(option.value)} type="radio" value={option.value} />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          <section className="rr-closeout-question rr-closeout-sleep-question">
+            <CloseoutSectionHeader
+              complete={sleepQuality !== null}
+              desktopTitle="Sueno de anoche"
+              title="Sueno de anoche"
+            />
+            <div className="rr-sleep-hours">
+              <h3>Horas</h3>
+              <div>
+                <button aria-label="Restar media hora" onClick={() => changeSleepHours(-0.5)} type="button">−</button>
+                <output>{formatSleepHours(sleepHours)} h</output>
+                <button aria-label="Sumar media hora" onClick={() => changeSleepHours(0.5)} type="button">+</button>
+              </div>
+              <input name="sleepHours" type="hidden" value={sleepHours} />
+            </div>
+            <div className="rr-closeout-field-group">
+              <h3>Calidad</h3>
+              <div className="rr-closeout-choice-row rr-five-choice-row" role="group" aria-label="Calidad del sueno">
+                {sleepQualityOptions.map((option) => (
+                  <label className={sleepQuality === option.value ? "is-selected" : ""} key={option.value}>
+                    <input checked={sleepQuality === option.value} name="sleepQuality" onChange={() => setSleepQuality(option.value)} type="radio" value={option.value} />
+                    <span>{option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside className="rr-closeout-side">
+          {!showNote ? (
+            <button className="rr-closeout-note-toggle" onClick={() => setShowNote(true)} type="button">+ Añadir nota (opcional)</button>
+          ) : null}
+          <section className={`rr-closeout-note ${showNote ? "is-open" : ""}`}>
+            <div><h2>Una linea sobre hoy</h2><span>opcional</span></div>
+            <textarea name="notes" placeholder="Lo que quieras dejar escrito antes de dormir..." />
+          </section>
+
+          <section className="rr-closeout-recent">
+            <h2>Cierres recientes</h2>
+            {recentCloseouts.length === 0 ? (
+              <p>Tu primer cierre aparecera aqui despues de guardarlo.</p>
+            ) : (
+              recentCloseouts.slice(0, 2).map((closeout) => (
+                <article key={closeout.id}>
+                  <strong>{formatRecentDay(closeout.date)}</strong>
+                  <span>
+                    Dolor {closeout.endOfDayPain} · energia {ratingLabel(closeout.energy, energyOptions).toLowerCase()} · {formatSleepHours(closeout.sleepHours)} h {ratingLabel(closeout.sleepQuality, sleepQualityOptions).toLowerCase()}
+                  </span>
+                  <b aria-hidden="true">✓</b>
+                </article>
+              ))
+            )}
+          </section>
+        </aside>
       </div>
 
-      <aside className="section-card metric-panel grid gap-4 rounded-[28px] border border-[#dfe5d8] p-6 sm:p-8">
-        <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#53735a]">
-            Ultimos cierres
-          </p>
-          <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#162117]">
-            Estabilidad del dia
-          </h3>
-          <p className="text-sm leading-7 text-[#526154]">
-            Sirve para ver rapido como termino cada dia y si aparecio dolor
-            tardio despues de una sesion.
-          </p>
-        </div>
-
-        {recentCloseouts.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-[#cdd8c8] bg-white/70 p-5 text-sm leading-7 text-[#5d6b5f]">
-            Todavia no hay cierres nocturnos registrados en este entorno.
-          </div>
-        ) : (
-          <div className="grid gap-3">
-            {recentCloseouts.map((closeout) => (
-              <article
-                className="rounded-2xl border border-[#d8e1d3] bg-white p-4"
-                key={closeout.id}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-[#1d2d20]">
-                      {formatDate(closeout.date)}
-                    </p>
-                    <p className="text-xs text-[#5d6b5f]">
-                      Rebote: {reboundLabel(closeout.reboundPainLevel)}
-                    </p>
-                  </div>
-                  <span className="rounded-full border border-[#dbe4d5] px-3 py-1 text-xs text-[#48624d]">
-                    Dolor {closeout.endOfDayPain}/10
-                  </span>
-                </div>
-                <div className="mt-3 grid gap-2 text-sm text-[#445546]">
-                  <p>Energia: {closeout.energy}/5</p>
-                  <p>Sueno: {closeout.sleepHours} h</p>
-                  <p>Calidad de sueno: {closeout.sleepQuality}/5</p>
-                  {closeout.notes ? <p>Nota: {closeout.notes}</p> : null}
-                </div>
-              </article>
-            ))}
-          </div>
-        )}
-      </aside>
-    </section>
+      <input name="date" type="hidden" value={toDateValue(defaultOccurredAt)} />
+      <footer className="rr-closeout-save-bar">
+        <CloseoutSaveButton isComplete={progress.isComplete} missingSteps={progress.missingSteps} />
+      </footer>
+    </form>
   );
 }

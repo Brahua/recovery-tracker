@@ -6,6 +6,7 @@ import { getRequestOrigin } from "@/lib/supabase/urls";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
+  const providerError = searchParams.get("error");
   let next = searchParams.get("next") ?? "/";
 
   if (!next.startsWith("/")) {
@@ -19,7 +20,32 @@ export async function GET(request: Request) {
     if (!error) {
       return NextResponse.redirect(`${await getRequestOrigin()}${next}`);
     }
+
+    console.error(
+      `Supabase OAuth code exchange failed: ${JSON.stringify({
+        code: error.code,
+        message: error.message,
+        status: error.status,
+      })}`,
+    );
+
+    return NextResponse.redirect(
+      `${await getRequestOrigin()}/auth/auth-code-error?reason=exchange_failed`,
+    );
   }
 
-  return NextResponse.redirect(`${await getRequestOrigin()}/auth/auth-code-error`);
+  if (providerError) {
+    console.error(
+      `OAuth provider rejected the request: ${JSON.stringify({
+        error: providerError,
+        errorCode: searchParams.get("error_code"),
+        errorDescription: searchParams.get("error_description"),
+      })}`,
+    );
+  }
+
+  const reason = providerError ? "provider_rejected" : "missing_code";
+  return NextResponse.redirect(
+    `${await getRequestOrigin()}/auth/auth-code-error?reason=${reason}`,
+  );
 }

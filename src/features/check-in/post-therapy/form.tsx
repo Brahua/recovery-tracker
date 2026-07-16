@@ -1,26 +1,49 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { useFormStatus } from "react-dom";
+
+import { RitualPainSlider } from "@/components/ritual-pain-slider";
 import { createPostTherapySessionAction } from "@/features/check-in/post-therapy/actions";
 import { exerciseShortcuts } from "@/lib/constants/exercises";
-import type { RehabSession } from "@/types/recovery";
+import { getSessionFormProgress } from "@/lib/session-form-state";
+import type {
+  ExerciseShortcutId,
+  FinalState,
+  PainScore,
+  Rating1To5,
+  RehabSession,
+  SessionType,
+} from "@/types/recovery";
 
-const sessionTypeOptions = [
-  { value: "PHYSIOTHERAPY", label: "Fisioterapia" },
-  { value: "HOME", label: "Casa" },
+const sessionTypeOptions: Array<{ value: SessionType; label: string }> = [
+  { value: "PHYSIOTHERAPY", label: "Fisio guiada" },
+  { value: "HOME", label: "En casa" },
+  { value: "GYM", label: "Gimnasio" },
   { value: "HYDROTHERAPY", label: "Hidroterapia" },
-  { value: "GYM", label: "Gym" },
   { value: "WALK", label: "Caminata" },
   { value: "OTHER", label: "Otro" },
-] as const;
+];
 
-const finalStateOptions = [
-  { value: "BETTER", label: "Mejor" },
+const loadOptions: Array<{ value: Rating1To5; label: string }> = [
+  { value: 1, label: "Muy suave" },
+  { value: 2, label: "Suave" },
+  { value: 3, label: "Media" },
+  { value: 4, label: "Alta" },
+  { value: 5, label: "Muy alta" },
+];
+
+const finalStateOptions: Array<{ value: FinalState; label: string }> = [
+  { value: "BETTER", label: "Mejor que antes" },
   { value: "SAME", label: "Igual" },
-  { value: "WORSE", label: "Peor" },
-] as const;
+  { value: "WORSE", label: "Molesta" },
+];
 
-const painScale = Array.from({ length: 11 }, (_, value) => value);
-const loadScale = [1, 2, 3, 4, 5] as const;
+const initialExercises = new Set<ExerciseShortcutId>(["SENTADILLA_ESPANOLA", "TKE"]);
 
-function toDateTimeLocalValue(date: Date) {
+function toDateTimeLocalValue(value: string) {
+  const date = new Date(value);
   const year = date.getFullYear();
   const month = `${date.getMonth() + 1}`.padStart(2, "0");
   const day = `${date.getDate()}`.padStart(2, "0");
@@ -30,343 +53,366 @@ function toDateTimeLocalValue(date: Date) {
   return `${year}-${month}-${day}T${hours}:${minutes}`;
 }
 
-function formatSessionDate(value: string) {
+function formatContextDate(value: string) {
+  const time = value.slice(11, 16);
+  return `Hoy · ${time || "--:--"}`;
+}
+
+function formatSessionDay(value: string) {
   const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Reciente";
 
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const key = date.toDateString();
 
-  return new Intl.DateTimeFormat("es-PE", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+  if (key === today.toDateString()) return "Hoy";
+  if (key === yesterday.toDateString()) return "Ayer";
+
+  return new Intl.DateTimeFormat("es-PE", { weekday: "long" }).format(date);
 }
 
-function finalStateLabel(value: RehabSession["finalState"]) {
-  return finalStateOptions.find((option) => option.value === value)?.label ?? value;
-}
-
-function sessionTypeLabel(value: RehabSession["sessionType"]) {
+function sessionTypeLabel(value: SessionType) {
   return sessionTypeOptions.find((option) => option.value === value)?.label ?? value;
 }
 
+function SectionHeader({
+  complete,
+  title,
+  trailing,
+}: {
+  complete: boolean;
+  title: string;
+  trailing?: React.ReactNode;
+}) {
+  return (
+    <div className="rr-form-section-heading">
+      <span aria-hidden="true" className={`rr-step-badge ${complete ? "is-complete" : ""}`}>
+        {complete ? "✓" : ""}
+      </span>
+      <h2>{title}</h2>
+      {trailing ? <div>{trailing}</div> : null}
+    </div>
+  );
+}
+
+function SaveButton({
+  exerciseCount,
+  isComplete,
+  missingSteps,
+}: {
+  exerciseCount: number;
+  isComplete: boolean;
+  missingSteps: number;
+}) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      className={`rr-session-save ${isComplete ? "is-ready" : ""}`}
+      disabled={!isComplete || pending}
+      type="submit"
+    >
+      <span>{pending ? "Guardando..." : "Guardar sesion"}</span>
+      <span>
+        <small>{isComplete ? `18 min · ${exerciseCount}/${exerciseShortcuts.length}` : `faltan ${missingSteps}`}</small>
+        <b aria-hidden="true">→</b>
+      </span>
+    </button>
+  );
+}
+
 interface PostTherapyFormProps {
+  defaultOccurredAt: string;
   errorMessage?: string;
-  successMessage?: string;
   recentSessions: RehabSession[];
 }
 
 export function PostTherapyForm({
+  defaultOccurredAt,
   errorMessage,
-  successMessage,
   recentSessions,
 }: PostTherapyFormProps) {
+  const [occurredAt, setOccurredAt] = useState(() =>
+    toDateTimeLocalValue(defaultOccurredAt),
+  );
+  const [showDateTime, setShowDateTime] = useState(false);
+  const [sessionType, setSessionType] = useState<SessionType>("PHYSIOTHERAPY");
+  const [painBefore, setPainBefore] = useState<PainScore | null>(3);
+  const [painDuring, setPainDuring] = useState<PainScore | null>(null);
+  const [painAfter, setPainAfter] = useState<PainScore | null>(null);
+  const [perceivedLoad, setPerceivedLoad] = useState<Rating1To5>(3);
+  const [finalState, setFinalState] = useState<FinalState | null>(null);
+  const [selectedExercises, setSelectedExercises] = useState(initialExercises);
+  const [showNote, setShowNote] = useState(false);
+  const [showCustomExercise, setShowCustomExercise] = useState(false);
+  const [customExerciseName, setCustomExerciseName] = useState("");
+
+  const exerciseCount =
+    selectedExercises.size + (customExerciseName.trim().length > 0 ? 1 : 0);
+  const progress = getSessionFormProgress({
+    painBefore,
+    painDuring,
+    painAfter,
+    finalState,
+    exerciseCount,
+  });
+  const painComplete =
+    painBefore !== null && painDuring !== null && painAfter !== null;
+  const allExercisesSelected = selectedExercises.size === exerciseShortcuts.length;
+
+  function toggleExercise(id: ExerciseShortcutId) {
+    setSelectedExercises((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAllExercises() {
+    setSelectedExercises(
+      allExercisesSelected
+        ? new Set<ExerciseShortcutId>()
+        : new Set(exerciseShortcuts.map((exercise) => exercise.id)),
+    );
+  }
+
   return (
-    <section className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-      <div className="section-card soft-panel rounded-[28px] border border-[#dfe5d8] p-6 sm:p-8">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="space-y-2">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#53735a]">
-              Check-in post-terapia
-            </p>
-            <h2 className="text-2xl font-semibold tracking-[-0.02em] text-[#162117] sm:text-3xl">
-              Registra como respondio la rodilla hoy
-            </h2>
-            <p className="max-w-2xl text-sm leading-7 text-[#526154] sm:text-base">
-              El objetivo es dejar una sesion clara en menos de dos minutos:
-              fecha, dolor, carga percibida, ejercicios principales y sensacion
-              final.
-            </p>
+    <form action={createPostTherapySessionAction} className="rr-session-form">
+      <header className="rr-registrar-header">
+        <div className="rr-registrar-title">
+          <Link aria-label="Volver a Hoy" href="/">
+            <span aria-hidden="true">‹</span>
+          </Link>
+          <div>
+            <p>{formatContextDate(occurredAt)}</p>
+            <h1>Registrar</h1>
           </div>
-          <div className="rounded-full border border-[#dfe5d8] bg-[#f7f8f3] px-3 py-1 text-sm text-[#5d6b5f]">
-            Persistencia real
-          </div>
+          <span>{formatContextDate(occurredAt)}</span>
         </div>
 
-        {successMessage ? (
-          <div className="success-banner mt-6 rounded-2xl border p-4 text-sm leading-7 text-[#29412d]">
-            <strong>Sesion guardada.</strong> {successMessage}
+        <div className="rr-registrar-controls">
+          <nav aria-label="Tipo de registro" className="rr-mode-switch">
+            <Link aria-current="page" className="is-active" href="/registrar?mode=session">
+              Sesion
+            </Link>
+            <Link href="/registrar?mode=closeout">Cierre</Link>
+          </nav>
+          <div className="rr-form-progress" aria-live="polite">
+            <span>
+              <i style={{ width: `${(progress.completedSteps / progress.totalSteps) * 100}%` }} />
+            </span>
+            <b className={progress.isComplete ? "is-complete" : ""}>
+              {progress.isComplete
+                ? "Listo para guardar"
+                : `${progress.completedSteps} de ${progress.totalSteps}`}
+            </b>
           </div>
-        ) : null}
+        </div>
+      </header>
 
-        {errorMessage ? (
-          <div className="error-banner mt-6 rounded-2xl border p-4 text-sm leading-7 text-[#6b3024]">
-            <strong>No se guardo la sesion.</strong> {errorMessage}
-          </div>
-        ) : null}
+      {errorMessage ? (
+        <div className="rr-session-error" role="alert">
+          <strong>No se guardo la sesion.</strong> {errorMessage}
+        </div>
+      ) : null}
 
-        <form action={createPostTherapySessionAction} className="ritual-form mt-8 grid gap-8">
-          <div className="grid gap-5 sm:grid-cols-2">
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Fecha y hora
+      <div className="rr-session-grid">
+        <section className="rr-form-card rr-context-card">
+          <SectionHeader complete title="Contexto" />
+          <button
+            className="rr-context-time"
+            onClick={() => setShowDateTime((visible) => !visible)}
+            type="button"
+          >
+            <span>{formatContextDate(occurredAt)}</span>
+            <small>{showDateTime ? "cerrar" : "cambiar"}</small>
+          </button>
+          {showDateTime ? (
+            <label className="rr-date-control">
+              <span>Fecha y hora</span>
               <input
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none ring-0 transition focus:border-[#7da482]"
-                defaultValue={toDateTimeLocalValue(new Date())}
                 name="occurredAt"
+                onChange={(event) => setOccurredAt(event.target.value)}
                 required
                 type="datetime-local"
+                value={occurredAt}
               />
             </label>
-
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Tipo de sesion
-              <select
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue="PHYSIOTHERAPY"
-                name="sessionType"
-                required
-              >
-                {sessionTypeOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-4">
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Dolor antes
-              <select
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue="3"
-                name="painBefore"
-                required
-              >
-                {painScale.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Dolor durante
-              <select
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue=""
-                name="painDuring"
-              >
-                <option value="">Sin registrar</option>
-                {painScale.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Dolor despues
-              <select
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue="3"
-                name="painAfter"
-                required
-              >
-                {painScale.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Carga percibida
-              <select
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue="3"
-                name="perceivedLoad"
-                required
-              >
-                {loadScale.map((value) => (
-                  <option key={value} value={value}>
-                    {value}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div className="grid gap-4">
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-[#263b29]">
-                Ejercicios principales
-              </p>
-              <p className="text-sm leading-6 text-[#5d6b5f]">
-                Marca los shortcuts usados hoy. Puedes agregar un ejercicio libre
-                abajo si hiciste algo fuera de esta lista.
-              </p>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {exerciseShortcuts.map((shortcut) => (
-                <label
-                  className="flex cursor-pointer items-center gap-3 rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] px-4 py-3 text-sm text-[#263b29]"
-                  key={shortcut.id}
-                >
-                  <input
-                    className="h-4 w-4 rounded border-[#c5d2bf] text-[#2b5a35]"
-                    name="exerciseShortcuts"
-                    type="checkbox"
-                    value={shortcut.id}
-                  />
-                  <span>{shortcut.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <div className="grid gap-5 rounded-[24px] border border-[#dfe5d8] bg-[#fbfcf7] p-5">
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-[#263b29]">
-                Ejercicio libre opcional
-              </p>
-              <p className="text-sm leading-6 text-[#5d6b5f]">
-                Solo llena esto si quieres registrar un ejercicio adicional.
-              </p>
-            </div>
-            <div className="grid gap-5 md:grid-cols-[1.2fr_0.4fr_0.4fr_0.4fr]">
-              <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-                Nombre
+          ) : (
+            <input name="occurredAt" type="hidden" value={occurredAt} />
+          )}
+          <div className="rr-session-type-grid">
+            {sessionTypeOptions.map((option) => (
+              <label className={sessionType === option.value ? "is-selected" : ""} key={option.value}>
                 <input
-                  className="rounded-2xl border border-[#d6ddd0] bg-white px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                  name="customExerciseName"
-                  placeholder="Ej. prensa, bici estatica, puente"
-                  type="text"
+                  checked={sessionType === option.value}
+                  name="sessionType"
+                  onChange={() => setSessionType(option.value)}
+                  type="radio"
+                  value={option.value}
                 />
+                <span>{option.label}</span>
               </label>
-              <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-                Series
-                <input
-                  className="rounded-2xl border border-[#d6ddd0] bg-white px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                  min="1"
-                  name="customExerciseSets"
-                  type="number"
-                />
-              </label>
-              <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-                Reps
-                <input
-                  className="rounded-2xl border border-[#d6ddd0] bg-white px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                  min="1"
-                  name="customExerciseReps"
-                  type="number"
-                />
-              </label>
-              <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-                Peso
-                <input
-                  className="rounded-2xl border border-[#d6ddd0] bg-white px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                  min="0"
-                  name="customExerciseWeight"
-                  step="0.5"
-                  type="number"
-                />
-              </label>
-            </div>
-          </div>
-
-          <div className="grid gap-5 md:grid-cols-[0.6fr_1fr]">
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Como terminaste
-              <select
-                className="rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                defaultValue="SAME"
-                name="finalState"
-                required
-              >
-                {finalStateOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label className="grid gap-2 text-sm font-medium text-[#263b29]">
-              Nota corta opcional
-              <textarea
-                className="min-h-[112px] rounded-2xl border border-[#d6ddd0] bg-[#fbfcf7] px-4 py-3 text-base text-[#18201a] outline-none transition focus:border-[#7da482]"
-                name="notes"
-                placeholder="Ej. step-down se sintio pesado, buena tolerancia a la bici, sin rebote inmediato."
-              />
-            </label>
-          </div>
-
-          <div className="flex flex-col gap-3 border-t border-[#e4eadf] pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <p className="max-w-xl text-sm leading-6 text-[#5d6b5f]">
-              Al guardar, la sesion queda persistida y reaparece abajo aunque
-              recargues la pagina.
-            </p>
-            <button
-              className="primary-button rounded-2xl bg-[#18201a] px-5 py-3 text-sm font-semibold text-white hover:bg-[#243026]"
-              type="submit"
-            >
-              Guardar sesion
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <aside className="section-card metric-panel grid gap-4 rounded-[28px] border border-[#dfe5d8] p-6 sm:p-8">
-        <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#53735a]">
-            Ultimas sesiones
-          </p>
-          <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#162117]">
-            Persistencia visible
-          </h3>
-          <p className="text-sm leading-7 text-[#526154]">
-            Este bloque sirve como prueba directa de que el registro queda
-            guardado y vuelve a aparecer tras recargar.
-          </p>
-        </div>
-
-        {recentSessions.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-[#cdd8c8] bg-white/70 p-5 text-sm leading-7 text-[#5d6b5f]">
-            Todavia no hay sesiones registradas en este entorno.
-          </div>
-        ) : (
-          <div className="grid gap-3">
-            {recentSessions.map((session) => (
-              <article
-                className="rounded-2xl border border-[#d8e1d3] bg-white p-4"
-                key={session.id}
-              >
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-[#1d2d20]">
-                      {sessionTypeLabel(session.sessionType)}
-                    </p>
-                    <p className="text-xs text-[#5d6b5f]">
-                      {formatSessionDate(session.occurredAt)}
-                    </p>
-                  </div>
-                  <span className="rounded-full border border-[#dbe4d5] px-3 py-1 text-xs text-[#48624d]">
-                    {finalStateLabel(session.finalState)}
-                  </span>
-                </div>
-                <div className="mt-3 grid gap-2 text-sm text-[#445546]">
-                  <p>
-                    Dolor: {session.painBefore} → {session.painAfter}
-                  </p>
-                  <p>Carga percibida: {session.perceivedLoad}/5</p>
-                  <p>
-                    Ejercicios:{" "}
-                    {session.exercises.map((exercise) => exercise.name).join(", ")}
-                  </p>
-                </div>
-              </article>
             ))}
           </div>
-        )}
-      </aside>
-    </section>
+        </section>
+
+        <section className="rr-form-card rr-pain-card">
+          <SectionHeader
+            complete={painComplete}
+            title="Dolor"
+            trailing={<span className="rr-slider-hint"><i className="rr-mobile-only">desliza</i><i className="rr-desktop-only">arrastra</i> · 0 a 10</span>}
+          />
+          <div className="rr-pain-list">
+            <RitualPainSlider label="Antes" name="painBefore" onChange={setPainBefore} value={painBefore} />
+            <RitualPainSlider label="Durante" name="painDuring" onChange={setPainDuring} value={painDuring} />
+            <RitualPainSlider label="Despues" name="painAfter" onChange={setPainAfter} value={painAfter} />
+          </div>
+        </section>
+
+        <section className="rr-form-card rr-load-card">
+          <SectionHeader complete={finalState !== null} title="Carga y cierre" />
+          <div className="rr-choice-row rr-load-choice-row" role="group" aria-label="Carga percibida">
+            {loadOptions.map((option) => (
+              <label className={perceivedLoad === option.value ? "is-selected" : ""} key={option.value}>
+                <input
+                  checked={perceivedLoad === option.value}
+                  name="perceivedLoad"
+                  onChange={() => setPerceivedLoad(option.value)}
+                  type="radio"
+                  value={option.value}
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+          <div className="rr-choice-row rr-final-state-row" role="group" aria-label="Como terminaste">
+            {finalStateOptions.map((option) => (
+              <label className={finalState === option.value ? "is-selected" : ""} key={option.value}>
+                <input
+                  checked={finalState === option.value}
+                  name="finalState"
+                  onChange={() => setFinalState(option.value)}
+                  type="radio"
+                  value={option.value}
+                />
+                <span>{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        <section className="rr-form-card rr-exercises-card">
+          <SectionHeader
+            complete={exerciseCount > 0}
+            title="Ejercicios"
+            trailing={
+              <span className="rr-exercise-actions">
+                <b>{exerciseCount}/{exerciseShortcuts.length}</b>
+                <button onClick={toggleAllExercises} type="button">
+                  {allExercisesSelected ? "Quitar todos" : "Marcar todos"}
+                </button>
+              </span>
+            }
+          />
+          <div className="rr-exercise-list">
+            {exerciseShortcuts.map((exercise) => {
+              const selected = selectedExercises.has(exercise.id);
+              return (
+                <label className={selected ? "is-selected" : ""} key={exercise.id}>
+                  <input
+                    checked={selected}
+                    name="exerciseShortcuts"
+                    onChange={() => toggleExercise(exercise.id)}
+                    type="checkbox"
+                    value={exercise.id}
+                  />
+                  <b aria-hidden="true">{selected ? "✓" : "+"}</b>
+                  <span>{exercise.label}</span>
+                </label>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className={`rr-note-card ${showNote ? "is-open" : ""}`}>
+          {showNote ? (
+            <>
+              <div>
+                <h2>Nota</h2>
+                <button onClick={() => setShowNote(false)} type="button">Quitar</button>
+              </div>
+              <textarea name="notes" placeholder="Algo que quieras recordar..." />
+            </>
+          ) : (
+            <button onClick={() => setShowNote(true)} type="button">+ Añadir nota (opcional)</button>
+          )}
+        </section>
+
+        <section className={`rr-custom-exercise ${showCustomExercise ? "is-open" : ""}`}>
+          {showCustomExercise ? (
+            <>
+              <div>
+                <h2>Otro ejercicio</h2>
+                <button
+                  onClick={() => {
+                    setCustomExerciseName("");
+                    setShowCustomExercise(false);
+                  }}
+                  type="button"
+                >
+                  Quitar
+                </button>
+              </div>
+              <div className="rr-custom-exercise-grid">
+                <label>
+                  <span>Nombre</span>
+                  <input
+                    name="customExerciseName"
+                    onChange={(event) => setCustomExerciseName(event.target.value)}
+                    placeholder="Ej. prensa o bici estatica"
+                    type="text"
+                    value={customExerciseName}
+                  />
+                </label>
+                <label><span>Series</span><input min="1" name="customExerciseSets" type="number" /></label>
+                <label><span>Reps</span><input min="1" name="customExerciseReps" type="number" /></label>
+                <label><span>Peso</span><input min="0" name="customExerciseWeight" step="0.5" type="number" /></label>
+              </div>
+            </>
+          ) : (
+            <button onClick={() => setShowCustomExercise(true)} type="button">+ Añadir otro ejercicio</button>
+          )}
+        </section>
+
+        <section className="rr-recent-sessions">
+          <h2>Recientes</h2>
+          {recentSessions.length === 0 ? (
+            <p>Tu primera sesion aparecera aqui despues de guardarla.</p>
+          ) : (
+            recentSessions.slice(0, 2).map((session) => (
+              <article key={session.id}>
+                <strong>{formatSessionDay(session.occurredAt)}</strong>
+                <span>
+                  {sessionTypeLabel(session.sessionType)} · {session.exercises.length}/{exerciseShortcuts.length} · dolor {session.painBefore}→{session.painAfter}
+                </span>
+                <b aria-hidden="true">✓</b>
+              </article>
+            ))
+          )}
+        </section>
+      </div>
+
+      <footer className="rr-session-save-bar">
+        <SaveButton
+          exerciseCount={exerciseCount}
+          isComplete={progress.isComplete}
+          missingSteps={progress.missingSteps}
+        />
+      </footer>
+    </form>
   );
 }

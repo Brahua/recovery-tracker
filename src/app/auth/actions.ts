@@ -16,11 +16,19 @@ export async function signInWithGoogleAction() {
   });
 
   if (error) {
-    redirect("/auth/auth-code-error");
+    console.error(
+      `Google OAuth initiation failed: ${JSON.stringify({
+        code: error.code,
+        message: error.message,
+        status: error.status,
+      })}`,
+    );
+    redirect("/auth/auth-code-error?reason=initiation_failed");
   }
 
   if (!data.url) {
-    redirect("/auth/auth-code-error");
+    console.error("Google OAuth initiation returned no redirect URL");
+    redirect("/auth/auth-code-error?reason=initiation_failed");
   }
 
   redirect(data.url);

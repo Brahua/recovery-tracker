@@ -136,9 +136,14 @@ export async function createPostTherapySessionAction(formData: FormData) {
         ? error.message
         : "No se pudo guardar la sesion. Revisa los datos e intenta otra vez.";
 
-    redirect(`/?sessionError=${encodeURIComponent(message)}`);
+    redirect(`/registrar?mode=session&sessionError=${encodeURIComponent(message)}`);
   }
 
   revalidatePath("/");
-  redirect(`/?sessionSaved=1&sessionSummary=${encodeURIComponent(summary)}`);
+  revalidatePath("/registrar");
+  revalidatePath("/insights");
+  revalidatePath("/reporte");
+  redirect(
+    `/registrar?mode=session&sessionSaved=1&sessionSummary=${encodeURIComponent(summary)}`,
+  );
 }

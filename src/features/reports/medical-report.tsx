@@ -1,196 +1,181 @@
-import { createMedicalReportSummary } from "@/lib/recovery-insights";
+import Link from "next/link";
+
+import { ReportActions } from "@/components/report-actions";
+import { ReportQuestions } from "@/components/report-questions";
+import { buildPainTrendInsight } from "@/lib/recovery-insights";
+import { createReportViewModel } from "@/lib/report-view-model";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
-const rangeDateFormatter = new Intl.DateTimeFormat("es-PE", {
-  day: "2-digit",
+const shortDateFormatter = new Intl.DateTimeFormat("es-PE", {
+  day: "numeric",
   month: "short",
+  timeZone: "UTC",
 });
 
-function formatDateLabel(value: string) {
-  const date = new Date(`${value}T00:00:00`);
+const longDateFormatter = new Intl.DateTimeFormat("es-PE", {
+  day: "numeric",
+  month: "long",
+  timeZone: "UTC",
+});
 
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-
-  return rangeDateFormatter.format(date);
+function formatDate(value: string, style: "short" | "long" = "short") {
+  const date = new Date(`${value}T00:00:00.000Z`);
+  if (Number.isNaN(date.getTime())) return value;
+  return (style === "long" ? longDateFormatter : shortDateFormatter).format(date);
 }
 
-function ReportWindowCard({
-  windowDays,
-  sessions,
-  closeouts,
+function formatNumber(value?: number) {
+  return typeof value === "number"
+    ? new Intl.NumberFormat("es-PE", { maximumFractionDigits: 1 })
+        .format(value)
+        .replace(".", ",")
+    : "--";
+}
+
+function painPolyline(points: Array<{ pain: number }>) {
+  const width = 520;
+  const height = 100;
+  if (points.length === 0) return "";
+
+  const coordinates = points.map((point, index) => {
+    const x = points.length === 1 ? width : (index / (points.length - 1)) * width;
+    const y = height - Math.min(1, point.pain / 6) * height;
+    return `${x.toFixed(1)},${y.toFixed(1)}`;
+  });
+
+  if (points.length === 1) coordinates.unshift(`0,${coordinates[0]!.split(",")[1]}`);
+  return coordinates.join(" ");
+}
+
+function ReportCard({
+  children,
+  number,
+  title,
 }: {
-  windowDays: number;
-  sessions: RehabSession[];
-  closeouts: NightlyCloseout[];
+  children: React.ReactNode;
+  number: string;
+  title: string;
 }) {
-  const summary = createMedicalReportSummary(sessions, closeouts, windowDays);
-
   return (
-    <article className="section-card soft-panel rounded-[28px] border border-[#dfe5d8] p-6 sm:p-8">
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div className="space-y-2">
-          <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#53735a]">
-            Ventana {windowDays} dias
-          </p>
-          <h3 className="text-2xl font-semibold tracking-[-0.02em] text-[#162117]">
-            Reporte para consulta
-          </h3>
-          <p className="text-sm leading-7 text-[#526154]">
-            {formatDateLabel(summary.dateRange.from)} al {formatDateLabel(summary.dateRange.to)}
-          </p>
-        </div>
-        <div className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] px-4 py-3">
-          <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-            Dolor promedio
-          </p>
-          <p className="mt-2 text-3xl font-semibold text-[#18201a]">
-            {summary.averagePain ?? "--"}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-6 grid gap-4 md:grid-cols-2">
-        <div className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-            Tendencia de dolor
-          </p>
-          <p className="mt-2 text-sm leading-7 text-[#263b29]">
-            {summary.painTrend.direction === "DOWN"
-              ? "Bajando"
-              : summary.painTrend.direction === "UP"
-                ? "Subiendo"
-                : summary.painTrend.direction === "STABLE"
-                  ? "Estable"
-                  : "Sin datos"}
-          </p>
-          <p className="mt-2 text-sm leading-7 text-[#526154]">
-            {summary.painTrend.sampleCount > 0
-              ? `Promedio ${summary.averagePain}/10 con delta ${summary.painTrend.delta ?? 0}.`
-              : "Todavia no hay suficientes cierres para una lectura de tendencia."}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-            Dias de dolor alto
-          </p>
-          {summary.highPainDays.length === 0 ? (
-            <p className="mt-2 text-sm leading-7 text-[#526154]">
-              No aparecen dias de 6/10 o mas en esta ventana.
-            </p>
-          ) : (
-            <div className="mt-2 grid gap-2 text-sm text-[#263b29]">
-              {summary.highPainDays.map((day) => (
-                <p key={day.date}>
-                  {formatDateLabel(day.date)}: {day.pain}/10
-                </p>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="mt-4 grid gap-4">
-        <div className="rounded-2xl border border-[#dfe5d8] bg-white p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-            Respuesta post-terapia
-          </p>
-          <p className="mt-2 text-sm leading-7 text-[#263b29]">
-            {summary.sessionResponseText}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-[#dfe5d8] bg-white p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-            Rebote y ejercicios
-          </p>
-          <p className="mt-2 text-sm leading-7 text-[#263b29]">
-            {summary.reboundAssociationText}
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-[#dfe5d8] bg-white p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-            Sueno y energia
-          </p>
-          <p className="mt-2 text-sm leading-7 text-[#263b29]">
-            {summary.sleepEnergyText}
-          </p>
-        </div>
-      </div>
-
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1fr_1fr]">
-        <div className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-            Notas utiles
-          </p>
-          {summary.noteHighlights.length === 0 ? (
-            <p className="mt-2 text-sm leading-7 text-[#526154]">
-              No hay notas breves destacables en esta ventana.
-            </p>
-          ) : (
-            <div className="mt-2 grid gap-2 text-sm text-[#263b29]">
-              {summary.noteHighlights.map((note, index) => (
-                <p key={`${windowDays}-${index}`}>{note}</p>
-              ))}
-            </div>
-          )}
-        </div>
-
-        <div className="rounded-2xl border border-[#dfe5d8] bg-[#f7f8f3] p-4">
-          <p className="text-xs uppercase tracking-[0.16em] text-[#5d6b5f]">
-            Preguntas para doctor o fisio
-          </p>
-          <div className="mt-2 grid gap-2 text-sm text-[#263b29]">
-            {summary.appointmentQuestions.map((question, index) => (
-              <p key={`${windowDays}-question-${index}`}>{index + 1}. {question}</p>
-            ))}
-          </div>
-        </div>
-      </div>
+    <article className="rr-report-card">
+      <header><span>{number}</span><h2>{title}</h2></header>
+      {children}
     </article>
   );
 }
 
 interface MedicalReportProps {
+  now: string;
   recentSessions: RehabSession[];
   recentCloseouts: NightlyCloseout[];
+  windowDays: 7 | 14 | 30;
 }
 
 export function MedicalReport({
+  now,
   recentSessions,
   recentCloseouts,
+  windowDays,
 }: MedicalReportProps) {
-  return (
-    <section className="report-grid grid gap-6" id="medical-report">
-      <div className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#53735a]">
-          Reporte medico
-        </p>
-        <h2 className="text-3xl font-semibold tracking-[-0.02em] text-[#162117] sm:text-4xl">
-          Evidencia breve para consulta.
-        </h2>
-        <p className="max-w-3xl text-sm leading-7 text-[#526154] sm:text-base">
-          Este reporte resume tendencia, dolor alto, respuesta a sesiones, rebote,
-          sueno, energia y preguntas de seguimiento sin convertir el resultado en
-          una recomendacion clinica.
-        </p>
-      </div>
+  const report = createReportViewModel(
+    recentSessions,
+    recentCloseouts,
+    windowDays,
+    now,
+  );
+  const { summary } = report;
+  const line = painPolyline(summary.painTrend.points);
+  const hasData = report.recordCount > 0 || report.sessionCount > 0;
+  const ranges = [
+    { days: 30, href: "/reporte", label: "30 dias" },
+    { days: 14, href: "/reporte?range=14", label: "2 semanas" },
+    { days: 7, href: "/reporte?range=7", label: "7 dias" },
+  ] as const;
 
-      <div className="grid gap-6 xl:grid-cols-2">
-        <ReportWindowCard
-          closeouts={recentCloseouts}
-          sessions={recentSessions}
-          windowDays={7}
-        />
-        <ReportWindowCard
-          closeouts={recentCloseouts}
-          sessions={recentSessions}
-          windowDays={30}
-        />
+  return (
+    <div className="rr-report">
+      <header className="rr-report-header">
+        <Link aria-label="Volver a Hoy" className="rr-report-back" href="/">‹</Link>
+        <div>
+          <p>{formatDate(summary.dateRange.from, "long")} al {formatDate(summary.dateRange.to, "long")}</p>
+          <h1>Reporte</h1>
+        </div>
+        <span className={`rr-report-status ${hasData ? "" : "is-empty"}`}>{hasData ? "Listo" : "Sin datos"}</span>
+        <nav aria-label="Rango del reporte" className="rr-report-ranges">
+          {ranges.map((range) => (
+            <Link
+              aria-current={windowDays === range.days ? "page" : undefined}
+              className={windowDays === range.days ? "is-active" : ""}
+              href={range.href}
+              key={range.days}
+            >
+              {range.label}
+            </Link>
+          ))}
+        </nav>
+      </header>
+
+      <div className="rr-report-main">
+        <section aria-label="Resumen del reporte" className="rr-report-summary">
+          <div><span>Dolor medio</span><strong>{formatNumber(summary.averagePain)}<small>/10</small></strong></div>
+          <div><span>Registros</span><strong>{report.recordCount}<small>/{windowDays} dias</small></strong></div>
+          <div><span>Sesiones</span><strong>{report.sessionCount}<small>hechas</small></strong></div>
+        </section>
+
+        <section className="rr-report-grid">
+          <ReportCard number="01" title="Evolucion del dolor">
+            {line ? (
+              <div className="rr-report-pain-chart">
+                <svg aria-label="Evolucion del dolor" preserveAspectRatio="none" role="img" viewBox="0 0 520 100">
+                  <defs><linearGradient id="rr-report-pain-area" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stopColor="var(--rr-accent)" stopOpacity="0.32" /><stop offset="1" stopColor="var(--rr-accent)" stopOpacity="0" /></linearGradient></defs>
+                  <polygon fill="url(#rr-report-pain-area)" points={`0,100 ${line} 520,100`} />
+                  <polyline fill="none" points={line} />
+                </svg>
+              </div>
+            ) : <p className="rr-report-empty">Aun no hay cierres en este rango.</p>}
+            <p className="rr-report-copy">{buildPainTrendInsight(summary.painTrend)}</p>
+            <div className="rr-high-pain-days">
+              <h3>Dias con dolor alto (6 o mas)</h3>
+              {summary.highPainDays.length > 0 ? summary.highPainDays.map((day) => (
+                <div key={day.date}><strong>{day.pain}</strong><span>{formatDate(day.date, "long")}</span><small>Dolor de cierre registrado</small></div>
+              )) : <p>No aparecen dias de 6/10 o mas.</p>}
+            </div>
+          </ReportCard>
+
+          <ReportCard number="02" title="Respuesta a las sesiones">
+            <div className="rr-report-stats">
+              <div><strong>{report.improvedSessionCount}/{report.sessionCount}</strong><span>terminan mejor que antes</span></div>
+              <div><strong>{formatNumber(report.averageSessionPainDelta)}</strong><span>cambio medio de dolor</span></div>
+            </div>
+            <p className="rr-report-copy">{summary.sessionResponseText}</p>
+          </ReportCard>
+
+          <ReportCard number="03" title="Rebote y asociaciones">
+            <p className="rr-report-copy">{summary.reboundAssociationText}</p>
+          </ReportCard>
+
+          <ReportCard number="04" title="Sueno y energia">
+            <div className="rr-report-stats">
+              <div><strong>{formatNumber(report.averageSleepHours)} h</strong><span>sueno medio</span></div>
+              <div><strong>{formatNumber(report.averageEnergy)}/5</strong><span>energia media al cierre</span></div>
+            </div>
+            <p className="rr-report-copy">{summary.sleepEnergyText}</p>
+          </ReportCard>
+
+          <ReportCard number="05" title="Notas destacadas">
+            <div className="rr-report-notes">
+              {report.notes.length > 0 ? report.notes.map((note, index) => (
+                <blockquote key={`${note.date}-${index}`}><p>“{note.text}”</p><cite>{formatDate(note.date, "long")} · {note.source}</cite></blockquote>
+              )) : <p className="rr-report-empty">No hay notas destacadas en este rango.</p>}
+            </div>
+          </ReportCard>
+
+          <ReportCard number="06" title="Preguntas para tu cita">
+            <ReportQuestions questions={summary.appointmentQuestions} />
+          </ReportCard>
+        </section>
       </div>
-    </section>
+      <ReportActions />
+    </div>
   );
 }

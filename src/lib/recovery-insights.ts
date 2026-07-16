@@ -13,6 +13,7 @@ import {
   getDateRangeForLastDays,
 } from "@/lib/recovery-calculations";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import { getRecoveryDateKey } from "@/lib/recovery-date";
 
 export interface RecoveryInsightsInput {
   painTrend: PainTrendSummary;
@@ -155,7 +156,7 @@ export function buildReboundAssociationReport(
       .map((closeout) => closeout.date),
   );
   const reboundSessions = filteredSessions.filter((session) =>
-    reboundDates.has(session.occurredAt.slice(0, 10)),
+    reboundDates.has(getRecoveryDateKey(session.occurredAt)),
   );
 
   if (reboundSessions.length === 0) {

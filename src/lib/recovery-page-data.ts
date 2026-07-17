@@ -5,15 +5,16 @@ import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 
 interface RecoveryPageDataOptions {
   from?: string;
+  to?: string;
   limit?: number | null;
 }
 
-function getRecentDateRange(fromOverride?: string) {
+function getRecentDateRange(fromOverride?: string, toOverride?: string) {
   const today = getRecoveryDateKey();
 
   return {
     from: fromOverride ?? addRecoveryDays(today, -30),
-    to: today,
+    to: toOverride ?? today,
   };
 }
 
@@ -28,7 +29,7 @@ export async function loadRecoveryPageData(options: RecoveryPageDataOptions = {}
     data: { user },
   } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const repository = user ? await createRecoveryLogRepository() : null;
-  const recentRange = getRecentDateRange(options.from);
+  const recentRange = getRecentDateRange(options.from, options.to);
   const sessionRecords = repository
     ? await repository.listRehabSessions(recentRange)
     : [];

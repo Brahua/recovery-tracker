@@ -127,6 +127,9 @@ export function DayClosedState({
               {secondaryLabel}
             </Link>
           ) : null}
+          <Link className="rr-day-closed-secondary" href="/historial">
+            Ver historial
+          </Link>
         </div>
       </div>
     </section>

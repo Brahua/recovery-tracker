@@ -62,6 +62,7 @@ function buildMicroSummary(painBefore: number, painAfter: number, finalState: Fi
 export async function createPostTherapySessionAction(formData: FormData) {
   const repository = await createRecoveryLogRepository();
   let summary = "";
+  let savedSessionId = "";
 
   try {
     const sessionType = getSingleValue(formData, "sessionType") as SessionType;
@@ -73,7 +74,7 @@ export async function createPostTherapySessionAction(formData: FormData) {
     );
     const finalState = getSingleValue(formData, "finalState") as FinalState;
 
-    await repository.createRehabSession({
+    const savedSession = await repository.createRehabSession({
       occurredAt: parseOccurredAt(getSingleValue(formData, "occurredAt")),
       sessionType,
       painBefore,
@@ -85,21 +86,19 @@ export async function createPostTherapySessionAction(formData: FormData) {
       notes: getSingleValue(formData, "notes") || undefined,
     });
 
+    savedSessionId = savedSession.id;
     summary = buildMicroSummary(painBefore, painAfter, finalState);
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "No se pudo guardar la sesion. Revisa los datos e intenta otra vez.";
-
+  } catch {
+    const message = "No se pudo guardar la sesion. Revisa los datos e intenta otra vez.";
     redirect(`/registrar?mode=session&sessionError=${encodeURIComponent(message)}`);
   }
 
   revalidatePath("/");
   revalidatePath("/registrar");
+  revalidatePath("/historial");
   revalidatePath("/insights");
   revalidatePath("/reporte");
   redirect(
-    `/registrar?mode=session&sessionSaved=1&sessionSummary=${encodeURIComponent(summary)}`,
+    `/registrar?mode=session&sessionSaved=1&sessionId=${encodeURIComponent(savedSessionId)}&sessionSummary=${encodeURIComponent(summary)}`,
   );
 }

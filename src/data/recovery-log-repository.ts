@@ -48,6 +48,8 @@ type NightlyCloseoutRow = {
   updated_at: string;
 };
 
+type ServerSupabaseClient = Awaited<ReturnType<typeof createServerSupabaseClient>>;
+
 export interface RecoveryLogRepository {
   createRehabSession(input: CreateRehabSessionInput): Promise<RehabSession>;
   listRehabSessions(params: DateRangeParams): Promise<RehabSession[]>;
@@ -161,13 +163,13 @@ async function requireAuthenticatedSupabase() {
 }
 
 async function listSessionExercisesBySessionIds(
+  supabase: ServerSupabaseClient,
   sessionIds: string[],
 ): Promise<SessionExerciseRow[]> {
   if (sessionIds.length === 0) {
     return [];
   }
 
-  const { supabase } = await requireAuthenticatedSupabase();
   const { data, error } = await supabase
     .from("session_exercises")
     .select(
@@ -184,13 +186,13 @@ async function listSessionExercisesBySessionIds(
 }
 
 async function listExerciseSetsByExerciseIds(
+  supabase: ServerSupabaseClient,
   exerciseIds: string[],
 ): Promise<ExerciseSetRow[]> {
   if (exerciseIds.length === 0) {
     return [];
   }
 
-  const { supabase } = await requireAuthenticatedSupabase();
   const { data, error } = await supabase
     .from("session_exercise_sets")
     .select(
@@ -294,9 +296,11 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
 
       const sessions = (data ?? []) as RehabSessionRow[];
       const exercises = await listSessionExercisesBySessionIds(
+        supabase,
         sessions.map((session) => session.id),
       );
       const exerciseSets = await listExerciseSetsByExerciseIds(
+        supabase,
         exercises.map((exercise) => exercise.id),
       );
       const exercisesBySessionId = new Map<string, SessionExerciseRow[]>();

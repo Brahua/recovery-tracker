@@ -127,6 +127,9 @@ export function SessionSavedState({
               {secondaryLabel}
             </Link>
           ) : null}
+          <Link className="rr-success-secondary" href="/historial">
+            Ver historial
+          </Link>
         </div>
       </div>
     </section>

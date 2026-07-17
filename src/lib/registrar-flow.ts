@@ -1,3 +1,5 @@
+import type { RehabSession } from "@/types/recovery";
+
 export type RegistrarMode = "session" | "closeout";
 
 export interface RitualSuccessConfig {
@@ -8,6 +10,15 @@ export interface RitualSuccessConfig {
   primaryLabel: string;
   secondaryHref?: string;
   secondaryLabel?: string;
+}
+
+export function resolveSavedSession(
+  sessions: RehabSession[],
+  savedSessionId?: string,
+) {
+  return savedSessionId
+    ? sessions.find((session) => session.id === savedSessionId)
+    : sessions[0];
 }
 
 export function resolveRegistrarMode(

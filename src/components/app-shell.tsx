@@ -11,6 +11,12 @@ const appTabs = [
     match: "startsWith" as const,
   },
   {
+    href: "/historial",
+    label: "Historial",
+    glyph: "HS",
+    match: "startsWith" as const,
+  },
+  {
     href: "/insights",
     label: "Insights",
     glyph: "IN",
@@ -115,6 +121,24 @@ export function AppShell({ pathname, user, streak, children, immersive = false }
         <div className="rr-main-glow" />
         <div className="rr-main-content">{children}</div>
       </section>
+
+      <nav aria-label="Navegacion principal movil" className="rr-mobile-nav">
+        {appTabs.map((tab) => {
+          const active = isTabActive(pathname, tab.href, tab.match);
+
+          return (
+            <Link
+              aria-current={active ? "page" : undefined}
+              className={active ? "is-active" : ""}
+              href={tab.href}
+              key={tab.href}
+            >
+              <span aria-hidden="true" className="rr-nav-glyph">{tab.glyph}</span>
+              <span>{tab.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
     </main>
   );
 }

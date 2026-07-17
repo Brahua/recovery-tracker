@@ -20,7 +20,7 @@
     "supabase:types": "npx supabase gen types typescript --local > src/types/database.generated.ts",
     "e2e": "playwright test",
     "e2e:auth": "playwright test tests/e2e/auth.setup.ts --project=setup",
-    "e2e:critical": "playwright test tests/e2e/post-therapy-check-in.spec.ts tests/e2e/nightly-closeout.spec.ts --project=chromium",
+    "e2e:critical": "playwright test tests/e2e/post-therapy-check-in.spec.ts tests/e2e/nightly-closeout.spec.ts tests/e2e/history.spec.ts --project=chromium",
     "e2e:headed": "playwright test --headed",
     "test": "vitest run",
     "test:unit": "vitest run",

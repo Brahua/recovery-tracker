@@ -9,6 +9,7 @@ import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 import {
   buildCloseoutSuccessState,
   buildSessionSuccessState,
+  resolveSavedSession,
   resolveRegistrarMode,
 } from "@/lib/registrar-flow";
 import { calculateLoggingStreak } from "@/lib/today-view-model";
@@ -34,7 +35,7 @@ export default async function RegistrarPage({
     recentCloseouts,
     hasSessionToday,
     hasCloseoutToday,
-  } = await loadRecoveryPageData();
+  } = await loadRecoveryPageData({ limit: null });
 
   if (!supabaseEnv || !user) {
     redirect("/");
@@ -51,6 +52,7 @@ export default async function RegistrarPage({
     "sessionSummary",
   );
   const sessionSaved = getSingleSearchParam(resolvedSearchParams, "sessionSaved") === "1";
+  const savedSessionId = getSingleSearchParam(resolvedSearchParams, "sessionId");
   const sessionErrorMessage = getSingleSearchParam(
     resolvedSearchParams,
     "sessionError",
@@ -72,6 +74,7 @@ export default async function RegistrarPage({
       ? buildCloseoutSuccessState(hasSessionToday, nightlySuccessMessage)
       : null;
   const streak = calculateLoggingStreak(recentSessions, recentCloseouts);
+  const savedSession = resolveSavedSession(recentSessions, savedSessionId);
   const latestCloseout = recentCloseouts[0];
   const closeoutSession = latestCloseout
     ? recentSessions.find(
@@ -90,7 +93,7 @@ export default async function RegistrarPage({
         <SessionSavedState
           {...successState}
           hasCloseoutToday={hasCloseoutToday}
-          session={recentSessions[0]}
+          session={savedSession}
           streak={streak}
         />
       ) : showNightlySuccess && successState && latestCloseout ? (

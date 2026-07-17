@@ -70,17 +70,14 @@ export async function createNightlyCloseoutAction(formData: FormData) {
     });
 
     summary = buildCloseoutSummary(endOfDayPain, energy, reboundPainLevel);
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "No se pudo guardar el cierre. Revisa los datos e intenta otra vez.";
-
+  } catch {
+    const message = "No se pudo guardar el cierre. Revisa los datos e intenta otra vez.";
     redirect(`/registrar?mode=closeout&nightlyError=${encodeURIComponent(message)}`);
   }
 
   revalidatePath("/");
   revalidatePath("/registrar");
+  revalidatePath("/historial");
   revalidatePath("/insights");
   revalidatePath("/reporte");
   redirect(

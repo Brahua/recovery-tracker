@@ -3,8 +3,15 @@ import { describe, expect, it } from "vitest";
 import {
   buildCloseoutSuccessState,
   buildSessionSuccessState,
+  resolveSavedSession,
   resolveRegistrarMode,
 } from "@/lib/registrar-flow";
+import type { RehabSession } from "@/types/recovery";
+
+const sessions = [
+  { id: "latest" },
+  { id: "saved" },
+] as RehabSession[];
 
 describe("resolveRegistrarMode", () => {
   it("keeps a valid requested mode", () => {
@@ -22,6 +29,16 @@ describe("resolveRegistrarMode", () => {
 
   it("falls back to session when both rituals are already done", () => {
     expect(resolveRegistrarMode(undefined, true, true)).toBe("session");
+  });
+});
+
+describe("resolveSavedSession", () => {
+  it("selects the session identified by the save redirect", () => {
+    expect(resolveSavedSession(sessions, "saved")?.id).toBe("saved");
+  });
+
+  it("keeps backward-compatible latest-session behavior without an id", () => {
+    expect(resolveSavedSession(sessions, undefined)?.id).toBe("latest");
   });
 });
 

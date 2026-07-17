@@ -3,15 +3,20 @@ import { describe, expect, it } from "vitest";
 import {
   buildCloseoutSuccessState,
   buildSessionSuccessState,
+  resolveSavedCloseout,
   resolveSavedSession,
   resolveRegistrarMode,
 } from "@/lib/registrar-flow";
-import type { RehabSession } from "@/types/recovery";
+import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
 const sessions = [
   { id: "latest" },
   { id: "saved" },
 ] as RehabSession[];
+const closeouts = [
+  { id: "latest" },
+  { id: "saved" },
+] as NightlyCloseout[];
 
 describe("resolveRegistrarMode", () => {
   it("keeps a valid requested mode", () => {
@@ -39,6 +44,16 @@ describe("resolveSavedSession", () => {
 
   it("keeps backward-compatible latest-session behavior without an id", () => {
     expect(resolveSavedSession(sessions, undefined)?.id).toBe("latest");
+  });
+});
+
+describe("resolveSavedCloseout", () => {
+  it("selects the closeout identified by the save redirect", () => {
+    expect(resolveSavedCloseout(closeouts, "saved")?.id).toBe("saved");
+  });
+
+  it("keeps backward-compatible latest-closeout behavior without an id", () => {
+    expect(resolveSavedCloseout(closeouts, undefined)?.id).toBe("latest");
   });
 });
 

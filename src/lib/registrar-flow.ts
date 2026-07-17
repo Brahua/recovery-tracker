@@ -1,4 +1,4 @@
-import type { RehabSession } from "@/types/recovery";
+import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
 export type RegistrarMode = "session" | "closeout";
 
@@ -19,6 +19,15 @@ export function resolveSavedSession(
   return savedSessionId
     ? sessions.find((session) => session.id === savedSessionId)
     : sessions[0];
+}
+
+export function resolveSavedCloseout(
+  closeouts: NightlyCloseout[],
+  savedCloseoutId?: string,
+) {
+  return savedCloseoutId
+    ? closeouts.find((closeout) => closeout.id === savedCloseoutId)
+    : closeouts[0];
 }
 
 export function resolveRegistrarMode(

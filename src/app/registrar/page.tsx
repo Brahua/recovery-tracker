@@ -6,9 +6,11 @@ import { SessionSavedState } from "@/components/session-saved-state";
 import { NightlyCloseoutForm } from "@/features/check-in/nightly-closeout/form";
 import { PostTherapyForm } from "@/features/check-in/post-therapy/form";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
+import { getCloseoutDateError } from "@/lib/closeout-date";
 import {
   buildCloseoutSuccessState,
   buildSessionSuccessState,
+  resolveSavedCloseout,
   resolveSavedSession,
   resolveRegistrarMode,
 } from "@/lib/registrar-flow";
@@ -28,6 +30,7 @@ export default async function RegistrarPage({
   searchParams: Promise<SearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
+  const pageData = await loadRecoveryPageData({ limit: null });
   const {
     supabaseEnv,
     user,
@@ -35,11 +38,33 @@ export default async function RegistrarPage({
     recentCloseouts,
     hasSessionToday,
     hasCloseoutToday,
-  } = await loadRecoveryPageData({ limit: null });
+  } = pageData;
 
   if (!supabaseEnv || !user) {
     redirect("/");
   }
+
+  const today = getRecoveryDateKey();
+  const requestedCloseoutDate = getSingleSearchParam(resolvedSearchParams, "date");
+  const selectedCloseoutDate =
+    requestedCloseoutDate &&
+    !getCloseoutDateError(requestedCloseoutDate, today)
+      ? requestedCloseoutDate
+      : today;
+  const selectedDayData =
+    selectedCloseoutDate === today
+      ? pageData
+      : await loadRecoveryPageData({
+          from: selectedCloseoutDate,
+          limit: null,
+          to: selectedCloseoutDate,
+        });
+  const selectedSession = selectedDayData.recentSessions.find(
+    (session) => getRecoveryDateKey(session.occurredAt) === selectedCloseoutDate,
+  );
+  const selectedCloseout = selectedDayData.recentCloseouts.find(
+    (closeout) => closeout.date === selectedCloseoutDate,
+  );
 
   const requestedMode = getSingleSearchParam(resolvedSearchParams, "mode");
   const mode = resolveRegistrarMode(
@@ -62,25 +87,29 @@ export default async function RegistrarPage({
     "nightlySummary",
   );
   const nightlySaved = getSingleSearchParam(resolvedSearchParams, "nightlySaved") === "1";
+  const savedCloseoutId = getSingleSearchParam(resolvedSearchParams, "closeoutId");
   const nightlyErrorMessage = getSingleSearchParam(
     resolvedSearchParams,
     "nightlyError",
   );
   const showSessionSuccess = mode === "session" && sessionSaved && !sessionErrorMessage;
   const showNightlySuccess = mode === "closeout" && nightlySaved && !nightlyErrorMessage;
+  const streak = calculateLoggingStreak(recentSessions, recentCloseouts);
+  const savedSession = resolveSavedSession(recentSessions, savedSessionId);
+  const savedCloseout = resolveSavedCloseout(
+    [...recentCloseouts, ...selectedDayData.recentCloseouts],
+    savedCloseoutId,
+  );
+  const closeoutSession = savedCloseout
+    ? [...recentSessions, ...selectedDayData.recentSessions].find(
+        (session) => getRecoveryDateKey(session.occurredAt) === savedCloseout.date,
+      )
+    : undefined;
   const successState = showSessionSuccess
     ? buildSessionSuccessState(hasCloseoutToday, sessionSuccessMessage)
     : showNightlySuccess
-      ? buildCloseoutSuccessState(hasSessionToday, nightlySuccessMessage)
+      ? buildCloseoutSuccessState(Boolean(closeoutSession), nightlySuccessMessage)
       : null;
-  const streak = calculateLoggingStreak(recentSessions, recentCloseouts);
-  const savedSession = resolveSavedSession(recentSessions, savedSessionId);
-  const latestCloseout = recentCloseouts[0];
-  const closeoutSession = latestCloseout
-    ? recentSessions.find(
-        (session) => getRecoveryDateKey(session.occurredAt) === latestCloseout.date,
-      )
-    : undefined;
 
   return (
     <AppShell
@@ -96,10 +125,10 @@ export default async function RegistrarPage({
           session={savedSession}
           streak={streak}
         />
-      ) : showNightlySuccess && successState && latestCloseout ? (
+      ) : showNightlySuccess && successState && savedCloseout ? (
         <DayClosedState
           {...successState}
-          closeout={latestCloseout}
+          closeout={savedCloseout}
           session={closeoutSession}
           streak={streak}
         />
@@ -115,8 +144,10 @@ export default async function RegistrarPage({
             <NightlyCloseoutForm
               defaultOccurredAt={new Date().toISOString()}
               errorMessage={nightlyErrorMessage}
-              latestSession={recentSessions[0]}
               recentCloseouts={recentCloseouts}
+              selectedCloseout={selectedCloseout}
+              selectedDate={selectedCloseoutDate}
+              selectedSession={selectedSession}
             />
           )}
         </div>

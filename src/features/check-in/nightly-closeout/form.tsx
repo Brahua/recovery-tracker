@@ -1,12 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type CSSProperties } from "react";
+import { useRouter } from "next/navigation";
+import {
+  useActionState,
+  useState,
+  useTransition,
+  type CSSProperties,
+} from "react";
 import { useFormStatus } from "react-dom";
 
 import { RitualPainSlider } from "@/components/ritual-pain-slider";
 import { createNightlyCloseoutAction } from "@/features/check-in/nightly-closeout/actions";
+import {
+  CloseoutDateContext,
+  formatCloseoutDateLabel,
+} from "@/features/check-in/nightly-closeout/date-context";
 import { getCloseoutFormProgress } from "@/lib/closeout-form-state";
+import { getRecoveryDateKey } from "@/lib/recovery-date";
 import type {
   NightlyCloseout,
   PainScore,
@@ -37,14 +48,6 @@ const reboundOptions: Array<{ value: ReboundLevel; label: string }> = [
   { value: "MODERATE", label: "Moderado" },
   { value: "STRONG", label: "Fuerte" },
 ];
-
-function toDateValue(value: string) {
-  const date = new Date(value);
-  const year = date.getFullYear();
-  const month = `${date.getMonth() + 1}`.padStart(2, "0");
-  const day = `${date.getDate()}`.padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
 
 function formatHeaderContext(value: string) {
   const date = new Date(value);
@@ -134,22 +137,41 @@ function CloseoutSaveButton({
 interface NightlyCloseoutFormProps {
   defaultOccurredAt: string;
   errorMessage?: string;
-  latestSession?: RehabSession;
   recentCloseouts: NightlyCloseout[];
+  selectedCloseout?: NightlyCloseout;
+  selectedDate: string;
+  selectedSession?: RehabSession;
 }
 
 export function NightlyCloseoutForm({
   defaultOccurredAt,
   errorMessage,
-  latestSession,
   recentCloseouts,
+  selectedCloseout,
+  selectedDate,
+  selectedSession,
 }: NightlyCloseoutFormProps) {
+  const router = useRouter();
+  const [actionState, formAction] = useActionState(
+    createNightlyCloseoutAction,
+    { error: errorMessage ?? null },
+  );
+  const [isDatePending, startDateTransition] = useTransition();
   const [endOfDayPain, setEndOfDayPain] = useState<PainScore | null>(null);
   const [energy, setEnergy] = useState<Rating1To5 | null>(null);
   const [reboundPainLevel, setReboundPainLevel] = useState<ReboundLevel | null>(null);
   const [sleepHours, setSleepHours] = useState(7.5);
   const [sleepQuality, setSleepQuality] = useState<Rating1To5 | null>(null);
   const [showNote, setShowNote] = useState(false);
+  const [note, setNote] = useState("");
+  const today = getRecoveryDateKey(defaultOccurredAt);
+  const dateLabel = formatCloseoutDateLabel(selectedDate, today);
+  const dateHasCloseout = selectedCloseout?.date === selectedDate;
+  const sessionForDate =
+    selectedSession &&
+    getRecoveryDateKey(selectedSession.occurredAt) === selectedDate
+      ? selectedSession
+      : undefined;
   const progress = getCloseoutFormProgress({
     endOfDayPain,
     energy,
@@ -165,17 +187,23 @@ export function NightlyCloseoutForm({
     setSleepHours((current) => Math.min(24, Math.max(0, current + delta)));
   }
 
+  function changeDate(nextDate: string) {
+    startDateTransition(() => {
+      router.replace(`/registrar?mode=closeout&date=${encodeURIComponent(nextDate)}`);
+    });
+  }
+
   return (
-    <form action={createNightlyCloseoutAction} className="rr-closeout-form">
+    <form action={formAction} className="rr-closeout-form">
       <div aria-hidden="true" className="rr-closeout-glow" />
       <header className="rr-registrar-header rr-closeout-header">
         <div className="rr-registrar-title">
           <Link aria-label="Volver a Hoy" href="/"><span aria-hidden="true">‹</span></Link>
           <div>
-            <p>{formatHeaderContext(defaultOccurredAt)}</p>
+            <p>{dateLabel} · {formatHeaderContext(defaultOccurredAt).split(" · ")[1]}</p>
             <h1>Registrar</h1>
           </div>
-          <span>☾ Hoy · {formatHeaderContext(defaultOccurredAt).split(" · ")[1]}</span>
+          <span>☾ {dateLabel} · {formatHeaderContext(defaultOccurredAt).split(" · ")[1]}</span>
         </div>
 
         <div className="rr-registrar-controls">
@@ -192,22 +220,33 @@ export function NightlyCloseoutForm({
         </div>
       </header>
 
-      {errorMessage ? (
+      {actionState.error ? (
         <div className="rr-session-error" role="alert">
-          <strong>No se guardo el cierre.</strong> {errorMessage}
+          <strong>No se guardó el cierre.</strong> {actionState.error}
         </div>
       ) : null}
 
-      <p className="rr-closeout-intro">Un minuto antes de dormir. ¿Como queda la rodilla hoy?</p>
+      <CloseoutDateContext
+        dateLabel={dateLabel}
+        hasCloseout={dateHasCloseout}
+        isPending={isDatePending}
+        onChange={changeDate}
+        selectedDate={selectedDate}
+        today={today}
+      />
+
+      <p className="rr-closeout-intro">
+        Un minuto para registrar cómo quedó la rodilla {selectedDate === today ? "hoy" : "ese día"}.
+      </p>
 
       <section className="rr-closeout-recap">
         <span aria-hidden="true">☾</span>
         <div>
-          <strong>El dia ya esta hecho.</strong>
+          <strong>El día ya está hecho.</strong>
           <p>
-            {latestSession
-              ? `Sesion completada · ${latestSession.exercises.length} ejercicios · dolor ${latestSession.painBefore}→${latestSession.painAfter}. Solo queda cerrarlo.`
-              : "Puedes cerrar el dia aunque hoy no hayas registrado una sesion."}
+            {sessionForDate
+              ? `Sesion completada · ${sessionForDate.exercises.length} ejercicios · dolor ${sessionForDate.painBefore}→${sessionForDate.painAfter}. Solo queda cerrarlo.`
+              : `Puedes cerrar ${selectedDate === today ? "el día" : "ese día"} aunque no haya una sesión registrada.`}
           </p>
         </div>
       </section>
@@ -232,11 +271,15 @@ export function NightlyCloseoutForm({
           <section className="rr-closeout-question rr-closeout-state-question">
             <CloseoutSectionHeader
               complete={stateComplete}
-              desktopTitle="¿Con cuanta energia terminas?"
+              desktopTitle={
+                selectedDate === today
+                  ? "¿Con cuánta energía terminas?"
+                  : "¿Con cuánta energía terminaste?"
+              }
               title="Como estas"
             />
             <div className="rr-closeout-field-group">
-              <h3>Energia hoy</h3>
+              <h3>Energía {selectedDate === today ? "hoy" : "ese día"}</h3>
               <div className="rr-closeout-choice-row rr-five-choice-row" role="group" aria-label="Energia al final del dia">
                 {energyOptions.map((option) => (
                   <label className={energy === option.value ? "is-selected" : ""} key={option.value}>
@@ -293,8 +336,16 @@ export function NightlyCloseoutForm({
             <button className="rr-closeout-note-toggle" onClick={() => setShowNote(true)} type="button">+ Añadir nota (opcional)</button>
           ) : null}
           <section className={`rr-closeout-note ${showNote ? "is-open" : ""}`}>
-            <div><h2>Una linea sobre hoy</h2><span>opcional</span></div>
-            <textarea name="notes" placeholder="Lo que quieras dejar escrito antes de dormir..." />
+            <div>
+              <h2>Una línea sobre {selectedDate === today ? "hoy" : "ese día"}</h2>
+              <span>opcional</span>
+            </div>
+            <textarea
+              name="notes"
+              onChange={(event) => setNote(event.target.value)}
+              placeholder="Lo que quieras dejar escrito antes de dormir..."
+              value={note}
+            />
           </section>
 
           <section className="rr-closeout-recent">
@@ -316,9 +367,11 @@ export function NightlyCloseoutForm({
         </aside>
       </div>
 
-      <input name="date" type="hidden" value={toDateValue(defaultOccurredAt)} />
       <footer className="rr-closeout-save-bar">
-        <CloseoutSaveButton isComplete={progress.isComplete} missingSteps={progress.missingSteps} />
+        <CloseoutSaveButton
+          isComplete={progress.isComplete && !dateHasCloseout && !isDatePending}
+          missingSteps={progress.missingSteps}
+        />
       </footer>
     </form>
   );

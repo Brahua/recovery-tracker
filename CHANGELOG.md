@@ -7,6 +7,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 ## [Unreleased]
 
 ### Added
+- Backdated nightly closeouts from the UI, with session context for the selected day and safeguards against future or duplicate dates.
 - Read-only `Historial` route with 30-day windows, Lima-day grouping, multiple same-day sessions, nightly closeouts, loading/error/empty states, and responsive navigation.
 - Individual exercise sets with repetitions, kilograms, optional set notes, total duration, and total distance.
 - Additive `session_exercise_sets` persistence with RLS, composite ownership constraints, compatible legacy reads, and browser regression coverage.

@@ -2912,6 +2912,33 @@ h3 {
   color: var(--rr-accent-light);
 }
 
+.rr-closeout-date-context {
+  position: relative;
+  z-index: 1;
+  padding: 12px 20px 0;
+}
+
+.rr-closeout-date-context .rr-context-time {
+  margin-top: 0;
+  border: 1px solid var(--rr-border);
+  background: var(--rr-card-bg);
+}
+
+.rr-closeout-date-context > p {
+  margin-top: 8px;
+  color: var(--rr-text-muted);
+  font-size: 12px;
+}
+
+.rr-closeout-date-context .rr-closeout-date-warning {
+  border: 1px solid rgba(201, 85, 46, 0.38);
+  border-radius: 10px;
+  background: rgba(201, 85, 46, 0.1);
+  padding: 9px 11px;
+  color: #e5a087;
+  font-weight: 650;
+}
+
 .rr-closeout-intro {
   position: relative;
   z-index: 1;
@@ -3342,6 +3369,16 @@ h3 {
 
   .rr-closeout-intro {
     display: none;
+  }
+
+  .rr-closeout-date-context {
+    width: min(100%, 360px);
+    margin-top: 20px;
+    padding: 0;
+  }
+
+  .rr-closeout-date-context + .rr-closeout-recap {
+    margin-top: 12px;
   }
 
   .rr-closeout-recap {

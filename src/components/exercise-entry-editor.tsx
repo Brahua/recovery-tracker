@@ -5,6 +5,7 @@ import {
   addExerciseSet,
   createExerciseEntry,
   duplicateExerciseSet,
+  isExerciseEntryComplete,
   removeExerciseSet,
   toExercisePayload,
   updateExerciseSet,
@@ -28,14 +29,20 @@ function nextId(prefix: string) {
 
 function ExerciseDetail({ entry, onChange, onRemove }: ExerciseDetailProps) {
   const isCustom = entry.shortcutId === undefined;
+  const incomplete = !isExerciseEntryComplete(entry);
+  const warningId = `${entry.id}-incomplete`;
 
   return (
-    <article className="rr-exercise-detail">
+    <article
+      aria-describedby={incomplete ? warningId : undefined}
+      className={`rr-exercise-detail ${incomplete ? "is-incomplete" : ""}`}
+    >
       <div className="rr-exercise-detail-heading">
         {isCustom ? (
           <label>
             <span>Nombre del ejercicio</span>
             <input
+              id={`${entry.id}-name`}
               onChange={(event) => onChange({ ...entry, name: event.target.value })}
               placeholder="Ej. prensa de pierna"
               type="text"
@@ -51,10 +58,18 @@ function ExerciseDetail({ entry, onChange, onRemove }: ExerciseDetailProps) {
         <button onClick={onRemove} type="button">Quitar</button>
       </div>
 
+      {incomplete && (
+        <p className="rr-exercise-incomplete" id={warningId} role="status">
+          <span aria-hidden="true">!</span>
+          Falta completar este ejercicio
+        </p>
+      )}
+
       <div className="rr-exercise-metrics">
         <label>
           <span>Duración total <small>min · opcional</small></span>
           <input
+            id={`${entry.id}-duration`}
             inputMode="decimal"
             min="0.5"
             onChange={(event) =>
@@ -69,6 +84,7 @@ function ExerciseDetail({ entry, onChange, onRemove }: ExerciseDetailProps) {
         <label>
           <span>Distancia total <small>km · opcional</small></span>
           <input
+            id={`${entry.id}-distance`}
             inputMode="decimal"
             min="0.1"
             onChange={(event) =>
@@ -130,6 +146,7 @@ function ExerciseDetail({ entry, onChange, onRemove }: ExerciseDetailProps) {
                 <label>
                   <span>Repeticiones</span>
                   <input
+                    id={`${set.id}-reps`}
                     inputMode="numeric"
                     min="1"
                     onChange={(event) =>
@@ -148,6 +165,7 @@ function ExerciseDetail({ entry, onChange, onRemove }: ExerciseDetailProps) {
                 <label>
                   <span>Peso <small>kg</small></span>
                   <input
+                    id={`${set.id}-weight`}
                     inputMode="decimal"
                     min="0"
                     onChange={(event) =>
@@ -166,6 +184,7 @@ function ExerciseDetail({ entry, onChange, onRemove }: ExerciseDetailProps) {
                 <label className="rr-exercise-set-note">
                   <span>Nota <small>opcional</small></span>
                   <input
+                    id={`${set.id}-note`}
                     maxLength={500}
                     onChange={(event) =>
                       onChange(
@@ -188,6 +207,7 @@ function ExerciseDetail({ entry, onChange, onRemove }: ExerciseDetailProps) {
       <label className="rr-exercise-note">
         <span>Nota del ejercicio <small>opcional</small></span>
         <textarea
+          id={`${entry.id}-note`}
           maxLength={500}
           onChange={(event) => onChange({ ...entry, notes: event.target.value })}
           placeholder="Algo general sobre este ejercicio..."

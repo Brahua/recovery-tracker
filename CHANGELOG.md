@@ -26,6 +26,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Aligned the responsive Historial with its mobile and desktop Claude Design references, including the date rail, single-open session accordion, two-column exercise details, separate closeout cards, and viewport-specific navigation.
 
 ### Fixed
+- Prevented incomplete selected exercises from enabling session saves, identified each unfinished exercise in the form, and preserved all entered values when server validation rejects a submission.
 - Prevented the Historial route from replacing the current module with a shell-less loading screen during navigation.
 - Kept evening sessions visible by querying calendar ranges with Lima-aware UTC boundaries.
 - Increased inactive mobile-navigation contrast after a Lighthouse accessibility finding.

@@ -8,10 +8,13 @@ const exercisePayloadSchema = z
   .min(1, "At least one exercise is required.")
   .max(20, "Too many exercises for one session.");
 
+export const invalidExercisePayloadMessage =
+  "Completa o elimina todos los ejercicios seleccionados antes de guardar.";
+
 export function parseExercisePayload(value: string): SessionExercise[] {
   try {
     return exercisePayloadSchema.parse(JSON.parse(value));
   } catch {
-    throw new Error("Los ejercicios enviados no son validos.");
+    throw new Error(invalidExercisePayloadMessage);
   }
 }

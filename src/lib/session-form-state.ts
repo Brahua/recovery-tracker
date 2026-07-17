@@ -6,6 +6,7 @@ export interface SessionFormState {
   painAfter: PainScore | null;
   finalState: FinalState | null;
   exerciseCount: number;
+  selectedExerciseCount: number;
 }
 
 export interface SessionFormProgress {
@@ -16,12 +17,15 @@ export interface SessionFormProgress {
 }
 
 export function getSessionFormProgress(state: SessionFormState): SessionFormProgress {
+  const exercisesComplete =
+    state.selectedExerciseCount > 0 &&
+    state.exerciseCount === state.selectedExerciseCount;
   const completedSteps = [
     state.painBefore !== null,
     state.painDuring !== null,
     state.painAfter !== null,
     state.finalState !== null,
-    state.exerciseCount > 0,
+    exercisesComplete,
   ].filter(Boolean).length;
   const totalSteps = 5 as const;
 

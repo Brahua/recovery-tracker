@@ -11,6 +11,7 @@ describe("getSessionFormProgress", () => {
         painAfter: null,
         finalState: null,
         exerciseCount: 2,
+        selectedExerciseCount: 2,
       }),
     ).toEqual({ completedSteps: 2, isComplete: false, missingSteps: 3, totalSteps: 5 });
   });
@@ -23,6 +24,7 @@ describe("getSessionFormProgress", () => {
         painAfter: 0,
         finalState: "SAME",
         exerciseCount: 1,
+        selectedExerciseCount: 1,
       }).isComplete,
     ).toBe(true);
   });
@@ -35,6 +37,20 @@ describe("getSessionFormProgress", () => {
         painAfter: 2,
         finalState: "BETTER",
         exerciseCount: 0,
+        selectedExerciseCount: 0,
+      }),
+    ).toEqual({ completedSteps: 4, isComplete: false, missingSteps: 1, totalSteps: 5 });
+  });
+
+  it("requires every selected exercise to be complete", () => {
+    expect(
+      getSessionFormProgress({
+        painBefore: 3,
+        painDuring: 4,
+        painAfter: 2,
+        finalState: "BETTER",
+        exerciseCount: 1,
+        selectedExerciseCount: 2,
       }),
     ).toEqual({ completedSteps: 4, isComplete: false, missingSteps: 1, totalSteps: 5 });
   });

@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createRecoveryLogRepository } from "@/data/recovery-log-repository";
-import { parseExercisePayload } from "@/features/check-in/post-therapy/exercise-payload";
+import {
+  invalidExercisePayloadMessage,
+  parseExercisePayload,
+} from "@/features/check-in/post-therapy/exercise-payload";
 import type {
   FinalState,
   PainScore,
@@ -59,7 +62,28 @@ function buildMicroSummary(painBefore: number, painAfter: number, finalState: Fi
   return "La sesion quedo registrada con respuesta estable.";
 }
 
-export async function createPostTherapySessionAction(formData: FormData) {
+export interface PostTherapyActionState {
+  error: string | null;
+}
+
+function getSaveErrorMessage(error: unknown) {
+  if (error instanceof Error) {
+    if (error.message === invalidExercisePayloadMessage) {
+      return error.message;
+    }
+
+    if (error.message === "Authenticated user is required.") {
+      return "Tu sesión expiró. Recarga la página e inicia sesión nuevamente.";
+    }
+  }
+
+  return "No se pudo guardar la sesión. Revisa los datos e intenta otra vez.";
+}
+
+export async function createPostTherapySessionAction(
+  _previousState: PostTherapyActionState,
+  formData: FormData,
+): Promise<PostTherapyActionState> {
   const repository = await createRecoveryLogRepository();
   let summary = "";
   let savedSessionId = "";
@@ -88,9 +112,17 @@ export async function createPostTherapySessionAction(formData: FormData) {
 
     savedSessionId = savedSession.id;
     summary = buildMicroSummary(painBefore, painAfter, finalState);
-  } catch {
-    const message = "No se pudo guardar la sesion. Revisa los datos e intenta otra vez.";
-    redirect(`/registrar?mode=session&sessionError=${encodeURIComponent(message)}`);
+  } catch (error) {
+    const errorMessage = getSaveErrorMessage(error);
+
+    if (
+      errorMessage !== invalidExercisePayloadMessage &&
+      errorMessage !== "Tu sesión expiró. Recarga la página e inicia sesión nuevamente."
+    ) {
+      console.error("Failed to save rehab session.", error);
+    }
+
+    return { error: errorMessage };
   }
 
   revalidatePath("/");

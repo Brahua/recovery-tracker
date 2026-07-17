@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { parseExercisePayload } from "@/features/check-in/post-therapy/exercise-payload";
+import {
+  invalidExercisePayloadMessage,
+  parseExercisePayload,
+} from "@/features/check-in/post-therapy/exercise-payload";
 
 describe("parseExercisePayload", () => {
   it("accepts a valid nested exercise payload", () => {
@@ -26,13 +29,13 @@ describe("parseExercisePayload", () => {
 
   it("rejects malformed JSON without exposing parser internals", () => {
     expect(() => parseExercisePayload("{not-json")).toThrow(
-      "Los ejercicios enviados no son validos.",
+      invalidExercisePayloadMessage,
     );
   });
 
   it("rejects an empty exercise collection", () => {
     expect(() => parseExercisePayload("[]")).toThrow(
-      "Los ejercicios enviados no son validos.",
+      invalidExercisePayloadMessage,
     );
   });
 
@@ -46,6 +49,6 @@ describe("parseExercisePayload", () => {
           },
         ]),
       ),
-    ).toThrow("Los ejercicios enviados no son validos.");
+    ).toThrow(invalidExercisePayloadMessage);
   });
 });

@@ -88,14 +88,15 @@ export function removeExerciseSet(
 
 export function isExerciseEntryComplete(exercise: ExerciseEntryDraft) {
   return (
-    exercise.durationMinutes.trim().length > 0 ||
-    exercise.distanceKm.trim().length > 0 ||
-    exercise.sets.some(
-      (set) =>
-        set.reps.trim().length > 0 ||
-        set.weightKg.trim().length > 0 ||
-        set.notes.trim().length > 0,
-    )
+    exercise.name.trim().length > 0 &&
+    (exercise.durationMinutes.trim().length > 0 ||
+      exercise.distanceKm.trim().length > 0 ||
+      exercise.sets.some(
+        (set) =>
+          set.reps.trim().length > 0 ||
+          set.weightKg.trim().length > 0 ||
+          set.notes.trim().length > 0,
+      ))
   );
 }
 

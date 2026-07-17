@@ -101,4 +101,13 @@ describe("exercise entry state", () => {
     expect(isExerciseEntryComplete(withReps)).toBe(true);
     expect(isExerciseEntryComplete(withDuration)).toBe(true);
   });
+
+  it("keeps a custom exercise incomplete until it has a name", () => {
+    const unnamed = {
+      ...createExerciseEntry("exercise-1", ""),
+      sets: [{ id: "set-1", reps: "12", weightKg: "", notes: "" }],
+    };
+
+    expect(isExerciseEntryComplete(unnamed)).toBe(false);
+  });
 });

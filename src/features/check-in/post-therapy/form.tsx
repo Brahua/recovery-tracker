@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { ExerciseEntryEditor } from "@/components/exercise-entry-editor";
@@ -136,6 +136,10 @@ export function PostTherapyForm({
   errorMessage,
   recentSessions,
 }: PostTherapyFormProps) {
+  const [actionState, formAction] = useActionState(
+    createPostTherapySessionAction,
+    { error: errorMessage ?? null },
+  );
   const [occurredAt, setOccurredAt] = useState(() =>
     toDateTimeLocalValue(defaultOccurredAt),
   );
@@ -148,6 +152,7 @@ export function PostTherapyForm({
   const [finalState, setFinalState] = useState<FinalState | null>(null);
   const [exerciseEntries, setExerciseEntries] = useState<ExerciseEntryDraft[]>([]);
   const [showNote, setShowNote] = useState(false);
+  const [sessionNote, setSessionNote] = useState("");
 
   const exerciseCount = exerciseEntries.filter(isExerciseEntryComplete).length;
   const progress = getSessionFormProgress({
@@ -156,11 +161,12 @@ export function PostTherapyForm({
     painAfter,
     finalState,
     exerciseCount,
+    selectedExerciseCount: exerciseEntries.length,
   });
   const painComplete =
     painBefore !== null && painDuring !== null && painAfter !== null;
   return (
-    <form action={createPostTherapySessionAction} className="rr-session-form">
+    <form action={formAction} className="rr-session-form">
       <header className="rr-registrar-header">
         <div className="rr-registrar-title">
           <Link aria-label="Volver a Hoy" href="/">
@@ -193,9 +199,9 @@ export function PostTherapyForm({
         </div>
       </header>
 
-      {errorMessage ? (
+      {actionState.error ? (
         <div className="rr-session-error" role="alert">
-          <strong>No se guardo la sesion.</strong> {errorMessage}
+          <strong>No se guardó la sesión.</strong> {actionState.error}
         </div>
       ) : null}
 
@@ -293,7 +299,10 @@ export function PostTherapyForm({
 
         <section className="rr-form-card rr-exercises-card">
           <SectionHeader
-            complete={exerciseCount > 0}
+            complete={
+              exerciseEntries.length > 0 &&
+              exerciseCount === exerciseEntries.length
+            }
             title="Ejercicios"
             trailing={
               <span className="rr-exercise-actions">
@@ -311,7 +320,12 @@ export function PostTherapyForm({
                 <h2>Nota</h2>
                 <button onClick={() => setShowNote(false)} type="button">Quitar</button>
               </div>
-              <textarea name="notes" placeholder="Algo que quieras recordar..." />
+              <textarea
+                name="notes"
+                onChange={(event) => setSessionNote(event.target.value)}
+                placeholder="Algo que quieras recordar..."
+                value={sessionNote}
+              />
             </>
           ) : (
             <button onClick={() => setShowNote(true)} type="button">+ Añadir nota (opcional)</button>

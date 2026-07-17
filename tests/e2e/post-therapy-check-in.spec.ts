@@ -70,5 +70,30 @@ test.describe("post-therapy check-in", () => {
     await tke.getByRole("button", { name: "+ Añadir serie" }).click();
     await tke.getByLabel("Repeticiones").fill("12");
     await expect(saveButton).toBeEnabled();
+
+    await page.getByText("Estiramientos suaves", { exact: true }).click();
+    await expect(saveButton).toBeDisabled();
+    const stretching = page
+      .locator(".rr-exercise-detail")
+      .filter({ hasText: "Estiramientos suaves" });
+    await expect(stretching).toContainText("Falta completar este ejercicio");
+
+    await page.getByText("Estiramientos suaves", { exact: true }).first().click();
+    await expect(saveButton).toBeEnabled();
+    await page.getByRole("button", { name: "Añadir nota" }).click();
+    const note = page.getByPlaceholder("Algo que quieras recordar...");
+    await note.fill("Conservar esta nota si el servidor rechaza el envío.");
+    await page.locator('input[name="exercisesPayload"]').evaluate((input) => {
+      (input as HTMLInputElement).value = "[]";
+    });
+    await saveButton.click();
+
+    await expect(page).toHaveURL(/\/registrar\?mode=session$/);
+    await expect(page.locator(".rr-session-error")).toContainText(
+      "Completa o elimina todos los ejercicios seleccionados",
+    );
+    await expect(page.getByRole("slider", { name: "Durante" })).toHaveValue("3");
+    await expect(tke.getByLabel("Repeticiones")).toHaveValue("12");
+    await expect(note).toHaveValue("Conservar esta nota si el servidor rechaza el envío.");
   });
 });

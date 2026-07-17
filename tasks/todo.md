@@ -4,6 +4,17 @@ Spec: `docs/specs/recovery-history-and-exercise-sets-spec.md`
 
 Plan: `tasks/plan.md`
 
+## Checkpoint posterior - 2026-07-17
+
+- [x] Aplicar los diseños móvil y desktop de Historial.
+- [x] Evitar la pantalla blanca durante la navegación a Historial.
+- [x] Impedir sesiones con ejercicios seleccionados incompletos y conservar el formulario ante errores.
+- [x] Permitir cierres de fechas anteriores con validación de duplicados y fechas futuras.
+- [x] Restaurar staging eliminando solo usuarios anónimos y conservar los datos reales.
+- [ ] Seleccionar la próxima feature a partir de una observación real y crear su spec/plan antes de implementarla.
+
+Handoff actual: `docs/specs/session-handoff-2026-07-17.md`.
+
 ## Fase 1: Contrato y persistencia
 
 - [x] Task 1: Definir y validar el contrato de series individuales.

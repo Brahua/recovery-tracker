@@ -4,6 +4,19 @@
 
 Implementado y verificado en staging el 2026-07-16. Las cuatro fases y sus checkpoints están completos.
 
+## Checkpoint posterior - 2026-07-17
+
+Después de completar este plan se entregaron y verificaron:
+
+- diseño móvil y desktop definitivo de Historial
+- corrección de la transición a Historial sin pantalla blanca
+- bloqueo e identificación de ejercicios seleccionados incompletos
+- preservación del formulario de sesión ante validaciones del servidor
+- cierres retrospectivos con contexto de la sesión del día elegido
+- rechazo seguro de fechas inválidas, futuras o duplicadas
+
+El estado canónico y el protocolo para iniciar la próxima feature están en `docs/specs/session-handoff-2026-07-17.md`. No existe una nueva feature aprobada; el siguiente plan debe reemplazar este alcance archivado solo después de priorizar una observación de uso real.
+
 Especificación aprobada: `docs/specs/recovery-history-and-exercise-sets-spec.md`.
 
 ## Resumen

@@ -99,7 +99,7 @@ Notes:
 - MVP spec: `docs/specs/recovery-ritual-mvp-spec.md`
 - UX redesign spec and Claude Design prompt pack: `docs/specs/recovery-ritual-ux-redesign-spec.md`
 - Implemented Claude Design inventory and recorded deviations: `docs/design/claude-design-reference.md`
-- Current field-trial handoff: `docs/specs/session-handoff-2026-07-16.md`
+- Current field-trial handoff: `docs/specs/session-handoff-2026-07-17.md`
 - Implementation plan: `tasks/plan.md`
 - Task list: `tasks/todo.md`
 
@@ -118,7 +118,8 @@ The project now has:
 - Supabase SSR clients, `proxy.ts`, Google OAuth callback handling, and a server-side recovery repository
 - SQL schema with RLS for rehab sessions, session exercises, individual exercise sets, and nightly closeouts
 - Spanish post-therapy check-in flow with real persistence and recent-session history
-- Spanish nightly closeout flow with real persistence and recent-closeout history
+- Backdated session registration with an editable occurrence date and time
+- Spanish nightly closeout flow with backdated registration, selected-day session context, and duplicate/future-date protection
 - Signed-out landing with stronger product framing and clearer auth entry
 - Development-only anonymous test entry preserved in the signed-out flow for local auth-safe validation
 - Authenticated app shell with mobile-first navigation for `Hoy`, `Registrar`, `Historial`, `Insights`, and `Reporte`
@@ -136,7 +137,7 @@ The project now has:
 - Visual system pass with atmospheric backgrounds, richer surfaces, subtle motion, and reduced-motion-safe completion feedback
 - Browser-reviewed mobile layout pass for the new multi-route flow, including shell compaction and navigation-density cleanup
 - Focused regression coverage for calculations, report summaries, validation edges, and reusable test scripts
-- Playwright E2E coverage for auth bootstrap, post-therapy save flow, nightly closeout save flow, and read-only history
+- Playwright E2E coverage for auth bootstrap, post-therapy save validation, backdated nightly closeouts, duplicate/future-date protection, and read-only history
 - Manual browser verification with Chrome DevTools MCP for signed-out, empty, partial, and complete Today states
 - Manual browser verification with Chrome DevTools MCP for dashboard empty and populated states in mobile and desktop
 - Manual browser verification with Chrome DevTools MCP for medical report empty and authenticated states
@@ -154,7 +155,8 @@ Latest verified commands:
 - `npm run test:recovery`
 - `npm run build`
 - `npm run e2e:auth`
-- `npm run e2e` (`6 passed` against an isolated anonymous staging context)
+- `npm run e2e` (`9 passed` against an isolated anonymous staging context)
+- `npm test` (`94 passed`)
 
 Latest redesign verification also included:
 
@@ -164,7 +166,7 @@ Latest redesign verification also included:
 
 ## Current Milestone
 
-The MVP, UX redesign, individual-series capture, and read-only history are implemented and browser-reviewed. Regression coverage is green, and staging is clean with the single real login user preserved. The current milestone returns to the real-use trial; findings will be documented and prioritized from observed use.
+The MVP, UX redesign, individual-series capture, read-only history, robust session validation, and backdated closeouts are implemented and browser-reviewed. Regression coverage is green. Staging has no anonymous test users; the single real user and its real session are preserved. The current milestone remains the real-use trial, and no next feature is committed until observations are prioritized.
 
 ## Documentation Practice
 

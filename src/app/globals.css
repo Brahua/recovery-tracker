@@ -1323,16 +1323,14 @@ h3 {
 }
 
 .rr-session-type-grid label,
-.rr-choice-row label,
-.rr-exercise-list label {
+.rr-choice-row label {
   position: relative;
   cursor: pointer;
   user-select: none;
 }
 
 .rr-session-type-grid input,
-.rr-choice-row input,
-.rr-exercise-list input {
+.rr-choice-row input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
@@ -1363,20 +1361,19 @@ h3 {
 }
 
 .rr-session-type-grid label:active > span,
-.rr-choice-row label:active > span,
-.rr-exercise-list label:active {
+.rr-choice-row label:active > span {
   transform: scale(0.96);
 }
 
 .rr-session-type-grid input:focus-visible + span,
-.rr-choice-row input:focus-visible + span,
-.rr-exercise-list input:focus-visible ~ span {
+.rr-choice-row input:focus-visible + span {
   outline: 2px solid var(--rr-accent-light);
   outline-offset: 3px;
 }
 
 .rr-pain-card,
-.rr-load-card {
+.rr-load-card,
+.rr-final-state-card {
   display: grid;
   gap: 13px;
 }
@@ -1523,6 +1520,12 @@ h3 {
   min-height: 48px;
 }
 
+.rr-field-question {
+  color: var(--rr-text-body);
+  font-size: 13px;
+  font-weight: 650;
+}
+
 .rr-exercises-card {
   display: grid;
   gap: 13px;
@@ -1541,20 +1544,13 @@ h3 {
   font-weight: 800;
 }
 
-.rr-exercise-actions button {
-  min-height: 32px;
-  color: var(--rr-text-body);
-  font-size: 11px;
-  font-weight: 700;
-}
-
 .rr-exercise-list {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
 }
 
-.rr-exercise-list label {
+.rr-exercise-list > button {
   display: flex;
   min-height: 38px;
   align-items: center;
@@ -1569,17 +1565,178 @@ h3 {
   transition: transform 100ms ease, border-color 150ms ease, background-color 150ms ease;
 }
 
-.rr-exercise-list label.is-selected {
+.rr-exercise-list > button.is-selected {
   border-color: var(--rr-accent-border);
   background: var(--rr-accent-tint);
   color: var(--rr-ink);
 }
 
-.rr-exercise-list label > b {
+.rr-exercise-list > button > b {
   width: 12px;
   color: var(--rr-accent-light);
   font-size: 12px;
   text-align: center;
+}
+
+.rr-exercise-list > button:active {
+  transform: scale(0.96);
+}
+
+.rr-exercise-list > button:focus-visible {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 3px;
+}
+
+.rr-selected-exercises {
+  display: grid;
+  gap: 12px;
+}
+
+.rr-exercise-detail {
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--rr-border-strong);
+  border-radius: var(--rr-radius-button);
+  background: rgba(14, 12, 10, 0.42);
+  padding: 14px;
+}
+
+.rr-exercise-detail-heading,
+.rr-exercise-sets-heading,
+.rr-exercise-set-number {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rr-exercise-detail-heading label,
+.rr-exercise-note,
+.rr-exercise-metrics label,
+.rr-exercise-set-fields label {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.rr-exercise-detail-heading label {
+  flex: 1;
+}
+
+.rr-exercise-detail-heading small,
+.rr-exercise-detail-heading label > span,
+.rr-exercise-note > span,
+.rr-exercise-metrics label > span,
+.rr-exercise-set-fields label > span {
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.rr-exercise-detail-heading h3 {
+  margin-top: 2px;
+  color: var(--rr-ink);
+  font-size: 16px;
+}
+
+.rr-exercise-detail-heading > button,
+.rr-exercise-set-number button {
+  min-height: 36px;
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rr-exercise-metrics,
+.rr-exercise-set-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rr-exercise-detail input,
+.rr-exercise-detail textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  padding: 10px 11px;
+  color: var(--rr-ink);
+  font: inherit;
+  outline: none;
+}
+
+.rr-exercise-detail input {
+  min-height: 42px;
+}
+
+.rr-exercise-detail textarea {
+  min-height: 62px;
+  resize: vertical;
+}
+
+.rr-exercise-detail input:focus,
+.rr-exercise-detail textarea:focus {
+  border-color: var(--rr-accent-light);
+}
+
+.rr-exercise-sets-heading h4 {
+  color: var(--rr-ink);
+  font-family: var(--font-archivo), sans-serif;
+  font-size: 14px;
+}
+
+.rr-exercise-sets-heading p,
+.rr-exercise-sets-empty {
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.rr-exercise-sets-heading > button,
+.rr-add-custom-exercise {
+  min-height: 40px;
+  border: 1px solid var(--rr-accent-border);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-accent-tint);
+  padding: 0 12px;
+  color: var(--rr-ink);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.rr-exercise-set-list {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+}
+
+.rr-exercise-set-list > li {
+  display: grid;
+  gap: 8px;
+  border-top: 1px solid var(--rr-border-soft);
+  padding-top: 10px;
+}
+
+.rr-exercise-set-number strong {
+  font-size: 12px;
+}
+
+.rr-exercise-set-number span {
+  display: flex;
+  gap: 8px;
+}
+
+.rr-exercise-set-note {
+  grid-column: 1 / -1;
+}
+
+.rr-add-custom-exercise {
+  width: 100%;
+  border-style: dashed;
+  background: transparent;
+  color: var(--rr-text-body);
 }
 
 .rr-note-card,
@@ -1863,25 +2020,26 @@ h3 {
     animation-delay: 120ms;
   }
 
+  .rr-final-state-card {
+    grid-column: 1;
+    grid-row: 4;
+    animation-delay: 140ms;
+  }
+
   .rr-exercises-card {
     grid-column: 2;
-    grid-row: 1 / span 3;
+    grid-row: 1 / span 4;
     animation-delay: 160ms;
   }
 
   .rr-note-card {
-    grid-column: 1;
-    grid-row: 4;
-  }
-
-  .rr-custom-exercise {
     grid-column: 1;
     grid-row: 5;
   }
 
   .rr-recent-sessions {
     grid-column: 2;
-    grid-row: 4 / span 2;
+    grid-row: 5;
   }
 
   .rr-session-type-grid label > span,
@@ -1911,7 +2069,7 @@ h3 {
     gap: 7px;
   }
 
-  .rr-exercise-list label {
+  .rr-exercise-list > button {
     min-height: 42px;
     border-radius: 12px;
   }

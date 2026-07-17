@@ -4,9 +4,8 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { createRecoveryLogRepository } from "@/data/recovery-log-repository";
-import { exerciseShortcutLabelById } from "@/lib/constants/exercises";
+import { parseExercisePayload } from "@/features/check-in/post-therapy/exercise-payload";
 import type {
-  ExerciseShortcutId,
   FinalState,
   PainScore,
   Rating1To5,
@@ -16,15 +15,6 @@ import type {
 function getSingleValue(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
-}
-
-function parseOptionalNumber(value: string) {
-  if (!value) {
-    return undefined;
-  }
-
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : undefined;
 }
 
 function parsePainScore(value: string) {
@@ -45,40 +35,6 @@ function parseOccurredAt(value: string) {
   }
 
   return new Date(value).toISOString();
-}
-
-function buildExercises(formData: FormData) {
-  const selectedShortcuts = formData
-    .getAll("exerciseShortcuts")
-    .filter((value): value is ExerciseShortcutId => typeof value === "string")
-    .map((shortcutId) => ({
-      name: exerciseShortcutLabelById[shortcutId],
-      shortcutId,
-    }));
-
-  const customExerciseName = getSingleValue(formData, "customExerciseName");
-  const customExerciseSets = parseOptionalNumber(
-    getSingleValue(formData, "customExerciseSets"),
-  );
-  const customExerciseReps = parseOptionalNumber(
-    getSingleValue(formData, "customExerciseReps"),
-  );
-  const customExerciseWeight = parseOptionalNumber(
-    getSingleValue(formData, "customExerciseWeight"),
-  );
-
-  const customExercise = customExerciseName
-    ? [
-        {
-          name: customExerciseName,
-          sets: customExerciseSets,
-          reps: customExerciseReps,
-          weight: customExerciseWeight,
-        },
-      ]
-    : [];
-
-  return [...selectedShortcuts, ...customExercise];
 }
 
 function buildMicroSummary(painBefore: number, painAfter: number, finalState: FinalState) {
@@ -124,7 +80,7 @@ export async function createPostTherapySessionAction(formData: FormData) {
       painDuring: parseOptionalPainScore(painDuringValue),
       painAfter,
       perceivedLoad,
-      exercises: buildExercises(formData),
+      exercises: parseExercisePayload(getSingleValue(formData, "exercisesPayload")),
       finalState,
       notes: getSingleValue(formData, "notes") || undefined,
     });

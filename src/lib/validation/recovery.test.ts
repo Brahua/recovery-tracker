@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   createNightlyCloseoutInputSchema,
   createRehabSessionInputSchema,
+  sessionExerciseSchema,
 } from "@/lib/validation/recovery";
 import { exerciseShortcuts } from "@/lib/constants/exercises";
 
@@ -19,8 +20,11 @@ describe("createRehabSessionInputSchema", () => {
         {
           name: "Step-up",
           shortcutId: "STEP_UP",
-          sets: 3,
-          reps: 10,
+          sets: [
+            { position: 0, reps: 12, weightKg: 10 },
+            { position: 1, reps: 10, weightKg: 12.5 },
+            { position: 2, reps: 8, weightKg: 14, notes: "Sin dolor" },
+          ],
         },
       ],
       finalState: "BETTER",
@@ -37,7 +41,7 @@ describe("createRehabSessionInputSchema", () => {
       painBefore: 11,
       painAfter: 4,
       perceivedLoad: 3,
-      exercises: [{ name: "Bicicleta" }],
+      exercises: [{ name: "Bicicleta", durationMinutes: 10, sets: [] }],
       finalState: "SAME",
     });
 
@@ -51,7 +55,7 @@ describe("createRehabSessionInputSchema", () => {
       painBefore: 4,
       painAfter: 4,
       perceivedLoad: 6,
-      exercises: [{ name: "Bicicleta" }],
+      exercises: [{ name: "Bicicleta", durationMinutes: 10, sets: [] }],
       finalState: "SAME",
     });
 
@@ -79,12 +83,71 @@ describe("createRehabSessionInputSchema", () => {
       painBefore: 2,
       painAfter: 2,
       perceivedLoad: 1,
-      exercises: [{ name: "Caminata" }],
+      exercises: [{ name: "Caminata", distanceKm: 1.5, sets: [] }],
       finalState: "SAME",
       notes: "   ",
     });
 
     expect(result.notes).toBeUndefined();
+  });
+});
+
+describe("sessionExerciseSchema", () => {
+  it("accepts an exercise measured by duration and distance without sets", () => {
+    const result = sessionExerciseSchema.safeParse({
+      name: "Bicicleta",
+      shortcutId: "BICICLETA",
+      durationMinutes: 12.5,
+      distanceKm: 4.2,
+      sets: [],
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects an exercise without a valid set, duration, or distance", () => {
+    const result = sessionExerciseSchema.safeParse({
+      name: "Step-up",
+      sets: [],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects an empty set", () => {
+    const result = sessionExerciseSchema.safeParse({
+      name: "TKE",
+      sets: [{ position: 0 }],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("normalizes blank set notes and keeps independent values", () => {
+    const result = sessionExerciseSchema.parse({
+      name: "Peso muerto rumano",
+      sets: [
+        { position: 0, reps: 10, weightKg: 20, notes: "   " },
+        { position: 1, reps: 8, weightKg: 25 },
+      ],
+    });
+
+    expect(result.sets).toEqual([
+      { position: 0, reps: 10, weightKg: 20, notes: undefined },
+      { position: 1, reps: 8, weightKg: 25 },
+    ]);
+  });
+
+  it("rejects duplicate set positions", () => {
+    const result = sessionExerciseSchema.safeParse({
+      name: "Hip thrust",
+      sets: [
+        { position: 0, reps: 10 },
+        { position: 0, reps: 8 },
+      ],
+    });
+
+    expect(result.success).toBe(false);
   });
 });
 

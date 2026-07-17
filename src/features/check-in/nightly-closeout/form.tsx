@@ -181,7 +181,7 @@ export function NightlyCloseoutForm({
         <div className="rr-registrar-controls">
           <nav aria-label="Tipo de registro" className="rr-mode-switch">
             <Link href="/registrar?mode=session">Sesion</Link>
-            <Link aria-current="page" className="is-active" href="/registrar?mode=closeout">Cierre</Link>
+            <Link aria-current="page" className="is-active" href="/registrar?mode=closeout">Cierre del dia</Link>
           </nav>
           <div className="rr-closeout-progress" aria-live="polite" style={progressStyle}>
             <span><i /><em aria-hidden="true">☾</em></span>

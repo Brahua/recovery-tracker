@@ -114,7 +114,7 @@ export function SessionSavedState({
               {hasCloseoutToday ? (
                 <>Tu dia ya esta completo. <strong>Los dos rituales quedaron registrados.</strong></>
               ) : (
-                <>Queda el cierre nocturno — <strong>1 minuto, esta noche.</strong> Puedes hacerlo cuando termine tu dia.</>
+                <>Queda el cierre del dia — <strong>1 minuto, esta noche.</strong> Puedes hacerlo cuando termine tu dia.</>
               )}
             </span>
           </p>

@@ -11,7 +11,7 @@ const sessions: RehabSession[] = [
     painBefore: 4,
     painAfter: 2,
     perceivedLoad: 3,
-    exercises: [{ name: "TKE" }],
+    exercises: [{ name: "TKE", sets: [] }],
     finalState: "BETTER",
     notes: "Mejor control al bajar.",
     createdAt: "2026-07-15T18:10:00.000Z",

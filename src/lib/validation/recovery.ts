@@ -56,14 +56,43 @@ const optionalTextSchema = z.preprocess(
   z.string().max(500).optional(),
 );
 
-export const sessionExerciseSchema = z.object({
-  name: z.string().trim().min(1, "Exercise name is required."),
-  shortcutId: exerciseShortcutIdSchema.optional(),
-  sets: z.number().int().positive().max(100).optional(),
-  reps: z.number().int().positive().max(1000).optional(),
-  weight: z.number().nonnegative().max(1000).optional(),
-  notes: optionalTextSchema,
-});
+export const exerciseSetSchema = z
+  .object({
+    position: z.number().int().nonnegative().max(99),
+    reps: z.number().int().positive().max(1000).optional(),
+    weightKg: z.number().nonnegative().max(1000).optional(),
+    notes: optionalTextSchema,
+  })
+  .refine(
+    (set) =>
+      set.reps !== undefined ||
+      set.weightKg !== undefined ||
+      set.notes !== undefined,
+    "A set requires repetitions, weight, or a note.",
+  );
+
+export const sessionExerciseSchema = z
+  .object({
+    name: z.string().trim().min(1, "Exercise name is required."),
+    shortcutId: exerciseShortcutIdSchema.optional(),
+    durationMinutes: z.number().positive().max(1440).optional(),
+    distanceKm: z.number().positive().max(1000).optional(),
+    sets: z.array(exerciseSetSchema).max(100),
+    notes: optionalTextSchema,
+  })
+  .refine(
+    (exercise) =>
+      exercise.sets.length > 0 ||
+      exercise.durationMinutes !== undefined ||
+      exercise.distanceKm !== undefined,
+    "An exercise requires a set, duration, or distance.",
+  )
+  .refine(
+    (exercise) =>
+      new Set(exercise.sets.map((set) => set.position)).size ===
+      exercise.sets.length,
+    "Set positions must be unique within an exercise.",
+  );
 
 export const createRehabSessionInputSchema = z.object({
   occurredAt: requiredDateTimeSchema,

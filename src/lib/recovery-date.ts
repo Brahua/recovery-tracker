@@ -26,6 +26,13 @@ export function addRecoveryDays(dateKey: string, days: number) {
   return date.toISOString().slice(0, 10);
 }
 
+export function getRecoveryUtcRange(from: string, to: string) {
+  return {
+    fromInclusive: `${from}T05:00:00.000Z`,
+    toExclusive: `${addRecoveryDays(to, 1)}T05:00:00.000Z`,
+  };
+}
+
 export function getRecoveryWeekKeys(value: Date | string = new Date()) {
   const today = getRecoveryDateKey(value);
   const anchor = new Date(`${today}T00:00:00.000Z`);

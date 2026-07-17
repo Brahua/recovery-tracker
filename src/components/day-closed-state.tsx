@@ -10,7 +10,7 @@ const limaTimeZone = "America/Lima";
 
 function formatContext(value: string) {
   const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Cierre nocturno";
+  if (Number.isNaN(date.getTime())) return "Cierre del dia";
 
   const parts = new Intl.DateTimeFormat("es-PE", {
     day: "numeric",
@@ -107,7 +107,7 @@ export function DayClosedState({
             ) : null}
             <div className="rr-day-closed-row">
               <span aria-hidden="true">✓</span>
-              <strong>Cierre nocturno</strong>
+              <strong>Cierre del dia</strong>
               <small>{formatTime(closeout.createdAt)} · dolor {closeout.endOfDayPain}</small>
             </div>
           </section>

@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 async function ensureAuthenticated(page: Page) {
   await page.goto("/registrar?mode=closeout");
   await expect(page.getByRole("heading", { name: "Registrar" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Cierre" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Cierre del dia" })).toHaveAttribute(
     "aria-current",
     "page",
   );
@@ -25,12 +25,12 @@ test.describe("nightly closeout", () => {
     await expect(
       page.getByRole("heading", { name: /^(Dia cerrado|Cierre guardado)\.$/ }),
     ).toBeVisible();
-    await expect(page.getByText("Cierre nocturno")).toBeVisible();
+    await expect(page.getByText("Cierre del dia")).toBeVisible();
     await expect(page.getByText("dolor 3")).toBeVisible();
 
     await page.reload();
 
-    await expect(page.getByText("Cierre nocturno")).toBeVisible();
+    await expect(page.getByText("Cierre del dia")).toBeVisible();
     await expect(page.getByText("dolor 3")).toBeVisible();
   });
 

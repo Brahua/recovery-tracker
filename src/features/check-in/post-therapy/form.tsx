@@ -4,12 +4,16 @@ import Link from "next/link";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { ExerciseEntryEditor } from "@/components/exercise-entry-editor";
 import { RitualPainSlider } from "@/components/ritual-pain-slider";
 import { createPostTherapySessionAction } from "@/features/check-in/post-therapy/actions";
 import { exerciseShortcuts } from "@/lib/constants/exercises";
+import {
+  isExerciseEntryComplete,
+  type ExerciseEntryDraft,
+} from "@/lib/exercise-entry-state";
 import { getSessionFormProgress } from "@/lib/session-form-state";
 import type {
-  ExerciseShortcutId,
   FinalState,
   PainScore,
   Rating1To5,
@@ -39,8 +43,6 @@ const finalStateOptions: Array<{ value: FinalState; label: string }> = [
   { value: "SAME", label: "Igual" },
   { value: "WORSE", label: "Molesta" },
 ];
-
-const initialExercises = new Set<ExerciseShortcutId>(["SENTADILLA_ESPANOLA", "TKE"]);
 
 function toDateTimeLocalValue(value: string) {
   const date = new Date(value);
@@ -144,13 +146,10 @@ export function PostTherapyForm({
   const [painAfter, setPainAfter] = useState<PainScore | null>(null);
   const [perceivedLoad, setPerceivedLoad] = useState<Rating1To5>(3);
   const [finalState, setFinalState] = useState<FinalState | null>(null);
-  const [selectedExercises, setSelectedExercises] = useState(initialExercises);
+  const [exerciseEntries, setExerciseEntries] = useState<ExerciseEntryDraft[]>([]);
   const [showNote, setShowNote] = useState(false);
-  const [showCustomExercise, setShowCustomExercise] = useState(false);
-  const [customExerciseName, setCustomExerciseName] = useState("");
 
-  const exerciseCount =
-    selectedExercises.size + (customExerciseName.trim().length > 0 ? 1 : 0);
+  const exerciseCount = exerciseEntries.filter(isExerciseEntryComplete).length;
   const progress = getSessionFormProgress({
     painBefore,
     painDuring,
@@ -160,25 +159,6 @@ export function PostTherapyForm({
   });
   const painComplete =
     painBefore !== null && painDuring !== null && painAfter !== null;
-  const allExercisesSelected = selectedExercises.size === exerciseShortcuts.length;
-
-  function toggleExercise(id: ExerciseShortcutId) {
-    setSelectedExercises((current) => {
-      const next = new Set(current);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }
-
-  function toggleAllExercises() {
-    setSelectedExercises(
-      allExercisesSelected
-        ? new Set<ExerciseShortcutId>()
-        : new Set(exerciseShortcuts.map((exercise) => exercise.id)),
-    );
-  }
-
   return (
     <form action={createPostTherapySessionAction} className="rr-session-form">
       <header className="rr-registrar-header">
@@ -198,7 +178,7 @@ export function PostTherapyForm({
             <Link aria-current="page" className="is-active" href="/registrar?mode=session">
               Sesion
             </Link>
-            <Link href="/registrar?mode=closeout">Cierre</Link>
+            <Link href="/registrar?mode=closeout">Cierre del dia</Link>
           </nav>
           <div className="rr-form-progress" aria-live="polite">
             <span>
@@ -274,7 +254,8 @@ export function PostTherapyForm({
         </section>
 
         <section className="rr-form-card rr-load-card">
-          <SectionHeader complete={finalState !== null} title="Carga y cierre" />
+          <SectionHeader complete title="Esfuerzo de la sesion" />
+          <p className="rr-field-question">¿Que tan exigente fue la sesion?</p>
           <div className="rr-choice-row rr-load-choice-row" role="group" aria-label="Carga percibida">
             {loadOptions.map((option) => (
               <label className={perceivedLoad === option.value ? "is-selected" : ""} key={option.value}>
@@ -289,7 +270,12 @@ export function PostTherapyForm({
               </label>
             ))}
           </div>
-          <div className="rr-choice-row rr-final-state-row" role="group" aria-label="Como terminaste">
+        </section>
+
+        <section className="rr-form-card rr-final-state-card">
+          <SectionHeader complete={finalState !== null} title="Estado al terminar" />
+          <p className="rr-field-question">¿Como quedo la rodilla justo al terminar?</p>
+          <div className="rr-choice-row rr-final-state-row" role="group" aria-label="Estado de la rodilla al terminar">
             {finalStateOptions.map((option) => (
               <label className={finalState === option.value ? "is-selected" : ""} key={option.value}>
                 <input
@@ -311,31 +297,11 @@ export function PostTherapyForm({
             title="Ejercicios"
             trailing={
               <span className="rr-exercise-actions">
-                <b>{exerciseCount}/{exerciseShortcuts.length}</b>
-                <button onClick={toggleAllExercises} type="button">
-                  {allExercisesSelected ? "Quitar todos" : "Marcar todos"}
-                </button>
+                <b>{exerciseCount}/{exerciseEntries.length} completos</b>
               </span>
             }
           />
-          <div className="rr-exercise-list">
-            {exerciseShortcuts.map((exercise) => {
-              const selected = selectedExercises.has(exercise.id);
-              return (
-                <label className={selected ? "is-selected" : ""} key={exercise.id}>
-                  <input
-                    checked={selected}
-                    name="exerciseShortcuts"
-                    onChange={() => toggleExercise(exercise.id)}
-                    type="checkbox"
-                    value={exercise.id}
-                  />
-                  <b aria-hidden="true">{selected ? "✓" : "+"}</b>
-                  <span>{exercise.label}</span>
-                </label>
-              );
-            })}
-          </div>
+          <ExerciseEntryEditor entries={exerciseEntries} onChange={setExerciseEntries} />
         </section>
 
         <section className={`rr-note-card ${showNote ? "is-open" : ""}`}>
@@ -349,42 +315,6 @@ export function PostTherapyForm({
             </>
           ) : (
             <button onClick={() => setShowNote(true)} type="button">+ Añadir nota (opcional)</button>
-          )}
-        </section>
-
-        <section className={`rr-custom-exercise ${showCustomExercise ? "is-open" : ""}`}>
-          {showCustomExercise ? (
-            <>
-              <div>
-                <h2>Otro ejercicio</h2>
-                <button
-                  onClick={() => {
-                    setCustomExerciseName("");
-                    setShowCustomExercise(false);
-                  }}
-                  type="button"
-                >
-                  Quitar
-                </button>
-              </div>
-              <div className="rr-custom-exercise-grid">
-                <label>
-                  <span>Nombre</span>
-                  <input
-                    name="customExerciseName"
-                    onChange={(event) => setCustomExerciseName(event.target.value)}
-                    placeholder="Ej. prensa o bici estatica"
-                    type="text"
-                    value={customExerciseName}
-                  />
-                </label>
-                <label><span>Series</span><input min="1" name="customExerciseSets" type="number" /></label>
-                <label><span>Reps</span><input min="1" name="customExerciseReps" type="number" /></label>
-                <label><span>Peso</span><input min="0" name="customExerciseWeight" step="0.5" type="number" /></label>
-              </div>
-            </>
-          ) : (
-            <button onClick={() => setShowCustomExercise(true)} type="button">+ Añadir otro ejercicio</button>
           )}
         </section>
 

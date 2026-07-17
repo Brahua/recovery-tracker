@@ -37,12 +37,26 @@ export type ExerciseShortcutId = (typeof exerciseShortcutIds)[number];
 export type ISODateString = string;
 export type ISODateTimeString = string;
 
+export interface ExerciseSet {
+  position: number;
+  reps?: number;
+  weightKg?: number;
+  notes?: string;
+}
+
+export interface LegacyExercisePrescription {
+  setCount?: number;
+  reps?: number;
+  weightKg?: number;
+}
+
 export interface SessionExercise {
   name: string;
   shortcutId?: ExerciseShortcutId;
-  sets?: number;
-  reps?: number;
-  weight?: number;
+  durationMinutes?: number;
+  distanceKm?: number;
+  sets: ExerciseSet[];
+  legacyPrescription?: LegacyExercisePrescription;
   notes?: string;
 }
 

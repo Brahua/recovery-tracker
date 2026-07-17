@@ -15,7 +15,7 @@ function sessionOn(date: string): RehabSession {
     painBefore: 2,
     painAfter: 2,
     perceivedLoad: 3,
-    exercises: [{ name: "Step-up" }],
+    exercises: [{ name: "Step-up", sets: [] }],
     finalState: "SAME",
     createdAt: `${date}T15:00:00.000Z`,
     updatedAt: `${date}T15:00:00.000Z`,

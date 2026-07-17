@@ -29,12 +29,12 @@ export function HistoryList({ days, from, to, previousTo }: HistoryListProps) {
   return (
     <section className="rr-history">
       <header className="rr-history-header">
-        <p className="rr-kicker">Registro personal</p>
-        <div>
+        <div className="rr-history-heading">
+          <p className="rr-kicker">Registro personal</p>
           <h1 className="rr-display">Historial</h1>
-          <span>{formatHistoryRange(from, to)}</span>
+          <p>Todo lo que registraste, día a día. Solo lectura.</p>
         </div>
-        <p>Todo lo que registraste, día a día. Solo lectura.</p>
+        <span className="rr-history-range">{formatHistoryRange(from, to)}</span>
       </header>
 
       <div className="rr-history-main">

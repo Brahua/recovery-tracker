@@ -9,10 +9,12 @@ export function HistoryCloseoutCard({ closeout }: { closeout: NightlyCloseout })
     <section className="rr-history-closeout">
       <header>
         <span aria-hidden="true">☾</span>
-        <strong>Cierre del día</strong>
-        <time dateTime={closeout.createdAt}>
-          {historyTimeFormatter.format(new Date(closeout.createdAt))}
-        </time>
+        <div>
+          <strong>Cierre del día</strong>
+          <time dateTime={closeout.createdAt}>
+            {historyTimeFormatter.format(new Date(closeout.createdAt))}
+          </time>
+        </div>
       </header>
       <div className="rr-history-closeout-chips">
         <span>Dolor final {closeout.endOfDayPain}/10</span>

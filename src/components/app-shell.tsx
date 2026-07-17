@@ -13,7 +13,7 @@ const appTabs = [
   {
     href: "/historial",
     label: "Historial",
-    glyph: "HS",
+    glyph: "HI",
     match: "startsWith" as const,
   },
   {

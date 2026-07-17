@@ -62,6 +62,15 @@ test.describe("read-only history", () => {
     await expect(session.getByText("11 rep")).toBeVisible();
     await expect(session.getByText("7,5 kg")).toBeVisible();
     await expect(session.getByText("12,5 min · 4,2 km")).toBeVisible();
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect(page.locator(".rr-app-shell.is-history .rr-main-content")).toHaveCSS(
+      "max-width",
+      "880px",
+    );
+    await expect(page.locator(".rr-history-day").first()).toHaveCSS("display", "grid");
+    await expect(page.locator(".rr-history-day > header").first()).toHaveCSS("width", "168px");
+    await expect(session.locator(".rr-history-exercises")).toHaveCSS("display", "grid");
     await expect(page.getByRole("link", { name: "Ver 30 días anteriores" })).toHaveAttribute(
       "href",
       /before=\d{4}-\d{2}-\d{2}/,

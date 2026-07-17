@@ -93,7 +93,12 @@ export function HistoryList({ days, from, to, previousTo }: HistoryListProps) {
 
               <div className="rr-history-events">
                 {day.sessions.map((session, sessionIndex) => (
-                  <details className="rr-card rr-history-event" key={session.id} open={sessionIndex === 0}>
+                  <details
+                    className="rr-card rr-history-event"
+                    data-session-id={session.id}
+                    key={session.id}
+                    open={sessionIndex === 0}
+                  >
                     <summary>
                       <span className="rr-history-event-mark">SE</span>
                       <span>

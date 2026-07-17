@@ -1,6 +1,28 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("read-only history", () => {
+  test("keeps the current screen visible while history data loads", async ({ page }) => {
+    let releaseHistoryRequest = () => {};
+    const holdHistoryRequest = new Promise<void>((resolve) => {
+      releaseHistoryRequest = resolve;
+    });
+
+    await page.route("**/historial**", async (route) => {
+      await holdHistoryRequest;
+      await route.continue();
+    });
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: /^Hola,/ })).toBeVisible();
+
+    const navigation = page.getByRole("link", { name: "Historial", exact: true }).click();
+
+    await expect(page.getByRole("heading", { name: /^Hola,/ })).toBeVisible();
+    await expect(page.getByLabel("Cargando historial")).toHaveCount(0);
+    releaseHistoryRequest();
+    await navigation;
+    await expect(page.getByRole("heading", { name: "Historial" })).toBeVisible();
+  });
+
   test("shows a saved session with its individual sets and supports older windows", async ({ page }) => {
     await page.goto("/registrar?mode=session");
     await expect(page.getByRole("heading", { name: "Registrar" })).toBeVisible();
@@ -20,17 +42,21 @@ test.describe("read-only history", () => {
     await page.getByText("Mejor que antes", { exact: true }).click();
     await page.getByRole("button", { name: "Guardar sesion" }).click();
     await expect(page.getByRole("heading", { name: "Sesion hecha." })).toBeVisible();
+    const savedSessionId = new URL(page.url()).searchParams.get("sessionId");
+    expect(savedSessionId).toBeTruthy();
 
     await page.getByRole("link", { name: "Ver historial", exact: true }).click();
 
     await expect(page).toHaveURL(/\/historial$/);
     await expect(page.getByRole("heading", { name: "Historial" })).toBeVisible();
-    const session = page.locator(".rr-history-event").filter({ hasText: "Step-up" }).first();
+    const session = page.locator(`[data-session-id="${savedSessionId}"]`);
+    if (!(await session.evaluate((element) => element.hasAttribute("open")))) {
+      await session.locator("summary").click();
+    }
     await expect(session.getByText("Serie 1")).toBeVisible();
     await expect(session.getByText("11 rep")).toBeVisible();
     await expect(session.getByText("7.5 kg")).toBeVisible();
-    const durationExercise = page.locator(".rr-history-event").filter({ hasText: "Bicicleta 5-10 min" }).first();
-    await expect(durationExercise.getByText("12.5 min · 4.2 km")).toBeVisible();
+    await expect(session.getByText("12.5 min · 4.2 km")).toBeVisible();
     await expect(page.getByRole("link", { name: "Ver 30 dias anteriores" })).toHaveAttribute(
       "href",
       /before=\d{4}-\d{2}-\d{2}/,

@@ -25,6 +25,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Updated the current-week strip to display Monday through Sunday and mark `Hoy` on its calendar weekday.
 
 ### Fixed
+- Prevented the Historial route from replacing the current module with a shell-less loading screen during navigation.
 - Kept evening sessions visible by querying calendar ranges with Lima-aware UTC boundaries.
 - Increased inactive mobile-navigation contrast after a Lighthouse accessibility finding.
 - Prevented open redirects and surfaced callback failures through a dedicated auth error state.

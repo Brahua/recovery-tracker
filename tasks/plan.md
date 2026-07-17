@@ -1,4 +1,198 @@
-# Implementation Plan: Recovery Ritual UX Redesign
+# Implementation Plan: Historial de recuperación y series individuales
+
+## Estado
+
+Borrador para revisión humana. Corresponde a la fase `PLAN` de `spec-driven-development`; todavía no autoriza implementación.
+
+Especificación aprobada: `docs/specs/recovery-history-and-exercise-sets-spec.md`.
+
+## Resumen
+
+Agregar un historial cronológico de solo lectura y reemplazar los valores agregados de ejercicio por series individuales, conservando los datos existentes y separando con claridad el esfuerzo de la sesión, el estado inmediato y el cierre nocturno.
+
+El trabajo se entregará en cortes verticales. Primero se probará el cambio de persistencia y su compatibilidad; después se completará el registro de series de extremo a extremo; finalmente se construirá el historial sobre el contrato ya estable.
+
+## Decisiones de arquitectura
+
+- **Tabla hija para series:** `session_exercise_sets` representará cada serie y mantendrá su orden mediante `position`.
+- **Métricas generales en el ejercicio:** `duration_minutes` y `distance_km` vivirán en `session_exercises`, porque describen el ejercicio completo.
+- **Compatibilidad explícita:** el dominio conservará una representación separada para la prescripción agregada anterior; no convertirá automáticamente datos incompletos en series individuales.
+- **Escritura compensada:** se mantendrá el repositorio directo sobre Supabase. Si falla la inserción de ejercicios o series, se eliminará la sesión recién creada y el borrado en cascada evitará persistencia parcial.
+- **Lectura acotada y sin N+1:** cada ventana de historial se resolverá con consultas por lotes para sesiones, ejercicios, series y cierres, no con una consulta por elemento.
+- **Paginación por fecha:** `/historial` cargará ventanas de 30 días mediante un límite temporal estable. La agrupación utilizará `America/Lima`.
+- **Server Component para la ruta:** la composición y lectura inicial del historial permanecerán en servidor; solo las interacciones que necesiten estado local serán componentes cliente.
+- **Payload anidado validado:** el editor dinámico serializará los ejercicios y series en un payload estructurado; la acción y el repositorio lo validarán con Zod antes de persistirlo.
+- **Sin dependencias nuevas:** se utilizarán React, Zod, Supabase y las utilidades existentes.
+- **Navegación de cinco destinos:** `Historial` se añadirá al shell existente y se verificará especialmente la densidad en móvil.
+
+## Grafo de dependencias
+
+```text
+Spec aprobada
+  -> Contrato de dominio y validación
+    -> Migración aditiva + RLS
+      -> Repositorio: escribir y leer series
+        -> Formulario: capturar series, duración y distancia
+          -> Flujo E2E de registro persistente
+        -> Consulta y agrupación del historial
+          -> Ruta /historial + navegación
+            -> Flujo E2E de consulta
+              -> Compatibilidad, responsive y gates finales
+```
+
+## Fase 1: Contrato y migración segura
+
+### Resultado esperado
+
+El sistema puede representar series individuales y aplicar una migración aditiva sin perder ni reinterpretar registros existentes.
+
+### Trabajo previsto
+
+- Definir `ExerciseSet`, métricas generales del ejercicio y representación de valores agregados anteriores.
+- Escribir primero las pruebas de validación para series, ejercicios basados en series y ejercicios basados en duración/distancia.
+- Crear la migración de `session_exercise_sets`, columnas generales, índices, claves foráneas y políticas RLS.
+- Probar el dry run de la migración contra staging antes de aplicarla.
+- Registrar conteos previos y posteriores para demostrar que sesiones y ejercicios existentes permanecen intactos.
+
+### Checkpoint: Persistencia preparada
+
+- La suite de validación pasa.
+- La migración es aditiva y supera `npm run supabase:push:dry`.
+- RLS y borrado en cascada están definidos para la tabla nueva.
+- Los datos antiguos conservan exactamente sus valores agregados.
+- Se requiere revisión antes de aplicar la migración a staging.
+
+## Fase 2: Registro vertical de series individuales
+
+### Resultado esperado
+
+El usuario puede registrar un ejercicio con varias series diferentes o un ejercicio basado en duración/distancia, recargar la aplicación y recuperar exactamente los mismos valores.
+
+### Trabajo previsto
+
+- Extender los mapeos y consultas del repositorio para insertar y leer series por lotes.
+- Añadir compensación completa si falla cualquier nivel de la escritura anidada.
+- Construir un modelo de estado puro para agregar, duplicar, actualizar y eliminar series.
+- Rediseñar cada ejercicio seleccionado como un detalle desplegable con métricas generales y series.
+- Permitir el mismo detalle para ejercicios predefinidos y personalizados.
+- Separar visual y semánticamente `Esfuerzo de la sesión` y `Estado al terminar`.
+- Renombrar el ritual nocturno como `Cierre del día` donde corresponda.
+- Cubrir parsing, validación, interacción y persistencia con pruebas unitarias y E2E.
+
+### Checkpoint: Registro completo
+
+- Varias series con valores distintos sobreviven una recarga.
+- Duración y distancia pueden guardarse sin series.
+- Un fallo de series no deja una sesión parcial.
+- Los tres conceptos de respuesta están separados en copy e interfaz.
+- Pruebas focalizadas, lint y typecheck pasan.
+- Se realiza revisión manual en móvil antes de continuar.
+
+## Fase 3: Historial vertical de solo lectura
+
+### Resultado esperado
+
+El usuario puede recorrer los últimos 30 días, abrir una fecha y reconstruir todas sus sesiones y su cierre nocturno sin encontrar controles de edición.
+
+### Trabajo previsto
+
+- Crear un view model puro que agrupe por fecha de Lima, preserve varias sesiones y ordene ejercicios y series.
+- Extender el límite de datos con una consulta de historial paginada por fecha.
+- Añadir `/historial` como Server Component autenticado.
+- Implementar resumen por día y detalle expandible accesible.
+- Mostrar series nuevas, métricas generales y el bloque `Registro anterior` cuando corresponda.
+- Añadir `Historial` a la navegación principal y estados activo, vacío, carga anterior y error.
+- Mantener separado el historial factual de las interpretaciones de `Insights`.
+
+### Checkpoint: Consulta completa
+
+- La ventana inicial contiene los 30 días más recientes.
+- Varias sesiones y un cierre del mismo día aparecen juntos sin sobrescribirse.
+- La carga anterior conserva un orden cronológico estable.
+- No existen acciones de editar o eliminar.
+- Los datos anteriores y nuevos se distinguen correctamente.
+- Pruebas de view model, ruta y navegador pasan.
+
+## Fase 4: Integración, accesibilidad y endurecimiento
+
+### Resultado esperado
+
+La funcionalidad completa cumple la spec, mantiene los flujos existentes y funciona correctamente en móvil, tablet y escritorio.
+
+### Trabajo previsto
+
+- Ejecutar la suite completa y corregir regresiones en Hoy, Registrar, Insights y Reporte.
+- Verificar que cálculos existentes sigan contando ejercicios sin duplicarlos por cantidad de series.
+- Revisar navegación por teclado, etiquetas, foco y anuncios de errores.
+- Comprobar que editores con muchas series no produzcan desbordamiento horizontal.
+- Verificar el shell de cinco destinos en anchos móviles estrechos.
+- Revisar runtime, consola y red en navegador real.
+- Actualizar README, changelog, handoff y documentación de comportamiento.
+
+### Checkpoint: Listo para entrega
+
+- `npm test` pasa.
+- `npm run e2e` pasa.
+- `npm run lint` pasa.
+- `npm run typecheck` pasa.
+- `npm run build` pasa.
+- La revisión responsive y de accesibilidad no deja defectos bloqueantes.
+- Todos los criterios de éxito de la spec tienen evidencia verificable.
+
+## Estrategia de cortes y commits
+
+Los commits deben seguir resultados verificables y no capas incompletas:
+
+1. Contrato, validación y migración aditiva.
+2. Persistencia y registro completo de series.
+3. Separación semántica de los tres momentos de respuesta, si no cabe limpiamente en el corte anterior.
+4. Consulta y UI del historial.
+5. E2E, hardening y documentación final.
+
+Ningún commit debe dejar el formulario escribiendo un contrato que el repositorio todavía no pueda leer.
+
+## Paralelización
+
+Aunque técnicamente podrían separarse algunas pruebas y la exploración visual, esta iteración se recomienda mayormente secuencial porque formulario, dominio, repositorio e historial comparten el mismo contrato.
+
+Después de estabilizar el contrato y la migración sí podrían avanzar de forma independiente:
+
+- componentes visuales del historial
+- pruebas del view model de historial
+- copy y separación semántica del registro
+
+La integración final debe permanecer coordinada.
+
+## Riesgos y mitigaciones
+
+| Riesgo | Impacto | Mitigación |
+| --- | --- | --- |
+| Una escritura falla después de crear la sesión | Alto | Inserciones ordenadas, compensación mediante borrado de la sesión y prueba específica de fallo parcial. |
+| La migración altera registros anteriores | Alto | Migración solo aditiva, dry run, conteos antes/después y lectura dual explícita. |
+| El historial genera consultas N+1 | Alto | Cargar por lotes usando IDs de sesión y ejercicio dentro de una ventana acotada. |
+| Las series hacen lento el registro móvil | Alto | Duplicar última serie, controles compactos, foco predecible y prueba manual con varias series. |
+| Los cálculos cuentan cada serie como un ejercicio | Medio | Mantener Insights basado en ejercicios de sesión y añadir regresión específica. |
+| Cinco destinos saturan la navegación móvil | Medio | Etiquetas breves, revisión en el ancho mínimo soportado y alternativa contextual si no cabe. |
+| Fechas UTC separan datos del día incorrecto | Alto | Agrupar siempre con `America/Lima` y cubrir bordes de medianoche con pruebas. |
+| El payload dinámico es manipulado | Alto | Tratarlo como entrada no confiable y validarlo de nuevo en acción y repositorio. |
+| La tabla nueva expone datos entre usuarios | Alto | RLS por propietario y verificación autenticada con usuarios aislados. |
+
+## Verificación transversal
+
+- TDD para cada cambio de comportamiento.
+- Prueba focalizada después de cada corte vertical.
+- `git diff --check` y revisión de secretos antes de commits.
+- Navegador real para flujos de registro e historial.
+- Base staging únicamente; producción requiere autorización separada.
+- No se considera terminado un corte si tiene regresiones conocidas, documentación desactualizada o comportamiento sin verificar en runtime.
+
+## Preguntas abiertas
+
+No quedan decisiones técnicas bloqueantes para desglosar este plan en tareas. La referencia `references/definition-of-done.md` mencionada por la skill de planificación no existe en el repositorio; este plan usa como barra transversal los criterios de la spec, las verificaciones anteriores y la definición resumida por el catálogo de skills: pruebas sin regresiones, runtime verificado y documentación actualizada.
+
+---
+
+# Plan archivado: Recovery Ritual UX Redesign
 
 ## Overview
 

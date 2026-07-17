@@ -2,7 +2,7 @@
 
 ## Estado
 
-Aprobada para planificación el 2026-07-16. La implementación no debe comenzar hasta que el plan y la lista de tareas sean revisados y aprobados.
+Implementada y verificada en staging el 2026-07-16. El historial permanece deliberadamente en modo de solo lectura.
 
 ## Suposiciones validadas
 
@@ -286,19 +286,19 @@ Las transformaciones y cálculos reutilizables deben ser funciones puras. Los co
 
 ## Criterios de éxito
 
-- [ ] Existe un acceso principal a `/historial` para usuarios autenticados.
-- [ ] El historial muestra al menos los 30 días más recientes, agrupados por fecha y en orden descendente.
-- [ ] Cada fecha muestra todas sus sesiones y su cierre nocturno, si existe.
-- [ ] El historial es estrictamente de lectura y no expone acciones de edición o eliminación.
-- [ ] Cada ejercicio nuevo admite múltiples series ordenadas con repeticiones, peso y nota independientes.
-- [ ] Un ejercicio admite duración total y distancia total opcionales.
-- [ ] Los valores guardados permanecen iguales después de recargar la aplicación.
-- [ ] Los registros agregados anteriores siguen siendo legibles y se identifican como anteriores.
-- [ ] `Esfuerzo de la sesión`, `Estado al terminar` y `Cierre del día` aparecen como conceptos separados.
-- [ ] Varias sesiones del mismo día se representan sin sobrescribirse.
-- [ ] Las nuevas tablas y consultas respetan Auth y RLS.
-- [ ] Pruebas unitarias, E2E, lint, typecheck y build terminan correctamente.
-- [ ] La experiencia funciona sin desbordamientos en móvil, tablet y escritorio.
+- [x] Existe un acceso principal a `/historial` para usuarios autenticados.
+- [x] El historial muestra los 30 días más recientes, agrupados por fecha y en orden descendente.
+- [x] Cada fecha muestra todas sus sesiones y su cierre nocturno, si existe.
+- [x] El historial es estrictamente de lectura y no expone acciones de edición o eliminación.
+- [x] Cada ejercicio nuevo admite múltiples series ordenadas con repeticiones, peso y nota independientes.
+- [x] Un ejercicio admite duración total y distancia total opcionales.
+- [x] Los valores guardados permanecen iguales después de recargar la aplicación.
+- [x] Los registros agregados anteriores siguen siendo legibles y se identifican como anteriores.
+- [x] `Esfuerzo de la sesión`, `Estado al terminar` y `Cierre del día` aparecen como conceptos separados.
+- [x] Varias sesiones del mismo día se representan sin sobrescribirse.
+- [x] Las nuevas tablas y consultas respetan Auth y RLS.
+- [x] Pruebas unitarias, E2E, lint, typecheck y build terminan correctamente.
+- [x] La experiencia funciona sin desbordamientos en móvil, tablet y escritorio.
 
 ## Fuera de alcance
 
@@ -314,4 +314,4 @@ Las transformaciones y cálculos reutilizables deben ser funciones puras. Los co
 
 ## Preguntas abiertas
 
-No quedan preguntas funcionales bloqueantes para pasar a planificación. Cualquier cambio de alcance debe actualizar primero esta especificación.
+No quedan preguntas funcionales bloqueantes. Cualquier ampliación, especialmente edición o eliminación histórica, debe actualizar primero esta especificación.

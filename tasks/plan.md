@@ -2,7 +2,7 @@
 
 ## Estado
 
-Borrador para revisión humana. Corresponde a la fase `PLAN` de `spec-driven-development`; todavía no autoriza implementación.
+Implementado y verificado en staging el 2026-07-16. Las cuatro fases y sus checkpoints están completos.
 
 Especificación aprobada: `docs/specs/recovery-history-and-exercise-sets-spec.md`.
 
@@ -187,6 +187,17 @@ La integración final debe permanecer coordinada.
 - No se considera terminado un corte si tiene regresiones conocidas, documentación desactualizada o comportamiento sin verificar en runtime.
 
 ## Preguntas abiertas
+
+No quedan preguntas abiertas para este alcance. La edición histórica, las rutinas reutilizables y los gráficos por ejercicio permanecen fuera de alcance.
+
+## Resultado de implementación
+
+- Migración aditiva aplicada a staging sin pérdida de datos.
+- Registro de series individuales, duración y distancia verificado por unidad y navegador.
+- `/historial` entrega ventanas de 30 días, agrupación por fecha de Lima y detalle de solo lectura.
+- Navegación de cinco destinos revisada a 320 y 1440 px; Lighthouse móvil: 100 en accesibilidad, buenas prácticas, SEO y navegación agente.
+- Gate final: pruebas, typecheck, lint, build y 6 E2E en verde.
+- Staging restaurado a 0 registros funcionales, 0 usuarios anónimos y 1 usuario real conservado.
 
 No quedan decisiones técnicas bloqueantes para desglosar este plan en tareas. La referencia `references/definition-of-done.md` mencionada por la skill de planificación no existe en el repositorio; este plan usa como barra transversal los criterios de la spec, las verificaciones anteriores y la definición resumida por el catálogo de skills: pruebas sin regresiones, runtime verificado y documentación actualizada.
 

@@ -6,21 +6,21 @@ Plan: `tasks/plan.md`
 
 ## Fase 1: Contrato y persistencia
 
-- [ ] Task 1: Definir y validar el contrato de series individuales.
+- [x] Task 1: Definir y validar el contrato de series individuales.
   - Acceptance: `ExerciseSet` admite repeticiones, peso y nota opcionales; `SessionExercise` admite series ordenadas, duración, distancia y una representación separada para datos agregados anteriores; un ejercicio es válido con al menos una serie válida o duración/distancia.
   - Verify: Escribir primero pruebas fallidas y ejecutar `npm run test:validation` hasta que pasen.
   - Dependencies: Ninguna.
   - Files: `src/types/recovery.ts`, `src/lib/validation/recovery.ts`, `src/lib/validation/recovery.test.ts`
   - Scope: M.
 
-- [ ] Task 2: Añadir la migración aditiva para series y métricas generales.
+- [x] Task 2: Añadir la migración aditiva para series y métricas generales.
   - Acceptance: Existe `session_exercise_sets` con restricciones, índices, FK compuesta y RLS por propietario; `session_exercises` incorpora duración y distancia sin eliminar columnas antiguas.
   - Verify: Revisar SQL, ejecutar `npm run supabase:push:dry`, aplicar en staging y comparar conteos antes/después.
   - Dependencies: Task 1.
   - Files: `supabase/migrations/20260716000000_exercise_sets_and_history.sql`
   - Scope: S.
 
-- [ ] Task 3: Persistir y recuperar series mediante el repositorio.
+- [x] Task 3: Persistir y recuperar series mediante el repositorio.
   - Acceptance: Las escrituras nuevas insertan ejercicios y series ordenadas; las lecturas cargan series por lotes; un fallo anidado elimina la sesión parcial; los campos antiguos siguen siendo legibles.
   - Verify: Ejecutar pruebas focalizadas del mapeo/repositorio, `npm run typecheck` y `npm test`.
   - Dependencies: Tasks 1 y 2.
@@ -29,27 +29,27 @@ Plan: `tasks/plan.md`
 
 ### Checkpoint: Persistencia preparada
 
-- [ ] Migración aplicada en staging sin pérdida de registros.
-- [ ] Contrato, validación y lectura dual pasan pruebas.
-- [ ] La aplicación sigue compilando antes de cambiar el formulario.
+- [x] Migración aplicada en staging sin pérdida de registros.
+- [x] Contrato, validación y lectura dual pasan pruebas.
+- [x] La aplicación sigue compilando antes de cambiar el formulario.
 
 ## Fase 2: Registro de series
 
-- [ ] Task 4: Crear el modelo de estado del editor de ejercicios.
+- [x] Task 4: Crear el modelo de estado del editor de ejercicios.
   - Acceptance: Funciones puras agregan, duplican, actualizan y eliminan series sin mutar el estado; mantienen identificadores locales y orden estable.
   - Verify: Seguir RED-GREEN-REFACTOR con `npm test -- src/lib/exercise-entry-state.test.ts`.
   - Dependencies: Task 1.
   - Files: `src/lib/exercise-entry-state.ts`, `src/lib/exercise-entry-state.test.ts`
   - Scope: S.
 
-- [ ] Task 5: Construir el editor accesible de detalle por ejercicio.
+- [x] Task 5: Construir el editor accesible de detalle por ejercicio.
   - Acceptance: Ejercicios predefinidos y personalizados permiten series individuales, duplicado, eliminación, duración y distancia; todos los controles tienen etiquetas y funcionan a 320 px.
   - Verify: Ejecutar prueba del estado, typecheck y revisión manual de teclado/móvil.
   - Dependencies: Task 4.
   - Files: `src/components/exercise-entry-editor.tsx`, `src/features/check-in/post-therapy/form.tsx`, `src/app/globals.css`
   - Scope: M.
 
-- [ ] Task 6: Integrar el payload anidado y separar los tres momentos de respuesta.
+- [x] Task 6: Integrar el payload anidado y separar los tres momentos de respuesta.
   - Acceptance: La Server Action trata el payload como no confiable, lo valida y persiste; la sesión muestra `Esfuerzo de la sesión` y `Estado al terminar`; el ritual nocturno usa `Cierre del día`.
   - Verify: Añadir pruebas de parsing, ejecutar `npm test`, `npm run typecheck` y el E2E focalizado de registro.
   - Dependencies: Tasks 3 y 5.
@@ -58,34 +58,34 @@ Plan: `tasks/plan.md`
 
 ### Checkpoint: Registro completo
 
-- [ ] Varias series diferentes sobreviven una recarga.
-- [ ] Duración/distancia se guardan sin series.
-- [ ] No se crean sesiones parciales y los tres conceptos están separados.
+- [x] Varias series diferentes sobreviven una recarga.
+- [x] Duración/distancia se guardan sin series.
+- [x] No se crean sesiones parciales y los tres conceptos están separados.
 
 ## Fase 3: Historial
 
-- [ ] Task 7: Crear el view model del historial.
+- [x] Task 7: Crear el view model del historial.
   - Acceptance: Agrupa por día de Lima, ordena fechas y sesiones de forma determinista, conserva múltiples sesiones y asocia el único cierre del día.
   - Verify: Seguir RED-GREEN-REFACTOR con `npm test -- src/lib/history-view-model.test.ts`.
   - Dependencies: Task 3.
   - Files: `src/lib/history-view-model.ts`, `src/lib/history-view-model.test.ts`
   - Scope: S.
 
-- [ ] Task 8: Añadir la lectura paginada de historial al límite de datos.
+- [x] Task 8: Añadir la lectura paginada de historial al límite de datos.
   - Acceptance: Una ventana de 30 días carga sesiones, ejercicios, series y cierres por lotes; el límite anterior se valida y no permite acceder a datos de otro usuario.
   - Verify: Ejecutar pruebas de fechas/view model, `npm run typecheck` y revisar las consultas/RLS.
   - Dependencies: Tasks 3 y 7.
   - Files: `src/data/recovery-log-repository.ts`, `src/lib/recovery-page-data.ts`, `src/lib/history-view-model.ts`
   - Scope: M.
 
-- [ ] Task 9: Implementar `/historial` como experiencia de solo lectura.
+- [x] Task 9: Implementar `/historial` como experiencia de solo lectura.
   - Acceptance: La ruta autenticada muestra resumen y detalle por día, estados vacío/error/carga anterior y ninguna acción de edición o eliminación.
   - Verify: Ejecutar build y revisión de DOM/teclado en móvil y escritorio.
   - Dependencies: Task 8.
   - Files: `src/app/historial/page.tsx`, `src/app/historial/loading.tsx`, `src/features/history/history-list.tsx`, `src/app/globals.css`
   - Scope: M.
 
-- [ ] Task 10: Integrar Historial en la navegación principal.
+- [x] Task 10: Integrar Historial en la navegación principal.
   - Acceptance: El shell ofrece cinco destinos con estado activo correcto y sin desbordamiento a 320, 768, 1024 y 1440 px.
   - Verify: Ejecutar typecheck y revisar navegación real por teclado en los cuatro anchos.
   - Dependencies: Task 9.
@@ -94,13 +94,13 @@ Plan: `tasks/plan.md`
 
 ### Checkpoint: Historial completo
 
-- [ ] Los últimos 30 días aparecen en orden y permiten cargar una ventana anterior.
-- [ ] Varias sesiones y el cierre de una fecha aparecen juntos.
-- [ ] Datos antiguos y nuevos son legibles sin controles de modificación.
+- [x] Los últimos 30 días aparecen en orden y permiten cargar una ventana anterior.
+- [x] Varias sesiones y el cierre de una fecha aparecen juntos.
+- [x] Datos antiguos y nuevos son legibles sin controles de modificación.
 
 ## Fase 4: Verificación y entrega
 
-- [ ] Task 11: Completar regresión, seguridad, runtime y documentación.
+- [x] Task 11: Completar regresión, seguridad, runtime y documentación.
   - Acceptance: E2E cubre series e historial; no hay regresiones en Insights/Reporte; RLS y validación se auditan; README, changelog, handoff, spec, plan y tareas reflejan el resultado real.
   - Verify: Ejecutar `npm test`, `npm run e2e`, `npm run lint`, `npm run typecheck`, `npm run build`, `npm audit --audit-level=high`, `git diff --check` y revisión real de consola/red/responsive.
   - Dependencies: Tasks 1-10.

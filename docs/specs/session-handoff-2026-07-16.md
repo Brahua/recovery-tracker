@@ -92,6 +92,22 @@ After the observation window:
 4. Update `tasks/plan.md` and `tasks/todo.md` with the next evidence-backed iteration.
 5. Decide whether the next milestone is history/detail UX, production readiness, or another focused usability pass.
 
+## Checkpoint adicional: historial y series individuales
+
+El 2026-07-16 se implementó el alcance aprobado en `recovery-history-and-exercise-sets-spec.md`:
+
+- Historial autenticado de solo lectura en ventanas de 30 días.
+- Agrupación por fecha de Lima con varias sesiones y un cierre por día.
+- Series individuales con repeticiones, peso y nota, más duración y distancia generales.
+- Compatibilidad explícita con prescripciones agregadas anteriores.
+- Separación de esfuerzo de sesión, estado inmediato y cierre del día.
+- Navegación principal de cinco destinos y accesos desde las confirmaciones.
+- Corrección de la confirmación concurrente para mostrar la sesión exacta recién guardada.
+
+La verificación final incluyó pruebas unitarias, typecheck, lint, build, auditoría de dependencias y 6 pruebas E2E. Chrome DevTools confirmó consola limpia, respuestas 200 y Lighthouse móvil con 100 en las cuatro categorías auditadas. La auditoría de npm conserva dos hallazgos moderados en PostCSS empaquetado por Next.js; la corrección automática propone un downgrade incompatible y no se aplicó.
+
+Después de las pruebas se eliminaron todos los usuarios anónimos y sus datos. La línea base queda en 0 sesiones, 0 ejercicios, 0 series, 0 cierres, 0 usuarios anónimos y 1 usuario real conservado.
+
 ## Files To Read First
 
 - `README.md`

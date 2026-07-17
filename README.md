@@ -107,6 +107,7 @@ Notes:
 
 - `docs/decisions/ADR-001-use-supabase-direct-for-mvp-persistence.md`
 - `docs/decisions/ADR-002-use-google-login-with-supabase-auth.md`
+- `docs/decisions/ADR-003-store-individual-exercise-sets-additively.md`
 
 ## Current Status
 
@@ -115,16 +116,19 @@ The project now has:
 - Next.js foundation with App Router and `src/` structure
 - Domain types, exercise constants, and Zod validation
 - Supabase SSR clients, `proxy.ts`, Google OAuth callback handling, and a server-side recovery repository
-- Initial SQL schema with RLS for rehab sessions, session exercises, and nightly closeouts
+- SQL schema with RLS for rehab sessions, session exercises, individual exercise sets, and nightly closeouts
 - Spanish post-therapy check-in flow with real persistence and recent-session history
 - Spanish nightly closeout flow with real persistence and recent-closeout history
 - Signed-out landing with stronger product framing and clearer auth entry
 - Development-only anonymous test entry preserved in the signed-out flow for local auth-safe validation
-- Authenticated app shell with mobile-first navigation for `Hoy`, `Registrar`, `Insights`, and `Reporte`
+- Authenticated app shell with mobile-first navigation for `Hoy`, `Registrar`, `Historial`, `Insights`, and `Reporte`
 - Home / Today screen that prioritizes the next useful action, shows recent status, and keeps insights/report as secondary previews
 - Current-week strip ordered Monday through Sunday with `Hoy` on the actual weekday
 - Recovery calendar comparisons normalized to `America/Lima` while persisted timestamps remain in UTC
 - Dedicated `Registrar` route with session and nightly closeout modes instead of embedding both forms in `/`
+- Individual series per exercise with repetitions, kilograms, notes, duration, and distance
+- Read-only `Historial` with 30-day windows, multiple sessions per day, closeout details, and backward-compatible legacy prescriptions
+- Separate session effort, immediate knee state, and end-of-day closeout concepts
 - Pure recovery calculations for pain trend, weekly load, rebound, sleep vs pain, and weekly story text
 - Dedicated `Insights` route with mobile-first trend cards, lightweight charts, empty states, and observational weekly summary
 - Dedicated `Reporte` route with 7- and 30-day windows, observational summaries, and conservative appointment prompts
@@ -132,7 +136,7 @@ The project now has:
 - Visual system pass with atmospheric backgrounds, richer surfaces, subtle motion, and reduced-motion-safe completion feedback
 - Browser-reviewed mobile layout pass for the new multi-route flow, including shell compaction and navigation-density cleanup
 - Focused regression coverage for calculations, report summaries, validation edges, and reusable test scripts
-- Playwright E2E coverage for auth bootstrap, post-therapy save flow, and nightly closeout save flow
+- Playwright E2E coverage for auth bootstrap, post-therapy save flow, nightly closeout save flow, and read-only history
 - Manual browser verification with Chrome DevTools MCP for signed-out, empty, partial, and complete Today states
 - Manual browser verification with Chrome DevTools MCP for dashboard empty and populated states in mobile and desktop
 - Manual browser verification with Chrome DevTools MCP for medical report empty and authenticated states
@@ -150,7 +154,7 @@ Latest verified commands:
 - `npm run test:recovery`
 - `npm run build`
 - `npm run e2e:auth`
-- `npm run e2e` (`5 passed` against a clean anonymous staging context)
+- `npm run e2e` (`6 passed` against an isolated anonymous staging context)
 
 Latest redesign verification also included:
 
@@ -160,7 +164,7 @@ Latest redesign verification also included:
 
 ## Current Milestone
 
-The MVP and UX redesign checklists are complete. All selected Claude Design references are implemented and browser-reviewed, regression coverage is green, and the staging database was reset before field validation. The current milestone is a one-week real-use trial beginning 2026-07-16; findings will be documented and prioritized after the observation window instead of adding speculative functionality during the trial.
+The MVP, UX redesign, individual-series capture, and read-only history are implemented and browser-reviewed. Regression coverage is green, and staging is clean with the single real login user preserved. The current milestone returns to the real-use trial; findings will be documented and prioritized from observed use.
 
 ## Documentation Practice
 

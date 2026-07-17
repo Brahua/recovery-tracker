@@ -14,7 +14,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Responsive Claude Design implementation for the shared system, landing, ritual forms, completion states, insights, and medical report.
 - Data-driven success states, report range controls, selectable appointment questions, native PDF printing, and share fallback.
 - Deterministic view models and regression tests for auth callback errors, registrar state, form progress, Today state, insights, and reports.
-- Project-owned rehabilitation hero image and a canonical inventory of the 17 implemented design references.
+- Project-owned rehabilitation hero image and a canonical inventory of the 18 implemented design references.
 
 ### Changed
 - Split the former `Carga y cierre` concept into `Esfuerzo de la sesión`, `Estado al terminar`, and the separate `Cierre del día` ritual.
@@ -23,6 +23,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Reworked auth callback errors and safe redirect URL handling.
 - Expanded responsive, accessibility, contrast, focus, empty-state, and reduced-motion behavior across the redesigned product.
 - Updated the current-week strip to display Monday through Sunday and mark `Hoy` on its calendar weekday.
+- Aligned the mobile Historial with its Claude Design reference, including the compact timeline, single-open session accordion, detailed exercise sets, separate closeout cards, and route-specific bottom navigation.
 
 ### Fixed
 - Prevented the Historial route from replacing the current module with a shell-less loading screen during navigation.

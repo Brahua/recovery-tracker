@@ -52,6 +52,7 @@ export default async function HistorialPage({
       <HistoryList
         days={buildHistoryDays(recentSessions, recentCloseouts)}
         from={window.from}
+        key={window.to}
         previousTo={window.previousTo}
         to={window.to}
       />

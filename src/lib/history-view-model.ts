@@ -23,7 +23,7 @@ export function getHistoryDaySummary(day: HistoryDay) {
     0,
   );
 
-  return `${sessionCount} sesion${sessionCount === 1 ? "" : "es"} · ${exerciseCount} ejercicio${exerciseCount === 1 ? "" : "s"} · ${day.closeout ? "cierre listo" : "sin cierre"}`;
+  return `${sessionCount} ${sessionCount === 1 ? "sesión" : "sesiones"} · ${exerciseCount} ejercicio${exerciseCount === 1 ? "" : "s"} · ${day.closeout ? "cierre listo" : "sin cierre"}`;
 }
 
 function isDateKey(value: string) {

@@ -2,7 +2,7 @@
 
 ## Status
 
-Canonical design inventory received on 2026-07-15. All 17 selected artifacts are implemented across the shared design system and eight responsive product surfaces. Browser comparison, reduced-motion handling, responsive review, and regression coverage are complete; the product entered a one-week field trial on 2026-07-16.
+Canonical design inventory received on 2026-07-15. All 18 selected artifacts are implemented across the shared design system and nine product surfaces. Browser comparison, reduced-motion handling, responsive review, and regression coverage are complete; the product entered a one-week field trial on 2026-07-16.
 
 ## Project Access
 
@@ -32,6 +32,7 @@ Canonical design inventory received on 2026-07-15. All 17 selected artifacts are
 | Sesion guardada | Mobile | `Recovery Tracker Sesion Guardada.dc.html` | [Open mobile design](https://claude.ai/design/p/74a9f44b-7927-4c4c-85a3-4424c2f105d8?file=Recovery+Tracker+Sesion+Guardada.dc.html) |
 | Hoy | Desktop | `Recovery Tracker Hoy Desktop.dc.html` | [Open desktop design](https://claude.ai/design/p/74a9f44b-7927-4c4c-85a3-4424c2f105d8?file=Recovery+Tracker+Hoy+Desktop.dc.html) |
 | Hoy | Mobile | `Recovery Tracker Hoy.dc.html` | [Open mobile design](https://claude.ai/design/p/74a9f44b-7927-4c4c-85a3-4424c2f105d8?file=Recovery+Tracker+Hoy.dc.html) |
+| Historial | Mobile | `Recovery Tracker Historial.dc.html` | [Open mobile design](https://claude.ai/design/p/74a9f44b-7927-4c4c-85a3-4424c2f105d8?file=Recovery+Tracker+Historial.dc.html) |
 
 ## Implementation Order
 
@@ -46,6 +47,7 @@ Each increment must preserve the current product behavior and finish with a mobi
 7. [x] Insights: implement analytical cards, charts, empty states, and responsive layout.
 8. [x] Reporte: implement date controls, summaries, notes, and responsive layout.
 9. [x] Landing: implement the signed-out mobile and desktop compositions after shared visual primitives stabilize.
+10. [x] Historial: implement the read-only mobile timeline, session accordion, exercise sets, and separate closeout cards.
 
 ## Per-Screen Definition of Done
 
@@ -93,3 +95,6 @@ Each increment must preserve the current product behavior and finish with a mobi
 - **Landing preview:** the 68%, day/week, and streak card is explicitly an illustrative product preview for signed-out visitors; it is not presented as authenticated user data.
 - **Landing demo access:** anonymous access remains development-only and is omitted from production. The approved secondary CTA maps to the existing auth-safe test action without weakening the server-side environment guard.
 - **Landing contrast:** the preview eyebrow and medical disclaimer are slightly brighter than the reference so their 10px text meets WCAG AA.
+- **Historial data:** fictional dates, sessions, exercise sets, and closeouts are replaced with the authenticated user's persisted records and Lima-local timestamps.
+- **Historial navigation:** the mobile reference's five-tab pill is scoped to this route; the existing desktop sidebar remains the responsive fallback until a desktop Historial artifact is approved.
+- **Historial pagination:** the prototype's previous-period control loads a real preceding 30-day window and resets the single-open session accordion to the newest session in that window.

@@ -62,7 +62,7 @@ export function AppShell({ pathname, user, streak, children, immersive = false }
   const identity = getUserIdentity(user);
 
   return (
-    <main className={`rr-app-shell rr-theme ${immersive ? "is-immersive" : ""}`}>
+    <main className={`rr-app-shell rr-theme ${immersive ? "is-immersive" : ""} ${pathname === "/historial" ? "is-history" : ""}`}>
       <aside className="rr-sidebar">
         <Link className="rr-sidebar-brand" href="/">
           <span aria-hidden="true" className="rr-logo-mark">

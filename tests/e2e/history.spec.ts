@@ -50,14 +50,19 @@ test.describe("read-only history", () => {
     await expect(page).toHaveURL(/\/historial$/);
     await expect(page.getByRole("heading", { name: "Historial" })).toBeVisible();
     const session = page.locator(`[data-session-id="${savedSessionId}"]`);
-    if (!(await session.evaluate((element) => element.hasAttribute("open")))) {
-      await session.locator("summary").click();
+    const toggle = session.getByRole("button");
+    if ((await toggle.getAttribute("aria-expanded")) !== "true") {
+      await toggle.click();
     }
     await expect(session.getByText("Serie 1")).toBeVisible();
+    await toggle.press("Enter");
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await toggle.press("Enter");
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
     await expect(session.getByText("11 rep")).toBeVisible();
-    await expect(session.getByText("7.5 kg")).toBeVisible();
-    await expect(session.getByText("12.5 min · 4.2 km")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Ver 30 dias anteriores" })).toHaveAttribute(
+    await expect(session.getByText("7,5 kg")).toBeVisible();
+    await expect(session.getByText("12,5 min · 4,2 km")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Ver 30 días anteriores" })).toHaveAttribute(
       "href",
       /before=\d{4}-\d{2}-\d{2}/,
     );

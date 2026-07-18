@@ -34,6 +34,11 @@ jobs:
   e2e:
     name: E2E (Supabase local + Playwright)
     runs-on: ubuntu-latest
+    # Demo mode is dev-only in the app; E2E runs a production build (for stable
+    # hydration), so expose the demo entry point via this server-side flag. It is
+    # never set on the real Vercel deploy, so demo stays hidden in production.
+    env:
+      ENABLE_DEMO_MODE: "1"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

@@ -51,6 +51,9 @@ jobs:
       - name: Install Playwright browser
         run: npx playwright install --with-deps chromium
 
+      - name: Build app (E2E runs against a production build in CI)
+        run: npm run build
+
       - name: Run critical E2E
         run: npm run e2e:critical
 

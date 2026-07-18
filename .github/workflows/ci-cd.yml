@@ -1,0 +1,101 @@
+name: CI/CD
+
+# Gates on every push/PR to main; deploy only on push to main.
+# Deploy target = Vercel project wired to Supabase STAGING (ref pevrupenrzueyzidfeah).
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-cd-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "20"
+  SUPABASE_STAGING_REF: pevrupenrzueyzidfeah
+
+jobs:
+  quality:
+    name: Lint · Typecheck · Unit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+
+  e2e:
+    name: E2E (Supabase local + Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+
+      - name: Start local Supabase (applies migrations + seed)
+        run: npx supabase start
+
+      - name: Point app env at local Supabase
+        run: npm run supabase:env:local
+
+      - name: Install Playwright browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run critical E2E
+        run: npm run e2e:critical
+
+      - name: Upload Playwright traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  deploy:
+    name: Deploy → Vercel (staging)
+    runs-on: ubuntu-latest
+    needs: [quality, e2e]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+      - run: npm ci
+
+      # --- Apply DB migrations to Supabase staging BEFORE deploying the app ---
+      - name: Apply migrations to Supabase staging
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+        run: |
+          npx supabase link --project-ref "$SUPABASE_STAGING_REF"
+          npx supabase db push
+
+      # --- Build & deploy on Vercel (env vars come from the Vercel project) ---
+      - name: Pull Vercel project settings
+        run: npx vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Build with Vercel
+        run: npx vercel build --prod --token="${{ secrets.VERCEL_TOKEN }}"
+
+      - name: Deploy prebuilt output to Vercel
+        run: npx vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}"

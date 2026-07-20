@@ -49,6 +49,19 @@ readable at build time, so `NEXT_PUBLIC_*` values would break the build):
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | staging publishable key (`sb_publishable_…`) |
 | `NEXT_PUBLIC_SITE_URL` | `https://recovery-tracker-brahua-lab.vercel.app` |
 
+## Supabase Auth URL configuration (staging)
+
+Google OAuth redirects are validated by the **hosted** Supabase project (not the
+repo). If the callback URL isn't allow-listed, Supabase falls back to the project
+**Site URL** — which defaulted to `http://localhost:3000`, sending signed-in users
+to a dead localhost. Configure (Dashboard → Authentication → URL Configuration,
+or the Management API `PATCH /v1/projects/{ref}/config/auth`):
+
+- **Site URL**: `https://recovery-tracker-brahua-lab.vercel.app`
+- **Redirect URLs (allow list)**:
+  `https://recovery-tracker-brahua-lab.vercel.app/**,http://localhost:3000/**`
+  (localhost entry keeps local dev against staging working.)
+
 ## Deployment protection
 
 Vercel Authentication (SSO protection) is **disabled** so the staging URL is

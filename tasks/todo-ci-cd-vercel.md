@@ -4,7 +4,7 @@ Ref: `tasks/plan-ci-cd-vercel.md`
 
 ## Prerrequisitos manuales (usuario — fuera del repo)
 
-- [ ] Task 0: Provisionar Vercel + secrets
+- [x] Task 0: Provisionar Vercel + secrets
   - Acceptance: proyecto Vercel creado y vinculado; 5 GitHub Secrets cargados
     (`VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`, `SUPABASE_ACCESS_TOKEN`,
     `SUPABASE_DB_PASSWORD`); 3 env vars públicas de Supabase staging configuradas
@@ -45,5 +45,5 @@ Ref: `tasks/plan-ci-cd-vercel.md`
 
 ## Gate final
 
-- [ ] PR de prueba: `quality` + `e2e` verdes, sin deploy.
-- [ ] Merge a `main`: deploy completo verificado (migración + URL staging).
+- [x] (pipeline en main verificado en su lugar) PR de prueba: `quality` + `e2e` verdes, sin deploy.
+- [x] Merge a `main`: deploy completo verificado (migración + URL staging).

@@ -17,14 +17,14 @@ export const reboundLevels = ["NONE", "MILD", "MODERATE", "STRONG"] as const;
 export const exerciseShortcutIds = [
   "BICICLETA",
   "SENTADILLA_ESPANOLA",
-  "TKE",
   "STEP_UP",
   "STEP_DOWN",
   "HIP_THRUST",
   "PESO_MUERTO_RUMANO",
   "CAMINATA_LATERAL_BANDA",
   "PROPIOCEPCION",
-  "ESTIRAMIENTOS_SUAVES",
+  "WALL_SIT",
+  "PUENTE_GLUTEOS",
 ] as const;
 
 export type PainScore = (typeof painScores)[number];

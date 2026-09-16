@@ -82,7 +82,7 @@ describe("exercise entry state", () => {
 
   it("keeps invalid numeric drafts for server validation instead of hiding them", () => {
     const entry = {
-      ...createExerciseEntry("exercise-1", "TKE", "TKE"),
+      ...createExerciseEntry("exercise-1", "Wall sit", "WALL_SIT"),
       sets: [{ id: "set-a", reps: "abc", weightKg: "", notes: "" }],
     };
 
@@ -90,7 +90,7 @@ describe("exercise entry state", () => {
   });
 
   it("only counts exercises with a meaningful set, duration, or distance", () => {
-    const empty = createExerciseEntry("exercise-1", "TKE", "TKE");
+    const empty = createExerciseEntry("exercise-1", "Wall sit", "WALL_SIT");
     const withReps = {
       ...empty,
       sets: [{ id: "set-1", reps: "12", weightKg: "", notes: "" }],

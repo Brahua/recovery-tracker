@@ -221,14 +221,14 @@ type ReboundLevel = 'NONE' | 'MILD' | 'MODERATE' | 'STRONG';
 type ExerciseShortcut =
   | 'BICICLETA'
   | 'SENTADILLA_ESPANOLA'
-  | 'TKE'
   | 'STEP_UP'
   | 'STEP_DOWN'
   | 'HIP_THRUST'
   | 'PESO_MUERTO_RUMANO'
   | 'CAMINATA_LATERAL_BANDA'
   | 'PROPIOCEPCION'
-  | 'ESTIRAMIENTOS_SUAVES';
+  | 'WALL_SIT'
+  | 'PUENTE_GLUTEOS';
 
 interface RehabSession {
   id: string;
@@ -271,14 +271,14 @@ Initial exercise shortcuts:
 
 - Bicicleta 5-10 min.
 - Sentadilla española.
-- TKE.
 - Step-up.
 - Step-down.
 - Hip Thrust.
 - Peso muerto rumano.
 - Caminata lateral con banda.
 - Propiocepción.
-- Estiramientos suaves.
+- Wall sit.
+- Puente de glúteos.
 
 ## API / Data Boundary Draft
 

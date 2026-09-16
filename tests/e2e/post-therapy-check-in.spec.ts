@@ -63,22 +63,22 @@ test.describe("post-therapy check-in", () => {
     await page.getByRole("slider", { name: "Durante" }).fill("3");
     await page.getByRole("slider", { name: "Despues" }).fill("3");
     await page.getByText("Igual", { exact: true }).click();
-    await page.getByText("TKE", { exact: true }).click();
+    await page.getByText("Wall sit", { exact: true }).click();
     await expect(saveButton).toBeDisabled();
     await expect(saveButton).toContainText("faltan 1");
-    const tke = page.locator(".rr-exercise-detail").filter({ hasText: "TKE" });
-    await tke.getByRole("button", { name: "+ Añadir serie" }).click();
-    await tke.getByLabel("Repeticiones").fill("12");
+    const wallSit = page.locator(".rr-exercise-detail").filter({ hasText: "Wall sit" });
+    await wallSit.getByRole("button", { name: "+ Añadir serie" }).click();
+    await wallSit.getByLabel("Repeticiones").fill("12");
     await expect(saveButton).toBeEnabled();
 
-    await page.getByText("Estiramientos suaves", { exact: true }).click();
+    await page.getByText("Puente de gluteos", { exact: true }).click();
     await expect(saveButton).toBeDisabled();
-    const stretching = page
+    const gluteBridge = page
       .locator(".rr-exercise-detail")
-      .filter({ hasText: "Estiramientos suaves" });
-    await expect(stretching).toContainText("Falta completar este ejercicio");
+      .filter({ hasText: "Puente de gluteos" });
+    await expect(gluteBridge).toContainText("Falta completar este ejercicio");
 
-    await page.getByText("Estiramientos suaves", { exact: true }).first().click();
+    await page.getByText("Puente de gluteos", { exact: true }).first().click();
     await expect(saveButton).toBeEnabled();
     await page.getByRole("button", { name: "Añadir nota" }).click();
     const note = page.getByPlaceholder("Algo que quieras recordar...");
@@ -93,7 +93,7 @@ test.describe("post-therapy check-in", () => {
       "Completa o elimina todos los ejercicios seleccionados",
     );
     await expect(page.getByRole("slider", { name: "Durante" })).toHaveValue("3");
-    await expect(tke.getByLabel("Repeticiones")).toHaveValue("12");
+    await expect(wallSit.getByLabel("Repeticiones")).toHaveValue("12");
     await expect(note).toHaveValue("Conservar esta nota si el servidor rechaza el envío.");
   });
 });

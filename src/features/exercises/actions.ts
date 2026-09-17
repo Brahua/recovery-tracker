@@ -6,6 +6,7 @@ import {
   createExerciseRepository,
   DuplicateExerciseNameError,
 } from "@/data/exercise-repository";
+import { AuthenticationRequiredError } from "@/lib/supabase/authenticated";
 import { exerciseIdSchema, exerciseInputSchema } from "@/lib/validation/exercises";
 
 export interface ExerciseActionResult {
@@ -25,7 +26,7 @@ function toErrorResult(error: unknown, context: string): ExerciseActionResult {
     return { ok: false, error: error.message };
   }
 
-  if (error instanceof Error && error.message === "Authenticated user is required.") {
+  if (error instanceof AuthenticationRequiredError) {
     return { ok: false, error: "Tu sesión expiró. Recarga la página e inicia sesión nuevamente." };
   }
 

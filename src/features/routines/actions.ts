@@ -6,6 +6,7 @@ import {
   createRoutineRepository,
   DuplicateRoutineNameError,
 } from "@/data/routine-repository";
+import { AuthenticationRequiredError } from "@/lib/supabase/authenticated";
 import { routineIdSchema, routineInputSchema, routineNameSchema } from "@/lib/validation/routines";
 
 export interface RoutineActionResult {
@@ -26,7 +27,7 @@ function toErrorResult(error: unknown, context: string): RoutineActionResult {
     return { ok: false, error: error.message };
   }
 
-  if (error instanceof Error && error.message === "Authenticated user is required.") {
+  if (error instanceof AuthenticationRequiredError) {
     return { ok: false, error: "Tu sesión expiró. Recarga la página e inicia sesión nuevamente." };
   }
 
@@ -47,16 +48,17 @@ export async function saveRoutineAction(
     return { ok: false, error: genericError };
   }
 
+  let routineId: string;
   try {
     const repository = await createRoutineRepository();
-    const routineId = await repository.saveRoutine(id, parsed.data);
-    revalidateRoutineViews();
-    // A new name typed in a routine can create catalog exercises.
-    revalidatePath("/ejercicios/rutinas/[id]", "page");
-    return { ok: true, routineId };
+    routineId = await repository.saveRoutine(id, parsed.data);
   } catch (error) {
     return toErrorResult(error, "Failed to save routine.");
   }
+
+  revalidateRoutineViews();
+  revalidatePath("/ejercicios/rutinas/[id]", "page");
+  return { ok: true, routineId };
 }
 
 export async function deleteRoutineAction(id: string): Promise<RoutineActionResult> {
@@ -88,12 +90,14 @@ export async function createRoutineFromSessionAction(
     return { ok: false, error: genericError };
   }
 
+  let routineId: string;
   try {
     const repository = await createRoutineRepository();
-    const routineId = await repository.createRoutineFromSession(sessionId, parsedName.data);
-    revalidateRoutineViews();
-    return { ok: true, routineId };
+    routineId = await repository.createRoutineFromSession(sessionId, parsedName.data);
   } catch (error) {
     return toErrorResult(error, "Failed to create routine from session.");
   }
+
+  revalidateRoutineViews();
+  return { ok: true, routineId };
 }

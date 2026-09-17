@@ -7,7 +7,10 @@ import {
   type RoutineExerciseSetRow,
   type RoutineRow,
 } from "@/data/recovery-log-mappers";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import {
+  requireAuthenticatedSupabase,
+  type ServerSupabaseClient,
+} from "@/lib/supabase/authenticated";
 import { routineIdSchema, routineInputSchema, routineNameSchema } from "@/lib/validation/routines";
 import type { Routine } from "@/types/recovery";
 
@@ -27,10 +30,9 @@ export class DuplicateRoutineNameError extends RoutineRepositoryError {
 
 const uniqueViolationCode = "23505";
 
-type ServerSupabaseClient = Awaited<ReturnType<typeof createServerSupabaseClient>>;
-
 export interface RoutineRepository {
-  listRoutines(): Promise<Routine[]>;
+  /** Pass the catalog names when already loaded to skip one query. */
+  listRoutines(exerciseNameById?: Map<string, string>): Promise<Routine[]>;
   getRoutine(id: string): Promise<Routine | null>;
   saveRoutine(id: string | null, input: unknown): Promise<string>;
   deleteRoutine(id: string): Promise<void>;
@@ -43,21 +45,10 @@ function toRepositoryError(error: { code?: string; message: string }) {
     : new RoutineRepositoryError(error.message);
 }
 
-async function requireAuthenticatedSupabase() {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    throw new RoutineRepositoryError("Authenticated user is required.");
-  }
-
-  return supabase;
-}
-
-async function loadRoutines(supabase: ServerSupabaseClient, routineId?: string) {
+async function loadRoutines(
+  supabase: ServerSupabaseClient,
+  { routineId, knownNames }: { routineId?: string; knownNames?: Map<string, string> } = {},
+) {
   let routineQuery = supabase.from("routines").select(routineColumns).order("name", { ascending: true });
   if (routineId) routineQuery = routineQuery.eq("id", routineId);
 
@@ -74,7 +65,9 @@ async function loadRoutines(supabase: ServerSupabaseClient, routineId?: string) 
   if (exerciseError) throw new RoutineRepositoryError(exerciseError.message);
 
   const exerciseRows = (exerciseData ?? []) as RoutineExerciseRow[];
-  const exerciseIds = [...new Set(exerciseRows.map((row) => row.exercise_id))];
+  const missingNameIds = [...new Set(exerciseRows.map((row) => row.exercise_id))].filter(
+    (id) => !knownNames?.has(id),
+  );
 
   const [{ data: setData, error: setError }, { data: nameData, error: nameError }] =
     await Promise.all([
@@ -84,17 +77,20 @@ async function loadRoutines(supabase: ServerSupabaseClient, routineId?: string) 
             .from("routine_exercise_sets")
             .select(routineExerciseSetColumns)
             .in("routine_exercise_id", exerciseRows.map((row) => row.id)),
-      exerciseIds.length === 0
+      missingNameIds.length === 0
         ? Promise.resolve({ data: [], error: null })
-        : supabase.from("exercises").select("id, name").in("id", exerciseIds),
+        : supabase.from("exercises").select("id, name").in("id", missingNameIds),
     ]);
   if (setError || nameError) {
     throw new RoutineRepositoryError((setError ?? nameError)?.message ?? "Failed to load routines.");
   }
 
-  const exerciseNameById = new Map(
-    ((nameData ?? []) as Array<{ id: string; name: string }>).map((row) => [row.id, row.name]),
-  );
+  const exerciseNameById = new Map([
+    ...(knownNames ?? []),
+    ...((nameData ?? []) as Array<{ id: string; name: string }>).map(
+      (row) => [row.id, row.name] as const,
+    ),
+  ]);
 
   return routines.map((routine) =>
     mapRoutineRows(
@@ -108,24 +104,24 @@ async function loadRoutines(supabase: ServerSupabaseClient, routineId?: string) 
 
 export async function createRoutineRepository(): Promise<RoutineRepository> {
   return {
-    async listRoutines() {
-      const supabase = await requireAuthenticatedSupabase();
-      return loadRoutines(supabase);
+    async listRoutines(exerciseNameById) {
+      const { supabase } = await requireAuthenticatedSupabase();
+      return loadRoutines(supabase, { knownNames: exerciseNameById });
     },
 
     async getRoutine(id) {
       const parsedId = routineIdSchema.safeParse(id);
       if (!parsedId.success) return null;
 
-      const supabase = await requireAuthenticatedSupabase();
-      const [routine] = await loadRoutines(supabase, parsedId.data);
+      const { supabase } = await requireAuthenticatedSupabase();
+      const [routine] = await loadRoutines(supabase, { routineId: parsedId.data });
       return routine ?? null;
     },
 
     async saveRoutine(id, input) {
       const routineId = id === null ? null : routineIdSchema.parse(id);
       const parsed = routineInputSchema.parse(input);
-      const supabase = await requireAuthenticatedSupabase();
+      const { supabase } = await requireAuthenticatedSupabase();
       const { data, error } = await supabase.rpc("save_routine", {
         target_routine_id: routineId,
         payload: parsed,
@@ -140,7 +136,7 @@ export async function createRoutineRepository(): Promise<RoutineRepository> {
 
     async deleteRoutine(id) {
       const routineId = routineIdSchema.parse(id);
-      const supabase = await requireAuthenticatedSupabase();
+      const { supabase } = await requireAuthenticatedSupabase();
       const { error } = await supabase.from("routines").delete().eq("id", routineId);
 
       if (error) throw new RoutineRepositoryError(error.message);
@@ -149,7 +145,7 @@ export async function createRoutineRepository(): Promise<RoutineRepository> {
     async createRoutineFromSession(sessionId, name) {
       const parsedSessionId = routineIdSchema.parse(sessionId);
       const parsedName = routineNameSchema.parse(name);
-      const supabase = await requireAuthenticatedSupabase();
+      const { supabase } = await requireAuthenticatedSupabase();
       const { data, error } = await supabase.rpc("create_routine_from_session", {
         source_session_id: parsedSessionId,
         routine_name: parsedName,

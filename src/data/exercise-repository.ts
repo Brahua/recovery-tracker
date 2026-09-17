@@ -3,7 +3,7 @@ import {
   mapExerciseRow,
   type ExerciseRow,
 } from "@/data/recovery-log-mappers";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { requireAuthenticatedSupabase } from "@/lib/supabase/authenticated";
 import { exerciseIdSchema, exerciseInputSchema } from "@/lib/validation/exercises";
 import type { Exercise, ExerciseInput } from "@/types/recovery";
 
@@ -49,20 +49,6 @@ function toRepositoryError(error: { code?: string; message: string }) {
   return error.code === uniqueViolationCode
     ? new DuplicateExerciseNameError()
     : new ExerciseRepositoryError(error.message);
-}
-
-async function requireAuthenticatedSupabase() {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    throw new ExerciseRepositoryError("Authenticated user is required.");
-  }
-
-  return { supabase, userId: user.id };
 }
 
 export async function createExerciseRepository(): Promise<ExerciseRepository> {

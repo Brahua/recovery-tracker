@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { ModalSheet } from "@/components/modal-sheet";
-import { formatExerciseCount, formatRoutinePreview } from "@/features/routines/routine-list";
+import { RoutineRowContent } from "@/features/routines/routine-list";
+import { createDraftId } from "@/lib/draft-id";
 import type { ExerciseEntryDraft } from "@/lib/exercise-entry-state";
 import { addRoutineToSession, formatRoutineAddedMessage } from "@/lib/routine-state";
 import type { Exercise, Routine } from "@/types/recovery";
@@ -12,17 +13,16 @@ import type { Exercise, Routine } from "@/types/recovery";
 interface RoutinePickerProps {
   catalog: Exercise[];
   entries: ExerciseEntryDraft[];
-  nextId: (prefix: string) => string;
   onChange: (entries: ExerciseEntryDraft[]) => void;
   routines: Routine[];
 }
 
-export function RoutinePicker({ catalog, entries, nextId, onChange, routines }: RoutinePickerProps) {
+export function RoutinePicker({ catalog, entries, onChange, routines }: RoutinePickerProps) {
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
 
   function applyRoutine(routine: Routine) {
-    const result = addRoutineToSession(entries, routine, catalog, nextId);
+    const result = addRoutineToSession(entries, routine, catalog, createDraftId);
     onChange(result.entries);
     setMessage(formatRoutineAddedMessage(routine.name, result.added, result.skipped));
     setOpen(false);
@@ -62,14 +62,7 @@ export function RoutinePicker({ catalog, entries, nextId, onChange, routines }: 
                   onClick={() => applyRoutine(routine)}
                   type="button"
                 >
-                  <span className="rr-routine-row-text">
-                    <strong>{routine.name}</strong>
-                    <small>{formatRoutinePreview(routine)}</small>
-                  </span>
-                  <span className="rr-exercise-row-summary">
-                    {formatExerciseCount(routine.exercises.length)}
-                  </span>
-                  <b aria-hidden="true">+</b>
+                  <RoutineRowContent routine={routine} trailing="+" />
                 </button>
               </li>
             ))}

@@ -8,6 +8,7 @@ import {
   invalidExercisePayloadMessage,
   parseExercisePayload,
 } from "@/features/check-in/post-therapy/exercise-payload";
+import { AuthenticationRequiredError } from "@/lib/supabase/authenticated";
 import type {
   FinalState,
   PainScore,
@@ -72,7 +73,7 @@ function getSaveErrorMessage(error: unknown) {
       return error.message;
     }
 
-    if (error.message === "Authenticated user is required.") {
+    if (error instanceof AuthenticationRequiredError) {
       return "Tu sesión expiró. Recarga la página e inicia sesión nuevamente.";
     }
   }

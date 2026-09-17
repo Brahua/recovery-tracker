@@ -6,6 +6,7 @@ import { useId, useState, useTransition } from "react";
 
 import { ExerciseEntryEditor } from "@/components/exercise-entry-editor";
 import { deleteRoutineAction, saveRoutineAction } from "@/features/routines/actions";
+import { createDraftId } from "@/lib/draft-id";
 import {
   findRepeatedEntryIds,
   isEntryReady,
@@ -21,17 +22,13 @@ interface RoutineEditorProps {
 
 const routinesHref = "/ejercicios?seccion=rutinas";
 
-function nextId(prefix: string) {
-  return `${prefix}-${crypto.randomUUID()}`;
-}
-
 export function RoutineEditor({ catalog, routine }: RoutineEditorProps) {
   const router = useRouter();
   const nameId = useId();
   const [pending, startTransition] = useTransition();
   const [name, setName] = useState(routine?.name ?? "");
   const [entries, setEntries] = useState<ExerciseEntryDraft[]>(() =>
-    routine ? routineToEntries(routine, nextId) : [],
+    routine ? routineToEntries(routine, createDraftId) : [],
   );
   const [error, setError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);

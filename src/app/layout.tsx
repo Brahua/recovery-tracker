@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Archivo, Instrument_Sans } from "next/font/google";
+import { FeedbackProviders } from "@/components/feedback/feedback-providers";
+
 import "./globals.css";
 
 const archivo = Archivo({
@@ -27,7 +29,9 @@ export default function RootLayout({
       lang="es"
       className={`${archivo.variable} ${instrumentSans.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <FeedbackProviders>{children}</FeedbackProviders>
+      </body>
     </html>
   );
 }

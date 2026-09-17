@@ -35,7 +35,7 @@ export default async function Home({
       <TodayOverview
         recentCloseouts={recentCloseouts}
         recentSessions={recentSessions}
-        userEmail={user.email}
+        user={user}
       />
     </AppShell>
   );

@@ -8,6 +8,10 @@ import {
 } from "@/lib/today-view-model";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 import { getRecoveryDateKey, recoveryTimeZone } from "@/lib/recovery-date";
+import {
+  getUserDisplayName,
+  type DisplayNameUser,
+} from "@/lib/user-display-name";
 
 const dateFormatter = new Intl.DateTimeFormat("es-PE", {
   weekday: "long",
@@ -30,12 +34,6 @@ const reboundLabels: Record<NightlyCloseout["reboundPainLevel"], string> = {
 
 function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function getFirstName(email?: string | null) {
-  const localPart = email?.trim().split("@")[0] || "tu";
-  const firstName = localPart.split(/[._-]/)[0] ?? localPart;
-  return capitalize(firstName);
 }
 
 function sessionDateKey(session: RehabSession) {
@@ -118,13 +116,13 @@ function PreviewLink({
 interface TodayOverviewProps {
   recentSessions: RehabSession[];
   recentCloseouts: NightlyCloseout[];
-  userEmail?: string | null;
+  user: DisplayNameUser;
 }
 
 export function TodayOverview({
   recentSessions,
   recentCloseouts,
-  userEmail,
+  user,
 }: TodayOverviewProps) {
   const now = new Date();
   const todayKey = getRecoveryDateKey(now);
@@ -141,7 +139,7 @@ export function TodayOverview({
   const milestoneProgress = Math.round((loggedDays / 30) * 100);
   const latestSession = recentSessions[0];
   const latestCloseout = recentCloseouts[0];
-  const firstName = getFirstName(userEmail);
+  const firstName = getUserDisplayName(user) ?? "Tu";
 
   return (
     <div className="rr-today">

@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/app-link";
 import { usePathname } from "next/navigation";
 
 import { signOutAction } from "@/app/auth/actions";
+import { FormPendingReporter } from "@/components/feedback/form-pending-reporter";
 import {
   getUserDisplayName,
   type DisplayNameUser,
@@ -119,6 +120,7 @@ export function AppShell({ user, streak, children }: AppShellProps) {
               <span>Tu recuperacion</span>
             </div>
             <form action={signOutAction}>
+              <FormPendingReporter />
               <button title="Cerrar sesion" type="submit">
                 Salir
               </button>

@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/app-link";
 
 import { ReportActions } from "@/components/report-actions";
 import { ReportQuestions } from "@/components/report-questions";

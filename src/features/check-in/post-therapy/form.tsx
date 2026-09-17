@@ -1,10 +1,11 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/app-link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { ExerciseEntryEditor } from "@/components/exercise-entry-editor";
+import { FormPendingReporter } from "@/components/feedback/form-pending-reporter";
 import { RitualPainSlider } from "@/components/ritual-pain-slider";
 import { createPostTherapySessionAction } from "@/features/check-in/post-therapy/actions";
 import { RoutinePicker } from "@/features/routines/routine-picker";
@@ -178,6 +179,7 @@ export function PostTherapyForm({
     painBefore !== null && painDuring !== null && painAfter !== null;
   return (
     <form action={formAction} className="rr-session-form">
+      <FormPendingReporter />
       <header className="rr-registrar-header">
         <div className="rr-registrar-title">
           <Link aria-label="Volver a Hoy" href="/">

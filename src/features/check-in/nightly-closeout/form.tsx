@@ -1,16 +1,16 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import Link from "@/components/app-link";
 import {
   useActionState,
   useState,
-  useTransition,
   type CSSProperties,
 } from "react";
 import { useFormStatus } from "react-dom";
 
+import { FormPendingReporter } from "@/components/feedback/form-pending-reporter";
 import { RitualPainSlider } from "@/components/ritual-pain-slider";
+import { useAppRouter } from "@/components/use-app-router";
 import { createNightlyCloseoutAction } from "@/features/check-in/nightly-closeout/actions";
 import {
   CloseoutDateContext,
@@ -151,12 +151,12 @@ export function NightlyCloseoutForm({
   selectedDate,
   selectedSession,
 }: NightlyCloseoutFormProps) {
-  const router = useRouter();
+  const router = useAppRouter();
   const [actionState, formAction] = useActionState(
     createNightlyCloseoutAction,
     { error: errorMessage ?? null },
   );
-  const [isDatePending, startDateTransition] = useTransition();
+  const isDatePending = router.pending;
   const [endOfDayPain, setEndOfDayPain] = useState<PainScore | null>(null);
   const [energy, setEnergy] = useState<Rating1To5 | null>(null);
   const [reboundPainLevel, setReboundPainLevel] = useState<ReboundLevel | null>(null);
@@ -188,13 +188,12 @@ export function NightlyCloseoutForm({
   }
 
   function changeDate(nextDate: string) {
-    startDateTransition(() => {
-      router.replace(`/registrar?mode=closeout&date=${encodeURIComponent(nextDate)}`);
-    });
+    router.replace(`/registrar?mode=closeout&date=${encodeURIComponent(nextDate)}`);
   }
 
   return (
     <form action={formAction} className="rr-closeout-form">
+      <FormPendingReporter />
       <div aria-hidden="true" className="rr-closeout-glow" />
       <header className="rr-registrar-header rr-closeout-header">
         <div className="rr-registrar-title">

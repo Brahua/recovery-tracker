@@ -42,6 +42,12 @@ export async function searchExercise(page: Page, query: string) {
   return dialog;
 }
 
+// Blur the name field so the suggestion list stops covering the sheet.
+export async function dismissSuggestions(page: Page) {
+  await exerciseDialog(page).locator(".rr-modal-sheet-header h2").click();
+  await expect(exerciseDialog(page).getByRole("listbox")).toBeHidden();
+}
+
 export async function addExerciseFromCatalog(page: Page, query: string, name: string) {
   const dialog = await searchExercise(page, query);
   await dialog.getByRole("option").filter({ hasText: name }).first().click();

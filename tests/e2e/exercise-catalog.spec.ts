@@ -5,6 +5,7 @@ import {
   catalogRow,
   closeExerciseDialog,
   createCatalogExercise,
+  dismissSuggestions,
   exerciseDialog,
   fillSessionBasics,
   openExerciseCatalog,
@@ -28,6 +29,7 @@ test.describe("exercise catalog", () => {
     const name = uniqueName("Prensa e2e");
     const dialog = await searchExercise(page, name);
     await expect(dialog.getByRole("option").filter({ hasText: `Crear “${name}”` })).toBeVisible();
+    await dismissSuggestions(page);
     await dialog.getByRole("button", { name: "+ Añadir serie" }).click();
     await dialog.getByLabel("Repeticiones").fill("10");
     await closeExerciseDialog(page);
@@ -108,6 +110,7 @@ test.describe("exercise catalog", () => {
     for (const typedName of ["PUENTE DE GLÚTEOS", "sentadilla  ESPAÑOLA"]) {
       const dialog = await searchExercise(page, typedName);
       await expect(dialog.getByRole("option").filter({ hasText: "Crear" })).toHaveCount(0);
+      await dismissSuggestions(page);
       await dialog.getByRole("button", { name: "+ Añadir serie" }).click();
       await dialog.getByLabel("Repeticiones").fill("8");
       await closeExerciseDialog(page);
@@ -131,7 +134,8 @@ test.describe("exercise catalog", () => {
     await closeExerciseDialog(page);
 
     const typed = await searchExercise(page, "wall sit");
-    await expect(typed.getByRole("option")).toHaveCount(0);
+    await expect(typed.getByRole("option").filter({ hasText: /^Wall sit$/ })).toHaveCount(0);
+    await dismissSuggestions(page);
     await typed.getByRole("button", { name: "+ Añadir serie" }).click();
     await typed.getByLabel("Repeticiones").fill("5");
     await expect(typed.getByText("Este ejercicio ya está en la sesión")).toBeVisible();

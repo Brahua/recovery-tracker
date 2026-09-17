@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { expect, test } from "@playwright/test";
 
 import {
@@ -148,5 +150,55 @@ test.describe("routines", () => {
     }
     await expect(session.getByText("Puente de gluteos")).toBeVisible();
     await expect(session.getByText("Serie 1 · 12 rep")).toBeVisible();
+  });
+
+  test("shows an error for a duplicate routine name and keeps the draft", async ({ page }) => {
+    const name = uniqueName("Duplicada e2e");
+    await createRoutine(page, name, [{ query: "step-u", name: "Step-up", reps: "10" }]);
+
+    await page.getByRole("link", { name: "+ Nueva rutina" }).click();
+    await page.getByLabel("Nombre de la rutina").fill(name.toUpperCase());
+    await addExerciseFromCatalog(page, "wall", "Wall sit");
+    await closeExerciseDialog(page);
+    await page.getByRole("button", { name: "Guardar rutina" }).click();
+
+    await expect(
+      page.getByRole("alert").filter({ hasText: "Ya existe una rutina con ese nombre." }),
+    ).toBeVisible();
+    await expect(page).toHaveURL(/\/ejercicios\/rutinas\/nueva$/);
+    await expect(page.getByLabel("Nombre de la rutina")).toHaveValue(name.toUpperCase());
+    await expect(routineExerciseRow(page, "Wall sit")).toBeVisible();
+  });
+
+  test("shows not found for a routine that does not exist or is not the user's", async ({ page }) => {
+    // Another user's routine is filtered out by RLS exactly like a missing id.
+    for (const id of [randomUUID(), "no-es-un-id"]) {
+      await page.goto(`/ejercicios/rutinas/${id}`);
+      await expect(page.getByText("This page could not be found.")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Editar rutina" })).toHaveCount(0);
+    }
+  });
+
+  test("changing values while logging does not modify the routine", async ({ page }) => {
+    const name = uniqueName("Intacta e2e");
+    await createRoutine(page, name, [{ query: "wall", name: "Wall sit", holdSeconds: "40" }]);
+
+    await openSessionForm(page);
+    await fillSessionBasics(page);
+    await page.getByRole("button", { name: "Usar rutina" }).click();
+    await exerciseDialog(page)
+      .getByRole("list", { name: "Rutinas disponibles" })
+      .getByRole("button")
+      .filter({ hasText: name })
+      .click();
+    await sessionExerciseRow(page, "Wall sit").click();
+    await exerciseDialog(page).getByLabel("Segundos", { exact: true }).fill("55");
+    await closeExerciseDialog(page);
+    await expect(sessionExerciseRow(page, "Wall sit")).toContainText("1 × 55 s");
+    await saveSession(page);
+
+    await openRoutines(page);
+    await routineListRow(page, name).click();
+    await expect(routineExerciseRow(page, "Wall sit")).toContainText("1 × 40 s");
   });
 });

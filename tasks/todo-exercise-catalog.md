@@ -143,4 +143,4 @@ Regla: en la PC solo `npm run typecheck`, `npm run lint` y `npm test`. Las migra
 ### Checkpoint final
 - [x] Criterios de éxito 1–10 de la spec cumplidos
 - [x] Aprobación del usuario → merge a `main` → CI aplica la migración a staging y despliega
-- [ ] Pendiente futuro (preguntar antes): migración que elimina `shortcut_id`
+- [x] Migración que elimina `shortcut_id`: `20260919000000_drop_session_exercise_shortcut_id.sql`

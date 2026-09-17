@@ -7,6 +7,8 @@ The format is based on Keep a Changelog and this project currently follows Seman
 ## [Unreleased]
 
 ### Added
+- Global loading feedback: a top progress bar fed by every server round-trip (links, programmatic navigation, form submissions and server actions) plus a route skeleton, and floating toasts confirming every write (session, closeout, exercise save/archive/reactivate/merge, routine save/delete, session→routine).
+- Fallback error screen for failures no form handled, keeping the shell and offering a retry.
 - Per-user exercise catalog (`/ejercicios`) with defaults, "isometric by default", archive/reactivate and merge; each user starts with 10 exercises.
 - Compact session logging: one summary row per exercise, detail in a native dialog sheet, accent-insensitive name autocomplete, most-used quick picks, and create/reactivate from typed names.
 - Isometric logging with hold seconds per set, shown in history.
@@ -23,6 +25,8 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Project-owned rehabilitation hero image and a canonical inventory of the 19 implemented design references.
 
 ### Changed
+- Greeting and sidebar show the name saved on the account (`user_metadata.full_name`), falling back to the email local part.
+- Signed-in routes live in an `(app)` route group whose layout renders the shell once, so navigation swaps only the content; this supersedes the earlier removal of the Historial loading boundary, which had no shell.
 - Replaced the TKE and Estiramientos suaves shortcuts with Wall sit and Puente de gluteos, then replaced fixed shortcuts with the catalog and dropped `session_exercises.shortcut_id`.
 - Insights counts catalog exercises once per session, even after renames or merges.
 - Split the former `Carga y cierre` concept into `Esfuerzo de la sesión`, `Estado al terminar`, and the separate `Cierre del día` ritual.

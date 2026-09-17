@@ -1,7 +1,9 @@
 import Link from "next/link";
 
+import { SaveSessionAsRoutine } from "@/features/routines/save-session-as-routine";
 import type { RitualSuccessConfig } from "@/lib/registrar-flow";
 import { recoveryTimeZone } from "@/lib/recovery-date";
+import { suggestRoutineName } from "@/lib/routine-state";
 import type { RehabSession, SessionType } from "@/types/recovery";
 
 const sessionTypeLabels: Record<SessionType, string> = {
@@ -130,6 +132,12 @@ export function SessionSavedState({
           <Link className="rr-success-secondary" href="/historial">
             Ver historial
           </Link>
+          {session && session.exercises.length > 0 ? (
+            <SaveSessionAsRoutine
+              sessionId={session.id}
+              suggestedName={suggestRoutineName(session.sessionType, session.occurredAt, recoveryTimeZone)}
+            />
+          ) : null}
         </div>
       </div>
     </section>

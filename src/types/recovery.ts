@@ -52,6 +52,23 @@ export interface Exercise extends ExerciseDefaults {
 
 export type ExerciseInput = ExerciseDefaults & { name: string };
 
+export interface RoutineExercise {
+  exerciseId: string;
+  name: string;
+  isIsometric: boolean;
+  durationMinutes?: number;
+  distanceKm?: number;
+  sets: Array<Omit<ExerciseSet, "notes">>;
+}
+
+export interface Routine {
+  id: string;
+  name: string;
+  exercises: RoutineExercise[];
+  createdAt: ISODateTimeString;
+  updatedAt: ISODateTimeString;
+}
+
 export interface LegacyExercisePrescription {
   setCount?: number;
   reps?: number;

@@ -1,24 +1,35 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 import { ModalSheet } from "@/components/modal-sheet";
 import { ExerciseForm } from "@/features/exercises/exercise-form";
+import { RoutineList } from "@/features/routines/routine-list";
 import { normalizeExerciseName } from "@/lib/exercise-name";
 import { summarizeExerciseDefaults } from "@/lib/exercise-summary";
-import type { Exercise } from "@/types/recovery";
+import type { Exercise, Routine } from "@/types/recovery";
+
+export type CatalogSection = "ejercicios" | "rutinas";
 
 interface ExerciseCatalogProps {
   exercises: Exercise[];
+  routines: Routine[];
+  section: CatalogSection;
 }
 
 type Editing = { mode: "create" } | { mode: "edit"; id: string } | null;
 type CatalogTab = "active" | "archived";
 
-export function ExerciseCatalog({ exercises }: ExerciseCatalogProps) {
+function ExerciseSection({
+  exercises,
+  onEdit,
+}: {
+  exercises: Exercise[];
+  onEdit: (id: string) => void;
+}) {
   const [query, setQuery] = useState("");
   const [tab, setTab] = useState<CatalogTab>("active");
-  const [editing, setEditing] = useState<Editing>(null);
 
   const active = exercises.filter((exercise) => !exercise.archivedAt);
   const archived = exercises.filter((exercise) => exercise.archivedAt);
@@ -26,25 +37,9 @@ export function ExerciseCatalog({ exercises }: ExerciseCatalogProps) {
   const visible = (tab === "active" ? active : archived).filter((exercise) =>
     normalizeExerciseName(exercise.name).includes(normalizedQuery),
   );
-  const editingExercise =
-    editing?.mode === "edit"
-      ? exercises.find((exercise) => exercise.id === editing.id)
-      : undefined;
-  const modalOpen = editing?.mode === "create" || Boolean(editingExercise);
 
   return (
-    <section className="rr-exercise-catalog">
-      <header className="rr-exercise-catalog-header">
-        <div>
-          <p className="rr-kicker">Tu catálogo</p>
-          <h1 className="rr-display">Ejercicios</h1>
-          <p>Define nombres y valores por defecto para registrar más rápido.</p>
-        </div>
-        <button className="rr-modal-primary" onClick={() => setEditing({ mode: "create" })} type="button">
-          + Nuevo
-        </button>
-      </header>
-
+    <>
       <div className="rr-exercise-catalog-controls">
         <label className="rr-exercise-catalog-search">
           <span className="rr-visually-hidden">Buscar ejercicio</span>
@@ -80,11 +75,7 @@ export function ExerciseCatalog({ exercises }: ExerciseCatalogProps) {
 
             return (
               <li key={exercise.id}>
-                <button
-                  className="rr-exercise-row"
-                  onClick={() => setEditing({ mode: "edit", id: exercise.id })}
-                  type="button"
-                >
+                <button className="rr-exercise-row" onClick={() => onEdit(exercise.id)} type="button">
                   <span className="rr-exercise-row-name">
                     <strong>{exercise.name}</strong>
                     {exercise.defaultIsometric ? <em>Isométrico</em> : null}
@@ -101,6 +92,57 @@ export function ExerciseCatalog({ exercises }: ExerciseCatalogProps) {
             );
           })}
         </ul>
+      )}
+    </>
+  );
+}
+
+export function ExerciseCatalog({ exercises, routines, section }: ExerciseCatalogProps) {
+  const [editing, setEditing] = useState<Editing>(null);
+
+  const activeCount = exercises.filter((exercise) => !exercise.archivedAt).length;
+  const editingExercise =
+    editing?.mode === "edit"
+      ? exercises.find((exercise) => exercise.id === editing.id)
+      : undefined;
+  const modalOpen = editing?.mode === "create" || Boolean(editingExercise);
+
+  return (
+    <section className="rr-exercise-catalog">
+      <header className="rr-exercise-catalog-header">
+        <div>
+          <p className="rr-kicker">Tu catálogo</p>
+          <h1 className="rr-display">Ejercicios</h1>
+          <p>
+            {section === "rutinas"
+              ? "Agrupa ejercicios con su plan para registrar sesiones repetidas en un toque."
+              : "Define nombres y valores por defecto para registrar más rápido."}
+          </p>
+        </div>
+        {section === "rutinas" ? (
+          <Link className="rr-modal-primary rr-link-button" href="/ejercicios/rutinas/nueva">
+            + Nueva rutina
+          </Link>
+        ) : (
+          <button className="rr-modal-primary" onClick={() => setEditing({ mode: "create" })} type="button">
+            + Nuevo
+          </button>
+        )}
+      </header>
+
+      <nav aria-label="Secciones de ejercicios" className="rr-exercise-catalog-tabs">
+        <Link aria-current={section === "ejercicios" ? "page" : undefined} href="/ejercicios">
+          Ejercicios <b>{activeCount}</b>
+        </Link>
+        <Link aria-current={section === "rutinas" ? "page" : undefined} href="/ejercicios?seccion=rutinas">
+          Rutinas <b>{routines.length}</b>
+        </Link>
+      </nav>
+
+      {section === "rutinas" ? (
+        <RoutineList routines={routines} />
+      ) : (
+        <ExerciseSection exercises={exercises} onEdit={(id) => setEditing({ mode: "edit", id })} />
       )}
 
       <ModalSheet

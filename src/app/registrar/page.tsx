@@ -4,6 +4,7 @@ import { AppShell } from "@/components/app-shell";
 import { DayClosedState } from "@/components/day-closed-state";
 import { SessionSavedState } from "@/components/session-saved-state";
 import { createExerciseRepository } from "@/data/exercise-repository";
+import { createRoutineRepository } from "@/data/routine-repository";
 import { NightlyCloseoutForm } from "@/features/check-in/nightly-closeout/form";
 import { PostTherapyForm } from "@/features/check-in/post-therapy/form";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
@@ -25,10 +26,16 @@ function getSingleSearchParam(searchParams: SearchParams, key: string) {
   return typeof value === "string" ? value : undefined;
 }
 
-async function loadExerciseCatalog() {
-  const repository = await createExerciseRepository();
-  await repository.ensureDefaultExercises();
-  return repository.listExercises();
+async function loadExerciseLibrary() {
+  const exerciseRepository = await createExerciseRepository();
+  await exerciseRepository.ensureDefaultExercises();
+  const routineRepository = await createRoutineRepository();
+  const [catalog, routines] = await Promise.all([
+    exerciseRepository.listExercises(),
+    routineRepository.listRoutines(),
+  ]);
+
+  return { catalog, routines };
 }
 
 export default async function RegistrarPage({
@@ -113,7 +120,9 @@ export default async function RegistrarPage({
       )
     : undefined;
   const showSessionForm = mode === "session" && !showSessionSuccess && !showNightlySuccess;
-  const catalog = showSessionForm ? await loadExerciseCatalog() : [];
+  const { catalog, routines } = showSessionForm
+    ? await loadExerciseLibrary()
+    : { catalog: [], routines: [] };
   const successState = showSessionSuccess
     ? buildSessionSuccessState(hasCloseoutToday, sessionSuccessMessage)
     : showNightlySuccess
@@ -146,6 +155,7 @@ export default async function RegistrarPage({
           {mode === "session" ? (
           <PostTherapyForm
             catalog={catalog}
+            routines={routines}
             defaultOccurredAt={new Date().toISOString()}
             errorMessage={sessionErrorMessage}
             recentSessions={recentSessions}

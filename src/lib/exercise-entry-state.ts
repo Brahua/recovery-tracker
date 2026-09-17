@@ -229,3 +229,10 @@ export function findRepeatedEntryIds(entries: ExerciseEntryDraft[], catalog: Cat
 
   return repeated;
 }
+
+export type ExerciseEditorMode = "session" | "routine";
+
+// A routine may leave the plan for later; a session needs something logged.
+export function isEntryReady(entry: ExerciseEntryDraft, mode: ExerciseEditorMode) {
+  return mode === "routine" ? hasText(entry.name) : isExerciseEntryComplete(entry);
+}

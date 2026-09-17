@@ -40,8 +40,8 @@ Regla: en la PC solo `npm run typecheck`, `npm run lint` y `npm test`. Las migra
 
 ### Checkpoint A
 - [x] typecheck, lint y unitarios en verde en la PC
-- [ ] PR a `main` con CI en verde (migración + e2e actuales)
-- [ ] Revisión con el usuario
+- [x] PR a `main` con CI en verde (migración + e2e actuales)
+- [x] Revisión con el usuario
 
 ## Phase 2: Registro de sesión
 
@@ -95,8 +95,8 @@ Regla: en la PC solo `npm run typecheck`, `npm run lint` y `npm test`. Las migra
   - Deps: T2, T3
 
 ### Checkpoint B
-- [ ] CI en verde en el PR con los e2e del registro nuevo
-- [ ] Revisión visual con el usuario
+- [x] CI en verde en el PR con los e2e del registro nuevo
+- [x] Revisión visual con el usuario
 
 ## Phase 3: Mantenimiento
 
@@ -141,6 +141,6 @@ Regla: en la PC solo `npm run typecheck`, `npm run lint` y `npm test`. Las migra
   - Deps: T1–T11
 
 ### Checkpoint final
-- [ ] Criterios de éxito 1–10 de la spec cumplidos
-- [ ] Aprobación del usuario → merge a `main` → CI aplica la migración a staging y despliega
+- [x] Criterios de éxito 1–10 de la spec cumplidos
+- [x] Aprobación del usuario → merge a `main` → CI aplica la migración a staging y despliega
 - [ ] Pendiente futuro (preguntar antes): migración que elimina `shortcut_id`

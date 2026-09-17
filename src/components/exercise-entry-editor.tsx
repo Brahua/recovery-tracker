@@ -10,7 +10,7 @@ import {
   createExerciseEntry,
   duplicateExerciseSet,
   findRepeatedEntryIds,
-  isExerciseEntryComplete,
+  isEntryReady,
   isExerciseEntryEmpty,
   removeExerciseSet,
   resolveEntryExerciseId,
@@ -18,22 +18,27 @@ import {
   toExerciseSummaryInput,
   unlinkExerciseEntry,
   updateExerciseSet,
+  type ExerciseEditorMode,
   type ExerciseEntryDraft,
 } from "@/lib/exercise-entry-state";
 import { selectMostUsedExercises } from "@/lib/exercise-name";
 import { summarizeExercise } from "@/lib/exercise-summary";
-import type { Exercise } from "@/types/recovery";
+import { RoutinePicker } from "@/features/routines/routine-picker";
+import type { Exercise, Routine } from "@/types/recovery";
 
 interface ExerciseEntryEditorProps {
   catalog: Exercise[];
   entries: ExerciseEntryDraft[];
+  mode?: ExerciseEditorMode;
   onChange: (entries: ExerciseEntryDraft[]) => void;
+  routines?: Routine[];
 }
 
 interface ExerciseDetailProps {
   catalog: Exercise[];
   entry: ExerciseEntryDraft;
   excludeIds: string[];
+  mode: ExerciseEditorMode;
   onChange: (entry: ExerciseEntryDraft) => void;
   repeated: boolean;
 }
@@ -46,7 +51,16 @@ function hasText(value: string) {
   return value.trim().length > 0;
 }
 
-function ExerciseDetail({ catalog, entry, excludeIds, onChange, repeated }: ExerciseDetailProps) {
+function incompleteMessage(repeated: boolean, mode: ExerciseEditorMode) {
+  if (repeated) {
+    return mode === "routine"
+      ? "Este ejercicio ya está en la rutina"
+      : "Este ejercicio ya está en la sesión";
+  }
+  return mode === "routine" ? "Escribe o elige el ejercicio" : "Falta completar este ejercicio";
+}
+
+function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }: ExerciseDetailProps) {
   const [showMetrics, setShowMetrics] = useState(
     hasText(entry.durationMinutes) || hasText(entry.distanceKm),
   );
@@ -54,7 +68,7 @@ function ExerciseDetail({ catalog, entry, excludeIds, onChange, repeated }: Exer
   const [openSetNotes, setOpenSetNotes] = useState(
     () => new Set(entry.sets.filter((set) => hasText(set.notes)).map((set) => set.id)),
   );
-  const incomplete = repeated || !isExerciseEntryComplete(entry);
+  const incomplete = repeated || !isEntryReady(entry, mode);
   const warningId = `${entry.id}-incomplete`;
   const isometricId = `${entry.id}-isometric`;
 
@@ -118,7 +132,7 @@ function ExerciseDetail({ catalog, entry, excludeIds, onChange, repeated }: Exer
       {incomplete && (
         <p className="rr-exercise-incomplete" id={warningId} role="status">
           <span aria-hidden="true">!</span>
-          {repeated ? "Este ejercicio ya está en la sesión" : "Falta completar este ejercicio"}
+          {incompleteMessage(repeated, mode)}
         </p>
       )}
 
@@ -304,7 +318,9 @@ function ExerciseDetail({ catalog, entry, excludeIds, onChange, repeated }: Exer
 export function ExerciseEntryEditor({
   catalog,
   entries,
+  mode = "session",
   onChange,
+  routines,
 }: ExerciseEntryEditorProps) {
   const [openEntryId, setOpenEntryId] = useState<string | null>(null);
   const openEntry = entries.find((entry) => entry.id === openEntryId);
@@ -376,11 +392,14 @@ export function ExerciseEntryEditor({
       ) : null}
 
       {entries.length > 0 ? (
-        <ul aria-label="Ejercicios de la sesión" className="rr-exercise-rows">
+        <ul
+          aria-label={mode === "routine" ? "Ejercicios de la rutina" : "Ejercicios de la sesión"}
+          className="rr-exercise-rows"
+        >
           {entries.map((entry) => {
             const repeated = repeatedEntryIds.has(entry.id);
-            const complete = !repeated && isExerciseEntryComplete(entry);
-            const summary = summarizeExercise(toExerciseSummaryInput(entry));
+            const complete = !repeated && isEntryReady(entry, mode);
+            const summary = summarizeExercise(toExerciseSummaryInput(entry)) || "Sin plan";
 
             return (
               <li key={entry.id}>
@@ -405,9 +424,20 @@ export function ExerciseEntryEditor({
         </ul>
       ) : null}
 
-      <button className="rr-add-custom-exercise" onClick={addExercise} type="button">
-        + Añadir ejercicio
-      </button>
+      <div className="rr-exercise-add-actions">
+        {mode === "session" && routines ? (
+          <RoutinePicker
+            catalog={catalog}
+            entries={entries}
+            nextId={nextId}
+            onChange={onChange}
+            routines={routines}
+          />
+        ) : null}
+        <button className="rr-add-custom-exercise" onClick={addExercise} type="button">
+          + Añadir ejercicio
+        </button>
+      </div>
 
       <ModalSheet
         footer={
@@ -443,17 +473,20 @@ export function ExerciseEntryEditor({
               return exerciseId ? [exerciseId] : [];
             })}
             key={openEntry.id}
+            mode={mode}
             onChange={updateEntry}
             repeated={repeatedEntryIds.has(openEntry.id)}
           />
         ) : null}
       </ModalSheet>
 
-      <input
-        name="exercisesPayload"
-        type="hidden"
-        value={JSON.stringify(toExercisePayload(entries))}
-      />
+      {mode === "session" ? (
+        <input
+          name="exercisesPayload"
+          type="hidden"
+          value={JSON.stringify(toExercisePayload(entries))}
+        />
+      ) : null}
     </>
   );
 }

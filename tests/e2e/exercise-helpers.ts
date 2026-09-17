@@ -100,3 +100,53 @@ export function catalogRow(page: Page, name: string) {
 export function uniqueName(prefix: string) {
   return `${prefix} ${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`;
 }
+
+export function routineExerciseRow(page: Page, name: string) {
+  return page
+    .getByRole("list", { name: "Ejercicios de la rutina" })
+    .getByRole("button")
+    .filter({ hasText: name });
+}
+
+export function routineListRow(page: Page, name: string) {
+  return page.getByRole("list", { name: "Lista de rutinas" }).getByRole("link").filter({ hasText: name });
+}
+
+export async function openRoutines(page: Page) {
+  await page.goto("/ejercicios?seccion=rutinas");
+  await expect(page.getByRole("link", { name: /Rutinas/, exact: false }).first()).toHaveAttribute(
+    "aria-current",
+    "page",
+  );
+}
+
+export interface RoutineItem {
+  query: string;
+  name: string;
+  holdSeconds?: string;
+  reps?: string;
+}
+
+export async function createRoutine(page: Page, routineName: string, items: RoutineItem[]) {
+  await openRoutines(page);
+  await page.getByRole("link", { name: "+ Nueva rutina" }).click();
+  await expect(page.getByRole("heading", { name: "Nueva rutina" })).toBeVisible();
+  await page.getByLabel("Nombre de la rutina").fill(routineName);
+
+  for (const item of items) {
+    const dialog = await addExerciseFromCatalog(page, item.query, item.name);
+    if (item.holdSeconds || item.reps) {
+      await dialog.getByRole("button", { name: "+ Añadir serie" }).click();
+      if (item.holdSeconds) {
+        await dialog.getByLabel("Segundos", { exact: true }).fill(item.holdSeconds);
+      } else if (item.reps) {
+        await dialog.getByLabel("Repeticiones").fill(item.reps);
+      }
+    }
+    await closeExerciseDialog(page);
+  }
+
+  await page.getByRole("button", { name: "Guardar rutina" }).click();
+  await expect(page).toHaveURL(/\/ejercicios\?seccion=rutinas$/);
+  await expect(routineListRow(page, routineName)).toBeVisible();
+}

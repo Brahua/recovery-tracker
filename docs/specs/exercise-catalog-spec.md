@@ -2,7 +2,7 @@
 
 ## Estado
 
-Aprobada el 2026-09-16. Implementada en la rama `feature/exercise-catalog` (PR a `main`), pendiente de revisión y merge. La migración `20260917000000_exercise_catalog.sql` incluye también la función de fusión.
+Aprobada el 2026-09-16. Implementada y desplegada en staging el 2026-09-17 (PR #1). La migración `20260917000000_exercise_catalog.sql` incluye también la función de fusión.
 
 ## Decisiones validadas
 

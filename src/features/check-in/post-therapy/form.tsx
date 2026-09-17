@@ -19,6 +19,7 @@ import type {
   PainScore,
   Rating1To5,
   RehabSession,
+  Routine,
   SessionType,
 } from "@/types/recovery";
 
@@ -128,6 +129,7 @@ function SaveButton({
 
 interface PostTherapyFormProps {
   catalog: Exercise[];
+  routines: Routine[];
   defaultOccurredAt: string;
   errorMessage?: string;
   recentSessions: RehabSession[];
@@ -135,6 +137,7 @@ interface PostTherapyFormProps {
 
 export function PostTherapyForm({
   catalog,
+  routines,
   defaultOccurredAt,
   errorMessage,
   recentSessions,
@@ -316,7 +319,12 @@ export function PostTherapyForm({
               </span>
             }
           />
-          <ExerciseEntryEditor catalog={catalog} entries={exerciseEntries} onChange={setExerciseEntries} />
+          <ExerciseEntryEditor
+            catalog={catalog}
+            entries={exerciseEntries}
+            onChange={setExerciseEntries}
+            routines={routines}
+          />
         </section>
 
         <section className={`rr-note-card ${showNote ? "is-open" : ""}`}>

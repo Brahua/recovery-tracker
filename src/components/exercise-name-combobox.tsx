@@ -155,13 +155,11 @@ export function ExerciseNameCombobox({
           </li>
         ))}
       </ul>
-      {exactMatch && !open ? (
+      {exactMatch && !alreadyInSession && !open ? (
         <p className="rr-combobox-hint">
-          {alreadyInSession
-            ? "Este ejercicio ya está en la sesión."
-            : exactMatch.archivedAt
-              ? `Se reactivará “${exactMatch.name}” al guardar.`
-              : `Se usará “${exactMatch.name}” de tus ejercicios.`}
+          {exactMatch.archivedAt
+            ? `Se reactivará “${exactMatch.name}” al guardar.`
+            : `Se usará “${exactMatch.name}” de tus ejercicios.`}
         </p>
       ) : null}
     </div>

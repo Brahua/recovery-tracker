@@ -13,6 +13,7 @@ import {
   saveSession,
   searchExercise,
   sessionExerciseRow,
+  toast,
   uniqueName,
 } from "./exercise-helpers";
 
@@ -84,6 +85,7 @@ test.describe("exercise catalog", () => {
     await catalogRow(page, name).click();
     await exerciseDialog(page).getByRole("button", { name: "Archivar" }).click();
     await expect(exerciseDialog(page)).toHaveCount(0);
+    await expect(toast(page, "Ejercicio archivado")).toBeVisible();
     await expect(catalogRow(page, name)).toHaveCount(0);
     await page.getByRole("button", { name: /Archivados/ }).click();
     await expect(catalogRow(page, name)).toBeVisible();
@@ -169,6 +171,7 @@ test.describe("exercise catalog", () => {
     await expect(edit.getByRole("status")).toContainText("Se moverán 1 sesión");
     await edit.getByRole("button", { name: "Fusionar y eliminar" }).click();
     await expect(exerciseDialog(page)).toHaveCount(0);
+    await expect(toast(page, "Ejercicios fusionados")).toBeVisible();
     await expect(catalogRow(page, source)).toHaveCount(0);
     await expect(catalogRow(page, target)).toContainText("1 sesión");
 

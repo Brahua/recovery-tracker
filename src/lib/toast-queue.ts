@@ -7,7 +7,7 @@ export interface Toast {
 }
 
 export const toastDurationMs: Record<ToastTone, number> = {
-  success: 3500,
+  success: 4500,
   error: 6000,
 };
 

@@ -1,6 +1,6 @@
 # Spec: Loading global y feedback de acciones
 
-Estado: **aprobado con decisiones (2026-09-17)** — plan en `tasks/plan-global-loading-feedback.md`
+Estado: **implementado (2026-09-17)**, pendiente de revisión en staging — plan en `tasks/plan-global-loading-feedback.md`
 
 ## Objective
 
@@ -155,7 +155,7 @@ function remove() {
    con texto de progreso y la barra superior está activa.
 3. Las acciones 1–8 muestran un toast de éxito con texto específico
    ("Sesión guardada", "Cierre guardado", "Ejercicio guardado", "Ejercicio
-   archivado", "Ejercicio restaurado", "Ejercicios fusionados", "Rutina
+   archivado", "Ejercicio reactivado", "Ejercicios fusionados", "Rutina
    guardada", "Rutina eliminada").
 4. Toda acción 1–9 que lanza una excepción muestra un mensaje de error visible
    (nunca pantalla en blanco ni silencio) y el usuario puede reintentar.

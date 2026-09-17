@@ -1,5 +1,9 @@
 import { expect, type Page } from "@playwright/test";
 
+export function toast(page: Page, message: string) {
+  return page.getByRole("status").filter({ hasText: message });
+}
+
 export async function openSessionForm(page: Page) {
   await page.goto("/registrar?mode=session");
   await expect(page.getByRole("heading", { name: "Registrar" })).toBeVisible();
@@ -63,6 +67,7 @@ export async function closeExerciseDialog(page: Page) {
 export async function saveSession(page: Page) {
   await page.getByRole("button", { name: "Guardar sesion" }).click();
   await expect(page.getByRole("heading", { name: "Sesion hecha." })).toBeVisible();
+  await expect(toast(page, "Sesión guardada")).toBeVisible();
   const sessionId = new URL(page.url()).searchParams.get("sessionId");
   expect(sessionId).toBeTruthy();
   return sessionId as string;
@@ -87,6 +92,7 @@ export async function createCatalogExercise(
   if (defaults.weight) await dialog.getByLabel(/^Peso/).fill(defaults.weight);
   await dialog.getByRole("button", { name: "Guardar" }).click();
   await expect(dialog).toHaveCount(0);
+  await expect(toast(page, "Ejercicio guardado")).toBeVisible();
   await expect(catalogRow(page, name)).toBeVisible();
 }
 
@@ -147,6 +153,7 @@ export async function createRoutine(page: Page, routineName: string, items: Rout
   }
 
   await page.getByRole("button", { name: "Guardar rutina" }).click();
+  await expect(toast(page, "Rutina guardada")).toBeVisible();
   await expect(page).toHaveURL(/\/ejercicios\?seccion=rutinas$/);
   await expect(routineListRow(page, routineName)).toBeVisible();
 }

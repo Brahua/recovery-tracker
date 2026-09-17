@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 
 import { ExerciseNameCombobox } from "@/components/exercise-name-combobox";
 import { ModalSheet } from "@/components/modal-sheet";
@@ -14,24 +14,24 @@ import {
   isExerciseEntryEmpty,
   removeExerciseSet,
   resolveEntryExerciseId,
-  toExercisePayload,
   toExerciseSummaryInput,
   unlinkExerciseEntry,
   updateExerciseSet,
   type ExerciseEditorMode,
   type ExerciseEntryDraft,
 } from "@/lib/exercise-entry-state";
+import { createDraftId as nextId } from "@/lib/draft-id";
 import { selectMostUsedExercises } from "@/lib/exercise-name";
 import { summarizeExercise } from "@/lib/exercise-summary";
-import { RoutinePicker } from "@/features/routines/routine-picker";
-import type { Exercise, Routine } from "@/types/recovery";
+import type { Exercise } from "@/types/recovery";
 
 interface ExerciseEntryEditorProps {
+  /** Extra buttons shown next to "+ Añadir ejercicio" (e.g. the session routine picker). */
+  addActions?: ReactNode;
   catalog: Exercise[];
   entries: ExerciseEntryDraft[];
   mode?: ExerciseEditorMode;
   onChange: (entries: ExerciseEntryDraft[]) => void;
-  routines?: Routine[];
 }
 
 interface ExerciseDetailProps {
@@ -41,10 +41,6 @@ interface ExerciseDetailProps {
   mode: ExerciseEditorMode;
   onChange: (entry: ExerciseEntryDraft) => void;
   repeated: boolean;
-}
-
-function nextId(prefix: string) {
-  return `${prefix}-${crypto.randomUUID()}`;
 }
 
 function hasText(value: string) {
@@ -316,11 +312,11 @@ function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }
 }
 
 export function ExerciseEntryEditor({
+  addActions,
   catalog,
   entries,
   mode = "session",
   onChange,
-  routines,
 }: ExerciseEntryEditorProps) {
   const [openEntryId, setOpenEntryId] = useState<string | null>(null);
   const openEntry = entries.find((entry) => entry.id === openEntryId);
@@ -425,15 +421,7 @@ export function ExerciseEntryEditor({
       ) : null}
 
       <div className="rr-exercise-add-actions">
-        {mode === "session" && routines ? (
-          <RoutinePicker
-            catalog={catalog}
-            entries={entries}
-            nextId={nextId}
-            onChange={onChange}
-            routines={routines}
-          />
-        ) : null}
+        {addActions}
         <button className="rr-add-custom-exercise" onClick={addExercise} type="button">
           + Añadir ejercicio
         </button>
@@ -479,14 +467,6 @@ export function ExerciseEntryEditor({
           />
         ) : null}
       </ModalSheet>
-
-      {mode === "session" ? (
-        <input
-          name="exercisesPayload"
-          type="hidden"
-          value={JSON.stringify(toExercisePayload(entries))}
-        />
-      ) : null}
     </>
   );
 }

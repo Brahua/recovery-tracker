@@ -2,14 +2,28 @@ import Link from "next/link";
 
 import type { Routine } from "@/types/recovery";
 
-export function formatRoutinePreview(routine: Routine, limit = 3) {
+function formatRoutinePreview(routine: Routine, limit = 3) {
   const names = routine.exercises.map((exercise) => exercise.name);
   const preview = names.slice(0, limit).join(" · ");
   return names.length > limit ? `${preview}…` : preview;
 }
 
-export function formatExerciseCount(count: number) {
+function formatExerciseCount(count: number) {
   return `${count} ejercicio${count === 1 ? "" : "s"}`;
+}
+
+// Shared row body for the routines list (link) and the routine picker (button).
+export function RoutineRowContent({ routine, trailing }: { routine: Routine; trailing: string }) {
+  return (
+    <>
+      <span className="rr-routine-row-text">
+        <strong>{routine.name}</strong>
+        <small>{formatRoutinePreview(routine)}</small>
+      </span>
+      <span className="rr-exercise-row-summary">{formatExerciseCount(routine.exercises.length)}</span>
+      <b aria-hidden="true">{trailing}</b>
+    </>
+  );
 }
 
 export function RoutineList({ routines }: { routines: Routine[] }) {
@@ -30,12 +44,7 @@ export function RoutineList({ routines }: { routines: Routine[] }) {
       {routines.map((routine) => (
         <li key={routine.id}>
           <Link className="rr-exercise-row rr-routine-row" href={`/ejercicios/rutinas/${routine.id}`}>
-            <span className="rr-routine-row-text">
-              <strong>{routine.name}</strong>
-              <small>{formatRoutinePreview(routine)}</small>
-            </span>
-            <span className="rr-exercise-row-summary">{formatExerciseCount(routine.exercises.length)}</span>
-            <b aria-hidden="true">›</b>
+            <RoutineRowContent routine={routine} trailing="›" />
           </Link>
         </li>
       ))}

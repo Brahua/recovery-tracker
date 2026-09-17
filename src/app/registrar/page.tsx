@@ -3,10 +3,9 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { DayClosedState } from "@/components/day-closed-state";
 import { SessionSavedState } from "@/components/session-saved-state";
-import { createExerciseRepository } from "@/data/exercise-repository";
-import { createRoutineRepository } from "@/data/routine-repository";
 import { NightlyCloseoutForm } from "@/features/check-in/nightly-closeout/form";
 import { PostTherapyForm } from "@/features/check-in/post-therapy/form";
+import { loadExerciseLibrary } from "@/lib/exercise-library";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 import { getCloseoutDateError } from "@/lib/closeout-date";
 import {
@@ -24,18 +23,6 @@ type SearchParams = Record<string, string | string[] | undefined>;
 function getSingleSearchParam(searchParams: SearchParams, key: string) {
   const value = searchParams[key];
   return typeof value === "string" ? value : undefined;
-}
-
-async function loadExerciseLibrary() {
-  const exerciseRepository = await createExerciseRepository();
-  await exerciseRepository.ensureDefaultExercises();
-  const routineRepository = await createRoutineRepository();
-  const [catalog, routines] = await Promise.all([
-    exerciseRepository.listExercises(),
-    routineRepository.listRoutines(),
-  ]);
-
-  return { catalog, routines };
 }
 
 export default async function RegistrarPage({

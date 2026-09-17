@@ -1,9 +1,8 @@
 import { redirect } from "next/navigation";
 
 import { AppShell } from "@/components/app-shell";
-import { createExerciseRepository } from "@/data/exercise-repository";
-import { createRoutineRepository } from "@/data/routine-repository";
 import { ExerciseCatalog, type CatalogSection } from "@/features/exercises/exercise-catalog";
+import { loadExerciseLibrary } from "@/lib/exercise-library";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 import { calculateLoggingStreak } from "@/lib/today-view-model";
 
@@ -23,13 +22,7 @@ export default async function EjerciciosPage({
     redirect("/");
   }
 
-  const exerciseRepository = await createExerciseRepository();
-  await exerciseRepository.ensureDefaultExercises();
-  const routineRepository = await createRoutineRepository();
-  const [exercises, routines] = await Promise.all([
-    exerciseRepository.listExercises(),
-    routineRepository.listRoutines(),
-  ]);
+  const { catalog: exercises, routines } = await loadExerciseLibrary();
 
   return (
     <AppShell

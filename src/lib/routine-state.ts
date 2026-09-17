@@ -113,7 +113,7 @@ const sessionTypeNames: Record<SessionType, string> = {
   HYDROTHERAPY: "Hidroterapia",
   GYM: "Gimnasio",
   WALK: "Caminata",
-  OTHER: "Sesión",
+  OTHER: "Otra",
 };
 
 const monthNames = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];

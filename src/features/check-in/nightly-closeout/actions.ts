@@ -10,6 +10,7 @@ import {
   getCloseoutDateError,
   invalidCloseoutDateMessage,
 } from "@/lib/closeout-date";
+import { AuthenticationRequiredError } from "@/lib/supabase/authenticated";
 import type { PainScore, Rating1To5, ReboundLevel } from "@/types/recovery";
 
 const expiredSessionMessage =
@@ -72,7 +73,7 @@ function getSaveErrorMessage(error: unknown) {
       return error.message;
     }
 
-    if (error.message === "Authenticated user is required.") {
+    if (error instanceof AuthenticationRequiredError) {
       return expiredSessionMessage;
     }
   }

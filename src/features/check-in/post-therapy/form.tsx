@@ -7,9 +7,11 @@ import { useFormStatus } from "react-dom";
 import { ExerciseEntryEditor } from "@/components/exercise-entry-editor";
 import { RitualPainSlider } from "@/components/ritual-pain-slider";
 import { createPostTherapySessionAction } from "@/features/check-in/post-therapy/actions";
+import { RoutinePicker } from "@/features/routines/routine-picker";
 import {
   findRepeatedEntryIds,
   isExerciseEntryComplete,
+  toExercisePayload,
   type ExerciseEntryDraft,
 } from "@/lib/exercise-entry-state";
 import { getSessionFormProgress } from "@/lib/session-form-state";
@@ -320,10 +322,22 @@ export function PostTherapyForm({
             }
           />
           <ExerciseEntryEditor
+            addActions={
+              <RoutinePicker
+                catalog={catalog}
+                entries={exerciseEntries}
+                onChange={setExerciseEntries}
+                routines={routines}
+              />
+            }
             catalog={catalog}
             entries={exerciseEntries}
             onChange={setExerciseEntries}
-            routines={routines}
+          />
+          <input
+            name="exercisesPayload"
+            type="hidden"
+            value={JSON.stringify(toExercisePayload(exerciseEntries))}
           />
         </section>
 

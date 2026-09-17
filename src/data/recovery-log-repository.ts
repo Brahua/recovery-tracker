@@ -5,7 +5,10 @@ import {
   type ExerciseSetRow,
   type SessionExerciseRow,
 } from "@/data/recovery-log-mappers";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
+import {
+  requireAuthenticatedSupabase,
+  type ServerSupabaseClient,
+} from "@/lib/supabase/authenticated";
 import { getRecoveryUtcRange } from "@/lib/recovery-date";
 import {
   createNightlyCloseoutInputSchema,
@@ -47,8 +50,6 @@ type NightlyCloseoutRow = {
   created_at: string;
   updated_at: string;
 };
-
-type ServerSupabaseClient = Awaited<ReturnType<typeof createServerSupabaseClient>>;
 
 export interface RecoveryLogRepository {
   createRehabSession(input: CreateRehabSessionInput): Promise<RehabSession>;
@@ -135,20 +136,6 @@ function toNightlyCloseoutInsertRow(
     rebound_pain_level: input.reboundPainLevel,
     notes: input.notes ?? null,
   };
-}
-
-async function requireAuthenticatedSupabase() {
-  const supabase = await createServerSupabaseClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    throw new RecoveryRepositoryError("Authenticated user is required.");
-  }
-
-  return { supabase, userId: user.id };
 }
 
 async function listSessionExercisesBySessionIds(

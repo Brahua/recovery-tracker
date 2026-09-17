@@ -15,7 +15,7 @@ const routineSetSchema = z
     "A routine set requires repetitions, weight, or hold seconds.",
   );
 
-export const routineExerciseSchema = z
+const routineExerciseSchema = z
   .object({
     name: z.string().trim().min(1, "Exercise name is required.").max(80),
     exerciseId: z.uuid().optional(),
@@ -58,7 +58,5 @@ export const routineInputSchema = z
     },
     "La rutina tiene ejercicios repetidos.",
   );
-
-export type RoutineInput = z.output<typeof routineInputSchema>;
 
 export const routineIdSchema = z.uuid();

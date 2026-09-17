@@ -1,5 +1,8 @@
+import { findExerciseByName, normalizeExerciseName } from "@/lib/exercise-name";
 import type { ExerciseSummaryInput } from "@/lib/exercise-summary";
 import type { Exercise } from "@/types/recovery";
+
+type CatalogEntry = Pick<Exercise, "id" | "name" | "archivedAt">;
 
 export interface ExerciseSetDraft {
   id: string;
@@ -202,4 +205,27 @@ export function toExercisePayload(exercises: ExerciseEntryDraft[]) {
     })),
     notes: optionalText(exercise.notes),
   }));
+}
+
+// Catalog id the server will link this entry to (by id, or by typed name).
+export function resolveEntryExerciseId(entry: ExerciseEntryDraft, catalog: CatalogEntry[]) {
+  return entry.exerciseId ?? findExerciseByName(catalog, entry.name)?.id;
+}
+
+// Entries that repeat an earlier exercise of the same session.
+export function findRepeatedEntryIds(entries: ExerciseEntryDraft[], catalog: CatalogEntry[]) {
+  const seen = new Set<string>();
+  const repeated = new Set<string>();
+
+  for (const entry of entries) {
+    const exerciseId = resolveEntryExerciseId(entry, catalog);
+    const normalizedName = normalizeExerciseName(entry.name);
+    const key = exerciseId ?? (normalizedName ? `name:${normalizedName}` : undefined);
+    if (!key) continue;
+
+    if (seen.has(key)) repeated.add(entry.id);
+    seen.add(key);
+  }
+
+  return repeated;
 }

@@ -75,7 +75,7 @@ test.describe("exercise catalog", () => {
     await expect(sessionExerciseRow(page, name)).toContainText("3 × 10–12 · 5 kg");
   });
 
-  test("archives an exercise so it no longer appears in the search", async ({ page }) => {
+  test("archives an exercise and reactivates it when it is logged again", async ({ page }) => {
     const name = uniqueName("Archivar e2e");
     await createCatalogExercise(page, name);
 
@@ -87,9 +87,60 @@ test.describe("exercise catalog", () => {
     await expect(catalogRow(page, name)).toBeVisible();
 
     await openSessionForm(page);
+    await fillSessionBasics(page);
     const dialog = await searchExercise(page, name);
-    await expect(dialog.getByRole("option").filter({ hasText: `Crear “${name}”` })).toBeVisible();
     await expect(dialog.getByRole("option")).toHaveCount(1);
+    await dialog.getByRole("option").filter({ hasText: `Reactivar “${name}”` }).click();
+    await expect(dialog.getByText(`Se reactivará “${name}” al guardar.`)).toBeVisible();
+    await dialog.getByRole("button", { name: "+ Añadir serie" }).click();
+    await dialog.getByLabel("Repeticiones").fill("6");
+    await closeExerciseDialog(page);
+    await saveSession(page);
+
+    await openExerciseCatalog(page);
+    await expect(catalogRow(page, name)).toContainText("1 sesión");
+  });
+
+  test("links typed names to the catalog like the database does", async ({ page }) => {
+    await openSessionForm(page);
+    await fillSessionBasics(page);
+
+    for (const typedName of ["PUENTE DE GLÚTEOS", "sentadilla  ESPAÑOLA"]) {
+      const dialog = await searchExercise(page, typedName);
+      await expect(dialog.getByRole("option").filter({ hasText: "Crear" })).toHaveCount(0);
+      await dialog.getByRole("button", { name: "+ Añadir serie" }).click();
+      await dialog.getByLabel("Repeticiones").fill("8");
+      await closeExerciseDialog(page);
+    }
+    await saveSession(page);
+
+    await openExerciseCatalog(page);
+    await page.getByPlaceholder("Buscar ejercicio").fill("puente");
+    await expect(page.getByRole("list", { name: "Lista de ejercicios" }).getByRole("button")).toHaveCount(1);
+    await page.getByPlaceholder("Buscar ejercicio").fill("sentadilla esp");
+    await expect(page.getByRole("list", { name: "Lista de ejercicios" }).getByRole("button")).toHaveCount(1);
+  });
+
+  test("blocks saving the same exercise twice in one session", async ({ page }) => {
+    await openSessionForm(page);
+    await fillSessionBasics(page);
+
+    const wallSit = await addExerciseFromCatalog(page, "wall", "Wall sit");
+    await wallSit.getByRole("button", { name: "+ Añadir serie" }).click();
+    await wallSit.getByLabel("Segundos", { exact: true }).fill("30");
+    await closeExerciseDialog(page);
+
+    const typed = await searchExercise(page, "wall sit");
+    await expect(typed.getByRole("option")).toHaveCount(0);
+    await typed.getByRole("button", { name: "+ Añadir serie" }).click();
+    await typed.getByLabel("Repeticiones").fill("5");
+    await expect(typed.getByText("Este ejercicio ya está en la sesión")).toBeVisible();
+    await closeExerciseDialog(page);
+
+    const rows = sessionExerciseRow(page, "wall sit");
+    await expect(rows).toHaveCount(2);
+    await expect(rows.nth(1)).toContainText("Repetido");
+    await expect(page.getByRole("button", { name: "Guardar sesion" })).toBeDisabled();
   });
 
   test("merges duplicates and keeps the logged name in history", async ({ page }) => {

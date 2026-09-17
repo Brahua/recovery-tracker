@@ -8,6 +8,7 @@ import { ExerciseEntryEditor } from "@/components/exercise-entry-editor";
 import { RitualPainSlider } from "@/components/ritual-pain-slider";
 import { createPostTherapySessionAction } from "@/features/check-in/post-therapy/actions";
 import {
+  findRepeatedEntryIds,
   isExerciseEntryComplete,
   type ExerciseEntryDraft,
 } from "@/lib/exercise-entry-state";
@@ -156,7 +157,10 @@ export function PostTherapyForm({
   const [showNote, setShowNote] = useState(false);
   const [sessionNote, setSessionNote] = useState("");
 
-  const exerciseCount = exerciseEntries.filter(isExerciseEntryComplete).length;
+  const repeatedEntryIds = findRepeatedEntryIds(exerciseEntries, catalog);
+  const exerciseCount = exerciseEntries.filter(
+    (entry) => isExerciseEntryComplete(entry) && !repeatedEntryIds.has(entry.id),
+  ).length;
   const progress = getSessionFormProgress({
     painBefore,
     painDuring,

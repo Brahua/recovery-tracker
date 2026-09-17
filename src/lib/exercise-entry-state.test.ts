@@ -5,6 +5,7 @@ import {
   applyExerciseDefaults,
   createExerciseEntry,
   duplicateExerciseSet,
+  findRepeatedEntryIds,
   isExerciseEntryComplete,
   isExerciseEntryEmpty,
   removeExerciseSet,
@@ -197,5 +198,17 @@ describe("exercise entry state", () => {
       durationMinutes: undefined,
       distanceKm: undefined,
     });
+  });
+
+  it("flags later entries that repeat an exercise by link or by typed name", () => {
+    const linked = applyExerciseDefaults(createExerciseEntry("a"), wallSit, sequentialIds());
+    const typedSame = createExerciseEntry("b", "WALL  sít");
+    const typedNew = createExerciseEntry("c", "Prensa");
+    const typedNewAgain = createExerciseEntry("d", "prensa ");
+    const unnamed = createExerciseEntry("e");
+
+    expect(
+      [...findRepeatedEntryIds([linked, typedSame, typedNew, typedNewAgain, unnamed, createExerciseEntry("f")], [wallSit])],
+    ).toEqual(["b", "d"]);
   });
 });

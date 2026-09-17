@@ -22,7 +22,8 @@ test.describe("exercise catalog", () => {
 
     const suggestions = await searchExercise(page, "glu");
     await expect(suggestions.getByRole("option").filter({ hasText: "Puente de gluteos" })).toBeVisible();
-    await closeExerciseDialog(page);
+    await suggestions.getByRole("button", { name: "Quitar ejercicio" }).click();
+    await expect(exerciseDialog(page)).toHaveCount(0);
 
     const name = uniqueName("Prensa e2e");
     const dialog = await searchExercise(page, name);

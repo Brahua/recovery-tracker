@@ -40,7 +40,7 @@ Regla: en la PC solo `npm run typecheck`, `npm run lint` y `npm test`. La migrac
 
 ### Checkpoint A
 - [x] typecheck, lint y unitarios en verde en la PC
-- [ ] PR a `main` con CI en verde (migración + e2e existentes)
+- [x] PR a `main` con CI en verde (migración + e2e existentes)
 
 ## Phase 2: Gestión
 
@@ -94,8 +94,8 @@ Regla: en la PC solo `npm run typecheck`, `npm run lint` y `npm test`. La migrac
   - Deps: R4–R7
 
 ### Checkpoint final
-- [ ] Criterios de éxito 1–8 cumplidos con CI en verde
-- [ ] Aprobación del usuario → migración en staging (dry-run + push) → merge a `main`
+- [x] Criterios de éxito 1–8 cumplidos con CI en verde
+- [x] Aprobación del usuario → migración en staging (dry-run + push) → merge a `main`
 
 ## Seguimiento
 - [x] E2E: nombre de rutina duplicado muestra error y conserva el borrador

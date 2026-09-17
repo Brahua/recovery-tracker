@@ -2,7 +2,7 @@
 
 ## Estado
 
-Aprobada el 2026-09-17. Implementada en la rama `feature/routines` (PR a `main`), pendiente de revisión. Migración: `20260918000000_routines.sql`.
+Aprobada el 2026-09-17. Implementada y desplegada en staging el 2026-09-17 (PRs #2 y #3). Migración: `20260918000000_routines.sql`.
 
 ## Decisiones validadas
 

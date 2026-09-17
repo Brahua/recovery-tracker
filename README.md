@@ -99,7 +99,10 @@ Notes:
 - MVP spec: `docs/specs/recovery-ritual-mvp-spec.md`
 - UX redesign spec and Claude Design prompt pack: `docs/specs/recovery-ritual-ux-redesign-spec.md`
 - Implemented Claude Design inventory and recorded deviations: `docs/design/claude-design-reference.md`
-- Current field-trial handoff: `docs/specs/session-handoff-2026-07-17.md`
+- Current handoff: `docs/specs/session-handoff-2026-09-17.md`
+- Exercise catalog spec: `docs/specs/exercise-catalog-spec.md`
+- Routines spec: `docs/specs/routines-spec.md`
+- Deployment and migration workflow: `docs/deployment.md`
 - Implementation plan: `tasks/plan.md`
 - Task list: `tasks/todo.md`
 

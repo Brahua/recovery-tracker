@@ -51,31 +51,31 @@ R1 Migración (tablas, RLS, resolver compartido, save_routine, desde sesión, me
 
 ### Phase 1: Base
 
-- [ ] R1: Migración de rutinas
-- [ ] R2: Contrato TS y funciones puras
-- [ ] R3: Repositorio y acciones de servidor
+- [x] R1: Migración de rutinas
+- [x] R2: Contrato TS y funciones puras
+- [x] R3: Repositorio y acciones de servidor
 
 ### Checkpoint A
-- [ ] typecheck, lint y unitarios en verde en la PC
-- [ ] PR abierto: CI aplica la migración y los e2e existentes siguen en verde (el `create_rehab_session` redefinido no rompe el registro)
+- [x] typecheck, lint y unitarios en verde en la PC
+- [x] PR abierto: CI aplica la migración y los e2e existentes siguen en verde (el `create_rehab_session` redefinido no rompe el registro)
 
 ### Phase 2: Gestión
 
-- [ ] R4: Sección Rutinas en Ejercicios
-- [ ] R5: Página de rutina
+- [x] R4: Sección Rutinas en Ejercicios
+- [x] R5: Página de rutina
 
 ### Phase 3: Uso
 
-- [ ] R6: Usar rutina en Registrar
-- [ ] R7: Guardar sesión como rutina
+- [x] R6: Usar rutina en Registrar
+- [x] R7: Guardar sesión como rutina
 
 ### Phase 4: Cierre
 
-- [ ] R8: E2E de rutinas y documentación
+- [x] R8: E2E de rutinas y documentación
 
 ### Checkpoint final
-- [ ] Criterios de éxito 1–8 de la spec cumplidos, con CI en verde en el PR
-- [ ] Con tu aprobación: migración en staging (dry-run + push) y después merge a `main`
+- [x] Criterios de éxito 1–8 de la spec cumplidos, con CI en verde en el PR
+- [x] Con tu aprobación: migración en staging (dry-run + push) y después merge a `main`
 
 ## Risks and Mitigations
 

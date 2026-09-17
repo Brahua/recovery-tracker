@@ -26,6 +26,17 @@ E2E always runs against **local Supabase** spun up in the runner — never again
 staging. Migrations are applied to staging only in the `deploy` job, before the
 Vercel deploy.
 
+## Changes with migrations (agreed workflow)
+
+1. Work on a short branch and open a PR to `main`; CI applies every migration to
+   its own Supabase and runs the e2e suite without deploying.
+2. After review, with approval: `npm run supabase:push:dry` (must list only the
+   new migration), then `npx supabase db push --linked` to staging.
+3. Merge the PR with rebase. The `deploy` job finds no pending migrations and
+   deploys the app.
+
+Never edit a migration that is already applied to staging; add a new one.
+
 ## Required GitHub Secrets
 
 Repo → Settings → Secrets and variables → Actions:

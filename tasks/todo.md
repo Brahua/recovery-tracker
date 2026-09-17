@@ -11,9 +11,9 @@ Plan: `tasks/plan.md`
 - [x] Impedir sesiones con ejercicios seleccionados incompletos y conservar el formulario ante errores.
 - [x] Permitir cierres de fechas anteriores con validación de duplicados y fechas futuras.
 - [x] Restaurar staging eliminando solo usuarios anónimos y conservar los datos reales.
-- [ ] Seleccionar la próxima feature a partir de una observación real y crear su spec/plan antes de implementarla.
+- [x] Seleccionar la próxima feature a partir de una observación real y crear su spec/plan antes de implementarla (catálogo de ejercicios y rutinas: `tasks/todo-exercise-catalog.md`, `tasks/todo-routines.md`).
 
-Handoff actual: `docs/specs/session-handoff-2026-07-17.md`.
+Handoff actual: `docs/specs/session-handoff-2026-09-17.md`.
 
 ## Fase 1: Contrato y persistencia
 

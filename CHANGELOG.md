@@ -7,6 +7,11 @@ The format is based on Keep a Changelog and this project currently follows Seman
 ## [Unreleased]
 
 ### Added
+- Per-user exercise catalog (`/ejercicios`) with defaults, "isometric by default", archive/reactivate and merge; each user starts with 10 exercises.
+- Compact session logging: one summary row per exercise, detail in a native dialog sheet, accent-insensitive name autocomplete, most-used quick picks, and create/reactivate from typed names.
+- Isometric logging with hold seconds per set, shown in history.
+- Routines: templates of catalog exercises with their plan, managed under `Ejercicios → Rutinas`, applied from Registrar ("Usar rutina", skipping exercises already logged) and created from a saved session ("Guardar como rutina").
+- Atomic `create_rehab_session`, `save_routine` and `create_routine_from_session` RPCs sharing `resolve_exercise_for_user`.
 - Backdated nightly closeouts from the UI, with session context for the selected day and safeguards against future or duplicate dates.
 - Read-only `Historial` route with 30-day windows, Lima-day grouping, multiple same-day sessions, nightly closeouts, loading/error/empty states, and responsive navigation.
 - Individual exercise sets with repetitions, kilograms, optional set notes, total duration, and total distance.
@@ -18,6 +23,8 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Project-owned rehabilitation hero image and a canonical inventory of the 19 implemented design references.
 
 ### Changed
+- Replaced the TKE and Estiramientos suaves shortcuts with Wall sit and Puente de gluteos, then replaced fixed shortcuts with the catalog and dropped `session_exercises.shortcut_id`.
+- Insights counts catalog exercises once per session, even after renames or merges.
 - Split the former `Carga y cierre` concept into `Esfuerzo de la sesión`, `Estado al terminar`, and the separate `Cierre del día` ritual.
 - Bound save confirmations to the exact newly-created session so concurrent tabs cannot show another recent session.
 - Moved session and nightly closeout forms out of the former one-page home into a focused registration flow.
@@ -27,6 +34,8 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Aligned the responsive Historial with its mobile and desktop Claude Design references, including the date rail, single-open session accordion, two-column exercise details, separate closeout cards, and viewport-specific navigation.
 
 ### Fixed
+- Kept the session, closeout and report action bars above the mobile tab bar and reserved its height at the end of each screen.
+- Showed the full catalog on a new user's first Registrar visit (a repeated GET in the same server render returned a memoized empty list).
 - Prevented incomplete selected exercises from enabling session saves, identified each unfinished exercise in the form, and preserved all entered values when server validation rejects a submission.
 - Prevented the Historial route from replacing the current module with a shell-less loading screen during navigation.
 - Kept evening sessions visible by querying calendar ranges with Lima-aware UTC boundaries.

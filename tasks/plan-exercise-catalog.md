@@ -64,43 +64,43 @@ T12 Limpieza de atajos fijos + e2e + docs  ← todo lo anterior
 
 ### Phase 1: Base de datos y contrato
 
-- [ ] T1: Migración del catálogo
-- [ ] T2: Guardado atómico por RPC
-- [ ] T3: Contrato TS del registro
+- [x] T1: Migración del catálogo
+- [x] T2: Guardado atómico por RPC
+- [x] T3: Contrato TS del registro
 
 ### Checkpoint A: Base
 
-- [ ] typecheck, lint y unitarios en verde en la PC
-- [ ] **PR a `main`** (sin merge): CI aplica la migración en su Supabase y corre los e2e actuales en verde. El registro actual, adaptado al nuevo payload, sigue funcionando.
-- [ ] Revisión contigo antes de seguir
+- [x] typecheck, lint y unitarios en verde en la PC
+- [x] **PR a `main`** (sin merge): CI aplica la migración en su Supabase y corre los e2e actuales en verde. El registro actual, adaptado al nuevo payload, sigue funcionando.
+- [x] Revisión contigo antes de seguir
 
 ### Phase 2: Registro de sesión
 
-- [ ] T4: Lecturas del catálogo en `/registrar`
-- [ ] T5: Lista compacta y modal de detalle
-- [ ] T6: Buscador con autocompletado y más usados
-- [ ] T7: Casilla isométrico y series compactas
-- [ ] T8: Historial e Insights
+- [x] T4: Lecturas del catálogo en `/registrar`
+- [x] T5: Lista compacta y modal de detalle
+- [x] T6: Buscador con autocompletado y más usados
+- [x] T7: Casilla isométrico y series compactas
+- [x] T8: Historial e Insights
 
 ### Checkpoint B: Registro completo
 
-- [ ] CI en verde en el PR, con e2e del registro nuevo
-- [ ] Revisión visual contigo sobre la preview o staging
+- [x] CI en verde en el PR, con e2e del registro nuevo
+- [x] Revisión visual contigo sobre la preview o staging
 
 ### Phase 3: Mantenimiento
 
-- [ ] T9: Pestaña y lista `/ejercicios`
-- [ ] T10: Crear, editar y archivar
-- [ ] T11: Fusionar ejercicios
+- [x] T9: Pestaña y lista `/ejercicios`
+- [x] T10: Crear, editar y archivar
+- [x] T11: Fusionar ejercicios
 
 ### Phase 4: Cierre
 
-- [ ] T12: Retirar los atajos fijos, completar los e2e y actualizar la documentación
+- [x] T12: Retirar los atajos fijos, completar los e2e y actualizar la documentación
 
 ### Checkpoint final
 
-- [ ] Todos los criterios de éxito de la spec cumplidos
-- [ ] Contigo: merge a `main` → CI aplica la migración a staging y despliega
+- [x] Todos los criterios de éxito de la spec cumplidos
+- [x] Contigo: merge a `main` → CI aplica la migración a staging y despliega
 
 ## Risks and Mitigations
 

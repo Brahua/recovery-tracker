@@ -2,22 +2,41 @@ import { describe, expect, it } from "vitest";
 
 import {
   addExerciseSet,
+  applyExerciseDefaults,
   createExerciseEntry,
   duplicateExerciseSet,
   isExerciseEntryComplete,
+  isExerciseEntryEmpty,
   removeExerciseSet,
   toExercisePayload,
+  toExerciseSummaryInput,
+  unlinkExerciseEntry,
   updateExerciseSet,
 } from "@/lib/exercise-entry-state";
+import type { Exercise } from "@/types/recovery";
+
+const wallSit: Exercise = {
+  id: "8d5b9f0e-4c1a-4a53-9a1e-2f1b7c3d9e10",
+  name: "Wall sit",
+  defaultIsometric: true,
+  defaultSetCount: 3,
+  defaultHoldSeconds: 45,
+  sessionCount: 0,
+  createdAt: "2026-09-17T00:00:00.000Z",
+  updatedAt: "2026-09-17T00:00:00.000Z",
+};
+
+function sequentialIds() {
+  let next = 0;
+  return () => `set-${++next}`;
+}
 
 describe("exercise entry state", () => {
-  it("creates an empty shortcut exercise without inventing set values", () => {
-    expect(
-      createExerciseEntry("exercise-1", "Step-up", "STEP_UP"),
-    ).toEqual({
+  it("creates an empty entry without inventing set values", () => {
+    expect(createExerciseEntry("exercise-1")).toEqual({
       id: "exercise-1",
-      name: "Step-up",
-      shortcutId: "STEP_UP",
+      name: "",
+      isIsometric: false,
       durationMinutes: "",
       distanceKm: "",
       notes: "",
@@ -26,7 +45,7 @@ describe("exercise entry state", () => {
   });
 
   it("adds, updates, duplicates, and removes sets immutably", () => {
-    const original = createExerciseEntry("exercise-1", "Step-up", "STEP_UP");
+    const original = createExerciseEntry("exercise-1", "Step-up");
     const withSet = addExerciseSet(original, "set-1");
     const updated = updateExerciseSet(withSet, "set-1", {
       reps: "12",
@@ -38,38 +57,75 @@ describe("exercise entry state", () => {
 
     expect(original.sets).toEqual([]);
     expect(updated.sets[0]).toMatchObject({ reps: "12", weightKg: "10.5" });
-    expect(duplicated.sets).toEqual([
-      {
-        id: "set-1",
-        reps: "12",
-        weightKg: "10.5",
-        notes: "Controlado",
-      },
-      {
-        id: "set-2",
-        reps: "12",
-        weightKg: "10.5",
-        notes: "Controlado",
-      },
-    ]);
+    expect(duplicated.sets[1]).toEqual({
+      id: "set-2",
+      reps: "12",
+      weightKg: "10.5",
+      holdSeconds: "",
+      notes: "Controlado",
+    });
     expect(removed.sets.map((set) => set.id)).toEqual(["set-2"]);
   });
 
-  it("serializes numbers and stable positions for the server boundary", () => {
+  it("applies catalog defaults to an empty entry", () => {
+    const entry = applyExerciseDefaults(
+      createExerciseEntry("exercise-1", "wall"),
+      { ...wallSit, defaultDurationMinutes: 5 },
+      sequentialIds(),
+    );
+
+    expect(entry).toMatchObject({
+      exerciseId: wallSit.id,
+      name: "Wall sit",
+      isIsometric: true,
+      durationMinutes: "5",
+    });
+    expect(entry.sets).toEqual([
+      { id: "set-1", reps: "", weightKg: "", holdSeconds: "45", notes: "" },
+      { id: "set-2", reps: "", weightKg: "", holdSeconds: "45", notes: "" },
+      { id: "set-3", reps: "", weightKg: "", holdSeconds: "45", notes: "" },
+    ]);
+  });
+
+  it("never overwrites values the user already entered", () => {
+    const typed = {
+      ...addExerciseSet(createExerciseEntry("exercise-1", "wall"), "mine"),
+      durationMinutes: "8",
+    };
+    const entry = applyExerciseDefaults(
+      typed,
+      { ...wallSit, defaultDurationMinutes: 5 },
+      sequentialIds(),
+    );
+
+    expect(entry.durationMinutes).toBe("8");
+    expect(entry.isIsometric).toBe(false);
+    expect(entry.sets.map((set) => set.id)).toEqual(["mine"]);
+  });
+
+  it("unlinks an entry so the name can be searched again", () => {
+    const linked = applyExerciseDefaults(createExerciseEntry("e"), wallSit, sequentialIds());
+
+    expect(unlinkExerciseEntry(linked)).toMatchObject({ exerciseId: undefined, name: "" });
+  });
+
+  it("serializes numbers, stable positions and catalog links for the server boundary", () => {
     const entry = {
-      ...createExerciseEntry("exercise-1", "Bicicleta", "BICICLETA"),
+      ...createExerciseEntry("exercise-1", "Bicicleta"),
+      exerciseId: wallSit.id,
       durationMinutes: "12.5",
       distanceKm: "4.2",
       sets: [
-        { id: "set-a", reps: "10", weightKg: "", notes: "" },
-        { id: "set-b", reps: "8", weightKg: "12.5", notes: "Final" },
+        { id: "set-a", reps: "10", weightKg: "", holdSeconds: "30", notes: "" },
+        { id: "set-b", reps: "8", weightKg: "12.5", holdSeconds: "", notes: "Final" },
       ],
     };
 
     expect(toExercisePayload([entry])).toEqual([
       {
         name: "Bicicleta",
-        shortcutId: "BICICLETA",
+        exerciseId: wallSit.id,
+        isIsometric: false,
         durationMinutes: 12.5,
         distanceKm: 4.2,
         sets: [
@@ -80,20 +136,32 @@ describe("exercise entry state", () => {
     ]);
   });
 
+  it("sends hold seconds only for isometric entries", () => {
+    const entry = {
+      ...createExerciseEntry("exercise-1", "Wall sit"),
+      isIsometric: true,
+      sets: [{ id: "set-a", reps: "", weightKg: "", holdSeconds: "45", notes: "" }],
+    };
+
+    expect(toExercisePayload([entry])[0]?.sets).toEqual([{ position: 0, holdSeconds: 45 }]);
+    expect(isExerciseEntryComplete(entry)).toBe(true);
+    expect(isExerciseEntryComplete({ ...entry, isIsometric: false })).toBe(false);
+  });
+
   it("keeps invalid numeric drafts for server validation instead of hiding them", () => {
     const entry = {
-      ...createExerciseEntry("exercise-1", "Wall sit", "WALL_SIT"),
-      sets: [{ id: "set-a", reps: "abc", weightKg: "", notes: "" }],
+      ...createExerciseEntry("exercise-1", "Wall sit"),
+      sets: [{ id: "set-a", reps: "abc", weightKg: "", holdSeconds: "", notes: "" }],
     };
 
     expect(toExercisePayload([entry])[0]?.sets[0]?.reps).toBe("abc");
   });
 
   it("only counts exercises with a meaningful set, duration, or distance", () => {
-    const empty = createExerciseEntry("exercise-1", "Wall sit", "WALL_SIT");
+    const empty = createExerciseEntry("exercise-1", "Wall sit");
     const withReps = {
       ...empty,
-      sets: [{ id: "set-1", reps: "12", weightKg: "", notes: "" }],
+      sets: [{ id: "set-1", reps: "12", weightKg: "", holdSeconds: "", notes: "" }],
     };
     const withDuration = { ...empty, durationMinutes: "10" };
 
@@ -102,12 +170,32 @@ describe("exercise entry state", () => {
     expect(isExerciseEntryComplete(withDuration)).toBe(true);
   });
 
-  it("keeps a custom exercise incomplete until it has a name", () => {
+  it("keeps an unnamed exercise incomplete and detects untouched entries", () => {
     const unnamed = {
-      ...createExerciseEntry("exercise-1", ""),
-      sets: [{ id: "set-1", reps: "12", weightKg: "", notes: "" }],
+      ...createExerciseEntry("exercise-1"),
+      sets: [{ id: "set-1", reps: "12", weightKg: "", holdSeconds: "", notes: "" }],
     };
 
     expect(isExerciseEntryComplete(unnamed)).toBe(false);
+    expect(isExerciseEntryEmpty(unnamed)).toBe(false);
+    expect(isExerciseEntryEmpty(addExerciseSet(createExerciseEntry("e"), "s"))).toBe(true);
+  });
+
+  it("builds summary input from meaningful sets only", () => {
+    const entry = {
+      ...createExerciseEntry("exercise-1", "Wall sit"),
+      isIsometric: true,
+      sets: [
+        { id: "a", reps: "", weightKg: "", holdSeconds: "45", notes: "" },
+        { id: "b", reps: "", weightKg: "", holdSeconds: "", notes: "" },
+      ],
+    };
+
+    expect(toExerciseSummaryInput(entry)).toEqual({
+      isIsometric: true,
+      sets: [{ holdSeconds: 45, reps: undefined, weightKg: undefined }],
+      durationMinutes: undefined,
+      distanceKm: undefined,
+    });
   });
 });

@@ -7,13 +7,13 @@ import { useFormStatus } from "react-dom";
 import { ExerciseEntryEditor } from "@/components/exercise-entry-editor";
 import { RitualPainSlider } from "@/components/ritual-pain-slider";
 import { createPostTherapySessionAction } from "@/features/check-in/post-therapy/actions";
-import { exerciseShortcuts } from "@/lib/constants/exercises";
 import {
   isExerciseEntryComplete,
   type ExerciseEntryDraft,
 } from "@/lib/exercise-entry-state";
 import { getSessionFormProgress } from "@/lib/session-form-state";
 import type {
+  Exercise,
   FinalState,
   PainScore,
   Rating1To5,
@@ -118,7 +118,7 @@ function SaveButton({
     >
       <span>{pending ? "Guardando..." : "Guardar sesion"}</span>
       <span>
-        <small>{isComplete ? `18 min · ${exerciseCount}/${exerciseShortcuts.length}` : `faltan ${missingSteps}`}</small>
+        <small>{isComplete ? `${exerciseCount} ejercicio${exerciseCount === 1 ? "" : "s"}` : `faltan ${missingSteps}`}</small>
         <b aria-hidden="true">→</b>
       </span>
     </button>
@@ -126,12 +126,14 @@ function SaveButton({
 }
 
 interface PostTherapyFormProps {
+  catalog: Exercise[];
   defaultOccurredAt: string;
   errorMessage?: string;
   recentSessions: RehabSession[];
 }
 
 export function PostTherapyForm({
+  catalog,
   defaultOccurredAt,
   errorMessage,
   recentSessions,
@@ -310,7 +312,7 @@ export function PostTherapyForm({
               </span>
             }
           />
-          <ExerciseEntryEditor entries={exerciseEntries} onChange={setExerciseEntries} />
+          <ExerciseEntryEditor catalog={catalog} entries={exerciseEntries} onChange={setExerciseEntries} />
         </section>
 
         <section className={`rr-note-card ${showNote ? "is-open" : ""}`}>
@@ -341,7 +343,7 @@ export function PostTherapyForm({
               <article key={session.id}>
                 <strong>{formatSessionDay(session.occurredAt)}</strong>
                 <span>
-                  {sessionTypeLabel(session.sessionType)} · {session.exercises.length}/{exerciseShortcuts.length} · dolor {session.painBefore}→{session.painAfter}
+                  {sessionTypeLabel(session.sessionType)} · {session.exercises.length} ejercicio{session.exercises.length === 1 ? "" : "s"} · dolor {session.painBefore}→{session.painAfter}
                 </span>
                 <b aria-hidden="true">✓</b>
               </article>

@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  mapExerciseRow,
   mapSessionExerciseRow,
-  toExerciseSetInsertRows,
-  toSessionExerciseInsertRows,
+  type ExerciseSetRow,
   type SessionExerciseRow,
 } from "@/data/recovery-log-mappers";
-import type { SessionExercise } from "@/types/recovery";
+
+const timestamp = "2026-07-16T18:00:00.000Z";
 
 const baseExerciseRow: SessionExerciseRow = {
   id: "exercise-1",
@@ -14,19 +15,36 @@ const baseExerciseRow: SessionExerciseRow = {
   user_id: "user-1",
   position: 0,
   name: "Step-up",
-  shortcut_id: "STEP_UP",
+  exercise_id: "catalog-1",
+  is_isometric: false,
   duration_minutes: null,
   distance_km: null,
   sets: null,
   reps: null,
   weight: null,
   notes: null,
-  created_at: "2026-07-16T18:00:00.000Z",
-  updated_at: "2026-07-16T18:00:00.000Z",
+  created_at: timestamp,
+  updated_at: timestamp,
 };
 
+function setRow(overrides: Partial<ExerciseSetRow>): ExerciseSetRow {
+  return {
+    id: "set-1",
+    session_exercise_id: "exercise-1",
+    user_id: "user-1",
+    position: 0,
+    reps: null,
+    weight_kg: null,
+    hold_seconds: null,
+    notes: null,
+    created_at: timestamp,
+    updated_at: timestamp,
+    ...overrides,
+  };
+}
+
 describe("recovery log mappers", () => {
-  it("maps ordered individual sets and general exercise metrics", () => {
+  it("maps ordered individual sets, catalog link and general exercise metrics", () => {
     const exercise = mapSessionExerciseRow(
       {
         ...baseExerciseRow,
@@ -34,34 +52,15 @@ describe("recovery log mappers", () => {
         distance_km: 1.75,
       },
       [
-        {
-          id: "set-2",
-          session_exercise_id: "exercise-1",
-          user_id: "user-1",
-          position: 1,
-          reps: 8,
-          weight_kg: 15,
-          notes: null,
-          created_at: "2026-07-16T18:00:00.000Z",
-          updated_at: "2026-07-16T18:00:00.000Z",
-        },
-        {
-          id: "set-1",
-          session_exercise_id: "exercise-1",
-          user_id: "user-1",
-          position: 0,
-          reps: 10,
-          weight_kg: 12.5,
-          notes: "Controlado",
-          created_at: "2026-07-16T18:00:00.000Z",
-          updated_at: "2026-07-16T18:00:00.000Z",
-        },
+        setRow({ id: "set-2", position: 1, reps: 8, weight_kg: 15 }),
+        setRow({ id: "set-1", position: 0, reps: 10, weight_kg: 12.5, notes: "Controlado" }),
       ],
     );
 
     expect(exercise).toEqual({
       name: "Step-up",
-      shortcutId: "STEP_UP",
+      exerciseId: "catalog-1",
+      isIsometric: false,
       durationMinutes: 12.5,
       distanceKm: 1.75,
       sets: [
@@ -69,6 +68,16 @@ describe("recovery log mappers", () => {
         { position: 1, reps: 8, weightKg: 15 },
       ],
     });
+  });
+
+  it("maps isometric hold seconds", () => {
+    const exercise = mapSessionExerciseRow(
+      { ...baseExerciseRow, name: "Wall sit", is_isometric: true },
+      [setRow({ hold_seconds: 45 })],
+    );
+
+    expect(exercise.isIsometric).toBe(true);
+    expect(exercise.sets).toEqual([{ position: 0, holdSeconds: 45 }]);
   });
 
   it("keeps legacy aggregate values separate from individual sets", () => {
@@ -90,66 +99,35 @@ describe("recovery log mappers", () => {
     });
   });
 
-  it("creates exercise rows without writing legacy aggregate columns", () => {
-    const exercise: SessionExercise = {
-      name: "Bicicleta",
-      shortcutId: "BICICLETA",
-      durationMinutes: 10,
-      distanceKm: 3.25,
-      sets: [],
-    };
-
-    expect(toSessionExerciseInsertRows("user-1", "session-1", [exercise])).toEqual([
-      {
-        session_id: "session-1",
-        user_id: "user-1",
-        position: 0,
-        name: "Bicicleta",
-        shortcut_id: "BICICLETA",
-        duration_minutes: 10,
-        distance_km: 3.25,
-        sets: null,
-        reps: null,
-        weight: null,
-        notes: null,
-      },
-    ]);
-  });
-
-  it("flattens sets using their inserted exercise positions", () => {
-    const exercises: SessionExercise[] = [
-      {
-        name: "Step-up",
-        sets: [
-          { position: 0, reps: 10, weightKg: 12 },
-          { position: 1, reps: 8, weightKg: 14, notes: "Ultima" },
-        ],
-      },
-    ];
-
-    const rows = toExerciseSetInsertRows(
-      "user-1",
-      exercises,
-      [{ id: "exercise-1", position: 0 }],
-    );
-
-    expect(rows).toEqual([
-      {
-        session_exercise_id: "exercise-1",
-        user_id: "user-1",
-        position: 0,
-        reps: 10,
-        weight_kg: 12,
-        notes: null,
-      },
-      {
-        session_exercise_id: "exercise-1",
-        user_id: "user-1",
-        position: 1,
-        reps: 8,
-        weight_kg: 14,
-        notes: "Ultima",
-      },
-    ]);
+  it("maps catalog rows converting numeric strings", () => {
+    expect(
+      mapExerciseRow(
+        {
+          id: "catalog-1",
+          user_id: "user-1",
+          name: "Bicicleta 5-10 min",
+          default_isometric: false,
+          default_set_count: null,
+          default_reps: null,
+          default_hold_seconds: null,
+          default_weight_kg: "2.50",
+          default_duration_minutes: "10.00",
+          default_distance_km: null,
+          archived_at: null,
+          created_at: timestamp,
+          updated_at: timestamp,
+        },
+        4,
+      ),
+    ).toEqual({
+      id: "catalog-1",
+      name: "Bicicleta 5-10 min",
+      defaultIsometric: false,
+      defaultWeightKg: 2.5,
+      defaultDurationMinutes: 10,
+      sessionCount: 4,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    });
   });
 });

@@ -17,6 +17,12 @@ const appTabs = [
     match: "startsWith" as const,
   },
   {
+    href: "/ejercicios",
+    label: "Ejercicios",
+    glyph: "EJ",
+    match: "startsWith" as const,
+  },
+  {
     href: "/insights",
     label: "Insights",
     glyph: "IN",

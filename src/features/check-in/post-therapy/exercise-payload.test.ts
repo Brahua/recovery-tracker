@@ -11,7 +11,6 @@ describe("parseExercisePayload", () => {
       JSON.stringify([
         {
           name: "Step-up",
-          shortcutId: "STEP_UP",
           sets: [
             { position: 0, reps: 12, weightKg: 10 },
             { position: 1, reps: 10, weightKg: 12.5 },
@@ -44,7 +43,7 @@ describe("parseExercisePayload", () => {
       parseExercisePayload(
         JSON.stringify([
           {
-            name: "TKE",
+            name: "Step-up",
             sets: [{ position: 0, reps: "abc" }],
           },
         ]),

@@ -1,0 +1,122 @@
+"use client";
+
+import { useState } from "react";
+
+import { ModalSheet } from "@/components/modal-sheet";
+import { ExerciseForm } from "@/features/exercises/exercise-form";
+import { normalizeExerciseName } from "@/lib/exercise-name";
+import { summarizeExerciseDefaults } from "@/lib/exercise-summary";
+import type { Exercise } from "@/types/recovery";
+
+interface ExerciseCatalogProps {
+  exercises: Exercise[];
+}
+
+type Editing = { mode: "create" } | { mode: "edit"; id: string } | null;
+type CatalogTab = "active" | "archived";
+
+export function ExerciseCatalog({ exercises }: ExerciseCatalogProps) {
+  const [query, setQuery] = useState("");
+  const [tab, setTab] = useState<CatalogTab>("active");
+  const [editing, setEditing] = useState<Editing>(null);
+
+  const active = exercises.filter((exercise) => !exercise.archivedAt);
+  const archived = exercises.filter((exercise) => exercise.archivedAt);
+  const normalizedQuery = normalizeExerciseName(query);
+  const visible = (tab === "active" ? active : archived).filter((exercise) =>
+    normalizeExerciseName(exercise.name).includes(normalizedQuery),
+  );
+  const editingExercise =
+    editing?.mode === "edit"
+      ? exercises.find((exercise) => exercise.id === editing.id)
+      : undefined;
+  const modalOpen = editing?.mode === "create" || Boolean(editingExercise);
+
+  return (
+    <section className="rr-exercise-catalog">
+      <header className="rr-exercise-catalog-header">
+        <div>
+          <p className="rr-kicker">Tu catálogo</p>
+          <h1 className="rr-display">Ejercicios</h1>
+          <p>Define nombres y valores por defecto para registrar más rápido.</p>
+        </div>
+        <button className="rr-modal-primary" onClick={() => setEditing({ mode: "create" })} type="button">
+          + Nuevo
+        </button>
+      </header>
+
+      <div className="rr-exercise-catalog-controls">
+        <label className="rr-exercise-catalog-search">
+          <span className="rr-visually-hidden">Buscar ejercicio</span>
+          <input
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Buscar ejercicio"
+            type="search"
+            value={query}
+          />
+        </label>
+        <div aria-label="Estado de los ejercicios" className="rr-exercise-catalog-tabs" role="group">
+          <button aria-pressed={tab === "active"} onClick={() => setTab("active")} type="button">
+            Activos <b>{active.length}</b>
+          </button>
+          <button aria-pressed={tab === "archived"} onClick={() => setTab("archived")} type="button">
+            Archivados <b>{archived.length}</b>
+          </button>
+        </div>
+      </div>
+
+      {visible.length === 0 ? (
+        <p className="rr-exercise-catalog-empty">
+          {query.trim()
+            ? "Ningún ejercicio coincide con la búsqueda."
+            : tab === "active"
+              ? "Aún no tienes ejercicios activos."
+              : "No hay ejercicios archivados."}
+        </p>
+      ) : (
+        <ul aria-label="Lista de ejercicios" className="rr-exercise-rows">
+          {visible.map((exercise) => {
+            const summary = summarizeExerciseDefaults(exercise);
+
+            return (
+              <li key={exercise.id}>
+                <button
+                  className="rr-exercise-row"
+                  onClick={() => setEditing({ mode: "edit", id: exercise.id })}
+                  type="button"
+                >
+                  <span className="rr-exercise-row-name">
+                    <strong>{exercise.name}</strong>
+                    {exercise.defaultIsometric ? <em>Isométrico</em> : null}
+                  </span>
+                  <span className="rr-exercise-row-summary">
+                    {summary || <small>Sin valores</small>}
+                    <small>
+                      {exercise.sessionCount} sesi{exercise.sessionCount === 1 ? "ón" : "ones"}
+                    </small>
+                  </span>
+                  <b aria-hidden="true">›</b>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+
+      <ModalSheet
+        onClose={() => setEditing(null)}
+        open={modalOpen}
+        title={editingExercise ? "Editar ejercicio" : "Nuevo ejercicio"}
+      >
+        {modalOpen ? (
+          <ExerciseForm
+            exercise={editingExercise}
+            exercises={exercises}
+            key={editingExercise?.id ?? "create"}
+            onDone={() => setEditing(null)}
+          />
+        ) : null}
+      </ModalSheet>
+    </section>
+  );
+}

@@ -76,7 +76,10 @@ export function HistorySessionCard({
             ) : session.exercises.map((exercise, exerciseIndex) => (
               <section key={`${session.id}-${exercise.name}-${exerciseIndex}`}>
                 <div className="rr-history-exercise-title">
-                  <strong>{exercise.name}</strong>
+                  <strong>
+                    {exercise.name}
+                    {exercise.isIsometric ? <small className="rr-history-isometric">Isométrico</small> : null}
+                  </strong>
                   {(exercise.durationMinutes || exercise.distanceKm) && (
                     <span>
                       {exercise.durationMinutes ? `${formatHistoryNumber(exercise.durationMinutes)} min` : ""}
@@ -92,6 +95,7 @@ export function HistorySessionCard({
                       <li key={set.position}>
                         <span>
                           Serie {set.position + 1}
+                          {exercise.isIsometric && set.holdSeconds !== undefined ? ` · ${set.holdSeconds} s` : ""}
                           {set.reps !== undefined ? ` · ${set.reps} rep` : ""}
                           {set.weightKg !== undefined ? ` · ${formatHistoryNumber(set.weightKg)} kg` : ""}
                         </span>

@@ -9,9 +9,11 @@ import {
   applyExerciseDefaults,
   createExerciseEntry,
   duplicateExerciseSet,
+  findRepeatedEntryIds,
   isExerciseEntryComplete,
   isExerciseEntryEmpty,
   removeExerciseSet,
+  resolveEntryExerciseId,
   toExercisePayload,
   toExerciseSummaryInput,
   unlinkExerciseEntry,
@@ -33,6 +35,7 @@ interface ExerciseDetailProps {
   entry: ExerciseEntryDraft;
   excludeIds: string[];
   onChange: (entry: ExerciseEntryDraft) => void;
+  repeated: boolean;
 }
 
 function nextId(prefix: string) {
@@ -43,7 +46,7 @@ function hasText(value: string) {
   return value.trim().length > 0;
 }
 
-function ExerciseDetail({ catalog, entry, excludeIds, onChange }: ExerciseDetailProps) {
+function ExerciseDetail({ catalog, entry, excludeIds, onChange, repeated }: ExerciseDetailProps) {
   const [showMetrics, setShowMetrics] = useState(
     hasText(entry.durationMinutes) || hasText(entry.distanceKm),
   );
@@ -51,7 +54,7 @@ function ExerciseDetail({ catalog, entry, excludeIds, onChange }: ExerciseDetail
   const [openSetNotes, setOpenSetNotes] = useState(
     () => new Set(entry.sets.filter((set) => hasText(set.notes)).map((set) => set.id)),
   );
-  const incomplete = !isExerciseEntryComplete(entry);
+  const incomplete = repeated || !isExerciseEntryComplete(entry);
   const warningId = `${entry.id}-incomplete`;
   const isometricId = `${entry.id}-isometric`;
 
@@ -84,6 +87,13 @@ function ExerciseDetail({ catalog, entry, excludeIds, onChange }: ExerciseDetail
           autoFocus={!hasText(entry.name)}
           catalog={catalog}
           excludeIds={excludeIds}
+          onRestore={(exercise) =>
+            onChange({
+              ...applyExerciseDefaults(entry, exercise, () => nextId("set")),
+              // Stay unlinked: the server reactivates the archived exercise by name.
+              exerciseId: undefined,
+            })
+          }
           onSelect={(exercise) =>
             onChange(applyExerciseDefaults(entry, exercise, () => nextId("set")))
           }
@@ -108,7 +118,7 @@ function ExerciseDetail({ catalog, entry, excludeIds, onChange }: ExerciseDetail
       {incomplete && (
         <p className="rr-exercise-incomplete" id={warningId} role="status">
           <span aria-hidden="true">!</span>
-          Falta completar este ejercicio
+          {repeated ? "Este ejercicio ya está en la sesión" : "Falta completar este ejercicio"}
         </p>
       )}
 
@@ -299,11 +309,17 @@ export function ExerciseEntryEditor({
   const [openEntryId, setOpenEntryId] = useState<string | null>(null);
   const openEntry = entries.find((entry) => entry.id === openEntryId);
   const mostUsed = selectMostUsedExercises(catalog);
-  const linkedIds = entries.flatMap((entry) => (entry.exerciseId ? [entry.exerciseId] : []));
+  const repeatedEntryIds = findRepeatedEntryIds(entries, catalog);
+  const usedExerciseIds = entries.flatMap((entry) => {
+    const exerciseId = resolveEntryExerciseId(entry, catalog);
+    return exerciseId ? [exerciseId] : [];
+  });
 
   function toggleExercise(exercise: Exercise) {
-    if (linkedIds.includes(exercise.id)) {
-      onChange(entries.filter((entry) => entry.exerciseId !== exercise.id));
+    if (usedExerciseIds.includes(exercise.id)) {
+      onChange(
+        entries.filter((entry) => resolveEntryExerciseId(entry, catalog) !== exercise.id),
+      );
       return;
     }
 
@@ -341,7 +357,7 @@ export function ExerciseEntryEditor({
           <p id="rr-exercise-quick-label">Más usados</p>
           <div aria-labelledby="rr-exercise-quick-label" className="rr-exercise-list" role="group">
             {mostUsed.map((exercise) => {
-              const selected = linkedIds.includes(exercise.id);
+              const selected = usedExerciseIds.includes(exercise.id);
               return (
                 <button
                   aria-pressed={selected}
@@ -362,7 +378,8 @@ export function ExerciseEntryEditor({
       {entries.length > 0 ? (
         <ul aria-label="Ejercicios de la sesión" className="rr-exercise-rows">
           {entries.map((entry) => {
-            const complete = isExerciseEntryComplete(entry);
+            const repeated = repeatedEntryIds.has(entry.id);
+            const complete = !repeated && isExerciseEntryComplete(entry);
             const summary = summarizeExercise(toExerciseSummaryInput(entry));
 
             return (
@@ -378,7 +395,7 @@ export function ExerciseEntryEditor({
                     {entry.isIsometric ? <em>Isométrico</em> : null}
                   </span>
                   <span className="rr-exercise-row-summary">
-                    {complete ? summary : "Completar"}
+                    {repeated ? "Repetido" : complete ? summary : "Completar"}
                   </span>
                   <b aria-hidden="true">›</b>
                 </button>
@@ -420,9 +437,14 @@ export function ExerciseEntryEditor({
           <ExerciseDetail
             catalog={catalog}
             entry={openEntry}
-            excludeIds={linkedIds.filter((id) => id !== openEntry.exerciseId)}
+            excludeIds={entries.flatMap((entry) => {
+              const exerciseId =
+                entry.id === openEntry.id ? undefined : resolveEntryExerciseId(entry, catalog);
+              return exerciseId ? [exerciseId] : [];
+            })}
             key={openEntry.id}
             onChange={updateEntry}
+            repeated={repeatedEntryIds.has(openEntry.id)}
           />
         ) : null}
       </ModalSheet>

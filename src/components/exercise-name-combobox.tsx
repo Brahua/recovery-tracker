@@ -10,6 +10,7 @@ interface ExerciseNameComboboxProps {
   autoFocus?: boolean;
   catalog: Exercise[];
   excludeIds: string[];
+  onRestore: (exercise: Exercise) => void;
   onSelect: (exercise: Exercise) => void;
   onValueChange: (value: string) => void;
   value: string;
@@ -17,12 +18,14 @@ interface ExerciseNameComboboxProps {
 
 type ComboboxOption =
   | { kind: "exercise"; exercise: Exercise }
+  | { kind: "restore"; exercise: Exercise }
   | { kind: "create"; name: string };
 
 export function ExerciseNameCombobox({
   autoFocus = false,
   catalog,
   excludeIds,
+  onRestore,
   onSelect,
   onValueChange,
   value,
@@ -34,12 +37,13 @@ export function ExerciseNameCombobox({
   const [activeIndex, setActiveIndex] = useState(-1);
 
   const matches = matchExercises(catalog, value, { excludeIds });
-  const exactMatch = findExerciseByName(
-    catalog.filter((exercise) => !exercise.archivedAt),
-    value,
-  );
+  const exactMatch = findExerciseByName(catalog, value);
+  const alreadyInSession = Boolean(exactMatch && excludeIds.includes(exactMatch.id));
   const options: ComboboxOption[] = [
     ...matches.map((exercise) => ({ kind: "exercise" as const, exercise })),
+    ...(exactMatch?.archivedAt && !alreadyInSession
+      ? [{ kind: "restore" as const, exercise: exactMatch }]
+      : []),
     ...(value.trim() && !exactMatch
       ? [{ kind: "create" as const, name: value.trim() }]
       : []),
@@ -50,6 +54,8 @@ export function ExerciseNameCombobox({
   function choose(option: ComboboxOption) {
     if (option.kind === "exercise") {
       onSelect(option.exercise);
+    } else if (option.kind === "restore") {
+      onRestore(option.exercise);
     }
     setOpen(false);
     setActiveIndex(-1);
@@ -72,8 +78,8 @@ export function ExerciseNameCombobox({
       const option = options[activeIndex];
       if (expanded && option) {
         choose(option);
-      } else if (exactMatch && !excludeIds.includes(exactMatch.id)) {
-        choose({ kind: "exercise", exercise: exactMatch });
+      } else if (exactMatch && !alreadyInSession) {
+        choose({ kind: exactMatch.archivedAt ? "restore" : "exercise", exercise: exactMatch });
       } else {
         setOpen(false);
       }
@@ -119,7 +125,7 @@ export function ExerciseNameCombobox({
             aria-selected={index === activeIndex}
             className={`${index === activeIndex ? "is-active" : ""} ${option.kind === "create" ? "is-create" : ""}`}
             id={optionId(index)}
-            key={option.kind === "exercise" ? option.exercise.id : "create"}
+            key={option.kind === "create" ? "create" : option.exercise.id}
             onMouseDown={(event) => {
               // Keep focus in the input so blur does not close the list first.
               event.preventDefault();
@@ -135,6 +141,11 @@ export function ExerciseNameCombobox({
                     (option.exercise.defaultIsometric ? "Isométrico" : "")}
                 </small>
               </>
+            ) : option.kind === "restore" ? (
+              <>
+                <span>Reactivar &ldquo;{option.exercise.name}&rdquo;</span>
+                <small>Está archivado; volverá a tus ejercicios al guardar</small>
+              </>
             ) : (
               <>
                 <span>Crear &ldquo;{option.name}&rdquo;</span>
@@ -144,8 +155,14 @@ export function ExerciseNameCombobox({
           </li>
         ))}
       </ul>
-      {exactMatch && !open && !excludeIds.includes(exactMatch.id) ? (
-        <p className="rr-combobox-hint">Se usará &ldquo;{exactMatch.name}&rdquo; de tus ejercicios.</p>
+      {exactMatch && !open ? (
+        <p className="rr-combobox-hint">
+          {alreadyInSession
+            ? "Este ejercicio ya está en la sesión."
+            : exactMatch.archivedAt
+              ? `Se reactivará “${exactMatch.name}” al guardar.`
+              : `Se usará “${exactMatch.name}” de tus ejercicios.`}
+        </p>
       ) : null}
     </div>
   );

@@ -222,7 +222,9 @@ as $$
 $$;
 
 -- Creates a session, its exercises and sets in one transaction. Exercises are
--- resolved by id, then by normalized name, and created when missing.
+-- resolved by id, then by normalized name (reactivating an archived one the
+-- user typed again), and created when missing. The same exercise cannot be
+-- logged twice in one session.
 create or replace function public.create_rehab_session(payload jsonb)
 returns uuid
 language plpgsql
@@ -239,6 +241,7 @@ declare
   exercise_name text;
   exercise_is_isometric boolean;
   set_item jsonb;
+  used_exercise_ids uuid[] := '{}';
 begin
   if current_user_id is null then
     raise exception 'Authenticated user is required.';
@@ -283,6 +286,12 @@ begin
     end if;
 
     if resolved_exercise_id is null then
+      update public.exercises
+      set archived_at = null
+      where user_id = current_user_id
+        and normalized_name = public.normalize_exercise_name(exercise_name)
+        and archived_at is not null;
+
       select id into resolved_exercise_id
       from public.exercises
       where user_id = current_user_id
@@ -302,6 +311,11 @@ begin
           and normalized_name = public.normalize_exercise_name(exercise_name);
       end if;
     end if;
+
+    if resolved_exercise_id = any(used_exercise_ids) then
+      raise exception 'Exercise is repeated in the session.';
+    end if;
+    used_exercise_ids := array_append(used_exercise_ids, resolved_exercise_id);
 
     insert into public.session_exercises (
       session_id,

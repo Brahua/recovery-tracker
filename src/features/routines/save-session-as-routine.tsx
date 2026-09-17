@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import Link from "@/components/app-link";
 import { useId, useState, useTransition } from "react";
 
 import { ModalSheet } from "@/components/modal-sheet";

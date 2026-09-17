@@ -1,4 +1,4 @@
-import Link from "next/link";
+import Link from "@/components/app-link";
 
 import { SaveSessionAsRoutine } from "@/features/routines/save-session-as-routine";
 import type { RitualSuccessConfig } from "@/lib/registrar-flow";

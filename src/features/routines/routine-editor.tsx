@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "@/components/app-link";
-import { useRouter } from "next/navigation";
-import { useId, useState, useTransition } from "react";
+import { useId, useState } from "react";
 
+import { useActionFeedback } from "@/components/feedback/use-action-feedback";
+import { useAppRouter } from "@/components/use-app-router";
 import { ExerciseEntryEditor } from "@/components/exercise-entry-editor";
 import { deleteRoutineAction, saveRoutineAction } from "@/features/routines/actions";
 import { createDraftId } from "@/lib/draft-id";
@@ -23,9 +24,10 @@ interface RoutineEditorProps {
 const routinesHref = "/ejercicios?seccion=rutinas";
 
 export function RoutineEditor({ catalog, routine }: RoutineEditorProps) {
-  const router = useRouter();
+  const router = useAppRouter();
   const nameId = useId();
-  const [pending, startTransition] = useTransition();
+  const { pending: actionPending, run } = useActionFeedback();
+  const pending = actionPending || router.pending;
   const [name, setName] = useState(routine?.name ?? "");
   const [entries, setEntries] = useState<ExerciseEntryDraft[]>(() =>
     routine ? routineToEntries(routine, createDraftId) : [],
@@ -41,27 +43,21 @@ export function RoutineEditor({ catalog, routine }: RoutineEditorProps) {
     name.trim().length > 0 && entries.length > 0 && readyCount === entries.length && !pending;
 
   function save() {
-    setError(null);
-    startTransition(async () => {
-      const result = await saveRoutineAction(routine?.id ?? null, toRoutinePayload(name, entries));
-      if (result.ok) {
-        router.push(routinesHref);
-      } else {
-        setError(result.error ?? "No se pudo guardar la rutina.");
-      }
+    run(() => saveRoutineAction(routine?.id ?? null, toRoutinePayload(name, entries)), {
+      success: "Rutina guardada",
+      fallbackError: "No se pudo guardar la rutina.",
+      onSuccess: () => router.push(routinesHref),
+      onError: (message) => setError(message || null),
     });
   }
 
   function remove() {
     if (!routine) return;
-    setError(null);
-    startTransition(async () => {
-      const result = await deleteRoutineAction(routine.id);
-      if (result.ok) {
-        router.push(routinesHref);
-      } else {
-        setError(result.error ?? "No se pudo eliminar la rutina.");
-      }
+    run(() => deleteRoutineAction(routine.id), {
+      success: "Rutina eliminada",
+      fallbackError: "No se pudo eliminar la rutina.",
+      onSuccess: () => router.push(routinesHref),
+      onError: (message) => setError(message || null),
     });
   }
 

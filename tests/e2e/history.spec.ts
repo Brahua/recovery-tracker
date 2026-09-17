@@ -11,7 +11,7 @@ import {
 } from "./exercise-helpers";
 
 test.describe("read-only history", () => {
-  test("keeps the current screen visible while history data loads", async ({ page }) => {
+  test("keeps the shell and shows progress while history data loads", async ({ page }) => {
     let releaseHistoryRequest = () => {};
     const holdHistoryRequest = new Promise<void>((resolve) => {
       releaseHistoryRequest = resolve;
@@ -26,11 +26,12 @@ test.describe("read-only history", () => {
 
     const navigation = page.getByRole("link", { name: "Historial", exact: true }).click();
 
-    await expect(page.getByRole("heading", { name: /^Hola,/ })).toBeVisible();
-    await expect(page.getByLabel("Cargando historial")).toHaveCount(0);
+    await expect(page.getByTestId("global-progress")).toHaveClass(/is-active/);
+    await expect(page.getByRole("navigation", { name: "Navegacion principal", exact: true })).toBeVisible();
     releaseHistoryRequest();
     await navigation;
     await expect(page.getByRole("heading", { name: "Historial" })).toBeVisible();
+    await expect(page.getByTestId("global-progress")).not.toHaveClass(/is-active/);
   });
 
   test("shows a saved session with its individual sets and supports older windows", async ({ page }) => {

@@ -17,6 +17,7 @@ import {
   routineListRow,
   saveSession,
   sessionExerciseRow,
+  toast,
   uniqueName,
 } from "./exercise-helpers";
 
@@ -38,6 +39,7 @@ test.describe("routines", () => {
     await expect(routineExerciseRow(page, "Step-up")).toContainText("Sin plan");
     await page.getByRole("button", { name: "Guardar rutina" }).click();
 
+    await expect(toast(page, "Rutina guardada")).toBeVisible();
     await expect(page).toHaveURL(/\/ejercicios\?seccion=rutinas$/);
     await expect(routineListRow(page, name)).toContainText("2 ejercicios");
     await expect(routineListRow(page, name)).toContainText("Wall sit · Step-up");
@@ -87,7 +89,7 @@ test.describe("routines", () => {
     const dialog = exerciseDialog(page);
     await dialog.getByLabel("Nombre de la rutina").fill(name);
     await dialog.getByRole("button", { name: "Guardar rutina" }).click();
-    await expect(page.getByRole("status").filter({ hasText: "Rutina guardada" })).toBeVisible();
+    await expect(toast(page, "Rutina guardada")).toBeVisible();
 
     await page.getByRole("link", { name: "Ver rutina" }).click();
     await expect(page.getByRole("heading", { name: "Editar rutina" })).toBeVisible();
@@ -139,6 +141,7 @@ test.describe("routines", () => {
     await routineListRow(page, name).click();
     await page.getByRole("button", { name: "Eliminar", exact: true }).click();
     await page.getByRole("button", { name: "Confirmar eliminación" }).click();
+    await expect(toast(page, "Rutina eliminada")).toBeVisible();
     await expect(page).toHaveURL(/\/ejercicios\?seccion=rutinas$/);
     await expect(routineListRow(page, name)).toHaveCount(0);
 

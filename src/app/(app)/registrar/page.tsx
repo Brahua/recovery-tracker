@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { ImmersiveMarker } from "@/components/app-shell";
+import { ToastOnMount } from "@/components/feedback/toast-on-mount";
 import { DayClosedState } from "@/components/day-closed-state";
 import { SessionSavedState } from "@/components/session-saved-state";
 import { NightlyCloseoutForm } from "@/features/check-in/nightly-closeout/form";
@@ -119,6 +120,12 @@ export default async function RegistrarPage({
   return (
     <>
       {showSessionSuccess || showNightlySuccess ? <ImmersiveMarker /> : null}
+      {showSessionSuccess ? (
+        <ToastOnMount message="Sesión guardada" onceKey={`session:${savedSessionId ?? "latest"}`} />
+      ) : null}
+      {showNightlySuccess ? (
+        <ToastOnMount message="Cierre guardado" onceKey={`closeout:${savedCloseoutId ?? selectedCloseoutDate}`} />
+      ) : null}
       {showSessionSuccess && successState ? (
         <SessionSavedState
           {...successState}

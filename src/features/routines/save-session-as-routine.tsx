@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "@/components/app-link";
-import { useId, useState, useTransition } from "react";
+import { useId, useState } from "react";
 
+import { useActionFeedback } from "@/components/feedback/use-action-feedback";
 import { ModalSheet } from "@/components/modal-sheet";
 import { createRoutineFromSessionAction } from "@/features/routines/actions";
 
@@ -17,26 +18,25 @@ export function SaveSessionAsRoutine({ sessionId, suggestedName }: SaveSessionAs
   const [name, setName] = useState(suggestedName);
   const [error, setError] = useState<string | null>(null);
   const [routineId, setRoutineId] = useState<string | null>(null);
-  const [pending, startTransition] = useTransition();
+  const { pending, run } = useActionFeedback();
 
   function save() {
-    setError(null);
-    startTransition(async () => {
-      const result = await createRoutineFromSessionAction(sessionId, name);
-      if (result.ok && result.routineId) {
-        setRoutineId(result.routineId);
+    run(() => createRoutineFromSessionAction(sessionId, name), {
+      success: "Rutina guardada",
+      fallbackError: "No se pudo guardar la rutina.",
+      onSuccess: (result) => {
+        if (result.routineId) setRoutineId(result.routineId);
         setOpen(false);
-      } else {
-        setError(result.error ?? "No se pudo guardar la rutina.");
-      }
+      },
+      onError: (message) => setError(message || null),
     });
   }
 
   return (
     <>
       {routineId ? (
-        <p className="rr-routine-saved" role="status">
-          Rutina guardada. <Link href={`/ejercicios/rutinas/${routineId}`}>Ver rutina</Link>
+        <p className="rr-routine-saved">
+          <Link href={`/ejercicios/rutinas/${routineId}`}>Ver rutina</Link>
         </p>
       ) : (
         <button className="rr-success-secondary" onClick={() => setOpen(true)} type="button">

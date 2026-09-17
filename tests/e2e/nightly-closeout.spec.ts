@@ -32,6 +32,7 @@ test.describe("nightly closeout", () => {
     await expect(
       page.getByRole("heading", { name: /^(Dia cerrado|Cierre guardado)\.$/ }),
     ).toBeVisible();
+    await expect(page.getByRole("status").filter({ hasText: "Cierre guardado" })).toBeVisible();
     await expect(page.getByText("Cierre del dia")).toBeVisible();
     await expect(page.getByText("dolor 3")).toBeVisible();
     await expect(page.getByText(/^Ayer · registrado/)).toBeVisible();

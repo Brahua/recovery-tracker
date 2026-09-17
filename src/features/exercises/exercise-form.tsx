@@ -1,7 +1,8 @@
 "use client";
 
-import { useId, useState, useTransition } from "react";
+import { useId, useState } from "react";
 
+import { useActionFeedback } from "@/components/feedback/use-action-feedback";
 import {
   mergeExercisesAction,
   saveExerciseAction,
@@ -51,7 +52,7 @@ function NumberField({ label, unit, value, onChange, step = "1", placeholder }: 
 export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps) {
   const nameId = useId();
   const mergeId = useId();
-  const [pending, startTransition] = useTransition();
+  const { pending, run: runAction } = useActionFeedback();
   const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState(exercise?.name ?? "");
   const [defaultIsometric, setDefaultIsometric] = useState(exercise?.defaultIsometric ?? false);
@@ -67,15 +68,12 @@ export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps)
   const mergeTargets = exercises.filter((item) => item.id !== exercise?.id);
   const mergeTarget = mergeTargets.find((item) => item.id === mergeTargetId);
 
-  function run(action: () => Promise<ExerciseActionResult>) {
-    setError(null);
-    startTransition(async () => {
-      const result = await action();
-      if (result.ok) {
-        onDone();
-      } else {
-        setError(result.error ?? "No se pudo guardar.");
-      }
+  function run(action: () => Promise<ExerciseActionResult>, success: string) {
+    runAction(action, {
+      success,
+      fallbackError: "No se pudo guardar.",
+      onSuccess: onDone,
+      onError: (message) => setError(message || null),
     });
   }
 
@@ -91,6 +89,7 @@ export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps)
         defaultDurationMinutes: durationMinutes,
         defaultDistanceKm: distanceKm,
       }),
+      "Ejercicio guardado",
     );
   }
 
@@ -151,7 +150,12 @@ export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps)
           <button
             className="rr-modal-secondary"
             disabled={pending}
-            onClick={() => run(() => setExerciseArchivedAction(exercise.id, !exercise.archivedAt))}
+            onClick={() =>
+              run(
+                () => setExerciseArchivedAction(exercise.id, !exercise.archivedAt),
+                exercise.archivedAt ? "Ejercicio reactivado" : "Ejercicio archivado",
+              )
+            }
             type="button"
           >
             {exercise.archivedAt ? "Reactivar" : "Archivar"}
@@ -202,7 +206,7 @@ export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps)
                 <button
                   className="rr-modal-secondary is-danger"
                   disabled={!mergeTarget || pending}
-                  onClick={() => run(() => mergeExercisesAction(exercise.id, mergeTargetId))}
+                  onClick={() => run(() => mergeExercisesAction(exercise.id, mergeTargetId), "Ejercicios fusionados")}
                   type="button"
                 >
                   Fusionar y eliminar

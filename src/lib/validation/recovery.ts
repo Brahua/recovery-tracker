@@ -1,13 +1,11 @@
 import { z } from "zod";
 
 import {
-  exerciseShortcutIds,
   finalStates,
   painScores,
   rating1To5Values,
   reboundLevels,
   sessionTypes,
-  type ExerciseShortcutId,
   type PainScore,
   type Rating1To5,
 } from "@/types/recovery";
@@ -37,8 +35,6 @@ const rating1To5Schema: z.ZodType<Rating1To5> = z.custom<Rating1To5>(
 const sessionTypeSchema = z.enum(sessionTypes);
 const finalStateSchema = z.enum(finalStates);
 const reboundLevelSchema = z.enum(reboundLevels);
-const exerciseShortcutIdSchema = z.enum(exerciseShortcutIds) as z.ZodType<ExerciseShortcutId>;
-
 const requiredDateTimeSchema = z
   .string()
   .trim()
@@ -61,20 +57,31 @@ export const exerciseSetSchema = z
     position: z.number().int().nonnegative().max(99),
     reps: z.number().int().positive().max(1000).optional(),
     weightKg: z.number().nonnegative().max(1000).optional(),
+    holdSeconds: z.number().int().positive().max(3600).optional(),
     notes: optionalTextSchema,
   })
   .refine(
     (set) =>
       set.reps !== undefined ||
       set.weightKg !== undefined ||
+      set.holdSeconds !== undefined ||
       set.notes !== undefined,
-    "A set requires repetitions, weight, or a note.",
+    "A set requires repetitions, weight, hold seconds, or a note.",
   );
+
+function hasNonIsometricContent(set: z.infer<typeof exerciseSetSchema>) {
+  return (
+    set.reps !== undefined ||
+    set.weightKg !== undefined ||
+    set.notes !== undefined
+  );
+}
 
 export const sessionExerciseSchema = z
   .object({
-    name: z.string().trim().min(1, "Exercise name is required."),
-    shortcutId: exerciseShortcutIdSchema.optional(),
+    name: z.string().trim().min(1, "Exercise name is required.").max(80),
+    exerciseId: z.uuid().optional(),
+    isIsometric: z.boolean().default(false),
     durationMinutes: z.number().positive().max(1440).optional(),
     distanceKm: z.number().positive().max(1000).optional(),
     sets: z.array(exerciseSetSchema).max(100),
@@ -92,6 +99,18 @@ export const sessionExerciseSchema = z
       new Set(exercise.sets.map((set) => set.position)).size ===
       exercise.sets.length,
     "Set positions must be unique within an exercise.",
+  )
+  .refine(
+    (exercise) => exercise.isIsometric || exercise.sets.every(hasNonIsometricContent),
+    "Hold seconds are only recorded for isometric exercises.",
+  )
+  .transform((exercise) =>
+    exercise.isIsometric
+      ? exercise
+      : {
+          ...exercise,
+          sets: exercise.sets.map((set) => ({ ...set, holdSeconds: undefined })),
+        },
   );
 
 export const createRehabSessionInputSchema = z.object({

@@ -14,25 +14,11 @@ export const finalStates = ["BETTER", "SAME", "WORSE"] as const;
 
 export const reboundLevels = ["NONE", "MILD", "MODERATE", "STRONG"] as const;
 
-export const exerciseShortcutIds = [
-  "BICICLETA",
-  "SENTADILLA_ESPANOLA",
-  "STEP_UP",
-  "STEP_DOWN",
-  "HIP_THRUST",
-  "PESO_MUERTO_RUMANO",
-  "CAMINATA_LATERAL_BANDA",
-  "PROPIOCEPCION",
-  "WALL_SIT",
-  "PUENTE_GLUTEOS",
-] as const;
-
 export type PainScore = (typeof painScores)[number];
 export type Rating1To5 = (typeof rating1To5Values)[number];
 export type SessionType = (typeof sessionTypes)[number];
 export type FinalState = (typeof finalStates)[number];
 export type ReboundLevel = (typeof reboundLevels)[number];
-export type ExerciseShortcutId = (typeof exerciseShortcutIds)[number];
 
 export type ISODateString = string;
 export type ISODateTimeString = string;
@@ -41,8 +27,30 @@ export interface ExerciseSet {
   position: number;
   reps?: number;
   weightKg?: number;
+  holdSeconds?: number;
   notes?: string;
 }
+
+export interface ExerciseDefaults {
+  defaultIsometric: boolean;
+  defaultSetCount?: number;
+  defaultReps?: number;
+  defaultHoldSeconds?: number;
+  defaultWeightKg?: number;
+  defaultDurationMinutes?: number;
+  defaultDistanceKm?: number;
+}
+
+export interface Exercise extends ExerciseDefaults {
+  id: string;
+  name: string;
+  archivedAt?: ISODateTimeString;
+  sessionCount: number;
+  createdAt: ISODateTimeString;
+  updatedAt: ISODateTimeString;
+}
+
+export type ExerciseInput = ExerciseDefaults & { name: string };
 
 export interface LegacyExercisePrescription {
   setCount?: number;
@@ -52,7 +60,8 @@ export interface LegacyExercisePrescription {
 
 export interface SessionExercise {
   name: string;
-  shortcutId?: ExerciseShortcutId;
+  exerciseId?: string;
+  isIsometric?: boolean;
   durationMinutes?: number;
   distanceKm?: number;
   sets: ExerciseSet[];

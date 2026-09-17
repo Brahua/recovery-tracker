@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { DayClosedState } from "@/components/day-closed-state";
 import { SessionSavedState } from "@/components/session-saved-state";
+import { createExerciseRepository } from "@/data/exercise-repository";
 import { NightlyCloseoutForm } from "@/features/check-in/nightly-closeout/form";
 import { PostTherapyForm } from "@/features/check-in/post-therapy/form";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
@@ -22,6 +23,12 @@ type SearchParams = Record<string, string | string[] | undefined>;
 function getSingleSearchParam(searchParams: SearchParams, key: string) {
   const value = searchParams[key];
   return typeof value === "string" ? value : undefined;
+}
+
+async function loadExerciseCatalog() {
+  const repository = await createExerciseRepository();
+  await repository.ensureDefaultExercises();
+  return repository.listExercises();
 }
 
 export default async function RegistrarPage({
@@ -105,6 +112,8 @@ export default async function RegistrarPage({
         (session) => getRecoveryDateKey(session.occurredAt) === savedCloseout.date,
       )
     : undefined;
+  const showSessionForm = mode === "session" && !showSessionSuccess && !showNightlySuccess;
+  const catalog = showSessionForm ? await loadExerciseCatalog() : [];
   const successState = showSessionSuccess
     ? buildSessionSuccessState(hasCloseoutToday, sessionSuccessMessage)
     : showNightlySuccess
@@ -136,6 +145,7 @@ export default async function RegistrarPage({
         <div>
           {mode === "session" ? (
           <PostTherapyForm
+            catalog={catalog}
             defaultOccurredAt={new Date().toISOString()}
             errorMessage={sessionErrorMessage}
             recentSessions={recentSessions}

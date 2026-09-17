@@ -1,7 +1,7 @@
 import {
+  exerciseSetColumns,
   mapSessionExerciseRow,
-  toExerciseSetInsertRows,
-  toSessionExerciseInsertRows,
+  sessionExerciseColumns,
   type ExerciseSetRow,
   type SessionExerciseRow,
 } from "@/data/recovery-log-mappers";
@@ -118,19 +118,8 @@ function mapNightlyCloseoutRow(row: NightlyCloseoutRow): NightlyCloseout {
   };
 }
 
-function toSessionInsertRow(userId: string, input: CreateRehabSessionInput) {
-  return {
-    user_id: userId,
-    occurred_at: input.occurredAt,
-    session_type: input.sessionType,
-    pain_before: input.painBefore,
-    pain_during: input.painDuring ?? null,
-    pain_after: input.painAfter,
-    perceived_load: input.perceivedLoad,
-    final_state: input.finalState,
-    notes: input.notes ?? null,
-  };
-}
+const rehabSessionColumns =
+  "id, user_id, occurred_at, session_type, pain_before, pain_during, pain_after, perceived_load, final_state, notes, created_at, updated_at";
 
 function toNightlyCloseoutInsertRow(
   userId: string,
@@ -172,9 +161,7 @@ async function listSessionExercisesBySessionIds(
 
   const { data, error } = await supabase
     .from("session_exercises")
-    .select(
-      "id, session_id, user_id, position, name, shortcut_id, duration_minutes, distance_km, sets, reps, weight, notes, created_at, updated_at",
-    )
+    .select(sessionExerciseColumns)
     .in("session_id", sessionIds)
     .order("position", { ascending: true });
 
@@ -195,9 +182,7 @@ async function listExerciseSetsByExerciseIds(
 
   const { data, error } = await supabase
     .from("session_exercise_sets")
-    .select(
-      "id, session_exercise_id, user_id, position, reps, weight_kg, notes, created_at, updated_at",
-    )
+    .select(exerciseSetColumns)
     .in("session_exercise_id", exerciseIds)
     .order("position", { ascending: true });
 
@@ -212,70 +197,38 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
   return {
     async createRehabSession(input) {
       const parsed = createRehabSessionInputSchema.parse(input);
-      const { supabase, userId } = await requireAuthenticatedSupabase();
+      const { supabase } = await requireAuthenticatedSupabase();
+
+      const { data: sessionId, error: createError } = await supabase.rpc(
+        "create_rehab_session",
+        { payload: parsed },
+      );
+
+      if (createError || typeof sessionId !== "string") {
+        throw new RecoveryRepositoryError(
+          createError?.message ?? "Failed to create rehab session.",
+        );
+      }
 
       const { data: sessionData, error: sessionError } = await supabase
         .from("rehab_sessions")
-        .insert(toSessionInsertRow(userId, parsed))
-        .select(
-          "id, user_id, occurred_at, session_type, pain_before, pain_during, pain_after, perceived_load, final_state, notes, created_at, updated_at",
-        )
+        .select(rehabSessionColumns)
+        .eq("id", sessionId)
         .single();
 
       if (sessionError || !sessionData) {
         throw new RecoveryRepositoryError(
-          sessionError?.message ?? "Failed to create rehab session.",
+          sessionError?.message ?? "Failed to load the created rehab session.",
         );
       }
 
-      const exerciseRows = toSessionExerciseInsertRows(
-        userId,
-        sessionData.id,
-        parsed.exercises,
+      const exercises = await listSessionExercisesBySessionIds(supabase, [sessionId]);
+      const exerciseSets = await listExerciseSetsByExerciseIds(
+        supabase,
+        exercises.map((exercise) => exercise.id),
       );
 
-      const { data: insertedExercises, error: exerciseError } = await supabase
-        .from("session_exercises")
-        .insert(exerciseRows)
-        .select(
-          "id, session_id, user_id, position, name, shortcut_id, duration_minutes, distance_km, sets, reps, weight, notes, created_at, updated_at",
-        )
-        .order("position", { ascending: true });
-
-      if (exerciseError) {
-        await supabase.from("rehab_sessions").delete().eq("id", sessionData.id);
-        throw new RecoveryRepositoryError(exerciseError.message);
-      }
-
-      const exerciseSetRows = toExerciseSetInsertRows(
-        userId,
-        parsed.exercises,
-        (insertedExercises ?? []) as SessionExerciseRow[],
-      );
-      let insertedSets: ExerciseSetRow[] = [];
-
-      if (exerciseSetRows.length > 0) {
-        const { data: setData, error: setError } = await supabase
-          .from("session_exercise_sets")
-          .insert(exerciseSetRows)
-          .select(
-            "id, session_exercise_id, user_id, position, reps, weight_kg, notes, created_at, updated_at",
-          )
-          .order("position", { ascending: true });
-
-        if (setError) {
-          await supabase.from("rehab_sessions").delete().eq("id", sessionData.id);
-          throw new RecoveryRepositoryError(setError.message);
-        }
-
-        insertedSets = (setData ?? []) as ExerciseSetRow[];
-      }
-
-      return mapRehabSessionRow(
-        sessionData as RehabSessionRow,
-        (insertedExercises ?? []) as SessionExerciseRow[],
-        insertedSets,
-      );
+      return mapRehabSessionRow(sessionData as RehabSessionRow, exercises, exerciseSets);
     },
 
     async listRehabSessions(params) {
@@ -283,9 +236,7 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
       const range = getRecoveryUtcRange(params.from, params.to);
       const { data, error } = await supabase
         .from("rehab_sessions")
-        .select(
-          "id, user_id, occurred_at, session_type, pain_before, pain_during, pain_after, perceived_load, final_state, notes, created_at, updated_at",
-        )
+        .select(rehabSessionColumns)
         .gte("occurred_at", range.fromInclusive)
         .lt("occurred_at", range.toExclusive)
         .order("occurred_at", { ascending: false });

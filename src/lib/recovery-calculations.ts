@@ -1,3 +1,4 @@
+import { normalizeExerciseName } from "@/lib/exercise-name";
 import type { NightlyCloseout, RehabSession, ReboundLevel } from "@/types/recovery";
 import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 
@@ -268,16 +269,29 @@ export function calculateRecentExerciseFrequency(
 ): ExerciseFrequency[] {
   const range = getDateRangeForLastDays(windowDays, referenceDate);
   const filtered = filterSessionsByRange(sessions, range);
-  const counts = new Map<string, number>();
+  // Catalog exercises count as one even if renamed or merged; the most recent name is shown.
+  const counts = new Map<string, { name: string; count: number; lastSeen: number }>();
 
   for (const session of filtered) {
+    const occurredAt = new Date(session.occurredAt).getTime();
+    const keys = new Set<string>();
+
     for (const exercise of session.exercises) {
-      counts.set(exercise.name, (counts.get(exercise.name) ?? 0) + 1);
+      const key = exercise.exerciseId ?? `name:${normalizeExerciseName(exercise.name)}`;
+      if (keys.has(key)) continue;
+      keys.add(key);
+
+      const current = counts.get(key);
+      counts.set(key, {
+        name: !current || occurredAt >= current.lastSeen ? exercise.name : current.name,
+        count: (current?.count ?? 0) + 1,
+        lastSeen: Math.max(current?.lastSeen ?? occurredAt, occurredAt),
+      });
     }
   }
 
-  return [...counts.entries()]
-    .map(([name, count]) => ({ name, count }))
+  return [...counts.values()]
+    .map(({ name, count }) => ({ name, count }))
     .sort((left, right) => {
       if (right.count !== left.count) {
         return right.count - left.count;

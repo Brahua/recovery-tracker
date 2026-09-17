@@ -5,7 +5,6 @@ import {
   createRehabSessionInputSchema,
   sessionExerciseSchema,
 } from "@/lib/validation/recovery";
-import { exerciseShortcuts } from "@/lib/constants/exercises";
 
 describe("createRehabSessionInputSchema", () => {
   it("accepts a valid rehab session payload", () => {
@@ -19,7 +18,6 @@ describe("createRehabSessionInputSchema", () => {
       exercises: [
         {
           name: "Step-up",
-          shortcutId: "STEP_UP",
           sets: [
             { position: 0, reps: 12, weightKg: 10 },
             { position: 1, reps: 10, weightKg: 12.5 },
@@ -96,7 +94,6 @@ describe("sessionExerciseSchema", () => {
   it("accepts an exercise measured by duration and distance without sets", () => {
     const result = sessionExerciseSchema.safeParse({
       name: "Bicicleta",
-      shortcutId: "BICICLETA",
       durationMinutes: 12.5,
       distanceKm: 4.2,
       sets: [],
@@ -193,15 +190,44 @@ describe("createNightlyCloseoutInputSchema", () => {
   });
 });
 
-describe("exercise shortcuts", () => {
-  it("keep Spanish-first labels for the default shortcuts", () => {
-    expect(exerciseShortcuts).toHaveLength(10);
-    expect(exerciseShortcuts[0]?.label).toBe("Bicicleta 5-10 min");
-    expect(exerciseShortcuts.some((shortcut) => shortcut.label === "Sentadilla espanola")).toBe(true);
+describe("isometric exercises", () => {
+  it("accepts sets measured only by hold seconds when the exercise is isometric", () => {
+    const result = sessionExerciseSchema.parse({
+      name: "Wall sit",
+      isIsometric: true,
+      sets: [
+        { position: 0, holdSeconds: 45 },
+        { position: 1, holdSeconds: 40, weightKg: 5 },
+      ],
+    });
+
+    expect(result.sets[0]).toEqual({ position: 0, holdSeconds: 45 });
+  });
+
+  it("rejects hold-only sets and drops hold seconds on non-isometric exercises", () => {
     expect(
-      exerciseShortcuts.some(
-        (shortcut) => shortcut.label === "Caminata lateral con banda",
-      ),
-    ).toBe(true);
+      sessionExerciseSchema.safeParse({
+        name: "Wall sit",
+        sets: [{ position: 0, holdSeconds: 45 }],
+      }).success,
+    ).toBe(false);
+
+    const result = sessionExerciseSchema.parse({
+      name: "Step-up",
+      sets: [{ position: 0, reps: 12, holdSeconds: 30 }],
+    });
+
+    expect(result.isIsometric).toBe(false);
+    expect(result.sets[0]?.holdSeconds).toBeUndefined();
+  });
+
+  it("only accepts a UUID as catalog reference", () => {
+    expect(
+      sessionExerciseSchema.safeParse({
+        name: "Wall sit",
+        exerciseId: "not-a-uuid",
+        sets: [{ position: 0, reps: 1 }],
+      }).success,
+    ).toBe(false);
   });
 });

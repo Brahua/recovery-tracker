@@ -1,5 +1,15 @@
 import { expect, test } from "@playwright/test";
 
+import {
+  addExerciseFromCatalog,
+  addQuickExercise,
+  closeExerciseDialog,
+  exerciseDialog,
+  fillSessionBasics,
+  openSessionForm,
+  sessionExerciseRow,
+} from "./exercise-helpers";
+
 test.describe("read-only history", () => {
   test("keeps the current screen visible while history data loads", async ({ page }) => {
     let releaseHistoryRequest = () => {};
@@ -24,22 +34,19 @@ test.describe("read-only history", () => {
   });
 
   test("shows a saved session with its individual sets and supports older windows", async ({ page }) => {
-    await page.goto("/registrar?mode=session");
-    await expect(page.getByRole("heading", { name: "Registrar" })).toBeVisible();
-
-    await page.getByRole("slider", { name: "Durante" }).fill("3");
-    await page.getByRole("slider", { name: "Despues" }).fill("2");
-    await page.getByText("Media", { exact: true }).click();
-    await page.getByText("Bicicleta 5-10 min", { exact: true }).click();
-    await page.getByText("Step-up", { exact: true }).click();
-    const bicycle = page.locator(".rr-exercise-detail").filter({ hasText: "Bicicleta 5-10 min" });
+    await openSessionForm(page);
+    await fillSessionBasics(page);
+    await addQuickExercise(page, "Bicicleta 5-10 min");
+    await sessionExerciseRow(page, "Bicicleta 5-10 min").click();
+    const bicycle = exerciseDialog(page);
     await bicycle.getByLabel(/Duración total/).fill("12.5");
     await bicycle.getByLabel(/Distancia total/).fill("4.2");
-    const exercise = page.locator(".rr-exercise-detail").filter({ hasText: "Step-up" });
+    await closeExerciseDialog(page);
+    const exercise = await addExerciseFromCatalog(page, "step-u", "Step-up");
     await exercise.getByRole("button", { name: "+ Añadir serie" }).click();
     await exercise.getByLabel("Repeticiones").fill("11");
     await exercise.getByLabel(/^Peso/).fill("7.5");
-    await page.getByText("Mejor que antes", { exact: true }).click();
+    await closeExerciseDialog(page);
     await page.getByRole("button", { name: "Guardar sesion" }).click();
     await expect(page.getByRole("heading", { name: "Sesion hecha." })).toBeVisible();
     const savedSessionId = new URL(page.url()).searchParams.get("sessionId");

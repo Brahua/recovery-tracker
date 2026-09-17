@@ -1,62 +1,109 @@
 "use client";
 
-import { exerciseShortcuts } from "@/lib/constants/exercises";
+import { useState } from "react";
+
+import { ExerciseNameCombobox } from "@/components/exercise-name-combobox";
+import { ModalSheet } from "@/components/modal-sheet";
 import {
   addExerciseSet,
+  applyExerciseDefaults,
   createExerciseEntry,
   duplicateExerciseSet,
   isExerciseEntryComplete,
+  isExerciseEntryEmpty,
   removeExerciseSet,
   toExercisePayload,
+  toExerciseSummaryInput,
+  unlinkExerciseEntry,
   updateExerciseSet,
   type ExerciseEntryDraft,
 } from "@/lib/exercise-entry-state";
+import { selectMostUsedExercises } from "@/lib/exercise-name";
+import { summarizeExercise } from "@/lib/exercise-summary";
+import type { Exercise } from "@/types/recovery";
 
 interface ExerciseEntryEditorProps {
+  catalog: Exercise[];
   entries: ExerciseEntryDraft[];
   onChange: (entries: ExerciseEntryDraft[]) => void;
 }
 
 interface ExerciseDetailProps {
+  catalog: Exercise[];
   entry: ExerciseEntryDraft;
+  excludeIds: string[];
   onChange: (entry: ExerciseEntryDraft) => void;
-  onRemove: () => void;
 }
 
 function nextId(prefix: string) {
   return `${prefix}-${crypto.randomUUID()}`;
 }
 
-function ExerciseDetail({ entry, onChange, onRemove }: ExerciseDetailProps) {
-  const isCustom = entry.shortcutId === undefined;
+function hasText(value: string) {
+  return value.trim().length > 0;
+}
+
+function ExerciseDetail({ catalog, entry, excludeIds, onChange }: ExerciseDetailProps) {
+  const [showMetrics, setShowMetrics] = useState(
+    hasText(entry.durationMinutes) || hasText(entry.distanceKm),
+  );
+  const [showExerciseNote, setShowExerciseNote] = useState(hasText(entry.notes));
+  const [openSetNotes, setOpenSetNotes] = useState(
+    () => new Set(entry.sets.filter((set) => hasText(set.notes)).map((set) => set.id)),
+  );
   const incomplete = !isExerciseEntryComplete(entry);
   const warningId = `${entry.id}-incomplete`;
+  const isometricId = `${entry.id}-isometric`;
+
+  function toggleSetNote(setId: string) {
+    setOpenSetNotes((current) => {
+      const next = new Set(current);
+      if (next.has(setId)) next.delete(setId);
+      else next.add(setId);
+      return next;
+    });
+  }
 
   return (
-    <article
+    <div
       aria-describedby={incomplete ? warningId : undefined}
       className={`rr-exercise-detail ${incomplete ? "is-incomplete" : ""}`}
     >
-      <div className="rr-exercise-detail-heading">
-        {isCustom ? (
-          <label>
-            <span>Nombre del ejercicio</span>
-            <input
-              id={`${entry.id}-name`}
-              onChange={(event) => onChange({ ...entry, name: event.target.value })}
-              placeholder="Ej. prensa de pierna"
-              type="text"
-              value={entry.name}
-            />
-          </label>
-        ) : (
+      {entry.exerciseId ? (
+        <div className="rr-exercise-detail-heading">
           <div>
             <small>Ejercicio</small>
             <h3>{entry.name}</h3>
           </div>
-        )}
-        <button onClick={onRemove} type="button">Quitar</button>
-      </div>
+          <button onClick={() => onChange(unlinkExerciseEntry(entry))} type="button">
+            Cambiar
+          </button>
+        </div>
+      ) : (
+        <ExerciseNameCombobox
+          autoFocus={!hasText(entry.name)}
+          catalog={catalog}
+          excludeIds={excludeIds}
+          onSelect={(exercise) =>
+            onChange(applyExerciseDefaults(entry, exercise, () => nextId("set")))
+          }
+          onValueChange={(name) => onChange({ ...entry, name })}
+          value={entry.name}
+        />
+      )}
+
+      <label className="rr-exercise-isometric" htmlFor={isometricId}>
+        <input
+          checked={entry.isIsometric}
+          id={isometricId}
+          onChange={(event) => onChange({ ...entry, isIsometric: event.target.checked })}
+          type="checkbox"
+        />
+        <span>
+          <strong>Isométrico</strong>
+          <small>Registra cuántos segundos mantienes la posición</small>
+        </span>
+      </label>
 
       {incomplete && (
         <p className="rr-exercise-incomplete" id={warningId} role="status">
@@ -65,44 +112,8 @@ function ExerciseDetail({ entry, onChange, onRemove }: ExerciseDetailProps) {
         </p>
       )}
 
-      <div className="rr-exercise-metrics">
-        <label>
-          <span>Duración total <small>min · opcional</small></span>
-          <input
-            id={`${entry.id}-duration`}
-            inputMode="decimal"
-            min="0.5"
-            onChange={(event) =>
-              onChange({ ...entry, durationMinutes: event.target.value })
-            }
-            placeholder="10"
-            step="0.5"
-            type="number"
-            value={entry.durationMinutes}
-          />
-        </label>
-        <label>
-          <span>Distancia total <small>km · opcional</small></span>
-          <input
-            id={`${entry.id}-distance`}
-            inputMode="decimal"
-            min="0.1"
-            onChange={(event) =>
-              onChange({ ...entry, distanceKm: event.target.value })
-            }
-            placeholder="2.5"
-            step="0.1"
-            type="number"
-            value={entry.distanceKm}
-          />
-        </label>
-      </div>
-
       <div className="rr-exercise-sets-heading">
-        <div>
-          <h4>Series</h4>
-          <p>Registra cada serie por separado.</p>
-        </div>
+        <h4>Series</h4>
         <button
           onClick={() => onChange(addExerciseSet(entry, nextId("set")))}
           type="button"
@@ -116,178 +127,305 @@ function ExerciseDetail({ entry, onChange, onRemove }: ExerciseDetailProps) {
           Añade una serie o registra duración/distancia para completar el ejercicio.
         </p>
       ) : (
-        <ol className="rr-exercise-set-list">
-          {entry.sets.map((set, index) => (
-            <li key={set.id}>
-              <div className="rr-exercise-set-number">
-                <strong>Serie {index + 1}</strong>
-                <span>
+        <ol className={`rr-exercise-set-list ${entry.isIsometric ? "is-isometric" : ""}`}>
+          {entry.sets.map((set, index) => {
+            const number = index + 1;
+            const noteOpen = openSetNotes.has(set.id);
+
+            return (
+              <li key={set.id}>
+                <span aria-hidden="true" className="rr-exercise-set-index">{number}</span>
+                <div className="rr-exercise-set-fields">
+                  {entry.isIsometric ? (
+                    <label>
+                      <span>Segundos</span>
+                      <input
+                        id={`${set.id}-hold`}
+                        inputMode="numeric"
+                        min="1"
+                        onChange={(event) =>
+                          onChange(updateExerciseSet(entry, set.id, { holdSeconds: event.target.value }))
+                        }
+                        placeholder="45"
+                        step="1"
+                        type="number"
+                        value={set.holdSeconds}
+                      />
+                    </label>
+                  ) : null}
+                  <label>
+                    <span>{entry.isIsometric ? "Rep." : "Repeticiones"}</span>
+                    <input
+                      aria-label={entry.isIsometric ? `Repeticiones serie ${number} (opcional)` : undefined}
+                      id={`${set.id}-reps`}
+                      inputMode="numeric"
+                      min="1"
+                      onChange={(event) =>
+                        onChange(updateExerciseSet(entry, set.id, { reps: event.target.value }))
+                      }
+                      placeholder={entry.isIsometric ? "—" : "12"}
+                      step="1"
+                      type="number"
+                      value={set.reps}
+                    />
+                  </label>
+                  <label>
+                    <span>Peso <small>kg</small></span>
+                    <input
+                      id={`${set.id}-weight`}
+                      inputMode="decimal"
+                      min="0"
+                      onChange={(event) =>
+                        onChange(updateExerciseSet(entry, set.id, { weightKg: event.target.value }))
+                      }
+                      placeholder="0"
+                      step="0.5"
+                      type="number"
+                      value={set.weightKg}
+                    />
+                  </label>
+                </div>
+                <div className="rr-exercise-set-actions">
                   <button
-                    aria-label={`Duplicar serie ${index + 1}`}
-                    onClick={() =>
-                      onChange(
-                        duplicateExerciseSet(entry, set.id, nextId("set")),
-                      )
-                    }
+                    aria-expanded={noteOpen}
+                    aria-label={`Nota de la serie ${number}`}
+                    className={hasText(set.notes) ? "has-value" : ""}
+                    onClick={() => toggleSetNote(set.id)}
+                    title="Nota"
                     type="button"
                   >
-                    Duplicar
+                    <span aria-hidden="true">✎</span>
                   </button>
                   <button
-                    aria-label={`Eliminar serie ${index + 1}`}
+                    aria-label={`Duplicar serie ${number}`}
+                    onClick={() => onChange(duplicateExerciseSet(entry, set.id, nextId("set")))}
+                    title="Duplicar"
+                    type="button"
+                  >
+                    <span aria-hidden="true">⧉</span>
+                  </button>
+                  <button
+                    aria-label={`Eliminar serie ${number}`}
                     onClick={() => onChange(removeExerciseSet(entry, set.id))}
+                    title="Eliminar"
                     type="button"
                   >
-                    Eliminar
+                    <span aria-hidden="true">✕</span>
                   </button>
-                </span>
-              </div>
-              <div className="rr-exercise-set-fields">
-                <label>
-                  <span>Repeticiones</span>
-                  <input
-                    id={`${set.id}-reps`}
-                    inputMode="numeric"
-                    min="1"
-                    onChange={(event) =>
-                      onChange(
-                        updateExerciseSet(entry, set.id, {
-                          reps: event.target.value,
-                        }),
-                      )
-                    }
-                    placeholder="12"
-                    step="1"
-                    type="number"
-                    value={set.reps}
-                  />
-                </label>
-                <label>
-                  <span>Peso <small>kg</small></span>
-                  <input
-                    id={`${set.id}-weight`}
-                    inputMode="decimal"
-                    min="0"
-                    onChange={(event) =>
-                      onChange(
-                        updateExerciseSet(entry, set.id, {
-                          weightKg: event.target.value,
-                        }),
-                      )
-                    }
-                    placeholder="0"
-                    step="0.5"
-                    type="number"
-                    value={set.weightKg}
-                  />
-                </label>
-                <label className="rr-exercise-set-note">
-                  <span>Nota <small>opcional</small></span>
-                  <input
-                    id={`${set.id}-note`}
-                    maxLength={500}
-                    onChange={(event) =>
-                      onChange(
-                        updateExerciseSet(entry, set.id, {
-                          notes: event.target.value,
-                        }),
-                      )
-                    }
-                    placeholder="Ej. última repetición difícil"
-                    type="text"
-                    value={set.notes}
-                  />
-                </label>
-              </div>
-            </li>
-          ))}
+                </div>
+                {noteOpen ? (
+                  <label className="rr-exercise-set-note">
+                    <span>Nota de la serie {number}</span>
+                    <input
+                      autoFocus={!hasText(set.notes)}
+                      id={`${set.id}-note`}
+                      maxLength={500}
+                      onChange={(event) =>
+                        onChange(updateExerciseSet(entry, set.id, { notes: event.target.value }))
+                      }
+                      placeholder="Ej. última repetición difícil"
+                      type="text"
+                      value={set.notes}
+                    />
+                  </label>
+                ) : null}
+              </li>
+            );
+          })}
         </ol>
       )}
 
-      <label className="rr-exercise-note">
-        <span>Nota del ejercicio <small>opcional</small></span>
-        <textarea
-          id={`${entry.id}-note`}
-          maxLength={500}
-          onChange={(event) => onChange({ ...entry, notes: event.target.value })}
-          placeholder="Algo general sobre este ejercicio..."
-          value={entry.notes}
-        />
-      </label>
-    </article>
+      {showMetrics ? (
+        <div className="rr-exercise-metrics">
+          <label>
+            <span>Duración total <small>min</small></span>
+            <input
+              id={`${entry.id}-duration`}
+              inputMode="decimal"
+              min="0.5"
+              onChange={(event) => onChange({ ...entry, durationMinutes: event.target.value })}
+              placeholder="10"
+              step="0.5"
+              type="number"
+              value={entry.durationMinutes}
+            />
+          </label>
+          <label>
+            <span>Distancia total <small>km</small></span>
+            <input
+              id={`${entry.id}-distance`}
+              inputMode="decimal"
+              min="0.1"
+              onChange={(event) => onChange({ ...entry, distanceKm: event.target.value })}
+              placeholder="2.5"
+              step="0.1"
+              type="number"
+              value={entry.distanceKm}
+            />
+          </label>
+        </div>
+      ) : (
+        <button className="rr-exercise-disclosure" onClick={() => setShowMetrics(true)} type="button">
+          + Duración o distancia
+        </button>
+      )}
+
+      {showExerciseNote ? (
+        <label className="rr-exercise-note">
+          <span>Nota del ejercicio</span>
+          <textarea
+            autoFocus={!hasText(entry.notes)}
+            id={`${entry.id}-note`}
+            maxLength={500}
+            onChange={(event) => onChange({ ...entry, notes: event.target.value })}
+            placeholder="Algo general sobre este ejercicio..."
+            value={entry.notes}
+          />
+        </label>
+      ) : (
+        <button className="rr-exercise-disclosure" onClick={() => setShowExerciseNote(true)} type="button">
+          + Nota del ejercicio
+        </button>
+      )}
+    </div>
   );
 }
 
 export function ExerciseEntryEditor({
+  catalog,
   entries,
   onChange,
 }: ExerciseEntryEditorProps) {
-  const selectedShortcuts = new Set(
-    entries.flatMap((entry) => (entry.shortcutId ? [entry.shortcutId] : [])),
-  );
+  const [openEntryId, setOpenEntryId] = useState<string | null>(null);
+  const openEntry = entries.find((entry) => entry.id === openEntryId);
+  const mostUsed = selectMostUsedExercises(catalog);
+  const linkedIds = entries.flatMap((entry) => (entry.exerciseId ? [entry.exerciseId] : []));
 
-  function toggleShortcut(shortcutId: (typeof exerciseShortcuts)[number]["id"]) {
-    if (selectedShortcuts.has(shortcutId)) {
-      onChange(entries.filter((entry) => entry.shortcutId !== shortcutId));
+  function toggleExercise(exercise: Exercise) {
+    if (linkedIds.includes(exercise.id)) {
+      onChange(entries.filter((entry) => entry.exerciseId !== exercise.id));
       return;
     }
 
-    const shortcut = exerciseShortcuts.find((item) => item.id === shortcutId);
-    if (!shortcut) return;
-
     onChange([
       ...entries,
-      createExerciseEntry(`shortcut-${shortcut.id}`, shortcut.label, shortcut.id),
+      applyExerciseDefaults(createExerciseEntry(nextId("exercise")), exercise, () => nextId("set")),
     ]);
+  }
+
+  function addExercise() {
+    const entry = createExerciseEntry(nextId("exercise"));
+    onChange([...entries, entry]);
+    setOpenEntryId(entry.id);
   }
 
   function updateEntry(nextEntry: ExerciseEntryDraft) {
     onChange(entries.map((entry) => (entry.id === nextEntry.id ? nextEntry : entry)));
   }
 
+  function removeEntry(entryId: string) {
+    onChange(entries.filter((entry) => entry.id !== entryId));
+  }
+
+  function closeModal() {
+    if (openEntry && isExerciseEntryEmpty(openEntry)) {
+      removeEntry(openEntry.id);
+    }
+    setOpenEntryId(null);
+  }
+
   return (
     <>
-      <div className="rr-exercise-list" aria-label="Ejercicios disponibles">
-        {exerciseShortcuts.map((exercise) => {
-          const selected = selectedShortcuts.has(exercise.id);
-          return (
-            <button
-              aria-pressed={selected}
-              className={selected ? "is-selected" : ""}
-              key={exercise.id}
-              onClick={() => toggleShortcut(exercise.id)}
-              type="button"
-            >
-              <b aria-hidden="true">{selected ? "✓" : "+"}</b>
-              <span>{exercise.label}</span>
-            </button>
-          );
-        })}
-      </div>
+      {mostUsed.length > 0 ? (
+        <div className="rr-exercise-quick">
+          <p id="rr-exercise-quick-label">Más usados</p>
+          <div aria-labelledby="rr-exercise-quick-label" className="rr-exercise-list" role="group">
+            {mostUsed.map((exercise) => {
+              const selected = linkedIds.includes(exercise.id);
+              return (
+                <button
+                  aria-pressed={selected}
+                  className={selected ? "is-selected" : ""}
+                  key={exercise.id}
+                  onClick={() => toggleExercise(exercise)}
+                  type="button"
+                >
+                  <b aria-hidden="true">{selected ? "✓" : "+"}</b>
+                  <span>{exercise.name}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
 
-      <div className="rr-selected-exercises">
-        {entries.map((entry) => (
-          <ExerciseDetail
-            entry={entry}
-            key={entry.id}
-            onChange={updateEntry}
-            onRemove={() => onChange(entries.filter((item) => item.id !== entry.id))}
-          />
-        ))}
-      </div>
+      {entries.length > 0 ? (
+        <ul aria-label="Ejercicios de la sesión" className="rr-exercise-rows">
+          {entries.map((entry) => {
+            const complete = isExerciseEntryComplete(entry);
+            const summary = summarizeExercise(toExerciseSummaryInput(entry));
 
-      <button
-        className="rr-add-custom-exercise"
-        onClick={() =>
-          onChange([
-            ...entries,
-            createExerciseEntry(nextId("exercise"), ""),
-          ])
-        }
-        type="button"
-      >
-        + Añadir otro ejercicio
+            return (
+              <li key={entry.id}>
+                <button
+                  className={`rr-exercise-row ${complete ? "" : "is-incomplete"}`}
+                  onClick={() => setOpenEntryId(entry.id)}
+                  type="button"
+                >
+                  <span className="rr-exercise-row-name">
+                    {!complete ? <i aria-hidden="true">!</i> : null}
+                    <strong>{entry.name.trim() || "Sin nombre"}</strong>
+                    {entry.isIsometric ? <em>Isométrico</em> : null}
+                  </span>
+                  <span className="rr-exercise-row-summary">
+                    {complete ? summary : "Completar"}
+                  </span>
+                  <b aria-hidden="true">›</b>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+
+      <button className="rr-add-custom-exercise" onClick={addExercise} type="button">
+        + Añadir ejercicio
       </button>
+
+      <ModalSheet
+        footer={
+          openEntry ? (
+            <>
+              <button
+                className="rr-modal-secondary"
+                onClick={() => {
+                  removeEntry(openEntry.id);
+                  setOpenEntryId(null);
+                }}
+                type="button"
+              >
+                Quitar ejercicio
+              </button>
+              <button className="rr-modal-primary" onClick={closeModal} type="button">
+                Listo
+              </button>
+            </>
+          ) : null
+        }
+        onClose={closeModal}
+        open={Boolean(openEntry)}
+        title={openEntry?.exerciseId || openEntry?.name.trim() ? "Ejercicio" : "Añadir ejercicio"}
+      >
+        {openEntry ? (
+          <ExerciseDetail
+            catalog={catalog}
+            entry={openEntry}
+            excludeIds={linkedIds.filter((id) => id !== openEntry.exerciseId)}
+            key={openEntry.id}
+            onChange={updateEntry}
+          />
+        ) : null}
+      </ModalSheet>
 
       <input
         name="exercisesPayload"

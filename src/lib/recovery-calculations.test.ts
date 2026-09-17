@@ -219,6 +219,34 @@ describe("recovery calculations", () => {
   });
 });
 
+describe("exercise frequency with the catalog", () => {
+  it("counts a catalog exercise once per session and shows its latest name", () => {
+    const base = rehabSessions[0]!;
+    const sessions = [
+      {
+        ...base,
+        id: "old",
+        occurredAt: "2026-07-08T10:00:00.000Z",
+        exercises: [{ name: "Sentadilla en pared", exerciseId: "wall-sit", sets: [] }],
+      },
+      {
+        ...base,
+        id: "new",
+        occurredAt: "2026-07-09T10:00:00.000Z",
+        exercises: [
+          { name: "Wall sit", exerciseId: "wall-sit", isIsometric: true, sets: [{ position: 0, holdSeconds: 45 }] },
+          { name: "wall  sít", sets: [] },
+        ],
+      },
+    ];
+
+    expect(calculateRecentExerciseFrequency(sessions, 30, "2026-07-10T12:00:00.000Z")).toEqual([
+      { name: "Wall sit", count: 2 },
+      { name: "wall  sít", count: 1 },
+    ]);
+  });
+});
+
 describe("recovery insights", () => {
   it("keeps pain trend insight observational in Spanish", () => {
     const trend = calculatePainTrend(

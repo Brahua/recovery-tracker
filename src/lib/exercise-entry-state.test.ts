@@ -7,6 +7,7 @@ import {
   duplicateExerciseSet,
   findRepeatedEntryIds,
   isExerciseEntryComplete,
+  isEntryReady,
   isExerciseEntryEmpty,
   removeExerciseSet,
   toExercisePayload,
@@ -210,5 +211,13 @@ describe("exercise entry state", () => {
     expect(
       [...findRepeatedEntryIds([linked, typedSame, typedNew, typedNewAgain, unnamed, createExerciseEntry("f")], [wallSit])],
     ).toEqual(["b", "d"]);
+  });
+
+  it("accepts a named entry without plan only in routine mode", () => {
+    const named = createExerciseEntry("e", "Step-up");
+
+    expect(isEntryReady(named, "routine")).toBe(true);
+    expect(isEntryReady(named, "session")).toBe(false);
+    expect(isEntryReady(createExerciseEntry("e"), "routine")).toBe(false);
   });
 });

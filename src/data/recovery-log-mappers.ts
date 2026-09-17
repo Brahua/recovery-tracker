@@ -1,6 +1,7 @@
 import type {
   Exercise,
   ExerciseSet,
+  Routine,
   SessionExercise,
 } from "@/types/recovery";
 
@@ -117,5 +118,75 @@ export function mapExerciseRow(row: ExerciseRow, sessionCount = 0): Exercise {
     sessionCount,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+export const routineColumns = "id, user_id, name, created_at, updated_at";
+
+export const routineExerciseColumns =
+  "id, routine_id, user_id, exercise_id, position, is_isometric, duration_minutes, distance_km";
+
+export const routineExerciseSetColumns =
+  "id, routine_exercise_id, user_id, position, reps, weight_kg, hold_seconds";
+
+export type RoutineRow = {
+  id: string;
+  user_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type RoutineExerciseRow = {
+  id: string;
+  routine_id: string;
+  user_id: string;
+  exercise_id: string;
+  position: number;
+  is_isometric: boolean;
+  duration_minutes: number | string | null;
+  distance_km: number | string | null;
+};
+
+export type RoutineExerciseSetRow = {
+  id: string;
+  routine_exercise_id: string;
+  user_id: string;
+  position: number;
+  reps: number | null;
+  weight_kg: number | string | null;
+  hold_seconds: number | null;
+};
+
+export function mapRoutineRows(
+  routine: RoutineRow,
+  exerciseRows: RoutineExerciseRow[],
+  setRows: RoutineExerciseSetRow[],
+  exerciseNameById: Map<string, string>,
+): Routine {
+  return {
+    id: routine.id,
+    name: routine.name,
+    createdAt: routine.created_at,
+    updatedAt: routine.updated_at,
+    exercises: exerciseRows
+      .filter((row) => row.routine_id === routine.id)
+      .sort((left, right) => left.position - right.position)
+      .map((row) => ({
+        exerciseId: row.exercise_id,
+        name: exerciseNameById.get(row.exercise_id) ?? "Ejercicio",
+        isIsometric: row.is_isometric,
+        durationMinutes: optionalNumber(row.duration_minutes),
+        distanceKm: optionalNumber(row.distance_km),
+        sets: setRows
+          .filter((set) => set.routine_exercise_id === row.id)
+          .sort((left, right) => left.position - right.position)
+          .map((set) => ({
+            position: set.position,
+            reps: set.reps ?? undefined,
+            weightKg: optionalNumber(set.weight_kg),
+            holdSeconds: set.hold_seconds ?? undefined,
+          })),
+      })),
   };
 }

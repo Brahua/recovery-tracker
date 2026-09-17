@@ -1,6 +1,10 @@
 import Link from "next/link";
 
 import { signOutAction } from "@/app/auth/actions";
+import {
+  getUserDisplayName,
+  type DisplayNameUser,
+} from "@/lib/user-display-name";
 
 const appTabs = [
   { href: "/", label: "Hoy", glyph: "HY", match: "exact" as const },
@@ -42,23 +46,19 @@ function isTabActive(pathname: string, href: string, match: "exact" | "startsWit
     : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function getUserIdentity(user: { email?: string | null }) {
-  const email = user.email?.trim();
+function getUserIdentity(user: DisplayNameUser) {
+  const name = getUserDisplayName(user);
 
-  if (!email) {
+  if (!name) {
     return { name: "Tu perfil", initial: "R" };
   }
-
-  const localPart = email.split("@")[0] ?? email;
-  const firstName = localPart.split(/[._-]/)[0] ?? localPart;
-  const name = firstName.charAt(0).toUpperCase() + firstName.slice(1);
 
   return { name, initial: name.charAt(0).toUpperCase() };
 }
 
 interface AppShellProps {
   pathname: string;
-  user: { email?: string | null };
+  user: DisplayNameUser;
   streak: number;
   children: React.ReactNode;
   immersive?: boolean;

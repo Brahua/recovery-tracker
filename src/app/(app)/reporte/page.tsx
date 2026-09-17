@@ -1,9 +1,7 @@
 import { redirect } from "next/navigation";
 
-import { AppShell } from "@/components/app-shell";
 import { MedicalReport } from "@/features/reports/medical-report";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
-import { calculateLoggingStreak } from "@/lib/today-view-model";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -23,17 +21,11 @@ export default async function ReportePage({
   }
 
   return (
-    <AppShell
-      pathname="/reporte"
-      streak={calculateLoggingStreak(recentSessions, recentCloseouts)}
-      user={user}
-    >
-      <MedicalReport
-        now={new Date().toISOString()}
-        recentCloseouts={recentCloseouts}
-        recentSessions={recentSessions}
-        windowDays={windowDays}
-      />
-    </AppShell>
+    <MedicalReport
+      now={new Date().toISOString()}
+      recentCloseouts={recentCloseouts}
+      recentSessions={recentSessions}
+      windowDays={windowDays}
+    />
   );
 }

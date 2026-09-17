@@ -1,8 +1,6 @@
-import { AppShell } from "@/components/app-shell";
 import { SignedOutLanding } from "@/components/signed-out-landing";
 import { TodayOverview } from "@/features/today/overview";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
-import { calculateLoggingStreak } from "@/lib/today-view-model";
 
 export default async function Home({
   searchParams,
@@ -27,16 +25,10 @@ export default async function Home({
   }
 
   return (
-    <AppShell
-      pathname="/"
-      streak={calculateLoggingStreak(recentSessions, recentCloseouts)}
+    <TodayOverview
+      recentCloseouts={recentCloseouts}
+      recentSessions={recentSessions}
       user={user}
-    >
-      <TodayOverview
-        recentCloseouts={recentCloseouts}
-        recentSessions={recentSessions}
-        user={user}
-      />
-    </AppShell>
+    />
   );
 }

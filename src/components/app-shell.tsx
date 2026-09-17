@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { signOutAction } from "@/app/auth/actions";
 import {
@@ -57,18 +60,19 @@ function getUserIdentity(user: DisplayNameUser) {
 }
 
 interface AppShellProps {
-  pathname: string;
   user: DisplayNameUser;
   streak: number;
   children: React.ReactNode;
-  immersive?: boolean;
 }
 
-export function AppShell({ pathname, user, streak, children, immersive = false }: AppShellProps) {
+// Rendered once by the (app) layout so navigation never remounts the shell.
+// Pages that need a distraction-free view render <ImmersiveMarker />.
+export function AppShell({ user, streak, children }: AppShellProps) {
+  const pathname = usePathname();
   const identity = getUserIdentity(user);
 
   return (
-    <main className={`rr-app-shell rr-theme ${immersive ? "is-immersive" : ""} ${pathname === "/historial" ? "is-history" : ""}`}>
+    <main className={`rr-app-shell rr-theme ${pathname === "/historial" ? "is-history" : ""}`}>
       <aside className="rr-sidebar">
         <Link className="rr-sidebar-brand" href="/">
           <span aria-hidden="true" className="rr-logo-mark">
@@ -147,4 +151,8 @@ export function AppShell({ pathname, user, streak, children, immersive = false }
       </nav>
     </main>
   );
+}
+
+export function ImmersiveMarker() {
+  return <span aria-hidden="true" className="rr-immersive-marker" hidden />;
 }

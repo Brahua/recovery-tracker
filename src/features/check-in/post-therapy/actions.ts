@@ -126,7 +126,8 @@ export async function createPostTherapySessionAction(
     return { error: errorMessage };
   }
 
-  revalidatePath("/");
+  // The (app) layout renders the streak, so refresh it along with the pages.
+  revalidatePath("/", "layout");
   revalidatePath("/registrar");
   revalidatePath("/historial");
   revalidatePath("/insights");

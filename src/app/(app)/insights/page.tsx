@@ -1,9 +1,7 @@
 import { redirect } from "next/navigation";
 
-import { AppShell } from "@/components/app-shell";
 import { RecoveryDashboard } from "@/features/dashboard/overview";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
-import { calculateLoggingStreak } from "@/lib/today-view-model";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -25,17 +23,11 @@ export default async function InsightsPage({
   }
 
   return (
-    <AppShell
-      pathname="/insights"
-      streak={calculateLoggingStreak(recentSessions, recentCloseouts)}
-      user={user}
-    >
-      <RecoveryDashboard
-        now={new Date().toISOString()}
-        range={range}
-        recentCloseouts={recentCloseouts}
-        recentSessions={recentSessions}
-      />
-    </AppShell>
+    <RecoveryDashboard
+      now={new Date().toISOString()}
+      range={range}
+      recentCloseouts={recentCloseouts}
+      recentSessions={recentSessions}
+    />
   );
 }

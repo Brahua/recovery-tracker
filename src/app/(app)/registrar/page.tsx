@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { AppShell } from "@/components/app-shell";
+import { ImmersiveMarker } from "@/components/app-shell";
 import { DayClosedState } from "@/components/day-closed-state";
 import { SessionSavedState } from "@/components/session-saved-state";
 import { NightlyCloseoutForm } from "@/features/check-in/nightly-closeout/form";
@@ -117,12 +117,8 @@ export default async function RegistrarPage({
       : null;
 
   return (
-    <AppShell
-      immersive={showSessionSuccess || showNightlySuccess}
-      pathname="/registrar"
-      streak={streak}
-      user={user}
-    >
+    <>
+      {showSessionSuccess || showNightlySuccess ? <ImmersiveMarker /> : null}
       {showSessionSuccess && successState ? (
         <SessionSavedState
           {...successState}
@@ -159,6 +155,6 @@ export default async function RegistrarPage({
           )}
         </div>
       )}
-    </AppShell>
+    </>
   );
 }

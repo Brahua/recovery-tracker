@@ -22,6 +22,14 @@ test.describe("exercise catalog", () => {
     await fillSessionBasics(page);
 
     const suggestions = await searchExercise(page, "glu");
+    // TEMP diagnostic for a first-attempt flake; remove once understood.
+    console.log("[diag] retry", test.info().retry, JSON.stringify({
+      quickPicks: await page.locator(".rr-exercise-quick button").allInnerTexts(),
+      combobox: await suggestions.getByRole("combobox").inputValue(),
+      expanded: await suggestions.getByRole("combobox").getAttribute("aria-expanded"),
+      focused: await suggestions.getByRole("combobox").evaluate((el) => el === document.activeElement),
+      options: await suggestions.locator("[role=option]").allInnerTexts(),
+    }));
     await expect(suggestions.getByRole("option").filter({ hasText: "Puente de gluteos" })).toBeVisible();
     await suggestions.getByRole("button", { name: "Quitar ejercicio" }).click();
     await expect(exerciseDialog(page)).toHaveCount(0);

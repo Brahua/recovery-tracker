@@ -96,3 +96,8 @@ Regla: en la PC solo `npm run typecheck`, `npm run lint` y `npm test`. La migrac
 ### Checkpoint final
 - [ ] Criterios de éxito 1–8 cumplidos con CI en verde
 - [ ] Aprobación del usuario → migración en staging (dry-run + push) → merge a `main`
+
+## Seguimiento
+- [x] E2E: nombre de rutina duplicado muestra error y conserva el borrador
+- [x] E2E: rutina inexistente o ajena muestra 404 (RLS la filtra igual que un id inexistente)
+- [x] E2E: cambiar valores al registrar no modifica la rutina (criterio de éxito 4)

@@ -25,6 +25,10 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Project-owned rehabilitation hero image and a canonical inventory of the 19 implemented design references.
 
 ### Changed
+- The former staging Supabase project and Vercel app are now production, served at https://recovery-tracker.brahua.com (ADR-004).
+- Trunk-based CI/CD like `brahua-os`: PRs run CI only; pushes to `main` never cancel, deploy one at a time, check the deploy secrets first, and migrate + deploy only when every check passes. CI runs on Node 24 (`.nvmrc`) with a pinned Vercel CLI.
+- Vercel Git deployments are fully disabled (no previews); GitHub Actions is the only deployer.
+- Local development and E2E default to the local Supabase stack; tests never touch production.
 - Greeting and sidebar show the name saved on the account (`user_metadata.full_name`), falling back to the email local part.
 - Signed-in routes live in an `(app)` route group whose layout renders the shell once, so navigation swaps only the content; this supersedes the earlier removal of the Historial loading boundary, which had no shell.
 - Replaced the TKE and Estiramientos suaves shortcuts with Wall sit and Puente de gluteos, then replaced fixed shortcuts with the catalog and dropped `session_exercises.shortcut_id`.

@@ -1,30 +1,35 @@
 name: CI/CD
 
-# Gates on every push/PR to main; deploy only on push to main.
-# Deploy target = Vercel project wired to Supabase STAGING (ref pevrupenrzueyzidfeah).
+# Trunk-based: short-lived feature branches open PRs against main (CI only).
+# Every push to main runs the same checks and, only if all of them pass, migrates the
+# production Supabase project and deploys to production (https://recovery-tracker.brahua.com).
 on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
 
 concurrency:
   group: ci-cd-${{ github.ref }}
-  cancel-in-progress: true
+  # Cancel superseded PR runs, but never cancel a run on main (it may be deploying).
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 env:
-  NODE_VERSION: "20"
-  SUPABASE_STAGING_REF: pevrupenrzueyzidfeah
+  # Production Supabase project (formerly "staging").
+  SUPABASE_PROJECT_REF: pevrupenrzueyzidfeah
 
 jobs:
   quality:
     name: Lint · Typecheck · Unit
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
       - run: npm run lint
@@ -34,6 +39,8 @@ jobs:
   e2e:
     name: E2E (Supabase local + Playwright)
     runs-on: ubuntu-latest
+    timeout-minutes: 25
+    # Throwaway Supabase started in the runner; never the production project.
     # Demo mode is dev-only in the app; E2E runs a production build (for stable
     # hydration), so expose the demo entry point via this server-side flag. It is
     # never set on the real Vercel deploy, so demo stays hidden in production.
@@ -43,7 +50,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
 
@@ -74,36 +81,51 @@ jobs:
           retention-days: 7
 
   deploy:
-    name: Deploy → Vercel (staging)
-    runs-on: ubuntu-latest
+    name: Deploy to production
     needs: [quality, e2e]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # One production deploy at a time, in merge order.
+    concurrency:
+      group: deploy-production
+      cancel-in-progress: false
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
     steps:
+      - name: Check deploy secrets
+        run: |
+          missing=0
+          for name in VERCEL_TOKEN VERCEL_ORG_ID VERCEL_PROJECT_ID SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing $name repository secret"
+              missing=1
+            fi
+          done
+          exit $missing
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: ${{ env.NODE_VERSION }}
+          node-version-file: .nvmrc
           cache: npm
       - run: npm ci
 
-      # --- Apply DB migrations to Supabase staging BEFORE deploying the app ---
-      - name: Apply migrations to Supabase staging
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      # Migrations are additive and run before the app deploy; a failed migration
+      # fails the job, so the app never ships against an old schema.
+      - name: Apply migrations to production Supabase
         run: |
-          npx supabase link --project-ref "$SUPABASE_STAGING_REF"
+          npx supabase link --project-ref "$SUPABASE_PROJECT_REF"
           npx supabase db push
 
-      # --- Build & deploy on Vercel (env vars come from the Vercel project) ---
-      - name: Pull Vercel project settings
-        run: npx vercel pull --yes --environment=production --token="${{ secrets.VERCEL_TOKEN }}"
+      - name: Pull production settings and env
+        run: npx vercel@61.1.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
 
-      - name: Build with Vercel
-        run: npx vercel build --prod --token="${{ secrets.VERCEL_TOKEN }}"
+      - name: Build
+        run: npx vercel@61.1.0 build --prod --token="$VERCEL_TOKEN"
 
-      - name: Deploy prebuilt output to Vercel
-        run: npx vercel deploy --prebuilt --prod --token="${{ secrets.VERCEL_TOKEN }}"
+      - name: Deploy
+        run: npx vercel@61.1.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN"

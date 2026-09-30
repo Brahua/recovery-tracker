@@ -2,7 +2,7 @@
 
 The E2E suite uses Playwright `storageState`, but it does not automate Google OAuth.
 
-Instead, in development it signs in with a Supabase anonymous user during the setup project. Supabase documents that anonymous users are authenticated users and use the `authenticated` Postgres role, so RLS still applies.
+Instead, in development and CI it signs in with a Supabase anonymous user during the setup project, always against the **local** Supabase stack (never production). Supabase documents that anonymous users are authenticated users and use the `authenticated` Postgres role, so RLS still applies.
 
 References:
 
@@ -12,11 +12,14 @@ References:
 
 ## Required Supabase setting
 
-Enable anonymous sign-ins in the `staging` project:
+Anonymous sign-ins are enabled in the local stack by `supabase/config.toml` (`enable_anonymous_sign_ins = true`). Start it before running the suite:
 
-1. Supabase Dashboard
-2. `Authentication` -> `Providers`
-3. Enable `Anonymous Sign-Ins`
+```bash
+npm run supabase:start
+npm run supabase:env:local
+```
+
+Anonymous sign-ins stay **disabled** in the production project.
 
 ## How the suite works
 

@@ -1,42 +1,38 @@
 # Supabase Setup
 
-Primary workflow for this project: hosted Supabase only.
+Two Supabase targets exist for this project:
 
-Recommended environments:
+| Target | Used for |
+|---|---|
+| **Local** (Supabase CLI in Docker) | Day-to-day development, Playwright E2E, CI |
+| **Production** (hosted, ref `pevrupenrzueyzidfeah`, formerly `staging`) | The live app at https://recovery-tracker.brahua.com; real data |
 
-1. `staging`
-2. `prod`
+There is no separate staging project anymore (see `docs/decisions/ADR-004-promote-staging-to-production.md`).
+Migrations reach production only through the `deploy` job in `.github/workflows/ci-cd.yml` (see `docs/deployment.md`).
 
-Use `staging` for all app development and smoke tests. Treat `prod` as migration-only unless you are releasing.
-
-## Hosted Workflow
-
-1. Create a dedicated Supabase Cloud project for `staging`.
-2. Create a second Supabase Cloud project for `prod`.
-3. Copy `.env.example` to `.env.local`.
-4. Put `staging` values in `.env.local`.
-5. Run `npm run supabase:login`.
-6. Run `npm run supabase:link`.
-7. Run `npm run supabase:push:dry`.
-8. Run `npm run supabase:push:linked`.
-9. Configure Google OAuth in the linked project.
-10. Verify login and data writes from the app.
-
-Then repeat the link and push flow for `prod`.
-
-## Optional Local Workflow
-
-This repo still supports the local CLI stack, but it is not the recommended path right now.
+## Local Workflow (default)
 
 1. Make sure Docker Desktop is healthy.
-2. Run `npm run supabase:start`.
-3. Run `npm run supabase:env:local`.
-4. Run `npm run supabase:types` if needed.
+2. Run `npm run supabase:start` (applies every migration in `supabase/migrations/` and `supabase/seed.sql`).
+3. Run `npm run supabase:env:local` to write the local URL and keys into `.env.local`.
+4. Run `npm run dev`. The dev-only anonymous entry (`Entrar anonimo para pruebas`) works because `supabase/config.toml` enables anonymous sign-ins locally.
+5. Run `npm run supabase:types` after schema changes, and `npm run supabase:reset` to start clean.
 
-## Current Local Runtime Blocker Seen Here
+## Production (hosted)
 
-`supabase start` failed in this environment with a Docker storage error:
+Normally untouched by hand. When needed:
 
-`commit failed ... metadata.db: input/output error`
+1. `npm run supabase:login`
+2. `npm run supabase:link` → project ref `pevrupenrzueyzidfeah`
+3. `npm run supabase:push:dry` to see pending migrations (read-only).
 
-That is a Docker runtime issue, not a repo issue.
+Avoid `npm run supabase:push:linked` from a laptop: let CI apply migrations after all checks pass.
+
+Hosted-only settings (Dashboard):
+
+- Authentication → URL Configuration: see `docs/deployment.md`.
+- Authentication → Providers: Google enabled; **Anonymous Sign-Ins disabled**.
+
+## Known local blocker
+
+`supabase start` once failed here with a Docker storage error (`commit failed ... metadata.db: input/output error`). That is a Docker runtime issue, not a repo issue; restarting or resetting Docker Desktop fixes it.

@@ -15,34 +15,19 @@ npm run test:recovery
 npm run e2e
 ```
 
-## Supabase Setup
+## Environments
 
-Recommended workflow: use two hosted Supabase projects.
+There is a single hosted environment: **production**.
 
-- `recovery-tracker-staging`
-- `recovery-tracker-prod`
+- App: https://recovery-tracker.brahua.com (Vercel project `brahua-lab/recovery-tracker`)
+- Supabase: `pevrupenrzueyzidfeah` (formerly `recovery-tracker-staging`; promoted to production on 2026-09-30, see `docs/decisions/ADR-004-promote-staging-to-production.md`)
+- Google OAuth is configured in that project. Anonymous sign-in is off in production; it is only enabled in local Supabase for Playwright.
 
-Use `staging` for local app development and validation. Promote the same migrations to `prod` only after verification.
+Trunk-based workflow: short branches and PRs against `main`; every push to `main` runs CI and, only if every check passes, migrates Supabase and deploys to production. Details: `docs/deployment.md`.
 
-Quick start:
-
-1. Create both hosted projects in Supabase Cloud.
-2. Point `.env.local` to `staging`.
-3. Run `npm run supabase:login`.
-4. Link the repo to `staging` with `npm run supabase:link`.
-5. Apply migrations with `npm run supabase:push:linked`.
-6. Configure Google OAuth in `staging`.
-7. Verify login and data writes against `staging`.
-8. Repeat the link/push flow for `prod`.
+Local development and tests use the local Supabase stack (see below), never production.
 
 Detailed guide: `docs/setup/supabase-cloud-step-by-step.md`
-
-Current working setup for this repo:
-
-- Development is currently pointed at a hosted `staging` Supabase project.
-- `prod` is intentionally deferred until the MVP is more stable.
-- Google OAuth is configured in `staging`.
-- Anonymous sign-in is enabled in non-production to support Playwright E2E without automating Google login.
 
 ## Remote Supabase Commands
 
@@ -72,7 +57,7 @@ npm run test:recovery
 
 In development, the Playwright setup authenticates through a Supabase anonymous user for testing. This keeps real Auth + RLS behavior while avoiding Google OAuth automation failures.
 
-## Optional Local Supabase CLI
+## Local Supabase CLI
 
 ```bash
 npm run supabase:start
@@ -85,15 +70,16 @@ npm run supabase:stop
 
 Notes:
 
-- Cloud-first is the intended workflow for this repo.
+- Local Supabase (Docker) is the default for development and E2E; CI uses the same stack.
 - `supabase/config.toml` is already initialized for this repo.
 - `supabase/seed.sql` is intentionally empty so resets work now and can be expanded later.
 - For local Google OAuth, also fill `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET`.
-- Keep `.env.local` pointed at `staging` during day-to-day development.
+- Pointing `.env.local` at the hosted project means writing real production data; do it only on purpose, and never run E2E that way.
 - Detailed setup notes: `docs/setup/supabase-setup.md`
 
 ## Project Docs
 
+- Quick project recap (start here): `RECAP.md`
 - Product direction: `docs/ideas/recovery-ritual.md`
 - Deferred ideas and design backlog: `docs/ideas/recovery-ritual-backlog.md`
 - MVP spec: `docs/specs/recovery-ritual-mvp-spec.md`
@@ -111,6 +97,7 @@ Notes:
 - `docs/decisions/ADR-001-use-supabase-direct-for-mvp-persistence.md`
 - `docs/decisions/ADR-002-use-google-login-with-supabase-auth.md`
 - `docs/decisions/ADR-003-store-individual-exercise-sets-additively.md`
+- `docs/decisions/ADR-004-promote-staging-to-production.md`
 
 ## Current Status
 
@@ -169,7 +156,7 @@ Latest redesign verification also included:
 
 ## Current Milestone
 
-The MVP, UX redesign, individual-series capture, read-only history, robust session validation, and backdated closeouts are implemented and browser-reviewed. Regression coverage is green. Staging has no anonymous test users; the single real user and its real session are preserved. The current milestone remains the real-use trial, and no next feature is committed until observations are prioritized.
+The MVP, UX redesign, individual-series capture, read-only history, robust session validation, and backdated closeouts are implemented and browser-reviewed. Since then the exercise catalog, routines and global loading/feedback have shipped. Regression coverage is green. The former staging project is now production at https://recovery-tracker.brahua.com and holds the single real user's data. The current milestone remains the real-use trial.
 
 ## Documentation Practice
 

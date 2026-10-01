@@ -82,6 +82,6 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 
 ## Próximos pasos
 
-- No hay feature en curso ni elegida. El owner quiere el proyecto ordenado antes de empezar algo nuevo.
-- Todo lo pendiente (producto, diseño y técnico) está en **`docs/ideas/recovery-ritual-backlog.md`**, revisado contra el código el 2026-10-01. Elegir de ahí con una observación real y escribir la spec antes de programar.
-- `tasks/` no tiene casillas abiertas: la validación de uso real y la revisión del feedback de carga (D5) se cerraron el 2026-10-01.
+- **En curso: design system CSS** (`docs/specs/design-system-css-spec.md`, tareas en `tasks/todo-design-system-css.md`). Fase 1 (división de `globals.css` en `src/design-system/styles/`) hecha; siguen la limpieza del bloque legado (PR B, con OK del owner para el `body` claro y `::selection`) y la fase 2 (tokens + `design:check`).
+- Para cualquier refactor de CSS: línea base con `npm run -s css:compare -- snapshot <archivo fuera del repo>` desde `main` y comparación después de cada paso.
+- El resto de lo pendiente está en **`docs/ideas/recovery-ritual-backlog.md`**.

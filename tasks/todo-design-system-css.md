@@ -6,29 +6,29 @@ Verificación común: `npm run lint && npm run typecheck && npm test` y la compa
 
 ## Preparación
 
-- [ ] T1. Herramienta de comparación y línea base
+- [x] T1. Herramienta de comparación y línea base
   - Acceptance: `scripts/design-system/compare-css.mjs <base.css> <nuevo.css>` compila ambos con `@tailwindcss/postcss` y compara normalizado (comentarios y espacios); modo `--resolve` para la fase 2. Línea base generada desde `main` y guardada fuera del repo.
   - Verify: test unitario del normalizador (`scripts/design-system/compare-css.test.mjs`); `compare-css` de `main` contra sí mismo da EQUIVALENTE.
   - Files: `scripts/design-system/compare-css.mjs`, `scripts/design-system/compare-css.test.mjs`, `package.json` (script `css:compare`)
 
 ## Fase 1: división (PR A)
 
-- [ ] T2. Tokens, base, primitivas, shell y Hoy
+- [x] T2. Tokens, base, primitivas, shell y Hoy
   - Acceptance: `tokens/root.css`, `tokens/theme.css`, `base.css`, `components/primitives.css`, `surfaces/shell.css`, `surfaces/today.css`; `globals.css` los importa en orden y conserva el resto.
   - Verify: `npm run css:compare` EQUIVALENTE.
   - Files: `src/app/globals.css`, `src/design-system/styles/**`
 
-- [ ] T3. Registrar, éxito y cierre
+- [x] T3. Registrar, éxito y cierre
   - Acceptance: `surfaces/registrar.css`, `surfaces/session-exercises.css`, `surfaces/success.css`, `surfaces/closeout.css` (partido si pasa de ~800 líneas).
   - Verify: EQUIVALENTE.
   - Files: `src/app/globals.css`, `src/design-system/styles/surfaces/*`
 
-- [ ] T4. Insights, reporte, landing, legado e historial
+- [x] T4. Insights, reporte, landing, legado e historial
   - Acceptance: `surfaces/insights.css`, `surfaces/report.css`, `surfaces/landing.css`, `legacy.css`, `surfaces/history.css`.
   - Verify: EQUIVALENTE.
   - Files: `src/app/globals.css`, `src/design-system/styles/**`
 
-- [ ] T5. Ejercicios, rutinas, feedback y skeleton; cierre de la fase
+- [x] T5. Ejercicios, rutinas, feedback y skeleton; cierre de la fase
   - Acceptance: resto del archivo movido; `globals.css` ≤ 40 líneas (solo `@import` y `@source`); ningún archivo > ~800 líneas; `src/design-system/README.md`; `AGENTS.md` y `docs/HANDOFF.md` apuntan al design system.
   - Verify: EQUIVALENTE; lint/typecheck/test; PR A con CI verde → merge → deploy.
   - Files: `src/app/globals.css`, `src/design-system/**`, `AGENTS.md`, `docs/HANDOFF.md`

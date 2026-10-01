@@ -1,0 +1,275 @@
+/* Ejercicios: isometric history label, catalog page, tabs, rows and form. */
+
+.rr-history-isometric {
+  margin-left: 7px;
+  border-radius: var(--rr-radius-pill);
+  background: rgba(126, 144, 186, 0.16);
+  padding: 2px 7px;
+  color: var(--rr-night);
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+/* Exercise catalog page */
+
+.rr-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.rr-exercise-catalog {
+  display: grid;
+  min-height: 100dvh;
+  align-content: start;
+  gap: 16px;
+  padding: 24px 24px calc(32px + var(--rr-bottom-nav-offset));
+  color: var(--rr-ink-secondary);
+}
+
+.rr-exercise-catalog-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rr-exercise-catalog-header > div {
+  display: grid;
+  gap: 4px;
+}
+
+.rr-exercise-catalog-header h1 {
+  color: var(--rr-ink);
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.rr-exercise-catalog-header > div > p:last-child {
+  color: var(--rr-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.rr-exercise-catalog-header .rr-modal-primary {
+  min-width: 0;
+  flex: none;
+}
+
+.rr-exercise-catalog-controls {
+  display: grid;
+  gap: 10px;
+}
+
+.rr-exercise-catalog-search input,
+.rr-exercise-form input,
+.rr-exercise-form select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  padding: 10px 12px;
+  color: var(--rr-ink);
+  font: inherit;
+  outline: none;
+}
+
+.rr-exercise-catalog-search input:focus,
+.rr-exercise-form input:focus,
+.rr-exercise-form select:focus {
+  border-color: var(--rr-accent-light);
+}
+
+.rr-exercise-catalog-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  border: 1px solid var(--rr-border);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-card-bg);
+  padding: 4px;
+}
+
+.rr-exercise-catalog-tabs button {
+  min-height: 38px;
+  border-radius: 10px;
+  color: var(--rr-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rr-exercise-catalog-tabs button b {
+  margin-left: 4px;
+  color: var(--rr-text-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.rr-exercise-catalog-tabs button[aria-pressed="true"] {
+  background: var(--rr-wash);
+  color: var(--rr-ink);
+}
+
+.rr-exercise-catalog .rr-exercise-row-summary {
+  display: grid;
+  justify-items: end;
+  gap: 1px;
+}
+
+.rr-exercise-catalog .rr-exercise-row-summary small {
+  color: var(--rr-text-muted);
+  font-family: var(--font-instrument-sans), system-ui, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.rr-exercise-catalog-empty {
+  border: 1px dashed var(--rr-border-control);
+  border-radius: var(--rr-radius-button);
+  padding: 20px;
+  color: var(--rr-text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.rr-exercise-form {
+  display: grid;
+  gap: 14px;
+}
+
+.rr-exercise-form label,
+.rr-exercise-form-defaults > div > label {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.rr-exercise-form label > span,
+.rr-exercise-form legend {
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.rr-exercise-form .rr-exercise-isometric {
+  display: flex;
+}
+
+.rr-exercise-form .rr-exercise-isometric input {
+  width: 20px;
+  min-height: 0;
+  height: 20px;
+  flex: none;
+  padding: 0;
+  accent-color: var(--rr-accent);
+}
+
+.rr-exercise-form .rr-exercise-isometric > span {
+  display: grid;
+  color: var(--rr-ink);
+  font-size: 13.5px;
+}
+
+.rr-exercise-form-hint {
+  margin-top: -8px;
+  color: var(--rr-text-muted);
+  font-size: 11.5px;
+}
+
+.rr-exercise-form-defaults {
+  display: grid;
+  gap: 8px;
+  border: 0;
+  padding: 0;
+}
+
+.rr-exercise-form-defaults > div {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rr-exercise-form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.rr-exercise-merge {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid var(--rr-border-soft);
+  padding-top: 12px;
+}
+
+.rr-exercise-merge h3 {
+  color: var(--rr-ink);
+  font-size: 14px;
+}
+
+.rr-exercise-merge p {
+  color: var(--rr-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.rr-exercise-merge .rr-exercise-merge-summary {
+  border-radius: 10px;
+  background: rgba(201, 85, 46, 0.1);
+  padding: 8px 10px;
+  color: #e5a087;
+}
+
+@media (min-width: 64rem) {
+  .rr-exercise-catalog {
+    max-width: 760px;
+    padding: 40px 40px 64px;
+  }
+
+  .rr-exercise-catalog-controls {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+}
+
+/* Routines */
+
+.rr-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.rr-exercise-catalog-tabs a {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: var(--rr-text-muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rr-exercise-catalog-tabs a b {
+  margin-left: 4px;
+  color: var(--rr-text-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.rr-exercise-catalog-tabs a[aria-current="page"] {
+  background: var(--rr-wash);
+  color: var(--rr-ink);
+}
+
+.rr-exercise-catalog-tabs a:focus-visible {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 2px;
+}

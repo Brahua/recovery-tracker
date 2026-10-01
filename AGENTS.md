@@ -28,3 +28,9 @@ Read first when resuming: `docs/HANDOFF.md` (exact status, work in flight and ma
 - There is a single hosted environment: production (Supabase `pevrupenrzueyzidfeah`, formerly "staging").
   It holds real data. Tests (unit and E2E) run against a throwaway local Supabase, never production.
 - Migrations are additive; anything destructive needs the owner's OK and a backup first.
+
+## Styles
+
+- CSS lives in `src/design-system/styles/` (see `src/design-system/README.md`); `src/app/globals.css` only imports it,
+  and the import order is the cascade order.
+- CSS refactors must prove the compiled stylesheet is unchanged: `npm run -s css:compare -- compare <baseline> [--resolve]`.

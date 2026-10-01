@@ -24,8 +24,7 @@ import type {
   ReboundLevel,
 } from "@/types/recovery";
 
-const expiredSessionMessage =
-  "Tu sesión expiró. Recarga la página e inicia sesión nuevamente.";
+const expiredSessionMessage = "Tu sesión expiró. Recarga la página e inicia sesión nuevamente.";
 const genericCloseoutErrorMessage =
   "No se pudo guardar el cierre. Revisa los datos e intenta otra vez.";
 const missingCloseoutMessage =
@@ -155,17 +154,11 @@ export async function createNightlyCloseoutAction(
 
     savedCloseoutId = savedCloseout.id;
     savedCloseoutDate = savedCloseout.date;
-    summary = buildCloseoutSummary(
-      input.endOfDayPain,
-      input.energy,
-      input.reboundPainLevel,
-    );
+    summary = buildCloseoutSummary(input.endOfDayPain, input.energy, input.reboundPainLevel);
   } catch (error) {
     const errorMessage = getSaveErrorMessage(error);
 
-    if (
-      errorMessage === genericCloseoutErrorMessage
-    ) {
+    if (errorMessage === genericCloseoutErrorMessage) {
       console.error("Failed to save nightly closeout.", error);
     }
 

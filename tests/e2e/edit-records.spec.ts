@@ -164,7 +164,9 @@ test.describe.serial("edit past sessions", () => {
     await page.getByRole("button", { name: "Eliminar sesión" }).click();
     const dialog = page.getByRole("dialog", { name: "¿Eliminar esta sesión?" });
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText("Se borran sus ejercicios, series y tratamientos.")).toBeVisible();
+    await expect(
+      dialog.getByText("Se borran sus ejercicios, series y tratamientos."),
+    ).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Cancelar" })).toBeFocused();
 
     await dialog.getByRole("button", { name: "Eliminar", exact: true }).click();

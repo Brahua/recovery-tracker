@@ -3,11 +3,7 @@
 import Link from "@/components/app-link";
 import { useEffect, useState } from "react";
 
-import {
-  addRecoveryDays,
-  getRecoveryDateKey,
-  recoveryTimeZone,
-} from "@/lib/recovery-date";
+import { addRecoveryDays, getRecoveryDateKey, recoveryTimeZone } from "@/lib/recovery-date";
 import type { RitualSuccessConfig } from "@/lib/registrar-flow";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
@@ -17,11 +13,7 @@ function formatContext(dateKey: string, createdAt: string) {
 
   const today = getRecoveryDateKey();
   const relativeDate =
-    dateKey === today
-      ? "Hoy"
-      : dateKey === addRecoveryDays(today, -1)
-        ? "Ayer"
-        : null;
+    dateKey === today ? "Hoy" : dateKey === addRecoveryDays(today, -1) ? "Ayer" : null;
 
   const parts = new Intl.DateTimeFormat("es-PE", {
     day: "numeric",
@@ -32,8 +24,7 @@ function formatContext(dateKey: string, createdAt: string) {
   const part = (type: Intl.DateTimeFormatPartTypes) =>
     parts.find((item) => item.type === type)?.value;
 
-  const dateLabel =
-    relativeDate ?? `${part("weekday")} ${part("day")} de ${part("month")}`;
+  const dateLabel = relativeDate ?? `${part("weekday")} ${part("day")} de ${part("month")}`;
   return `${dateLabel} · registrado ${formatTime(createdAt)}`;
 }
 
@@ -81,9 +72,7 @@ export function DayClosedState({
     <section className={`rr-day-closed ${dayComplete ? "is-complete" : "is-partial"}`}>
       <div aria-hidden="true" className="rr-day-closed-glow" />
       <div className="rr-day-closed-content">
-        <p className="rr-day-closed-context">
-          {formatContext(closeout.date, closeout.createdAt)}
-        </p>
+        <p className="rr-day-closed-context">{formatContext(closeout.date, closeout.createdAt)}</p>
 
         <div
           aria-label={`${dayComplete ? 2 : 1} de 2 rituales completados`}
@@ -123,12 +112,17 @@ export function DayClosedState({
             <div className="rr-day-closed-row">
               <span aria-hidden="true">✓</span>
               <strong>Cierre del dia</strong>
-              <small>{formatTime(closeout.createdAt)} · dolor {closeout.endOfDayPain}</small>
+              <small>
+                {formatTime(closeout.createdAt)} · dolor {closeout.endOfDayPain}
+              </small>
             </div>
           </section>
 
           <p className="rr-day-closed-streak">
-            Racha de <strong>{visibleStreak} dia{visibleStreak === 1 ? "" : "s"}</strong>
+            Racha de{" "}
+            <strong>
+              {visibleStreak} dia{visibleStreak === 1 ? "" : "s"}
+            </strong>
             {" · manana seguimos"}
           </p>
         </div>

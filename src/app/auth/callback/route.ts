@@ -45,7 +45,5 @@ export async function GET(request: Request) {
   }
 
   const reason = providerError ? "provider_rejected" : "missing_code";
-  return NextResponse.redirect(
-    `${await getRequestOrigin()}/auth/auth-code-error?reason=${reason}`,
-  );
+  return NextResponse.redirect(`${await getRequestOrigin()}/auth/auth-code-error?reason=${reason}`);
 }

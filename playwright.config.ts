@@ -52,9 +52,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: isCI
-      ? `npm run start -- --port ${port}`
-      : `npm run dev -- --port ${port}`,
+    command: isCI ? `npm run start -- --port ${port}` : `npm run dev -- --port ${port}`,
     url: baseURL,
     reuseExistingServer,
     timeout: 120_000,

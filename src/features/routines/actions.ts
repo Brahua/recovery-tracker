@@ -2,10 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import {
-  createRoutineRepository,
-  DuplicateRoutineNameError,
-} from "@/data/routine-repository";
+import { createRoutineRepository, DuplicateRoutineNameError } from "@/data/routine-repository";
 import { AuthenticationRequiredError } from "@/lib/supabase/authenticated";
 import { routineIdSchema, routineInputSchema, routineNameSchema } from "@/lib/validation/routines";
 

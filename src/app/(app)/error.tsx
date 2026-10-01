@@ -10,7 +10,11 @@ export default function AppError({ reset }: { reset: () => void }) {
       <section className="rr-card rr-history-empty" role="alert">
         <strong>Algo salió mal</strong>
         <p>{unexpectedErrorMessage} Lo que ya guardaste no se modificó.</p>
-        <button className="rr-button rr-button--secondary rr-history-more" onClick={reset} type="button">
+        <button
+          className="rr-button rr-button--secondary rr-history-more"
+          onClick={reset}
+          type="button"
+        >
           Reintentar
         </button>
       </section>

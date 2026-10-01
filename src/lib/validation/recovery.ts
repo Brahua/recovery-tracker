@@ -37,8 +37,7 @@ const painScoreSchema: z.ZodType<PainScore> = z.custom<PainScore>(
 );
 
 const rating1To5Schema: z.ZodType<Rating1To5> = z.custom<Rating1To5>(
-  (value) =>
-    typeof value === "number" && rating1To5Values.includes(value as Rating1To5),
+  (value) => typeof value === "number" && rating1To5Values.includes(value as Rating1To5),
   { message: "Rating must be an integer between 1 and 5." },
 );
 
@@ -57,10 +56,7 @@ const requiredDateSchema = z
   .min(1, "Date is required.")
   .refine(isValidDateString, "Date must be parseable.");
 
-const optionalTextSchema = z.preprocess(
-  normalizeOptionalText,
-  z.string().max(500).optional(),
-);
+const optionalTextSchema = z.preprocess(normalizeOptionalText, z.string().max(500).optional());
 
 export const exerciseSetSchema = z
   .object({
@@ -80,11 +76,7 @@ export const exerciseSetSchema = z
   );
 
 function hasNonIsometricContent(set: z.infer<typeof exerciseSetSchema>) {
-  return (
-    set.reps !== undefined ||
-    set.weightKg !== undefined ||
-    set.notes !== undefined
-  );
+  return set.reps !== undefined || set.weightKg !== undefined || set.notes !== undefined;
 }
 
 export const sessionExerciseSchema = z
@@ -105,9 +97,7 @@ export const sessionExerciseSchema = z
     "An exercise requires a set, duration, or distance.",
   )
   .refine(
-    (exercise) =>
-      new Set(exercise.sets.map((set) => set.position)).size ===
-      exercise.sets.length,
+    (exercise) => new Set(exercise.sets.map((set) => set.position)).size === exercise.sets.length,
     "Set positions must be unique within an exercise.",
   )
   .refine(
@@ -162,9 +152,7 @@ export const createRehabSessionInputSchema = z
     painDuring: painScoreSchema.optional(),
     painAfter: painScoreSchema,
     perceivedLoad: rating1To5Schema,
-    exercises: z
-      .array(sessionExerciseSchema)
-      .max(20, "Too many exercises for one session."),
+    exercises: z.array(sessionExerciseSchema).max(20, "Too many exercises for one session."),
     finalState: finalStateSchema,
     notes: optionalTextSchema,
     treatments: z
@@ -207,9 +195,7 @@ export const createRehabSessionInputSchema = z
     }
   })
   .transform((session) =>
-    session.sessionType === "PHYSIOTHERAPY"
-      ? session
-      : { ...session, therapistNotes: undefined },
+    session.sessionType === "PHYSIOTHERAPY" ? session : { ...session, therapistNotes: undefined },
   );
 
 export const createNightlyCloseoutInputSchema = z.object({
@@ -231,6 +217,4 @@ const persistedFieldsSchema = {
   updatedAt: requiredDateTimeSchema,
 };
 
-export const nightlyCloseoutSchema = createNightlyCloseoutInputSchema.extend(
-  persistedFieldsSchema,
-);
+export const nightlyCloseoutSchema = createNightlyCloseoutInputSchema.extend(persistedFieldsSchema);

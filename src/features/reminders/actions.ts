@@ -39,9 +39,12 @@ export async function saveReminderSettingsAction(input: unknown): Promise<Remind
 }
 
 /** Stores this browser's push subscription (PushSubscription.toJSON()) for the signed-in user. */
-export async function registerPushSubscriptionAction(input: unknown): Promise<ReminderActionResult> {
+export async function registerPushSubscriptionAction(
+  input: unknown,
+): Promise<ReminderActionResult> {
   const parsed = pushSubscriptionInputSchema.safeParse(input);
-  if (!parsed.success) return { ok: false, error: "Este navegador devolvió una suscripción inválida." };
+  if (!parsed.success)
+    return { ok: false, error: "Este navegador devolvió una suscripción inválida." };
 
   try {
     const userAgent = (await headers()).get("user-agent");
@@ -55,8 +58,11 @@ export async function registerPushSubscriptionAction(input: unknown): Promise<Re
   return { ok: true };
 }
 
-export async function unregisterPushSubscriptionAction(endpoint: unknown): Promise<ReminderActionResult> {
-  if (typeof endpoint !== "string" || !endpoint.startsWith("https://")) return { ok: false, error: genericError };
+export async function unregisterPushSubscriptionAction(
+  endpoint: unknown,
+): Promise<ReminderActionResult> {
+  if (typeof endpoint !== "string" || !endpoint.startsWith("https://"))
+    return { ok: false, error: genericError };
 
   try {
     const repository = await createRemindersRepository();
@@ -70,7 +76,9 @@ export async function unregisterPushSubscriptionAction(endpoint: unknown): Promi
 }
 
 /** Sends a test notification to every device of the signed-in user. */
-export async function sendTestNotificationAction(): Promise<ReminderActionResult & { sent?: number }> {
+export async function sendTestNotificationAction(): Promise<
+  ReminderActionResult & { sent?: number }
+> {
   const sendPush = getPushSender();
   if (!sendPush) {
     return { ok: false, error: "Las notificaciones todavía no están configuradas en el servidor." };
@@ -88,12 +96,16 @@ export async function sendTestNotificationAction(): Promise<ReminderActionResult
       const result = await sendPush(subscription, testMessage);
       if (result.status === "sent") sent += 1;
       if (result.status === "gone") await repository.removeSubscriptionById(subscription.id);
-      if (result.status === "failed") console.error("Test push failed.", result.statusCode, result.message);
+      if (result.status === "failed")
+        console.error("Test push failed.", result.statusCode, result.message);
     }
 
     if (sent === 0) {
       revalidatePath("/ajustes");
-      return { ok: false, error: "No se pudo enviar. Vuelve a activar las notificaciones en este dispositivo." };
+      return {
+        ok: false,
+        error: "No se pudo enviar. Vuelve a activar las notificaciones en este dispositivo.",
+      };
     }
     return { ok: true, sent };
   } catch (error) {

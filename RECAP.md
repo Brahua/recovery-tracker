@@ -85,7 +85,7 @@ Vienen de `docs/archive/handoffs/session-handoff-2026-07-17.md`:
 ### Comandos
 
 ```bash
-npm run lint && npm run typecheck && npm test   # lo que se corre en la PC antes de commitear
+npm run format && npm run lint && npm run design:check && npm run typecheck && npm test   # antes de commitear
 npm run dev                                     # solo si el owner lo pide; .env.local apunta a producción
 npm run supabase:push:dry                       # ver migraciones pendientes en producción (no aplica nada)
 ```
@@ -95,6 +95,7 @@ npm run supabase:push:dry                       # ver migraciones pendientes en 
 ### CI/CD (`.github/workflows/ci-cd.yml`)
 
 - En cada PR corren los checks de calidad y los E2E, con Supabase local en Docker. Si llega un commit nuevo, el run anterior se cancela.
+- `.github/workflows/schema-drift.yml` compara cada lunes el esquema de producción con las migraciones (solo lectura); si falla, algo se cambió fuera de una migración (`docs/deployment.md`).
 - En cada push a `main` corren los mismos checks y, **solo si todos pasan**, el job `deploy` hace `supabase db push` a producción y después `vercel deploy --prod`. Los runs de `main` nunca se cancelan y los deploys van de uno en uno.
 - El auto-deploy de Vercel está apagado en `vercel.json` (`git.deploymentEnabled: false`), así que GitHub Actions es el único que despliega.
 - Detalle completo: `docs/deployment.md`.

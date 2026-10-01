@@ -33,7 +33,9 @@ async function seedRecoveryData(page: Page) {
   await fillSessionBasics(page);
   await addQuickExercise(page, "Bicicleta 5-10 min");
   await sessionExerciseRow(page, "Bicicleta 5-10 min").click();
-  await exerciseDialog(page).getByLabel(/Duración total/).fill("10");
+  await exerciseDialog(page)
+    .getByLabel(/Duración total/)
+    .fill("10");
   await closeExerciseDialog(page);
   const exercise = await addExerciseFromCatalog(page, "step-u", "Step-up");
   await exercise.getByRole("button", { name: "+ Añadir serie" }).click();
@@ -79,7 +81,10 @@ test.describe.serial("accessibility (axe)", () => {
     await openSessionForm(page);
     const treatments = page.getByRole("region", { name: "Tratamientos del centro" });
     await treatments.getByRole("button", { name: "Tecarterapia" }).click();
-    await treatments.getByRole("group", { name: "Vendaje" }).getByRole("button", { name: "+ Otro" }).click();
+    await treatments
+      .getByRole("group", { name: "Vendaje" })
+      .getByRole("button", { name: "+ Otro" })
+      .click();
     await expect(treatments.getByRole("listitem")).toHaveCount(2);
     await expectNoAxeViolations(page);
   });

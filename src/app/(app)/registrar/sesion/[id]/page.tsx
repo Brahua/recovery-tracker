@@ -7,11 +7,7 @@ import { getSupabaseEnv } from "@/lib/supabase/env";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { recordIdSchema } from "@/lib/validation/recovery";
 
-export default async function EditSessionPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function EditSessionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
 
   if (!recordIdSchema.safeParse(id).success) {

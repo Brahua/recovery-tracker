@@ -1,0 +1,16 @@
+package-lock.json
+.claude/
+.next/
+playwright/
+playwright-report/
+test-results/
+coverage/
+docs/
+tasks/
+*.md
+supabase/.temp/
+# Hand-tuned token tables; design:check guards them.
+src/design-system/styles/tokens/
+# Served as-is (offline page and service worker); keep byte-for-byte control.
+public/
+.mcp.json

@@ -36,10 +36,21 @@ const session: RehabSession = {
       isIsometric: true,
       sets: [{ position: 0, holdSeconds: 45 }],
     },
-    { name: "Bicicleta", exerciseId: "exercise-3", durationMinutes: 12.5, distanceKm: 4.2, sets: [] },
+    {
+      name: "Bicicleta",
+      exerciseId: "exercise-3",
+      durationMinutes: 12.5,
+      distanceKm: 4.2,
+      sets: [],
+    },
   ],
   treatments: [
-    { category: "PHYSICAL_AGENT", modality: "TECAR", bodyZone: "Rodilla anterior", durationMinutes: 10 },
+    {
+      category: "PHYSICAL_AGENT",
+      modality: "TECAR",
+      bodyZone: "Rodilla anterior",
+      durationMinutes: 10,
+    },
     { category: "TAPING", modality: "OTHER", customName: "Vendaje rígido" },
   ],
   therapistNotes: "Bajar carga",
@@ -70,7 +81,9 @@ describe("sessionToExerciseEntries", () => {
         isIsometric: true,
         durationMinutes: undefined,
         distanceKm: undefined,
-        sets: [{ position: 0, reps: undefined, weightKg: undefined, holdSeconds: 45, notes: undefined }],
+        sets: [
+          { position: 0, reps: undefined, weightKg: undefined, holdSeconds: 45, notes: undefined },
+        ],
         notes: undefined,
       },
       {
@@ -90,7 +103,11 @@ describe("sessionToExerciseEntries", () => {
       {
         ...session,
         exercises: [
-          { name: "Sentadilla", sets: [], legacyPrescription: { setCount: 3, reps: 12, weightKg: 5 } },
+          {
+            name: "Sentadilla",
+            sets: [],
+            legacyPrescription: { setCount: 3, reps: 12, weightKg: 5 },
+          },
         ],
       },
       counterIds(),

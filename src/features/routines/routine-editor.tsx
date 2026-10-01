@@ -101,22 +101,40 @@ export function RoutineEditor({ catalog, routine }: RoutineEditorProps) {
             </span>
           </div>
         </div>
-        <ExerciseEntryEditor catalog={catalog} entries={entries} mode="routine" onChange={setEntries} />
+        <ExerciseEntryEditor
+          catalog={catalog}
+          entries={entries}
+          mode="routine"
+          onChange={setEntries}
+        />
       </div>
 
       <footer className="rr-exercise-form-actions rr-routine-editor-actions">
         {routine ? (
           confirmDelete ? (
             <span className="rr-routine-delete-confirm">
-              <button className="rr-modal-secondary" onClick={() => setConfirmDelete(false)} type="button">
+              <button
+                className="rr-modal-secondary"
+                onClick={() => setConfirmDelete(false)}
+                type="button"
+              >
                 Cancelar
               </button>
-              <button className="rr-modal-secondary is-danger" disabled={pending} onClick={remove} type="button">
+              <button
+                className="rr-modal-secondary is-danger"
+                disabled={pending}
+                onClick={remove}
+                type="button"
+              >
                 Confirmar eliminación
               </button>
             </span>
           ) : (
-            <button className="rr-modal-secondary" onClick={() => setConfirmDelete(true)} type="button">
+            <button
+              className="rr-modal-secondary"
+              onClick={() => setConfirmDelete(true)}
+              type="button"
+            >
               Eliminar
             </button>
           )

@@ -21,7 +21,5 @@ export default async function EjerciciosPage({
 
   const { catalog: exercises, routines } = await loadExerciseLibrary();
 
-  return (
-    <ExerciseCatalog exercises={exercises} routines={routines} section={section} />
-  );
+  return <ExerciseCatalog exercises={exercises} routines={routines} section={section} />;
 }

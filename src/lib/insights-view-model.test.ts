@@ -1,9 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  buildFourWeekSessionCounts,
-  buildReboundDistribution,
-} from "@/lib/insights-view-model";
+import { buildFourWeekSessionCounts, buildReboundDistribution } from "@/lib/insights-view-model";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
 function sessionOn(id: string, date: string): RehabSession {
@@ -79,8 +76,6 @@ describe("buildReboundDistribution", () => {
   });
 
   it("returns zeroed buckets when there are no closeouts", () => {
-    expect(buildReboundDistribution([]).map((item) => item.percentage)).toEqual([
-      0, 0, 0,
-    ]);
+    expect(buildReboundDistribution([]).map((item) => item.percentage)).toEqual([0, 0, 0]);
   });
 });

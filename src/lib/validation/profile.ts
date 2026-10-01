@@ -7,6 +7,12 @@ export const DISPLAY_NAME_MAX_LENGTH = 30;
 export const displayNameSchema = z
   .string({ error: "Escribe un nombre válido." })
   .transform((value) => value.trim().replace(/\s+/g, " "))
-  .refine((value) => !/[\u0000-\u001F\u007F]/.test(value), "Usa solo letras, números y signos comunes.")
-  .refine((value) => value.length <= DISPLAY_NAME_MAX_LENGTH, `Usa como máximo ${DISPLAY_NAME_MAX_LENGTH} caracteres.`)
+  .refine(
+    (value) => !/[\u0000-\u001F\u007F]/.test(value),
+    "Usa solo letras, números y signos comunes.",
+  )
+  .refine(
+    (value) => value.length <= DISPLAY_NAME_MAX_LENGTH,
+    `Usa como máximo ${DISPLAY_NAME_MAX_LENGTH} caracteres.`,
+  )
   .transform((value) => (value === "" ? null : value));

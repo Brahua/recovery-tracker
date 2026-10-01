@@ -15,10 +15,7 @@ import {
   buildReboundInsight,
   buildSleepPainInsight,
 } from "@/lib/recovery-insights";
-import {
-  buildFourWeekSessionCounts,
-  buildReboundDistribution,
-} from "@/lib/insights-view-model";
+import { buildFourWeekSessionCounts, buildReboundDistribution } from "@/lib/insights-view-model";
 import {
   calculateTreatmentResponse,
   minTreatmentSessionsForComparison,
@@ -42,10 +39,7 @@ function buildPolyline(
   maximum: number,
 ) {
   if (values.length === 1) {
-    const normalized = Math.min(
-      1,
-      Math.max(0, (values[0]! - minimum) / (maximum - minimum)),
-    );
+    const normalized = Math.min(1, Math.max(0, (values[0]! - minimum) / (maximum - minimum)));
     const y = (height - normalized * height).toFixed(1);
     return `0,${y} ${width},${y}`;
   }
@@ -71,13 +65,24 @@ function PainChart({ points }: { points: PainTrendPoint[] }) {
 
   const width = 920;
   const height = 130;
-  const polyline = buildPolyline(points.map((point) => point.pain), width, height, 0, 6);
+  const polyline = buildPolyline(
+    points.map((point) => point.pain),
+    width,
+    height,
+    0,
+    6,
+  );
   const area = `0,${height} ${polyline} ${width},${height}`;
   const lastPoint = polyline.split(" ").at(-1)?.split(",") ?? [width, height];
 
   return (
     <div className="rr-pain-chart">
-      <svg aria-label="Tendencia del dolor medio" preserveAspectRatio="none" role="img" viewBox="0 0 920 130">
+      <svg
+        aria-label="Tendencia del dolor medio"
+        preserveAspectRatio="none"
+        role="img"
+        viewBox="0 0 920 130"
+      >
         <defs>
           <linearGradient id="rr-pain-area" x1="0" x2="0" y1="0" y2="1">
             <stop offset="0" stopColor="var(--rr-accent)" stopOpacity="0.35" />
@@ -96,7 +101,10 @@ function PainChart({ points }: { points: PainTrendPoint[] }) {
         />
       </svg>
       <div className="rr-pain-chart-axis" aria-hidden="true">
-        <span>Sem 1</span><span>Sem 2</span><span>Sem 3</span><span>Sem 4</span>
+        <span>Sem 1</span>
+        <span>Sem 2</span>
+        <span>Sem 3</span>
+        <span>Sem 4</span>
       </div>
     </div>
   );
@@ -112,13 +120,19 @@ function WeeklyLoadChart({ sessions, now }: { sessions: RehabSession[]; now: str
       <div className="rr-load-bars" aria-label="Sesiones registradas por semana">
         {weeks.map((week, index) => (
           <div key={week.label}>
-            <span className={index === weeks.length - 1 ? "is-current" : ""} style={{ height: `${Math.max(5, (week.count / maximum) * 100)}%` }} />
+            <span
+              className={index === weeks.length - 1 ? "is-current" : ""}
+              style={{ height: `${Math.max(5, (week.count / maximum) * 100)}%` }}
+            />
             <small>{week.label}</small>
           </div>
         ))}
       </div>
       <p className="rr-insights-caption">
-        <strong>{current} sesion{current === 1 ? "" : "es"}</strong> esta semana
+        <strong>
+          {current} sesion{current === 1 ? "" : "es"}
+        </strong>{" "}
+        esta semana
       </p>
     </div>
   );
@@ -132,13 +146,21 @@ function ReboundChart({ closeouts }: { closeouts: NightlyCloseout[] }) {
       <div className="rr-rebound-bars">
         {distribution.map((item) => (
           <div key={item.label}>
-            <p><span>{item.label}</span><strong>{item.percentage}%</strong></p>
-            <span><i className={`is-${item.tone}`} style={{ width: `${item.percentage}%` }} /></span>
+            <p>
+              <span>{item.label}</span>
+              <strong>{item.percentage}%</strong>
+            </p>
+            <span>
+              <i className={`is-${item.tone}`} style={{ width: `${item.percentage}%` }} />
+            </span>
           </div>
         ))}
       </div>
       <p className="rr-insights-caption">
-        <strong>{distribution[0]?.count ?? 0} de {closeouts.length}</strong> cierres sin rebote
+        <strong>
+          {distribution[0]?.count ?? 0} de {closeouts.length}
+        </strong>{" "}
+        cierres sin rebote
       </p>
     </div>
   );
@@ -150,11 +172,29 @@ function SleepPainChart({ closeouts }: { closeouts: NightlyCloseout[] }) {
   }
 
   const ordered = [...closeouts].sort((left, right) => left.date.localeCompare(right.date));
-  const sleepLine = buildPolyline(ordered.map((item) => item.sleepHours), 420, 90, 5, 9);
-  const painLine = buildPolyline(ordered.map((item) => item.endOfDayPain), 420, 90, 0, 5);
+  const sleepLine = buildPolyline(
+    ordered.map((item) => item.sleepHours),
+    420,
+    90,
+    5,
+    9,
+  );
+  const painLine = buildPolyline(
+    ordered.map((item) => item.endOfDayPain),
+    420,
+    90,
+    0,
+    5,
+  );
 
   return (
-    <svg aria-label="Comparacion entre horas de sueño y dolor" className="rr-sleep-chart" preserveAspectRatio="none" role="img" viewBox="0 0 420 90">
+    <svg
+      aria-label="Comparacion entre horas de sueño y dolor"
+      className="rr-sleep-chart"
+      preserveAspectRatio="none"
+      role="img"
+      viewBox="0 0 420 90"
+    >
       <polyline className="rr-chart-sleep-line" fill="none" points={sleepLine} />
       <polyline className="rr-chart-accent-line" fill="none" points={painLine} />
     </svg>
@@ -174,7 +214,12 @@ function ExerciseBars({ items }: { items: Array<{ name: string; count: number }>
       {visible.map((item, index) => (
         <div key={item.name}>
           <span title={item.name}>{item.name}</span>
-          <i><b className={index === 0 ? "is-leading" : ""} style={{ width: `${(item.count / maximum) * 100}%` }} /></i>
+          <i>
+            <b
+              className={index === 0 ? "is-leading" : ""}
+              style={{ width: `${(item.count / maximum) * 100}%` }}
+            />
+          </i>
           <strong>{item.count}</strong>
         </div>
       ))}
@@ -194,7 +239,9 @@ function formatRate(value?: number) {
 
 function TreatmentResponse({ items }: { items: TreatmentResponseItem[] }) {
   if (items.length === 0) {
-    return <EmptyChart>Registra tratamientos en tus sesiones de fisio para compararlos.</EmptyChart>;
+    return (
+      <EmptyChart>Registra tratamientos en tus sesiones de fisio para compararlos.</EmptyChart>
+    );
   }
 
   return (
@@ -212,19 +259,22 @@ function TreatmentResponse({ items }: { items: TreatmentResponseItem[] }) {
               <div>
                 <dt>Dolor en la sesion</dt>
                 <dd>
-                  <b>{formatSigned(item.painDeltaWith)}</b> con · {formatSigned(item.painDeltaWithout)} sin
+                  <b>{formatSigned(item.painDeltaWith)}</b> con ·{" "}
+                  {formatSigned(item.painDeltaWithout)} sin
                 </dd>
               </div>
               <div>
                 <dt>Rebote esa noche</dt>
                 <dd>
-                  <b>{formatRate(item.reboundRateWith)}</b> con · {formatRate(item.reboundRateWithout)} sin
+                  <b>{formatRate(item.reboundRateWith)}</b> con ·{" "}
+                  {formatRate(item.reboundRateWithout)} sin
                 </dd>
               </div>
             </dl>
           ) : (
             <small>
-              Aun pocos datos: {item.sessionCount} de {minTreatmentSessionsForComparison} sesiones para comparar.
+              Aun pocos datos: {item.sessionCount} de {minTreatmentSessionsForComparison} sesiones
+              para comparar.
             </small>
           )}
         </li>
@@ -233,13 +283,7 @@ function TreatmentResponse({ items }: { items: TreatmentResponseItem[] }) {
   );
 }
 
-function InsightCard({
-  children,
-  title,
-}: {
-  children: React.ReactNode;
-  title: string;
-}) {
+function InsightCard({ children, title }: { children: React.ReactNode; title: string }) {
   return (
     <article className="rr-insight-card">
       <h2>{title}</h2>
@@ -270,13 +314,13 @@ export function RecoveryDashboard({
   const sleepCloseouts = filterCloseoutsByRange(selectedCloseouts, sleepWindow);
   const sleepPain = calculateSleepPainComparison(selectedCloseouts, 14, now);
   const exercises = calculateRecentExerciseFrequency(selectedSessions, rangeDays, now);
-  const hasPhysioSessions = selectedSessions.some((session) => session.sessionType === "PHYSIOTHERAPY");
+  const hasPhysioSessions = selectedSessions.some(
+    (session) => session.sessionType === "PHYSIOTHERAPY",
+  );
   const treatmentResponse = calculateTreatmentResponse(selectedSessions, selectedCloseouts);
   const weeklyStory = [
     buildPainTrendInsight(calculatePainTrend(recentCloseouts, 7, now)),
-    buildReboundInsight(
-      calculateReboundSummary(recentSessions, recentCloseouts, 7, now),
-    ),
+    buildReboundInsight(calculateReboundSummary(recentSessions, recentCloseouts, 7, now)),
     buildSleepPainInsight(sleepPain),
   ].join(" ");
   const delta = pain.delta;
@@ -284,14 +328,28 @@ export function RecoveryDashboard({
   return (
     <div className="rr-insights">
       <header className="rr-insights-header">
-        <Link aria-label="Volver a Hoy" className="rr-insights-back" href="/">‹</Link>
+        <Link aria-label="Volver a Hoy" className="rr-insights-back" href="/">
+          ‹
+        </Link>
         <div>
           <p>{range === "all" ? "Historial completo" : "Ultimas 4 semanas"}</p>
           <h1>Insights</h1>
         </div>
         <nav aria-label="Rango de Insights" className="rr-insights-range">
-          <Link aria-current={range === "four-weeks" ? "page" : undefined} className={range === "four-weeks" ? "is-active" : ""} href="/insights">4 sem</Link>
-          <Link aria-current={range === "all" ? "page" : undefined} className={range === "all" ? "is-active" : ""} href="/insights?range=all">Todo</Link>
+          <Link
+            aria-current={range === "four-weeks" ? "page" : undefined}
+            className={range === "four-weeks" ? "is-active" : ""}
+            href="/insights"
+          >
+            4 sem
+          </Link>
+          <Link
+            aria-current={range === "all" ? "page" : undefined}
+            className={range === "all" ? "is-active" : ""}
+            href="/insights?range=all"
+          >
+            Todo
+          </Link>
         </nav>
       </header>
 
@@ -307,7 +365,8 @@ export function RecoveryDashboard({
               <strong>{formatNumber(pain.averagePain)}</strong>
               {typeof delta === "number" ? (
                 <span className={delta > 0 ? "is-rising" : ""}>
-                  {delta > 0 ? "▲" : delta < 0 ? "▼" : "="} {formatNumber(Math.abs(delta))} en {range === "all" ? "el historial" : "4 sem"}
+                  {delta > 0 ? "▲" : delta < 0 ? "▼" : "="} {formatNumber(Math.abs(delta))} en{" "}
+                  {range === "all" ? "el historial" : "4 sem"}
                 </span>
               ) : null}
             </div>
@@ -323,7 +382,10 @@ export function RecoveryDashboard({
           </InsightCard>
 
           <InsightCard title="Sueño y dolor">
-            <div className="rr-sleep-legend"><span>● Sueño</span><span>● Dolor</span></div>
+            <div className="rr-sleep-legend">
+              <span>● Sueño</span>
+              <span>● Dolor</span>
+            </div>
             <SleepPainChart closeouts={sleepCloseouts} />
             <p className="rr-insights-caption">{buildSleepPainInsight(sleepPain)}</p>
           </InsightCard>
@@ -336,7 +398,8 @@ export function RecoveryDashboard({
             <InsightCard title="Tratamientos del centro">
               <TreatmentResponse items={treatmentResponse} />
               <p className="rr-insights-caption">
-                Cambio medio de dolor (despues − antes) y noches con rebote, en sesiones de fisio con y sin cada tratamiento. Es una coincidencia, no una causa.
+                Cambio medio de dolor (despues − antes) y noches con rebote, en sesiones de fisio
+                con y sin cada tratamiento. Es una coincidencia, no una causa.
               </p>
             </InsightCard>
           ) : null}

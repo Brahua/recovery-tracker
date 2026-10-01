@@ -1,8 +1,4 @@
-import type {
-  SessionTreatment,
-  TreatmentCategory,
-  TreatmentModality,
-} from "@/types/recovery";
+import type { SessionTreatment, TreatmentCategory, TreatmentModality } from "@/types/recovery";
 
 export const maxTreatmentsPerSession = 15;
 export const maxTreatmentMinutes = 120;
@@ -81,9 +77,14 @@ export const treatmentZoneSuggestions = [
   "Gemelos",
 ] as const;
 
-const optionByModality = new Map<CatalogModality, TreatmentOption & { category: TreatmentCategory }>(
+const optionByModality = new Map<
+  CatalogModality,
+  TreatmentOption & { category: TreatmentCategory }
+>(
   treatmentCatalog.flatMap((group) =>
-    group.options.map((option) => [option.modality, { ...option, category: group.category }] as const),
+    group.options.map(
+      (option) => [option.modality, { ...option, category: group.category }] as const,
+    ),
   ),
 );
 
@@ -191,7 +192,9 @@ export function countValidTreatments(drafts: TreatmentDraft[]) {
 
 export function toTreatmentPayload(drafts: TreatmentDraft[]): SessionTreatment[] {
   return drafts.map((draft) => {
-    const minutes = treatmentTakesMinutes(draft.modality) ? parseMinutes(draft.durationMinutes) : undefined;
+    const minutes = treatmentTakesMinutes(draft.modality)
+      ? parseMinutes(draft.durationMinutes)
+      : undefined;
 
     return {
       category: draft.category,

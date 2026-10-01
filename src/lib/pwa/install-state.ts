@@ -9,9 +9,14 @@ interface InstallEnvironment {
 
 // Whether the app runs from the home screen, or else whether this is an iPhone/iPad (where push
 // only works once installed). iPadOS reports itself as a Mac; touch support tells them apart.
-export function getInstallState({ userAgent, maxTouchPoints, standalone }: InstallEnvironment): InstallState {
+export function getInstallState({
+  userAgent,
+  maxTouchPoints,
+  standalone,
+}: InstallEnvironment): InstallState {
   if (standalone) return "installed";
-  const ios = /iPhone|iPad|iPod/.test(userAgent) || (userAgent.includes("Macintosh") && maxTouchPoints > 1);
+  const ios =
+    /iPhone|iPad|iPod/.test(userAgent) || (userAgent.includes("Macintosh") && maxTouchPoints > 1);
   return ios ? "ios" : "other";
 }
 

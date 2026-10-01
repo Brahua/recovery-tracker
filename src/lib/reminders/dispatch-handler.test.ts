@@ -67,7 +67,10 @@ describe("createDispatchHandler", () => {
   });
 
   it("answers 500 without details when the store fails", async () => {
-    const broken = { ...emptyStore, listActiveSettings: async () => Promise.reject(new Error("db down")) };
+    const broken = {
+      ...emptyStore,
+      listActiveSettings: async () => Promise.reject(new Error("db down")),
+    };
     const errors = vi.spyOn(console, "error").mockImplementation(() => {});
     const response = await handler({ getStore: () => broken })(request("Bearer s3cret"));
     errors.mockRestore();

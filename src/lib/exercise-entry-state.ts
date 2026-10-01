@@ -52,8 +52,7 @@ export function applyExerciseDefaults(
     exerciseId: exercise.id,
     name: exercise.name,
     isIsometric: hasSets ? entry.isIsometric : exercise.defaultIsometric,
-    durationMinutes:
-      entry.durationMinutes || toDraftValue(exercise.defaultDurationMinutes),
+    durationMinutes: entry.durationMinutes || toDraftValue(exercise.defaultDurationMinutes),
     distanceKm: entry.distanceKm || toDraftValue(exercise.defaultDistanceKm),
     sets: hasSets
       ? entry.sets
@@ -71,16 +70,10 @@ export function unlinkExerciseEntry(entry: ExerciseEntryDraft): ExerciseEntryDra
   return { ...entry, exerciseId: undefined, name: "" };
 }
 
-export function addExerciseSet(
-  exercise: ExerciseEntryDraft,
-  setId: string,
-): ExerciseEntryDraft {
+export function addExerciseSet(exercise: ExerciseEntryDraft, setId: string): ExerciseEntryDraft {
   return {
     ...exercise,
-    sets: [
-      ...exercise.sets,
-      { id: setId, reps: "", weightKg: "", holdSeconds: "", notes: "" },
-    ],
+    sets: [...exercise.sets, { id: setId, reps: "", weightKg: "", holdSeconds: "", notes: "" }],
   };
 }
 
@@ -91,9 +84,7 @@ export function updateExerciseSet(
 ): ExerciseEntryDraft {
   return {
     ...exercise,
-    sets: exercise.sets.map((set) =>
-      set.id === setId ? { ...set, ...changes } : set,
-    ),
+    sets: exercise.sets.map((set) => (set.id === setId ? { ...set, ...changes } : set)),
   };
 }
 
@@ -114,10 +105,7 @@ export function duplicateExerciseSet(
   };
 }
 
-export function removeExerciseSet(
-  exercise: ExerciseEntryDraft,
-  setId: string,
-): ExerciseEntryDraft {
+export function removeExerciseSet(exercise: ExerciseEntryDraft, setId: string): ExerciseEntryDraft {
   return {
     ...exercise,
     sets: exercise.sets.filter((set) => set.id !== setId),

@@ -16,10 +16,7 @@ export function selectRequestOrigin(
     const configuredUrl = new URL(configuredSiteUrl);
     const requestUrl = new URL(requestOrigin);
 
-    if (
-      isLoopbackHostname(configuredUrl.hostname) &&
-      isLoopbackHostname(requestUrl.hostname)
-    ) {
+    if (isLoopbackHostname(configuredUrl.hostname) && isLoopbackHostname(requestUrl.hostname)) {
       return stripTrailingSlash(requestUrl.origin);
     }
   }
@@ -33,23 +30,16 @@ export async function getRequestOrigin() {
   const host = forwardedHost ?? headerStore.get("host");
 
   if (!host) {
-    return (
-      selectRequestOrigin(process.env.NEXT_PUBLIC_SITE_URL, null) ??
-      "http://localhost:3000"
-    );
+    return selectRequestOrigin(process.env.NEXT_PUBLIC_SITE_URL, null) ?? "http://localhost:3000";
   }
 
   const protocol =
     headerStore.get("x-forwarded-proto") ??
     (isLoopbackHostname(host.split(":")[0]) ? "http" : "https");
 
-  const requestOrigin =
-    headerStore.get("origin") ?? `${protocol}://${host}`;
+  const requestOrigin = headerStore.get("origin") ?? `${protocol}://${host}`;
 
-  return (
-    selectRequestOrigin(process.env.NEXT_PUBLIC_SITE_URL, requestOrigin) ??
-    requestOrigin
-  );
+  return selectRequestOrigin(process.env.NEXT_PUBLIC_SITE_URL, requestOrigin) ?? requestOrigin;
 }
 
 export async function buildAuthCallbackUrl(nextPath: string) {

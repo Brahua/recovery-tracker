@@ -28,7 +28,10 @@ export function createDispatchStore(client: SupabaseClient): DispatchStore {
           .or("session_enabled.eq.true,closeout_enabled.eq.true")
           .returns<ReminderSettingsRow[]>(),
       );
-      return (rows ?? []).map((row) => ({ userId: row.user_id, settings: mapReminderSettingsRow(row) }));
+      return (rows ?? []).map((row) => ({
+        userId: row.user_id,
+        settings: mapReminderSettingsRow(row),
+      }));
     },
 
     async usersWithSessionOn(userIds, localDate) {
@@ -67,7 +70,8 @@ export function createDispatchStore(client: SupabaseClient): DispatchStore {
           .returns<Array<{ user_id: string; kind: ReminderKind }>>(),
       );
       const byUser = new Map<string, ReminderKind[]>();
-      for (const row of rows ?? []) byUser.set(row.user_id, [...(byUser.get(row.user_id) ?? []), row.kind]);
+      for (const row of rows ?? [])
+        byUser.set(row.user_id, [...(byUser.get(row.user_id) ?? []), row.kind]);
       return byUser;
     },
 
@@ -90,7 +94,10 @@ export function createDispatchStore(client: SupabaseClient): DispatchStore {
       const rows = check(
         await client
           .from("reminder_deliveries")
-          .upsert({ user_id: userId, kind, local_date: localDate }, { onConflict: "user_id,kind,local_date", ignoreDuplicates: true })
+          .upsert(
+            { user_id: userId, kind, local_date: localDate },
+            { onConflict: "user_id,kind,local_date", ignoreDuplicates: true },
+          )
           .select("user_id")
           .returns<Array<{ user_id: string }>>(),
       );
@@ -102,7 +109,12 @@ export function createDispatchStore(client: SupabaseClient): DispatchStore {
     },
 
     async markSubscriptionSuccess(id) {
-      check(await client.from("push_subscriptions").update({ last_success_at: new Date().toISOString() }).eq("id", id));
+      check(
+        await client
+          .from("push_subscriptions")
+          .update({ last_success_at: new Date().toISOString() })
+          .eq("id", id),
+      );
     },
   };
 }

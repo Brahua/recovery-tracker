@@ -49,9 +49,7 @@ export function DeleteRecordDialog({
     >
       <div className="rr-delete-record">
         <strong>{description}</strong>
-        <p>
-          {consequence ? `${consequence} ` : ""}No se puede deshacer.
-        </p>
+        <p>{consequence ? `${consequence} ` : ""}No se puede deshacer.</p>
         {error ? (
           <p className="rr-delete-record-error" role="alert">
             {error}

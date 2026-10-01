@@ -19,10 +19,18 @@ export interface DispatchHandlerDeps {
 }
 
 const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } });
+  new Response(JSON.stringify(body), {
+    status,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+  });
 
 // POST /api/reminders/dispatch, called every 5 minutes by Supabase pg_cron. Returns only counters.
-export function createDispatchHandler({ secret, getSender, getStore, now = () => new Date() }: DispatchHandlerDeps) {
+export function createDispatchHandler({
+  secret,
+  getSender,
+  getStore,
+  now = () => new Date(),
+}: DispatchHandlerDeps) {
   return async function handleDispatch(request: Request): Promise<Response> {
     if (!secret?.trim()) return json({ error: "Reminders are not configured." }, 503);
     if (!isAuthorizedDispatch(request.headers.get("authorization"), secret.trim())) {

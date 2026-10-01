@@ -3,14 +3,16 @@
 
 /** Drops comments and formatting so only the CSS content is compared. */
 export function normalizeCss(css) {
-  return css
-    .replace(/\/\*[\s\S]*?\*\//g, "")
-    .replace(/\s+/g, " ")
-    // Only around separators whose spacing never changes meaning. Not ":", "(" or ")":
-    // in selectors ".a :hover" and ".a:hover" are different rules.
-    .replace(/\s*([{};,>])\s*/g, "$1")
-    .replace(/;}/g, "}")
-    .trim();
+  return (
+    css
+      .replace(/\/\*[\s\S]*?\*\//g, "")
+      .replace(/\s+/g, " ")
+      // Only around separators whose spacing never changes meaning. Not ":", "(" or ")":
+      // in selectors ".a :hover" and ".a:hover" are different rules.
+      .replace(/\s*([{};,>])\s*/g, "$1")
+      .replace(/;}/g, "}")
+      .trim()
+  );
 }
 
 /** Collects `--name: value` declarations from the stylesheet (last one wins, like the cascade on :root). */
@@ -26,17 +28,20 @@ export function collectCustomProperties(css) {
 export function resolveVars(value, props, depth = 0) {
   if (depth > 20) return value;
   let changed = false;
-  const out = value.replace(/var\(\s*(--[\w-]+)\s*(?:,([^()]*(?:\([^()]*\)[^()]*)*))?\)/g, (whole, name, fallback) => {
-    if (props.has(name)) {
-      changed = true;
-      return props.get(name);
-    }
-    if (fallback !== undefined) {
-      changed = true;
-      return fallback.trim();
-    }
-    return whole;
-  });
+  const out = value.replace(
+    /var\(\s*(--[\w-]+)\s*(?:,([^()]*(?:\([^()]*\)[^()]*)*))?\)/g,
+    (whole, name, fallback) => {
+      if (props.has(name)) {
+        changed = true;
+        return props.get(name);
+      }
+      if (fallback !== undefined) {
+        changed = true;
+        return fallback.trim();
+      }
+      return whole;
+    },
+  );
   return changed ? resolveVars(out, props, depth + 1) : out;
 }
 
@@ -53,10 +58,13 @@ export function canonicalizeColors(css) {
   };
   return css
     .replace(/#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[0-9a-fA-F]{3,4})\b/g, hex)
-    .replace(/rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)\s*(?:[,/]\s*([\d.]+%?))?\s*\)/g, (_, r, g, b, a) => {
-      const alpha = a === undefined ? 1 : a.endsWith("%") ? round(parseFloat(a) / 100) : round(a);
-      return `rgba(${round(r)},${round(g)},${round(b)},${alpha})`;
-    });
+    .replace(
+      /rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)\s*(?:[,/]\s*([\d.]+%?))?\s*\)/g,
+      (_, r, g, b, a) => {
+        const alpha = a === undefined ? 1 : a.endsWith("%") ? round(parseFloat(a) / 100) : round(a);
+        return `rgba(${round(r)},${round(g)},${round(b)},${alpha})`;
+      },
+    );
 }
 
 /**
@@ -66,7 +74,9 @@ export function canonicalizeColors(css) {
 export function resolvedCss(css, { tokenPrefixes = ["--rr-", "--font-"] } = {}) {
   const props = collectCustomProperties(css);
   const isToken = (name) => tokenPrefixes.some((prefix) => name.startsWith(prefix));
-  const withoutDefs = css.replace(/(--[\w-]+)\s*:\s*[^;{}]+(?:;|(?=}))/g, (decl, name) => (isToken(name) ? "" : decl));
+  const withoutDefs = css.replace(/(--[\w-]+)\s*:\s*[^;{}]+(?:;|(?=}))/g, (decl, name) =>
+    isToken(name) ? "" : decl,
+  );
   const tokenProps = new Map([...props].filter(([name]) => isToken(name)));
   const resolved = withoutDefs.replace(/var\([^;{}]*\)/g, (expr) => resolveVars(expr, tokenProps));
   // Empty rules left behind (e.g. a :root that only held tokens) are not content.
@@ -78,5 +88,9 @@ export function firstDifference(a, b, context = 120) {
   if (a === b) return null;
   let i = 0;
   while (i < a.length && i < b.length && a[i] === b[i]) i += 1;
-  return { index: i, before: a.slice(Math.max(0, i - context), i + context), after: b.slice(Math.max(0, i - context), i + context) };
+  return {
+    index: i,
+    before: a.slice(Math.max(0, i - context), i + context),
+    after: b.slice(Math.max(0, i - context), i + context),
+  };
 }

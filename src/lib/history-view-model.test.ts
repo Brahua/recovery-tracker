@@ -68,9 +68,7 @@ describe("getHistoryHrefForDate", () => {
   });
 
   it("opens an older window that ends on that day", () => {
-    expect(getHistoryHrefForDate("2026-06-16", "2026-07-16")).toBe(
-      "/historial?before=2026-06-16",
-    );
+    expect(getHistoryHrefForDate("2026-06-16", "2026-07-16")).toBe("/historial?before=2026-06-16");
   });
 });
 
@@ -96,20 +94,21 @@ describe("buildHistoryDays", () => {
 
 describe("getHistoryDaySummary", () => {
   it("summarizes sessions, exercises, and closeout presence", () => {
-    const day = buildHistoryDays([
-      session("one", "2026-07-16T14:00:00.000Z", {
-        exercises: [
-          { name: "Step-up", sets: [{ position: 0, reps: 10 }] },
-          { name: "TKE", sets: [{ position: 0, reps: 12 }] },
-        ],
-      }),
-      session("two", "2026-07-16T20:00:00.000Z", {
-        exercises: [{ name: "Bicicleta", durationMinutes: 10, sets: [] }],
-      }),
-    ], [closeout("2026-07-16")])[0];
+    const day = buildHistoryDays(
+      [
+        session("one", "2026-07-16T14:00:00.000Z", {
+          exercises: [
+            { name: "Step-up", sets: [{ position: 0, reps: 10 }] },
+            { name: "TKE", sets: [{ position: 0, reps: 12 }] },
+          ],
+        }),
+        session("two", "2026-07-16T20:00:00.000Z", {
+          exercises: [{ name: "Bicicleta", durationMinutes: 10, sets: [] }],
+        }),
+      ],
+      [closeout("2026-07-16")],
+    )[0];
 
-    expect(day && getHistoryDaySummary(day)).toBe(
-      "2 sesiones · 3 ejercicios · cierre listo",
-    );
+    expect(day && getHistoryDaySummary(day)).toBe("2 sesiones · 3 ejercicios · cierre listo");
   });
 });

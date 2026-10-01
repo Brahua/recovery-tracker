@@ -37,16 +37,12 @@ export function buildFourWeekSessionCounts(
   return buckets.map((count, index) => ({ label: `S${index + 1}`, count }));
 }
 
-export function buildReboundDistribution(
-  closeouts: NightlyCloseout[],
-): ReboundDistributionItem[] {
+export function buildReboundDistribution(closeouts: NightlyCloseout[]): ReboundDistributionItem[] {
   const counts = {
     none: closeouts.filter((item) => item.reboundPainLevel === "NONE").length,
     mild: closeouts.filter((item) => item.reboundPainLevel === "MILD").length,
     strong: closeouts.filter(
-      (item) =>
-        item.reboundPainLevel === "MODERATE" ||
-        item.reboundPainLevel === "STRONG",
+      (item) => item.reboundPainLevel === "MODERATE" || item.reboundPainLevel === "STRONG",
     ).length,
   };
   const percentage = (count: number) =>

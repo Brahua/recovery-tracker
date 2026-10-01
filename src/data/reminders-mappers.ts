@@ -24,7 +24,9 @@ export interface PushSubscriptionRow {
 }
 
 /** A user without a saved row gets the defaults. */
-export function mapReminderSettingsRow(row: ReminderSettingsRow | null | undefined): ReminderSettings {
+export function mapReminderSettingsRow(
+  row: ReminderSettingsRow | null | undefined,
+): ReminderSettings {
   if (!row) return { ...defaultReminderSettings };
   return {
     sessionEnabled: row.session_enabled,
@@ -36,5 +38,10 @@ export function mapReminderSettingsRow(row: ReminderSettingsRow | null | undefin
 }
 
 export function mapPushSubscriptionRow(row: PushSubscriptionRow): StoredPushSubscription {
-  return { id: row.id, userId: row.user_id, endpoint: row.endpoint, keys: { p256dh: row.p256dh, auth: row.auth } };
+  return {
+    id: row.id,
+    userId: row.user_id,
+    endpoint: row.endpoint,
+    keys: { p256dh: row.p256dh, auth: row.auth },
+  };
 }

@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
-import { AuthenticationRequiredError, requireAuthenticatedSupabase } from "@/lib/supabase/authenticated";
+import {
+  AuthenticationRequiredError,
+  requireAuthenticatedSupabase,
+} from "@/lib/supabase/authenticated";
 import { displayNameSchema } from "@/lib/validation/profile";
 
 export interface ProfileActionResult {
@@ -26,7 +29,10 @@ export async function saveDisplayNameAction(input: unknown): Promise<ProfileActi
     if (error) throw error;
   } catch (error) {
     if (error instanceof AuthenticationRequiredError) {
-      return { ok: false, error: "Tu sesión expiró. Recarga la página e inicia sesión nuevamente." };
+      return {
+        ok: false,
+        error: "Tu sesión expiró. Recarga la página e inicia sesión nuevamente.",
+      };
     }
     console.error("Failed to save display name.", error);
     return { ok: false, error: genericError };

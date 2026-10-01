@@ -17,7 +17,10 @@ const sessions: RehabSession[] = [
     painBefore: 5,
     painAfter: 4,
     perceivedLoad: 3,
-    exercises: [{ name: "Step-up", sets: [] }, { name: "TKE", sets: [] }],
+    exercises: [
+      { name: "Step-up", sets: [] },
+      { name: "TKE", sets: [] },
+    ],
     finalState: "BETTER",
     treatments: [],
     notes: "La rodilla respondio mejor de lo esperado.",
@@ -67,46 +70,28 @@ const closeouts: NightlyCloseout[] = [
 
 describe("medical report insights", () => {
   it("builds a session response summary without advice", () => {
-    const text = buildSessionResponseReport(
-      sessions,
-      7,
-      "2026-07-10T12:00:00.000Z",
-    );
+    const text = buildSessionResponseReport(sessions, 7, "2026-07-10T12:00:00.000Z");
 
     expect(text).toContain("2 sesiones");
     expect(text).toContain("1 terminaron mejor");
   });
 
   it("detects rebound-related exercise repetition", () => {
-    const text = buildReboundAssociationReport(
-      sessions,
-      closeouts,
-      7,
-      "2026-07-10T12:00:00.000Z",
-    );
+    const text = buildReboundAssociationReport(sessions, closeouts, 7, "2026-07-10T12:00:00.000Z");
 
     expect(text).toContain("coincidieron con rebote");
     expect(text).toContain("Step-up");
   });
 
   it("summarizes sleep and energy conservatively", () => {
-    const text = buildSleepEnergyReport(
-      closeouts,
-      7,
-      "2026-07-10T12:00:00.000Z",
-    );
+    const text = buildSleepEnergyReport(closeouts, 7, "2026-07-10T12:00:00.000Z");
 
     expect(text).toContain("sueno promedio");
     expect(text).toContain("energia promedio");
   });
 
   it("creates a medical report summary with questions and notes", () => {
-    const summary = createMedicalReportSummary(
-      sessions,
-      closeouts,
-      7,
-      "2026-07-10T12:00:00.000Z",
-    );
+    const summary = createMedicalReportSummary(sessions, closeouts, 7, "2026-07-10T12:00:00.000Z");
 
     expect(summary.highPainDays).toEqual([{ date: "2026-07-08", pain: 6 }]);
     expect(summary.noteHighlights[0]).toContain("Dolor alto");

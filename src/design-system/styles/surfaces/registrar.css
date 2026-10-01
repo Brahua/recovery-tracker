@@ -229,7 +229,10 @@
   font-weight: 650;
   line-height: 1.15;
   text-align: center;
-  transition: transform 100ms ease, border-color 150ms ease, background-color 150ms ease;
+  transition:
+    transform 100ms ease,
+    border-color 150ms ease,
+    background-color 150ms ease;
 }
 
 .rr-session-type-grid label.is-selected > span,

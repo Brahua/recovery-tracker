@@ -9,12 +9,7 @@ interface RitualPainSliderProps {
   value: PainScore | null;
 }
 
-export function RitualPainSlider({
-  label,
-  name,
-  onChange,
-  value,
-}: RitualPainSliderProps) {
+export function RitualPainSlider({ label, name, onChange, value }: RitualPainSliderProps) {
   const numericValue = value ?? 0;
   const style = {
     "--rr-range-progress": `${numericValue * 10}%`,

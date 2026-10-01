@@ -31,7 +31,10 @@
   color: var(--rr-text-muted);
   font-size: 12.5px;
   font-weight: 600;
-  transition: transform 100ms ease, border-color 150ms ease, background-color 150ms ease;
+  transition:
+    transform 100ms ease,
+    border-color 150ms ease,
+    background-color 150ms ease;
 }
 
 .rr-exercise-list > button.is-selected {
@@ -319,7 +322,10 @@
   color: var(--rr-text-muted);
   font-size: 16.5px;
   font-weight: 700;
-  transition: filter 150ms ease, transform 120ms ease, background 350ms ease;
+  transition:
+    filter 150ms ease,
+    transform 120ms ease,
+    background 350ms ease;
 }
 
 .rr-session-save > span:last-child {

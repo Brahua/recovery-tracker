@@ -20,7 +20,9 @@ export function RoutineRowContent({ routine, trailing }: { routine: Routine; tra
         <strong>{routine.name}</strong>
         <small>{formatRoutinePreview(routine)}</small>
       </span>
-      <span className="rr-exercise-row-summary">{formatExerciseCount(routine.exercises.length)}</span>
+      <span className="rr-exercise-row-summary">
+        {formatExerciseCount(routine.exercises.length)}
+      </span>
       <b aria-hidden="true">{trailing}</b>
     </>
   );
@@ -43,7 +45,10 @@ export function RoutineList({ routines }: { routines: Routine[] }) {
     <ul aria-label="Lista de rutinas" className="rr-exercise-rows">
       {routines.map((routine) => (
         <li key={routine.id}>
-          <Link className="rr-exercise-row rr-routine-row" href={`/ejercicios/rutinas/${routine.id}`}>
+          <Link
+            className="rr-exercise-row rr-routine-row"
+            href={`/ejercicios/rutinas/${routine.id}`}
+          >
             <RoutineRowContent routine={routine} trailing="›" />
           </Link>
         </li>

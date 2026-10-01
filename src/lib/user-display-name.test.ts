@@ -31,9 +31,7 @@ describe("getUserDisplayName", () => {
   });
 
   it("falls back to the capitalized email local part", () => {
-    expect(getUserDisplayName({ email: "maria.lopez@example.com" })).toBe(
-      "Maria",
-    );
+    expect(getUserDisplayName({ email: "maria.lopez@example.com" })).toBe("Maria");
   });
 
   it("ignores a blank or non-string full_name", () => {

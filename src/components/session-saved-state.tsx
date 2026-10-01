@@ -56,7 +56,11 @@ export function SessionSavedState({
       <div className="rr-success-content">
         <p className="rr-success-context">{formatSessionContext(session?.occurredAt)}</p>
 
-        <div className="rr-success-ring" role="img" aria-label={`${dayProgress} de 2 rituales completados`}>
+        <div
+          className="rr-success-ring"
+          role="img"
+          aria-label={`${dayProgress} de 2 rituales completados`}
+        >
           <svg aria-hidden="true" viewBox="0 0 136 136">
             <circle className="rr-success-ring-track" cx="68" cy="68" r="60" />
             <circle
@@ -83,7 +87,9 @@ export function SessionSavedState({
           </div>
           {session && session.treatments.length > 0 ? (
             <div>
-              <strong>{session.exercises.length} · {session.treatments.length}</strong>
+              <strong>
+                {session.exercises.length} · {session.treatments.length}
+              </strong>
               <span>Ejerc. · trat.</span>
             </div>
           ) : (
@@ -111,19 +117,29 @@ export function SessionSavedState({
             })}
           </div>
           <p>
-            <strong>{visibleStreak} dia{visibleStreak === 1 ? "" : "s"} seguido{visibleStreak === 1 ? "" : "s"}</strong>
+            <strong>
+              {visibleStreak} dia{visibleStreak === 1 ? "" : "s"} seguido
+              {visibleStreak === 1 ? "" : "s"}
+            </strong>
             {" — tu registro de hoy ya cuenta."}
           </p>
         </section>
 
         <div className="rr-success-actions">
           <p>
-            <span aria-hidden="true" className="rr-moon-chip">☾</span>
+            <span aria-hidden="true" className="rr-moon-chip">
+              ☾
+            </span>
             <span>
               {hasCloseoutToday ? (
-                <>Tu dia ya esta completo. <strong>Los dos rituales quedaron registrados.</strong></>
+                <>
+                  Tu dia ya esta completo. <strong>Los dos rituales quedaron registrados.</strong>
+                </>
               ) : (
-                <>Queda el cierre del dia — <strong>1 minuto, esta noche.</strong> Puedes hacerlo cuando termine tu dia.</>
+                <>
+                  Queda el cierre del dia — <strong>1 minuto, esta noche.</strong> Puedes hacerlo
+                  cuando termine tu dia.
+                </>
               )}
             </span>
           </p>
@@ -151,7 +167,11 @@ export function SessionSavedState({
           {session && session.exercises.length > 0 ? (
             <SaveSessionAsRoutine
               sessionId={session.id}
-              suggestedName={suggestRoutineName(session.sessionType, session.occurredAt, recoveryTimeZone)}
+              suggestedName={suggestRoutineName(
+                session.sessionType,
+                session.occurredAt,
+                recoveryTimeZone,
+              )}
             />
           ) : null}
         </div>

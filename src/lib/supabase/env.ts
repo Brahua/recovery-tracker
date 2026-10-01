@@ -10,9 +10,7 @@ function cleanEnvValue(value: string | undefined) {
 
 export function getSupabaseEnv(): SupabaseEnv | null {
   const url = cleanEnvValue(process.env.NEXT_PUBLIC_SUPABASE_URL);
-  const publishableKey = cleanEnvValue(
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-  );
+  const publishableKey = cleanEnvValue(process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
 
   if (!url || !publishableKey) {
     return null;

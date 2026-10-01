@@ -15,13 +15,7 @@ import { reminderLabels } from "@/lib/reminders/settings";
 import type { ReminderKind, ReminderSettings } from "@/types/reminders";
 
 type DeviceState =
-  | "checking"
-  | "unsupported"
-  | "needs-install"
-  | "not-configured"
-  | "denied"
-  | "off"
-  | "on";
+  "checking" | "unsupported" | "needs-install" | "not-configured" | "denied" | "off" | "on";
 
 interface RemindersSettingsProps {
   settings: ReminderSettings;
@@ -36,7 +30,11 @@ async function currentSubscription() {
 
 function detectDeviceState(vapidPublicKey: string | null): Promise<DeviceState> | DeviceState {
   if (readBrowserInstallState() === "ios") return "needs-install";
-  if (!("serviceWorker" in navigator) || !("PushManager" in window) || !("Notification" in window)) {
+  if (
+    !("serviceWorker" in navigator) ||
+    !("PushManager" in window) ||
+    !("Notification" in window)
+  ) {
     return "unsupported";
   }
   if (!vapidPublicKey) return "not-configured";
@@ -45,10 +43,13 @@ function detectDeviceState(vapidPublicKey: string | null): Promise<DeviceState> 
 }
 
 const deviceMessages: Record<Exclude<DeviceState, "checking" | "off" | "on">, string> = {
-  unsupported: "Este navegador no permite notificaciones. En el iPhone, ábrela desde el ícono de la pantalla de inicio.",
-  "needs-install": "En el iPhone, las notificaciones solo funcionan con la app instalada. Agrégala a la pantalla de inicio (sección de arriba) y ábrela desde el ícono.",
+  unsupported:
+    "Este navegador no permite notificaciones. En el iPhone, ábrela desde el ícono de la pantalla de inicio.",
+  "needs-install":
+    "En el iPhone, las notificaciones solo funcionan con la app instalada. Agrégala a la pantalla de inicio (sección de arriba) y ábrela desde el ícono.",
   "not-configured": "Las notificaciones todavía no están configuradas en el servidor.",
-  denied: "Las notificaciones están bloqueadas. Actívalas en Ajustes del iPhone → Notificaciones → Recovery y vuelve aquí.",
+  denied:
+    "Las notificaciones están bloqueadas. Actívalas en Ajustes del iPhone → Notificaciones → Recovery y vuelve aquí.",
 };
 
 export function RemindersSettings({ settings, vapidPublicKey }: RemindersSettingsProps) {
@@ -79,7 +80,10 @@ export function RemindersSettings({ settings, vapidPublicKey }: RemindersSetting
         const permission = await Notification.requestPermission();
         if (permission !== "granted") {
           setDevice(permission === "denied" ? "denied" : "off");
-          return { ok: false, error: "Sin permiso no podemos avisarte. Puedes volver a intentarlo cuando quieras." };
+          return {
+            ok: false,
+            error: "Sin permiso no podemos avisarte. Puedes volver a intentarlo cuando quieras.",
+          };
         }
         const registration = await navigator.serviceWorker.ready;
         const subscription =
@@ -149,17 +153,29 @@ export function RemindersSettings({ settings, vapidPublicKey }: RemindersSetting
   return (
     <div className="rr-reminders">
       <div className="rr-reminders-device" aria-live="polite">
-        {device === "checking" ? <p className="rr-settings-hint">Revisando este dispositivo…</p> : null}
+        {device === "checking" ? (
+          <p className="rr-settings-hint">Revisando este dispositivo…</p>
+        ) : null}
         {device === "on" ? (
           <>
             <p className="rr-settings-status is-ok">
               <span aria-hidden="true">✓</span> Notificaciones activas en este dispositivo.
             </p>
             <div className="rr-reminders-actions">
-              <button className="rr-modal-primary" disabled={pending} onClick={sendTest} type="button">
+              <button
+                className="rr-modal-primary"
+                disabled={pending}
+                onClick={sendTest}
+                type="button"
+              >
                 Enviar notificación de prueba
               </button>
-              <button className="rr-modal-secondary" disabled={pending} onClick={disableOnThisDevice} type="button">
+              <button
+                className="rr-modal-secondary"
+                disabled={pending}
+                onClick={disableOnThisDevice}
+                type="button"
+              >
                 Desactivar en este dispositivo
               </button>
             </div>
@@ -168,13 +184,20 @@ export function RemindersSettings({ settings, vapidPublicKey }: RemindersSetting
         {device === "off" ? (
           <>
             <p className="rr-settings-hint">Este dispositivo todavía no recibe recordatorios.</p>
-            <button className="rr-modal-primary" disabled={pending} onClick={enableOnThisDevice} type="button">
+            <button
+              className="rr-modal-primary"
+              disabled={pending}
+              onClick={enableOnThisDevice}
+              type="button"
+            >
               Activar notificaciones en este dispositivo
             </button>
           </>
         ) : null}
         {device in deviceMessages ? (
-          <p className="rr-settings-hint">{deviceMessages[device as keyof typeof deviceMessages]}</p>
+          <p className="rr-settings-hint">
+            {deviceMessages[device as keyof typeof deviceMessages]}
+          </p>
         ) : null}
       </div>
 
@@ -186,12 +209,16 @@ export function RemindersSettings({ settings, vapidPublicKey }: RemindersSetting
             kind={kind}
             onEnabledChange={(enabled) =>
               setDraft((current) =>
-                kind === "session" ? { ...current, sessionEnabled: enabled } : { ...current, closeoutEnabled: enabled },
+                kind === "session"
+                  ? { ...current, sessionEnabled: enabled }
+                  : { ...current, closeoutEnabled: enabled },
               )
             }
             onTimeChange={(time) =>
               setDraft((current) =>
-                kind === "session" ? { ...current, sessionTime: time } : { ...current, closeoutTime: time },
+                kind === "session"
+                  ? { ...current, sessionTime: time }
+                  : { ...current, closeoutTime: time },
               )
             }
             time={kind === "session" ? draft.sessionTime : draft.closeoutTime}

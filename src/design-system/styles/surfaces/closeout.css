@@ -20,7 +20,12 @@
 }
 
 .rr-closeout-header {
-  background: linear-gradient(180deg, var(--rr-surface-deep) 0%, var(--rr-surface-deep) 78%, rgb(var(--rr-surface-deep-rgb) / 0) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--rr-surface-deep) 0%,
+    var(--rr-surface-deep) 78%,
+    rgb(var(--rr-surface-deep-rgb) / 0) 100%
+  );
 }
 
 .rr-closeout-progress {
@@ -214,7 +219,10 @@
   font-weight: 650;
   line-height: 1.15;
   text-align: center;
-  transition: transform 100ms ease, border-color 150ms ease, background-color 150ms ease;
+  transition:
+    transform 100ms ease,
+    border-color 150ms ease,
+    background-color 150ms ease;
 }
 
 .rr-closeout-choice-row label.is-selected > span {
@@ -379,7 +387,11 @@
   width: 100%;
   max-width: 430px;
   padding: 26px 20px 14px;
-  background: linear-gradient(180deg, rgb(var(--rr-surface-deep-rgb) / 0), var(--rr-surface-deep) 45%);
+  background: linear-gradient(
+    180deg,
+    rgb(var(--rr-surface-deep-rgb) / 0),
+    var(--rr-surface-deep) 45%
+  );
   transform: translateX(-50%);
 }
 
@@ -395,7 +407,10 @@
   color: var(--rr-text-muted);
   font-size: 16.5px;
   font-weight: 700;
-  transition: filter 150ms ease, transform 120ms ease, background 350ms ease;
+  transition:
+    filter 150ms ease,
+    transform 120ms ease,
+    background 350ms ease;
 }
 
 .rr-closeout-save > span:last-child {
@@ -541,7 +556,11 @@
     margin-top: 24px;
     border: 1px solid rgb(var(--rr-night-rgb) / 0.18);
     border-radius: 20px;
-    background: linear-gradient(150deg, rgb(var(--rr-night-rgb) / 0.1), rgb(var(--rr-night-rgb) / 0.03));
+    background: linear-gradient(
+      150deg,
+      rgb(var(--rr-night-rgb) / 0.1),
+      rgb(var(--rr-night-rgb) / 0.03)
+    );
     padding: 16px 20px;
     animation: rr-rise 400ms ease both;
   }
@@ -669,7 +688,11 @@
     width: auto;
     max-width: none;
     padding: 26px 40px 24px;
-    background: linear-gradient(180deg, rgb(var(--rr-surface-deep-rgb) / 0), var(--rr-surface-deep) 55%);
+    background: linear-gradient(
+      180deg,
+      rgb(var(--rr-surface-deep-rgb) / 0),
+      var(--rr-surface-deep) 55%
+    );
     transform: none;
   }
 

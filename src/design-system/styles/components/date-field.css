@@ -13,7 +13,9 @@
   padding-inline: 16px;
   color: var(--rr-ink);
   cursor: pointer;
-  transition: border-color 150ms ease, background-color 150ms ease;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease;
 }
 
 .rr-date-field:hover {

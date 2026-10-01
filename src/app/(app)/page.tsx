@@ -9,17 +9,13 @@ export default async function Home({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
-  const { supabaseEnv, user, recentSessions, recentCloseouts } =
-    await loadRecoveryPageData();
+  const { supabaseEnv, user, recentSessions, recentCloseouts } = await loadRecoveryPageData();
 
   if (!supabaseEnv || !user) {
     return (
       <SignedOutLanding
         errorMessage={error}
-        showDemo={
-          process.env.NODE_ENV !== "production" ||
-          process.env.ENABLE_DEMO_MODE === "1"
-        }
+        showDemo={process.env.NODE_ENV !== "production" || process.env.ENABLE_DEMO_MODE === "1"}
         supabaseEnv={Boolean(supabaseEnv)}
       />
     );

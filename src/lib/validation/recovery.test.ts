@@ -23,7 +23,12 @@ describe("session treatments", () => {
     const result = createRehabSessionInputSchema.parse({
       ...physioBase,
       treatments: [
-        { category: "PHYSICAL_AGENT", modality: "SHOCKWAVE", bodyZone: "Tendón rotuliano", durationMinutes: 10 },
+        {
+          category: "PHYSICAL_AGENT",
+          modality: "SHOCKWAVE",
+          bodyZone: "Tendón rotuliano",
+          durationMinutes: 10,
+        },
         { category: "INVASIVE", modality: "OTHER", customName: "Indiba" },
       ],
       therapistNotes: "  Bajar carga  ",
@@ -69,18 +74,32 @@ describe("session treatments", () => {
   });
 
   it("checks code, category and custom name together", () => {
-    expect(sessionTreatmentSchema.safeParse({ category: "TAPING", modality: "LASER" }).success).toBe(false);
-    expect(sessionTreatmentSchema.safeParse({ category: "TAPING", modality: "OTHER" }).success).toBe(false);
     expect(
-      sessionTreatmentSchema.safeParse({ category: "TAPING", modality: "LASER", customName: "x" }).success,
+      sessionTreatmentSchema.safeParse({ category: "TAPING", modality: "LASER" }).success,
     ).toBe(false);
-    expect(sessionTreatmentSchema.safeParse({ category: "PHYSICAL_AGENT", modality: "LASER", durationMinutes: 121 }).success).toBe(false);
+    expect(
+      sessionTreatmentSchema.safeParse({ category: "TAPING", modality: "OTHER" }).success,
+    ).toBe(false);
+    expect(
+      sessionTreatmentSchema.safeParse({ category: "TAPING", modality: "LASER", customName: "x" })
+        .success,
+    ).toBe(false);
+    expect(
+      sessionTreatmentSchema.safeParse({
+        category: "PHYSICAL_AGENT",
+        modality: "LASER",
+        durationMinutes: 121,
+      }).success,
+    ).toBe(false);
   });
 
   it("drops minutes for treatments that do not take them", () => {
     expect(
-      sessionTreatmentSchema.parse({ category: "TAPING", modality: "KINESIO_TAPE", durationMinutes: 30 })
-        .durationMinutes,
+      sessionTreatmentSchema.parse({
+        category: "TAPING",
+        modality: "KINESIO_TAPE",
+        durationMinutes: 30,
+      }).durationMinutes,
     ).toBeUndefined();
   });
 });

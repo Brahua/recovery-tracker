@@ -35,7 +35,13 @@ export interface DueRemindersInput {
 }
 
 /** Reminders to send now: window open, still pending (no session / no closeout today) and not sent yet today. */
-export function dueReminders({ now, settings, hasSessionToday, hasCloseoutToday, deliveredToday }: DueRemindersInput) {
+export function dueReminders({
+  now,
+  settings,
+  hasSessionToday,
+  hasCloseoutToday,
+  deliveredToday,
+}: DueRemindersInput) {
   const { localDate, kinds } = openReminderWindows(now, settings);
   return {
     localDate,

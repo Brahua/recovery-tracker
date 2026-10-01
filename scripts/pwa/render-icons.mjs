@@ -19,14 +19,21 @@ const OUTPUTS = [
 const browser = await chromium.launch();
 try {
   for (const { size, file } of OUTPUTS) {
-    const page = await browser.newPage({ viewport: { width: size, height: size }, deviceScaleFactor: 1 });
+    const page = await browser.newPage({
+      viewport: { width: size, height: size },
+      deviceScaleFactor: 1,
+    });
     await page.setContent(
       `<html><body style="margin:0;background:transparent">${svg.replace(
         "<svg ",
         `<svg style="display:block;width:${size}px;height:${size}px" `,
       )}</body></html>`,
     );
-    await page.screenshot({ path: file, omitBackground: false, clip: { x: 0, y: 0, width: size, height: size } });
+    await page.screenshot({
+      path: file,
+      omitBackground: false,
+      clip: { x: 0, y: 0, width: size, height: size },
+    });
     await page.close();
     console.log(`${file} (${size}x${size})`);
   }

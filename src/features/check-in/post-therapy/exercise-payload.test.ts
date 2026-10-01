@@ -27,9 +27,7 @@ describe("parseExercisePayload", () => {
   });
 
   it("rejects malformed JSON without exposing parser internals", () => {
-    expect(() => parseExercisePayload("{not-json")).toThrow(
-      invalidExercisePayloadMessage,
-    );
+    expect(() => parseExercisePayload("{not-json")).toThrow(invalidExercisePayloadMessage);
   });
 
   it("accepts an empty exercise collection", () => {

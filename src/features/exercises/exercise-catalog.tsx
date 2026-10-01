@@ -50,11 +50,19 @@ function ExerciseSection({
             value={query}
           />
         </label>
-        <div aria-label="Estado de los ejercicios" className="rr-exercise-catalog-tabs" role="group">
+        <div
+          aria-label="Estado de los ejercicios"
+          className="rr-exercise-catalog-tabs"
+          role="group"
+        >
           <button aria-pressed={tab === "active"} onClick={() => setTab("active")} type="button">
             Activos <b>{active.length}</b>
           </button>
-          <button aria-pressed={tab === "archived"} onClick={() => setTab("archived")} type="button">
+          <button
+            aria-pressed={tab === "archived"}
+            onClick={() => setTab("archived")}
+            type="button"
+          >
             Archivados <b>{archived.length}</b>
           </button>
         </div>
@@ -75,7 +83,11 @@ function ExerciseSection({
 
             return (
               <li key={exercise.id}>
-                <button className="rr-exercise-row" onClick={() => onEdit(exercise.id)} type="button">
+                <button
+                  className="rr-exercise-row"
+                  onClick={() => onEdit(exercise.id)}
+                  type="button"
+                >
                   <span className="rr-exercise-row-name">
                     <strong>{exercise.name}</strong>
                     {exercise.defaultIsometric ? <em>Isométrico</em> : null}
@@ -102,9 +114,7 @@ export function ExerciseCatalog({ exercises, routines, section }: ExerciseCatalo
 
   const activeCount = exercises.filter((exercise) => !exercise.archivedAt).length;
   const editingExercise =
-    editing?.mode === "edit"
-      ? exercises.find((exercise) => exercise.id === editing.id)
-      : undefined;
+    editing?.mode === "edit" ? exercises.find((exercise) => exercise.id === editing.id) : undefined;
   const modalOpen = editing?.mode === "create" || Boolean(editingExercise);
 
   return (
@@ -124,7 +134,11 @@ export function ExerciseCatalog({ exercises, routines, section }: ExerciseCatalo
             + Nueva rutina
           </Link>
         ) : (
-          <button className="rr-modal-primary" onClick={() => setEditing({ mode: "create" })} type="button">
+          <button
+            className="rr-modal-primary"
+            onClick={() => setEditing({ mode: "create" })}
+            type="button"
+          >
             + Nuevo
           </button>
         )}
@@ -134,7 +148,10 @@ export function ExerciseCatalog({ exercises, routines, section }: ExerciseCatalo
         <Link aria-current={section === "ejercicios" ? "page" : undefined} href="/ejercicios">
           Ejercicios <b>{activeCount}</b>
         </Link>
-        <Link aria-current={section === "rutinas" ? "page" : undefined} href="/ejercicios?seccion=rutinas">
+        <Link
+          aria-current={section === "rutinas" ? "page" : undefined}
+          href="/ejercicios?seccion=rutinas"
+        >
           Rutinas <b>{routines.length}</b>
         </Link>
       </nav>

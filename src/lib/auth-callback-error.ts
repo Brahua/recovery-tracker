@@ -8,10 +8,7 @@ export const authCallbackReasons = [
 
 export type AuthCallbackReason = (typeof authCallbackReasons)[number];
 
-const authCallbackCopy: Record<
-  AuthCallbackReason,
-  { title: string; description: string }
-> = {
+const authCallbackCopy: Record<AuthCallbackReason, { title: string; description: string }> = {
   exchange_failed: {
     title: "No pudimos verificar el acceso.",
     description:
@@ -39,9 +36,7 @@ const authCallbackCopy: Record<
   },
 };
 
-export function normalizeAuthCallbackReason(
-  reason: string | undefined,
-): AuthCallbackReason {
+export function normalizeAuthCallbackReason(reason: string | undefined): AuthCallbackReason {
   return authCallbackReasons.includes(reason as AuthCallbackReason)
     ? (reason as AuthCallbackReason)
     : "unknown";

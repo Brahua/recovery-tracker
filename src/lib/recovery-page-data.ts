@@ -30,12 +30,8 @@ export async function loadRecoveryPageData(options: RecoveryPageDataOptions = {}
   } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
   const repository = user ? await createRecoveryLogRepository() : null;
   const recentRange = getRecentDateRange(options.from, options.to);
-  const sessionRecords = repository
-    ? await repository.listRehabSessions(recentRange)
-    : [];
-  const closeoutRecords = repository
-    ? await repository.listNightlyCloseouts(recentRange)
-    : [];
+  const sessionRecords = repository ? await repository.listRehabSessions(recentRange) : [];
+  const closeoutRecords = repository ? await repository.listNightlyCloseouts(recentRange) : [];
   const limit = options.limit === undefined ? 4 : options.limit;
   const recentSessions = limit === null ? sessionRecords : sessionRecords.slice(0, limit);
   const recentCloseouts = limit === null ? closeoutRecords : closeoutRecords.slice(0, limit);

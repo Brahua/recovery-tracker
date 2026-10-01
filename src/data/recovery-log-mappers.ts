@@ -105,8 +105,7 @@ export function mapSessionExerciseRow(
   row: SessionExerciseRow,
   setRows: ExerciseSetRow[],
 ): SessionExercise {
-  const hasLegacyPrescription =
-    row.sets !== null || row.reps !== null || row.weight !== null;
+  const hasLegacyPrescription = row.sets !== null || row.reps !== null || row.weight !== null;
 
   return {
     name: row.name,

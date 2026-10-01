@@ -1,9 +1,5 @@
 import { recoveryTimeZone } from "@/lib/recovery-date";
-import type {
-  FinalState,
-  ReboundLevel,
-  SessionType,
-} from "@/types/recovery";
+import type { FinalState, ReboundLevel, SessionType } from "@/types/recovery";
 
 export const sessionTypeLabels: Record<SessionType, string> = {
   HOME: "En casa",

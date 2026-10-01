@@ -45,7 +45,9 @@ test.describe("settings", () => {
     await page.goto("/ajustes");
     await expect(page.getByRole("heading", { name: "Recordatorios" })).toBeVisible();
     // CI has no VAPID keys, so this device cannot subscribe; the schedule still saves.
-    await expect(page.getByText("Las notificaciones todavía no están configuradas en el servidor.")).toBeVisible();
+    await expect(
+      page.getByText("Las notificaciones todavía no están configuradas en el servidor."),
+    ).toBeVisible();
 
     const session = page.getByRole("switch", { name: "Sesión del día" });
     const closeout = page.getByRole("switch", { name: "Cierre nocturno" });

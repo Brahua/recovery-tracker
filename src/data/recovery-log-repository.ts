@@ -63,14 +63,9 @@ export interface RecoveryLogRepository {
   deleteRehabSession(id: string): Promise<void>;
   listRehabSessions(params: DateRangeParams): Promise<RehabSession[]>;
   getLatestTherapistNotes(): Promise<LatestTherapistNotes | null>;
-  createNightlyCloseout(
-    input: CreateNightlyCloseoutInput,
-  ): Promise<NightlyCloseout>;
+  createNightlyCloseout(input: CreateNightlyCloseoutInput): Promise<NightlyCloseout>;
   getNightlyCloseout(id: string): Promise<NightlyCloseout | null>;
-  updateNightlyCloseout(
-    id: string,
-    input: CreateNightlyCloseoutInput,
-  ): Promise<NightlyCloseout>;
+  updateNightlyCloseout(id: string, input: CreateNightlyCloseoutInput): Promise<NightlyCloseout>;
   deleteNightlyCloseout(id: string): Promise<void>;
   listNightlyCloseouts(params: DateRangeParams): Promise<NightlyCloseout[]>;
 }
@@ -127,12 +122,7 @@ function mapRehabSessionRow(
     exercises: exercises
       .slice()
       .sort((left, right) => left.position - right.position)
-      .map((exercise) =>
-        mapSessionExerciseRow(
-          exercise,
-          setsByExerciseId.get(exercise.id) ?? [],
-        ),
-      ),
+      .map((exercise) => mapSessionExerciseRow(exercise, setsByExerciseId.get(exercise.id) ?? [])),
     finalState: row.final_state,
     notes: row.notes ?? undefined,
     treatments: treatments
@@ -269,12 +259,7 @@ async function loadRehabSession(
     exercises.map((exercise) => exercise.id),
   );
 
-  return mapRehabSessionRow(
-    sessionData as RehabSessionRow,
-    exercises,
-    exerciseSets,
-    treatments,
-  );
+  return mapRehabSessionRow(sessionData as RehabSessionRow, exercises, exerciseSets, treatments);
 }
 
 export async function createRecoveryLogRepository(): Promise<RecoveryLogRepository> {
@@ -283,10 +268,9 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
       const parsed = createRehabSessionInputSchema.parse(input);
       const { supabase } = await requireAuthenticatedSupabase();
 
-      const { data: sessionId, error: createError } = await supabase.rpc(
-        "create_rehab_session",
-        { payload: parsed },
-      );
+      const { data: sessionId, error: createError } = await supabase.rpc("create_rehab_session", {
+        payload: parsed,
+      });
 
       if (createError || typeof sessionId !== "string") {
         throw new RecoveryRepositoryError(
@@ -444,9 +428,7 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
         .single();
 
       if (error || !data) {
-        throw new RecoveryRepositoryError(
-          error?.message ?? "Failed to create nightly closeout.",
-        );
+        throw new RecoveryRepositoryError(error?.message ?? "Failed to create nightly closeout.");
       }
 
       return mapNightlyCloseoutRow(data as NightlyCloseoutRow);

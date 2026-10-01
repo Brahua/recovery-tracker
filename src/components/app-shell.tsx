@@ -5,10 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { signOutAction } from "@/app/auth/actions";
 import { FormPendingReporter } from "@/components/feedback/form-pending-reporter";
-import {
-  getUserDisplayName,
-  type DisplayNameUser,
-} from "@/lib/user-display-name";
+import { getUserDisplayName, type DisplayNameUser } from "@/lib/user-display-name";
 
 const appTabs = [
   { href: "/", label: "Hoy", glyph: "HY", match: "exact" as const },
@@ -147,7 +144,9 @@ export function AppShell({ user, streak, children }: AppShellProps) {
               href={tab.href}
               key={tab.href}
             >
-              <span aria-hidden="true" className="rr-nav-glyph">{tab.glyph}</span>
+              <span aria-hidden="true" className="rr-nav-glyph">
+                {tab.glyph}
+              </span>
               <span>{tab.label}</span>
             </Link>
           );

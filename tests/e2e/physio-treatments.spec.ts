@@ -20,11 +20,15 @@ function treatmentGroup(page: Page, name: string) {
 }
 
 function treatmentRows(page: Page) {
-  return treatmentsCard(page).getByRole("list", { name: "Tratamientos aplicados" }).getByRole("listitem");
+  return treatmentsCard(page)
+    .getByRole("list", { name: "Tratamientos aplicados" })
+    .getByRole("listitem");
 }
 
 test.describe("physio treatments", () => {
-  test("saves a physio session with only treatments and shows them in history and Today", async ({ page }) => {
+  test("saves a physio session with only treatments and shows them in history and Today", async ({
+    page,
+  }) => {
     const otherName = uniqueName("Indiba");
     const instructions = uniqueName("Bajar carga en sentadilla");
 
@@ -32,7 +36,9 @@ test.describe("physio treatments", () => {
     await fillSessionBasics(page);
     await expect(page.getByRole("heading", { name: "Ejercicios o tratamientos" })).toBeVisible();
 
-    await treatmentGroup(page, "Agentes físicos").getByRole("button", { name: "Ondas de choque" }).click();
+    await treatmentGroup(page, "Agentes físicos")
+      .getByRole("button", { name: "Ondas de choque" })
+      .click();
     await expect(
       treatmentGroup(page, "Agentes físicos").getByRole("button", { name: "Ondas de choque" }),
     ).toHaveAttribute("aria-pressed", "true");
@@ -94,7 +100,9 @@ test.describe("physio treatments", () => {
 
     await addQuickExercise(page, "Bicicleta 5-10 min");
     await sessionExerciseRow(page, "Bicicleta 5-10 min").click();
-    await exerciseDialog(page).getByLabel(/Duración total/).fill("10");
+    await exerciseDialog(page)
+      .getByLabel(/Duración total/)
+      .fill("10");
     await closeExerciseDialog(page);
     await expect(page.getByRole("button", { name: /Guardar sesion/ })).toBeEnabled();
     const sessionId = await saveSession(page);

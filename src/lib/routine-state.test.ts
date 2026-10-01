@@ -25,7 +25,9 @@ function exercise(id: string, name: string, overrides: Partial<Exercise> = {}): 
   };
 }
 
-const wallSit = exercise("7f0d3c52-1d7e-4b8e-9c1a-4f0a8b6f1a01", "Wall sit", { defaultIsometric: true });
+const wallSit = exercise("7f0d3c52-1d7e-4b8e-9c1a-4f0a8b6f1a01", "Wall sit", {
+  defaultIsometric: true,
+});
 const stepUp = exercise("7f0d3c52-1d7e-4b8e-9c1a-4f0a8b6f1a02", "Step-up");
 const bicycle = exercise("7f0d3c52-1d7e-4b8e-9c1a-4f0a8b6f1a03", "Bicicleta", {
   defaultDurationMinutes: 10,
@@ -38,8 +40,18 @@ const routine: Routine = {
   createdAt: timestamp,
   updatedAt: timestamp,
   exercises: [
-    { exerciseId: wallSit.id, name: "Wall sit", isIsometric: true, sets: [{ position: 0, holdSeconds: 45 }] },
-    { exerciseId: stepUp.id, name: "Step-up", isIsometric: false, sets: [{ position: 0, reps: 12, weightKg: 5 }] },
+    {
+      exerciseId: wallSit.id,
+      name: "Wall sit",
+      isIsometric: true,
+      sets: [{ position: 0, holdSeconds: 45 }],
+    },
+    {
+      exerciseId: stepUp.id,
+      name: "Step-up",
+      isIsometric: false,
+      sets: [{ position: 0, reps: 12, weightKg: 5 }],
+    },
     { exerciseId: bicycle.id, name: "Bicicleta", isIsometric: false, sets: [] },
   ],
 };
@@ -76,7 +88,9 @@ describe("addRoutineToSession", () => {
     const result = addRoutineToSession([typed], routine, catalog, sequentialIds());
 
     expect(result.skipped).toBe(1);
-    expect(result.entries.filter((entry) => entry.name.toLowerCase().includes("wall"))).toHaveLength(1);
+    expect(
+      result.entries.filter((entry) => entry.name.toLowerCase().includes("wall")),
+    ).toHaveLength(1);
   });
 });
 
@@ -89,8 +103,18 @@ describe("routine drafts", () => {
     expect(payload).toEqual({
       name: "Core rodilla",
       exercises: [
-        { name: "Wall sit", exerciseId: wallSit.id, isIsometric: true, sets: [{ position: 0, holdSeconds: 45 }] },
-        { name: "Step-up", exerciseId: stepUp.id, isIsometric: false, sets: [{ position: 0, reps: 12, weightKg: 5 }] },
+        {
+          name: "Wall sit",
+          exerciseId: wallSit.id,
+          isIsometric: true,
+          sets: [{ position: 0, holdSeconds: 45 }],
+        },
+        {
+          name: "Step-up",
+          exerciseId: stepUp.id,
+          isIsometric: false,
+          sets: [{ position: 0, reps: 12, weightKg: 5 }],
+        },
         { name: "Bicicleta", exerciseId: bicycle.id, isIsometric: false, sets: [] },
       ],
     });
@@ -117,10 +141,14 @@ describe("routineInputSchema", () => {
     expect(routineInputSchema.safeParse({ name: " ", exercises: [item] }).success).toBe(false);
     expect(routineInputSchema.safeParse({ name: "R", exercises: [] }).success).toBe(false);
     expect(
-      routineInputSchema.safeParse({ name: "R", exercises: Array.from({ length: 21 }, (_, i) => ({ name: `E${i}`, sets: [] })) }).success,
+      routineInputSchema.safeParse({
+        name: "R",
+        exercises: Array.from({ length: 21 }, (_, i) => ({ name: `E${i}`, sets: [] })),
+      }).success,
     ).toBe(false);
     expect(
-      routineInputSchema.safeParse({ name: "R", exercises: [item, { name: "STEP-UP", sets: [] }] }).success,
+      routineInputSchema.safeParse({ name: "R", exercises: [item, { name: "STEP-UP", sets: [] }] })
+        .success,
     ).toBe(false);
   });
 
@@ -140,7 +168,9 @@ describe("routine messages", () => {
       'Se agregaron 4 ejercicios de "Core rodilla" · 1 ya estaba',
     );
     expect(formatRoutineAddedMessage("Core", 1, 0)).toBe('Se agregó 1 ejercicio de "Core"');
-    expect(formatRoutineAddedMessage("Core", 0, 3)).toBe('No se agregaron ejercicios de "Core" · 3 ya estaban');
+    expect(formatRoutineAddedMessage("Core", 0, 3)).toBe(
+      'No se agregaron ejercicios de "Core" · 3 ya estaban',
+    );
   });
 
   it("suggests a routine name from the session type and local date", () => {

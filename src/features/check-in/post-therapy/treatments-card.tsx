@@ -118,7 +118,9 @@ export function TreatmentsCard({
       ))}
 
       {isFull ? (
-        <p className="rr-treatments-hint">Máximo {maxTreatmentsPerSession} tratamientos por sesión.</p>
+        <p className="rr-treatments-hint">
+          Máximo {maxTreatmentsPerSession} tratamientos por sesión.
+        </p>
       ) : null}
 
       {drafts.length > 0 ? (
@@ -176,7 +178,9 @@ export function TreatmentsCard({
                         inputMode="numeric"
                         max={maxTreatmentMinutes}
                         min={1}
-                        onChange={(event) => update(draft.id, { durationMinutes: event.target.value })}
+                        onChange={(event) =>
+                          update(draft.id, { durationMinutes: event.target.value })
+                        }
                         placeholder="—"
                         step={1}
                         type="number"

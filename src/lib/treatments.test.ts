@@ -21,7 +21,9 @@ function draft(id: string, overrides: Partial<TreatmentDraft> = {}): TreatmentDr
 
 describe("treatment catalog", () => {
   it("lists every code except OTHER exactly once", () => {
-    const codes = treatmentCatalog.flatMap((group) => group.options.map((option) => option.modality));
+    const codes = treatmentCatalog.flatMap((group) =>
+      group.options.map((option) => option.modality),
+    );
 
     expect(new Set(codes).size).toBe(codes.length);
     expect([...codes, "OTHER"].sort()).toEqual([...treatmentModalities].sort());
@@ -47,8 +49,12 @@ describe("treatment drafts", () => {
   });
 
   it("requires a name for OTHER", () => {
-    expect(getTreatmentDraftError(draft("a", { modality: "OTHER" }))).toBe("Escribe qué tratamiento fue.");
-    expect(getTreatmentDraftError(draft("a", { modality: "OTHER", customName: "Indiba" }))).toBeNull();
+    expect(getTreatmentDraftError(draft("a", { modality: "OTHER" }))).toBe(
+      "Escribe qué tratamiento fue.",
+    );
+    expect(
+      getTreatmentDraftError(draft("a", { modality: "OTHER", customName: "Indiba" })),
+    ).toBeNull();
   });
 
   it("rejects minutes outside 1 to 120 or with decimals", () => {
@@ -59,7 +65,11 @@ describe("treatment drafts", () => {
   });
 
   it("ignores minutes typed for a treatment that does not take them", () => {
-    const taping = draft("a", { category: "TAPING", modality: "KINESIO_TAPE", durationMinutes: "999" });
+    const taping = draft("a", {
+      category: "TAPING",
+      modality: "KINESIO_TAPE",
+      durationMinutes: "999",
+    });
 
     expect(getTreatmentDraftError(taping)).toBeNull();
     expect(toTreatmentPayload([taping])[0].durationMinutes).toBeUndefined();
@@ -80,7 +90,12 @@ describe("treatment drafts", () => {
     expect(
       toTreatmentPayload([
         draft("a", { bodyZone: "  Rodilla anterior ", durationMinutes: "10" }),
-        draft("b", { category: "INVASIVE", modality: "OTHER", customName: " Indiba ", bodyZone: " " }),
+        draft("b", {
+          category: "INVASIVE",
+          modality: "OTHER",
+          customName: " Indiba ",
+          bodyZone: " ",
+        }),
       ]),
     ).toEqual([
       {
@@ -104,7 +119,12 @@ describe("treatment drafts", () => {
 describe("treatment formatting", () => {
   it("joins label, zone and minutes", () => {
     expect(
-      formatTreatment({ category: "PHYSICAL_AGENT", modality: "LASER", bodyZone: "Tendón rotuliano", durationMinutes: 5 }),
+      formatTreatment({
+        category: "PHYSICAL_AGENT",
+        modality: "LASER",
+        bodyZone: "Tendón rotuliano",
+        durationMinutes: 5,
+      }),
     ).toBe("Láser · Tendón rotuliano · 5 min");
     expect(formatTreatment({ category: "TAPING", modality: "KINESIO_TAPE" })).toBe("Kinesiotape");
   });

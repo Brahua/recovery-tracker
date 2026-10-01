@@ -23,7 +23,9 @@ test.describe("exercise catalog", () => {
     await fillSessionBasics(page);
 
     const suggestions = await searchExercise(page, "glu");
-    await expect(suggestions.getByRole("option").filter({ hasText: "Puente de gluteos" })).toBeVisible();
+    await expect(
+      suggestions.getByRole("option").filter({ hasText: "Puente de gluteos" }),
+    ).toBeVisible();
     await suggestions.getByRole("button", { name: "Quitar ejercicio" }).click();
     await expect(exerciseDialog(page)).toHaveCount(0);
 
@@ -94,7 +96,10 @@ test.describe("exercise catalog", () => {
     await fillSessionBasics(page);
     const dialog = await searchExercise(page, name);
     await expect(dialog.getByRole("option")).toHaveCount(1);
-    await dialog.getByRole("option").filter({ hasText: `Reactivar “${name}”` }).click();
+    await dialog
+      .getByRole("option")
+      .filter({ hasText: `Reactivar “${name}”` })
+      .click();
     await expect(dialog.getByText(`Se reactivará “${name}” al guardar.`)).toBeVisible();
     await dialog.getByRole("button", { name: "+ Añadir serie" }).click();
     await dialog.getByLabel("Repeticiones").fill("6");
@@ -121,9 +126,13 @@ test.describe("exercise catalog", () => {
 
     await openExerciseCatalog(page);
     await page.getByPlaceholder("Buscar ejercicio").fill("puente");
-    await expect(page.getByRole("list", { name: "Lista de ejercicios" }).getByRole("button")).toHaveCount(1);
+    await expect(
+      page.getByRole("list", { name: "Lista de ejercicios" }).getByRole("button"),
+    ).toHaveCount(1);
     await page.getByPlaceholder("Buscar ejercicio").fill("sentadilla esp");
-    await expect(page.getByRole("list", { name: "Lista de ejercicios" }).getByRole("button")).toHaveCount(1);
+    await expect(
+      page.getByRole("list", { name: "Lista de ejercicios" }).getByRole("button"),
+    ).toHaveCount(1);
   });
 
   test("blocks saving the same exercise twice in one session", async ({ page }) => {

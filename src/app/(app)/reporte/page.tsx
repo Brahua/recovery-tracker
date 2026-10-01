@@ -13,8 +13,9 @@ export default async function ReportePage({
   const resolvedSearchParams = await searchParams;
   const requestedRange = resolvedSearchParams.range;
   const windowDays = requestedRange === "7" ? 7 : requestedRange === "14" ? 14 : 30;
-  const { supabaseEnv, user, recentSessions, recentCloseouts } =
-    await loadRecoveryPageData({ limit: null });
+  const { supabaseEnv, user, recentSessions, recentCloseouts } = await loadRecoveryPageData({
+    limit: null,
+  });
 
   if (!supabaseEnv || !user) {
     redirect("/");

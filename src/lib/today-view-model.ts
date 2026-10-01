@@ -1,9 +1,5 @@
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
-import {
-  addRecoveryDays,
-  getRecoveryDateKey,
-  getRecoveryWeekKeys,
-} from "@/lib/recovery-date";
+import { addRecoveryDays, getRecoveryDateKey, getRecoveryWeekKeys } from "@/lib/recovery-date";
 
 const weekdayInitials = ["D", "L", "M", "X", "J", "V", "S"] as const;
 
@@ -15,14 +11,8 @@ function sessionDateKey(session: RehabSession) {
   return getRecoveryDateKey(session.occurredAt);
 }
 
-function buildLoggedDayKeys(
-  sessions: RehabSession[],
-  closeouts: NightlyCloseout[],
-) {
-  return new Set([
-    ...sessions.map(sessionDateKey),
-    ...closeouts.map((closeout) => closeout.date),
-  ]);
+function buildLoggedDayKeys(sessions: RehabSession[], closeouts: NightlyCloseout[]) {
+  return new Set([...sessions.map(sessionDateKey), ...closeouts.map((closeout) => closeout.date)]);
 }
 
 export interface TodayRitualState {

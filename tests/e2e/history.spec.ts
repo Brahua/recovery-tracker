@@ -27,14 +27,18 @@ test.describe("history", () => {
     const navigation = page.getByRole("link", { name: "Historial", exact: true }).click();
 
     await expect(page.getByTestId("global-progress")).toHaveClass(/is-active/);
-    await expect(page.getByRole("navigation", { name: "Navegacion principal", exact: true })).toBeVisible();
+    await expect(
+      page.getByRole("navigation", { name: "Navegacion principal", exact: true }),
+    ).toBeVisible();
     releaseHistoryRequest();
     await navigation;
     await expect(page.getByRole("heading", { name: "Historial" })).toBeVisible();
     await expect(page.getByTestId("global-progress")).not.toHaveClass(/is-active/);
   });
 
-  test("shows a saved session with its individual sets and supports older windows", async ({ page }) => {
+  test("shows a saved session with its individual sets and supports older windows", async ({
+    page,
+  }) => {
     await openSessionForm(page);
     await fillSessionBasics(page);
     await addQuickExercise(page, "Bicicleta 5-10 min");

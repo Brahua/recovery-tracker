@@ -21,7 +21,9 @@ for (const file of files) {
 }
 
 if (count > 0) {
-  console.error(`\n${count} literal value(s) outside tokens/. Add or reuse a token in ${STYLES}/tokens/.`);
+  console.error(
+    `\n${count} literal value(s) outside tokens/. Add or reuse a token in ${STYLES}/tokens/.`,
+  );
   process.exit(1);
 }
 console.log(`design:check OK (${files.length} files).`);

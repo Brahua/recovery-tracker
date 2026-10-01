@@ -2,13 +2,21 @@
 // design tokens instead of literal colors, easing curves or font stacks.
 
 const RULES = [
-  { id: "hex-color", pattern: /#[0-9a-fA-F]{3,8}\b(?![^{}]*\{)/g, hint: "use a color token (var(--rr-…))" },
+  {
+    id: "hex-color",
+    pattern: /#[0-9a-fA-F]{3,8}\b(?![^{}]*\{)/g,
+    hint: "use a color token (var(--rr-…))",
+  },
   {
     id: "literal-color-function",
     pattern: /\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch|color)\(\s*(?!var\()[^)]*\)/g,
     hint: "use a color token, or rgb(var(--rr-…-rgb) / alpha) for transparency",
   },
-  { id: "cubic-bezier", pattern: /\bcubic-bezier\(/g, hint: "use an easing token (var(--rr-ease-…))" },
+  {
+    id: "cubic-bezier",
+    pattern: /\bcubic-bezier\(/g,
+    hint: "use an easing token (var(--rr-ease-…))",
+  },
   {
     id: "font-family",
     pattern: /font-family\s*:\s*(?!\s*var\(--rr-font-[\w-]+\)\s*[;}])[^;}]*/g,

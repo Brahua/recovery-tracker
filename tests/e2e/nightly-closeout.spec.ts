@@ -88,8 +88,11 @@ test.describe("nightly closeout", () => {
       "Lo que quieras dejar escrito antes de dormir...",
     );
     await note.fill("Conservar el cierre si la fecha es rechazada.");
+    // The picker's max blocks this in the browser; drop it to prove the server rejects it too.
     await page.locator('input[name="date"]').evaluate((input, value) => {
-      (input as HTMLInputElement).value = value;
+      const dateInput = input as HTMLInputElement;
+      dateInput.removeAttribute("max");
+      dateInput.value = value;
     }, futureDate);
     await page.getByRole("button", { name: "Cerrar el dia" }).click();
 

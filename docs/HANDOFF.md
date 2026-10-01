@@ -20,7 +20,7 @@
 - **Producción:** https://recovery-tracker.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
 - **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01).
 - **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo y feedback global de carga. Detalle en `CHANGELOG.md`.
-- **Fase:** prueba de uso real. No hay una próxima feature elegida.
+- **Fase:** prueba de uso real. En curso: tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`), fase 1.
 
 ### Paso a producción (2026-09-30) ✅
 
@@ -29,7 +29,9 @@
 - Token viejo de Supabase revocado; `SUPABASE_ACCESS_TOKEN` nuevo (token de proyecto, vence en ~1 año: renovarlo antes y actualizar el secret). Probado con un workflow temporal: API 200 y `link` + `db push --dry-run` OK.
 - PR #9 integrado y desplegado: cabeceras de seguridad (comprobadas en el dominio), guardia de la base de producción, axe en E2E y acciones de GitHub en `@v7`.
 
-No hay ramas abiertas.
+| Rama | Qué | Estado |
+|---|---|---|
+| `feat/physio-treatments` | Tratamientos del centro (fase 1): tarjeta en Registrar, Historial, indicaciones del fisio en Hoy. Migración `20261002000000_session_treatments.sql` | Lint, design:check, typecheck y unitarios en verde en local; E2E y build en CI. Fase 2 (Insights y Reporte) pendiente |
 
 ## ⏰ Vencimientos
 

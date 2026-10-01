@@ -8,6 +8,10 @@ import {
   invalidExercisePayloadMessage,
   parseExercisePayload,
 } from "@/features/check-in/post-therapy/exercise-payload";
+import {
+  invalidTreatmentPayloadMessage,
+  parseTreatmentPayload,
+} from "@/features/check-in/post-therapy/treatment-payload";
 import { AuthenticationRequiredError } from "@/lib/supabase/authenticated";
 import type {
   FinalState,
@@ -67,9 +71,17 @@ export interface PostTherapyActionState {
   error: string | null;
 }
 
+const emptySessionMessage =
+  "Agrega al menos un ejercicio (o un tratamiento, si es fisio guiada).";
+const expectedErrorMessages = new Set([
+  invalidExercisePayloadMessage,
+  invalidTreatmentPayloadMessage,
+  emptySessionMessage,
+]);
+
 function getSaveErrorMessage(error: unknown) {
   if (error instanceof Error) {
-    if (error.message === invalidExercisePayloadMessage) {
+    if (expectedErrorMessages.has(error.message)) {
       return error.message;
     }
 
@@ -98,6 +110,15 @@ export async function createPostTherapySessionAction(
       getSingleValue(formData, "perceivedLoad"),
     );
     const finalState = getSingleValue(formData, "finalState") as FinalState;
+    const isPhysiotherapy = sessionType === "PHYSIOTHERAPY";
+    const exercises = parseExercisePayload(getSingleValue(formData, "exercisesPayload"));
+    const treatments = isPhysiotherapy
+      ? parseTreatmentPayload(getSingleValue(formData, "treatmentsPayload"))
+      : [];
+
+    if (exercises.length === 0 && treatments.length === 0) {
+      throw new Error(emptySessionMessage);
+    }
 
     const savedSession = await repository.createRehabSession({
       occurredAt: parseOccurredAt(getSingleValue(formData, "occurredAt")),
@@ -106,9 +127,13 @@ export async function createPostTherapySessionAction(
       painDuring: parseOptionalPainScore(painDuringValue),
       painAfter,
       perceivedLoad,
-      exercises: parseExercisePayload(getSingleValue(formData, "exercisesPayload")),
+      exercises,
       finalState,
       notes: getSingleValue(formData, "notes") || undefined,
+      treatments,
+      therapistNotes: isPhysiotherapy
+        ? getSingleValue(formData, "therapistNotes") || undefined
+        : undefined,
     });
 
     savedSessionId = savedSession.id;
@@ -117,7 +142,7 @@ export async function createPostTherapySessionAction(
     const errorMessage = getSaveErrorMessage(error);
 
     if (
-      errorMessage !== invalidExercisePayloadMessage &&
+      !expectedErrorMessages.has(errorMessage) &&
       errorMessage !== "Tu sesión expiró. Recarga la página e inicia sesión nuevamente."
     ) {
       console.error("Failed to save rehab session.", error);

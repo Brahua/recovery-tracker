@@ -3,6 +3,7 @@ import type {
   ExerciseSet,
   Routine,
   SessionExercise,
+  SessionTreatment,
 } from "@/types/recovery";
 
 export const sessionExerciseColumns =
@@ -10,6 +11,9 @@ export const sessionExerciseColumns =
 
 export const exerciseSetColumns =
   "id, session_exercise_id, user_id, position, reps, weight_kg, hold_seconds, notes, created_at, updated_at";
+
+export const sessionTreatmentColumns =
+  "id, session_id, user_id, position, category, modality, custom_name, body_zone, duration_minutes";
 
 export const exerciseColumns =
   "id, user_id, name, default_isometric, default_set_count, default_reps, default_hold_seconds, default_weight_kg, default_duration_minutes, default_distance_km, archived_at, created_at, updated_at";
@@ -44,6 +48,28 @@ export type ExerciseSetRow = {
   created_at: string;
   updated_at: string;
 };
+
+export type SessionTreatmentRow = {
+  id: string;
+  session_id: string;
+  user_id: string;
+  position: number;
+  category: SessionTreatment["category"];
+  modality: SessionTreatment["modality"];
+  custom_name: string | null;
+  body_zone: string | null;
+  duration_minutes: number | null;
+};
+
+export function mapSessionTreatmentRow(row: SessionTreatmentRow): SessionTreatment {
+  return {
+    category: row.category,
+    modality: row.modality,
+    customName: row.custom_name ?? undefined,
+    bodyZone: row.body_zone ?? undefined,
+    durationMinutes: row.duration_minutes ?? undefined,
+  };
+}
 
 export type ExerciseRow = {
   id: string;

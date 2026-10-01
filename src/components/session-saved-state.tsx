@@ -81,10 +81,17 @@ export function SessionSavedState({
             <strong>{session ? sessionTypeLabels[session.sessionType] : "—"}</strong>
             <span>Tipo</span>
           </div>
-          <div>
-            <strong>{session?.exercises.length ?? 0}</strong>
-            <span>Ejercicios</span>
-          </div>
+          {session && session.treatments.length > 0 ? (
+            <div>
+              <strong>{session.exercises.length} · {session.treatments.length}</strong>
+              <span>Ejerc. · trat.</span>
+            </div>
+          ) : (
+            <div>
+              <strong>{session?.exercises.length ?? 0}</strong>
+              <span>Ejercicios</span>
+            </div>
+          )}
           <div>
             <strong>{session ? `${session.painBefore} → ${session.painAfter}` : "—"}</strong>
             <span>Dolor</span>

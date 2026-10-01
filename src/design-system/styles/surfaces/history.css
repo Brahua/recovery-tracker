@@ -245,6 +245,7 @@
 
 .rr-history-metrics dt,
 .rr-history-session-note strong,
+.rr-history-treatments > strong,
 .rr-history-legacy span {
   color: var(--rr-text-muted);
   font-size: 9.5px;
@@ -354,6 +355,26 @@
 
 .rr-history-legacy p {
   color: var(--rr-text-body);
+  font-size: 12.5px;
+}
+
+.rr-history-treatments {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.rr-history-treatments ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-left: 2px solid rgb(var(--rr-accent-rgb) / 0.45);
+  padding-left: 11px;
+  list-style: none;
+}
+
+.rr-history-treatments li {
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.75);
   font-size: 12.5px;
 }
 

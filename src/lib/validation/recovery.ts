@@ -1,11 +1,21 @@
 import { z } from "zod";
 
 import {
+  isModalityInCategory,
+  maxTherapistNotesLength,
+  maxTreatmentMinutes,
+  maxTreatmentsPerSession,
+  maxTreatmentTextLength,
+  treatmentTakesMinutes,
+} from "@/lib/treatments";
+import {
   finalStates,
   painScores,
   rating1To5Values,
   reboundLevels,
   sessionTypes,
+  treatmentCategories,
+  treatmentModalities,
   type PainScore,
   type Rating1To5,
 } from "@/types/recovery";
@@ -113,20 +123,94 @@ export const sessionExerciseSchema = z
         },
   );
 
-export const createRehabSessionInputSchema = z.object({
-  occurredAt: requiredDateTimeSchema,
-  sessionType: sessionTypeSchema,
-  painBefore: painScoreSchema,
-  painDuring: painScoreSchema.optional(),
-  painAfter: painScoreSchema,
-  perceivedLoad: rating1To5Schema,
-  exercises: z
-    .array(sessionExerciseSchema)
-    .min(1, "At least one exercise is required.")
-    .max(20, "Too many exercises for one session."),
-  finalState: finalStateSchema,
-  notes: optionalTextSchema,
-});
+const optionalShortTextSchema = z.preprocess(
+  normalizeOptionalText,
+  z.string().max(maxTreatmentTextLength).optional(),
+);
+
+export const sessionTreatmentSchema = z
+  .object({
+    category: z.enum(treatmentCategories),
+    modality: z.enum(treatmentModalities),
+    customName: optionalShortTextSchema,
+    bodyZone: optionalShortTextSchema,
+    durationMinutes: z.number().int().min(1).max(maxTreatmentMinutes).optional(),
+  })
+  .refine(
+    (treatment) => isModalityInCategory(treatment.modality, treatment.category),
+    "Treatment does not belong to its category.",
+  )
+  .refine(
+    (treatment) => (treatment.modality === "OTHER") === (treatment.customName !== undefined),
+    "Only 'OTHER' treatments have a custom name, and it is required.",
+  )
+  .transform((treatment) =>
+    treatmentTakesMinutes(treatment.modality)
+      ? treatment
+      : { ...treatment, durationMinutes: undefined },
+  );
+
+function treatmentKey(treatment: z.infer<typeof sessionTreatmentSchema>) {
+  return `${treatment.modality}:${treatment.customName?.toLocaleLowerCase("es") ?? ""}`;
+}
+
+export const createRehabSessionInputSchema = z
+  .object({
+    occurredAt: requiredDateTimeSchema,
+    sessionType: sessionTypeSchema,
+    painBefore: painScoreSchema,
+    painDuring: painScoreSchema.optional(),
+    painAfter: painScoreSchema,
+    perceivedLoad: rating1To5Schema,
+    exercises: z
+      .array(sessionExerciseSchema)
+      .max(20, "Too many exercises for one session."),
+    finalState: finalStateSchema,
+    notes: optionalTextSchema,
+    treatments: z
+      .array(sessionTreatmentSchema)
+      .max(maxTreatmentsPerSession, "Too many treatments for one session.")
+      .default([]),
+    therapistNotes: z.preprocess(
+      normalizeOptionalText,
+      z.string().max(maxTherapistNotesLength).optional(),
+    ),
+  })
+  .superRefine((session, context) => {
+    const isPhysiotherapy = session.sessionType === "PHYSIOTHERAPY";
+
+    if (!isPhysiotherapy && session.treatments.length > 0) {
+      context.addIssue({
+        code: "custom",
+        message: "Treatments are only recorded for physiotherapy sessions.",
+        path: ["treatments"],
+      });
+    }
+
+    if (session.exercises.length === 0 && !(isPhysiotherapy && session.treatments.length > 0)) {
+      context.addIssue({
+        code: "custom",
+        message: isPhysiotherapy
+          ? "At least one exercise or treatment is required."
+          : "At least one exercise is required.",
+        path: ["exercises"],
+      });
+    }
+
+    const keys = session.treatments.map(treatmentKey);
+    if (new Set(keys).size !== keys.length) {
+      context.addIssue({
+        code: "custom",
+        message: "Treatments must not repeat within a session.",
+        path: ["treatments"],
+      });
+    }
+  })
+  .transform((session) =>
+    session.sessionType === "PHYSIOTHERAPY"
+      ? session
+      : { ...session, therapistNotes: undefined },
+  );
 
 export const createNightlyCloseoutInputSchema = z.object({
   date: requiredDateSchema,
@@ -143,10 +227,6 @@ const persistedFieldsSchema = {
   createdAt: requiredDateTimeSchema,
   updatedAt: requiredDateTimeSchema,
 };
-
-export const rehabSessionSchema = createRehabSessionInputSchema.extend(
-  persistedFieldsSchema,
-);
 
 export const nightlyCloseoutSchema = createNightlyCloseoutInputSchema.extend(
   persistedFieldsSchema,

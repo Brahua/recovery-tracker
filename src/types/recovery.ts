@@ -14,11 +14,43 @@ export const finalStates = ["BETTER", "SAME", "WORSE"] as const;
 
 export const reboundLevels = ["NONE", "MILD", "MODERATE", "STRONG"] as const;
 
+export const treatmentCategories = [
+  "PHYSICAL_AGENT",
+  "MANUAL_THERAPY",
+  "INVASIVE",
+  "TAPING",
+] as const;
+
+export const treatmentModalities = [
+  "TECAR",
+  "SHOCKWAVE",
+  "LASER",
+  "ULTRASOUND",
+  "ELECTROTHERAPY",
+  "MAGNETOTHERAPY",
+  "CRYOTHERAPY",
+  "THERMOTHERAPY",
+  "PRESSOTHERAPY",
+  "MASSAGE",
+  "JOINT_MOBILIZATION",
+  "MYOFASCIAL_RELEASE",
+  "LYMPHATIC_DRAINAGE",
+  "DRY_NEEDLING",
+  "EPI",
+  "MESOTHERAPY",
+  "INFILTRATION",
+  "KINESIO_TAPE",
+  "FUNCTIONAL_TAPE",
+  "OTHER",
+] as const;
+
 export type PainScore = (typeof painScores)[number];
 export type Rating1To5 = (typeof rating1To5Values)[number];
 export type SessionType = (typeof sessionTypes)[number];
 export type FinalState = (typeof finalStates)[number];
 export type ReboundLevel = (typeof reboundLevels)[number];
+export type TreatmentCategory = (typeof treatmentCategories)[number];
+export type TreatmentModality = (typeof treatmentModalities)[number];
 
 export type ISODateString = string;
 export type ISODateTimeString = string;
@@ -86,6 +118,14 @@ export interface SessionExercise {
   notes?: string;
 }
 
+export interface SessionTreatment {
+  category: TreatmentCategory;
+  modality: TreatmentModality;
+  customName?: string;
+  bodyZone?: string;
+  durationMinutes?: number;
+}
+
 export interface RehabSession {
   id: string;
   occurredAt: ISODateTimeString;
@@ -97,8 +137,16 @@ export interface RehabSession {
   exercises: SessionExercise[];
   finalState: FinalState;
   notes?: string;
+  treatments: SessionTreatment[];
+  therapistNotes?: string;
   createdAt: ISODateTimeString;
   updatedAt: ISODateTimeString;
+}
+
+export interface LatestTherapistNotes {
+  sessionId: string;
+  occurredAt: ISODateTimeString;
+  notes: string;
 }
 
 export interface NightlyCloseout {

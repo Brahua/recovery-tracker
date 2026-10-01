@@ -90,6 +90,15 @@ test.describe.serial("accessibility (axe)", () => {
     });
   }
 
+  test("Registrar with physio treatments has no WCAG A/AA violations", async ({ page }) => {
+    await openSessionForm(page);
+    const treatments = page.getByRole("region", { name: "Tratamientos del centro" });
+    await treatments.getByRole("button", { name: "Tecarterapia" }).click();
+    await treatments.getByRole("group", { name: "Vendaje" }).getByRole("button", { name: "+ Otro" }).click();
+    await expect(treatments.getByRole("listitem")).toHaveCount(2);
+    await expectNoAxeViolations(page);
+  });
+
   test.describe("signed out", () => {
     test.use({ storageState: { cookies: [], origins: [] } });
 

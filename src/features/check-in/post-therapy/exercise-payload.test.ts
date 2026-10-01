@@ -32,10 +32,8 @@ describe("parseExercisePayload", () => {
     );
   });
 
-  it("rejects an empty exercise collection", () => {
-    expect(() => parseExercisePayload("[]")).toThrow(
-      invalidExercisePayloadMessage,
-    );
+  it("accepts an empty exercise collection", () => {
+    expect(parseExercisePayload("[]")).toEqual([]);
   });
 
   it("rejects invalid nested numeric values", () => {

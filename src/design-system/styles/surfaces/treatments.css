@@ -1,0 +1,173 @@
+/* Registrar: "Tratamientos del centro" card (physio sessions only). */
+
+.rr-treatments-card {
+  display: grid;
+  gap: 13px;
+}
+
+.rr-treatments-count {
+  color: var(--rr-text-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.rr-treatment-group {
+  display: grid;
+  gap: 8px;
+}
+
+.rr-treatment-group h3 {
+  color: var(--rr-text-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.rr-treatment-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.rr-treatment-chips button {
+  min-height: var(--rr-hit-target);
+  border: 1px solid var(--rr-border-strong);
+  border-radius: var(--rr-radius-pill);
+  background: var(--rr-input-bg);
+  padding: 6px 13px;
+  color: var(--rr-text-body);
+  font-size: 12.5px;
+  font-weight: 650;
+  transition: transform 100ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+
+.rr-treatment-chips button.is-selected {
+  border-color: var(--rr-accent-border);
+  background: var(--rr-accent-tint);
+  color: var(--rr-ink);
+}
+
+.rr-treatment-chips button:active {
+  transform: scale(0.96);
+}
+
+.rr-treatment-chips button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.rr-treatment-chips .rr-treatment-chip-other {
+  border-style: dashed;
+  background: transparent;
+}
+
+.rr-treatment-chips button:focus-visible,
+.rr-treatment-remove:focus-visible {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 3px;
+}
+
+.rr-treatments-hint {
+  color: var(--rr-text-muted);
+  font-size: 12px;
+}
+
+.rr-treatment-list {
+  display: grid;
+  gap: 8px;
+}
+
+.rr-treatment-list li {
+  display: grid;
+  gap: 9px;
+  border: 1px solid var(--rr-border-strong);
+  border-radius: var(--rr-radius-control);
+  background: rgb(var(--rr-surface-rgb) / 0.42);
+  padding: 11px 12px;
+}
+
+.rr-treatment-list li.is-incomplete {
+  border-color: rgb(var(--rr-pain-rgb) / 0.45);
+}
+
+.rr-treatment-row-heading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--rr-hit-target);
+  align-items: center;
+  gap: 8px;
+}
+
+.rr-treatment-row-heading strong {
+  color: var(--rr-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rr-treatment-remove {
+  display: grid;
+  width: var(--rr-hit-target);
+  height: var(--rr-hit-target);
+  place-items: center;
+  border-radius: 50%;
+  color: var(--rr-text-muted);
+  font-size: 14px;
+}
+
+.rr-treatment-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 76px;
+  gap: 8px;
+}
+
+.rr-treatment-fields:has(> :only-child) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.rr-treatment-field {
+  display: grid;
+  gap: 5px;
+  color: var(--rr-text-muted);
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+.rr-treatment-field input,
+.rr-treatment-field textarea {
+  min-width: 0;
+  min-height: var(--rr-hit-target);
+  border: 1px solid var(--rr-border-strong);
+  border-radius: var(--rr-radius-control);
+  background: rgb(var(--rr-surface-rgb) / 0.5);
+  padding-inline: 12px;
+  color: var(--rr-ink);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+}
+
+.rr-treatment-field textarea {
+  min-height: 70px;
+  resize: vertical;
+  padding-block: 12px;
+}
+
+.rr-treatment-field input:focus,
+.rr-treatment-field textarea:focus {
+  border-color: var(--rr-accent);
+}
+
+.rr-treatment-error {
+  color: var(--rr-pain-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+@media (min-width: 64rem) {
+  .rr-treatments-card {
+    grid-column: 1;
+    grid-row: 5;
+  }
+
+  .rr-session-grid:has(.rr-treatments-card) .rr-note-card {
+    grid-row: 6;
+  }
+}

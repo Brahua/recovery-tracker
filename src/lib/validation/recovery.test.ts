@@ -4,7 +4,85 @@ import {
   createNightlyCloseoutInputSchema,
   createRehabSessionInputSchema,
   sessionExerciseSchema,
+  sessionTreatmentSchema,
 } from "@/lib/validation/recovery";
+
+const physioBase = {
+  occurredAt: "2026-10-01T15:00:00.000Z",
+  sessionType: "PHYSIOTHERAPY",
+  painBefore: 4,
+  painAfter: 3,
+  perceivedLoad: 3,
+  exercises: [],
+  finalState: "BETTER",
+} as const;
+
+describe("session treatments", () => {
+  it("accepts a physio session with treatments and no exercises", () => {
+    const result = createRehabSessionInputSchema.parse({
+      ...physioBase,
+      treatments: [
+        { category: "PHYSICAL_AGENT", modality: "SHOCKWAVE", bodyZone: "Tendón rotuliano", durationMinutes: 10 },
+        { category: "INVASIVE", modality: "OTHER", customName: "Indiba" },
+      ],
+      therapistNotes: "  Bajar carga  ",
+    });
+
+    expect(result.treatments).toHaveLength(2);
+    expect(result.therapistNotes).toBe("Bajar carga");
+  });
+
+  it("requires an exercise or a treatment in a physio session", () => {
+    expect(createRehabSessionInputSchema.safeParse(physioBase).success).toBe(false);
+  });
+
+  it("rejects treatments outside physio and drops therapist notes there", () => {
+    const withTreatments = createRehabSessionInputSchema.safeParse({
+      ...physioBase,
+      sessionType: "HOME",
+      exercises: [{ name: "Bicicleta", durationMinutes: 10, sets: [] }],
+      treatments: [{ category: "PHYSICAL_AGENT", modality: "LASER" }],
+    });
+    const withNotes = createRehabSessionInputSchema.parse({
+      ...physioBase,
+      sessionType: "HOME",
+      exercises: [{ name: "Bicicleta", durationMinutes: 10, sets: [] }],
+      therapistNotes: "No aplica",
+    });
+
+    expect(withTreatments.success).toBe(false);
+    expect(withNotes.therapistNotes).toBeUndefined();
+    expect(withNotes.treatments).toEqual([]);
+  });
+
+  it("rejects repeated treatments", () => {
+    const result = createRehabSessionInputSchema.safeParse({
+      ...physioBase,
+      treatments: [
+        { category: "PHYSICAL_AGENT", modality: "LASER" },
+        { category: "PHYSICAL_AGENT", modality: "LASER", durationMinutes: 5 },
+      ],
+    });
+
+    expect(result.success).toBe(false);
+  });
+
+  it("checks code, category and custom name together", () => {
+    expect(sessionTreatmentSchema.safeParse({ category: "TAPING", modality: "LASER" }).success).toBe(false);
+    expect(sessionTreatmentSchema.safeParse({ category: "TAPING", modality: "OTHER" }).success).toBe(false);
+    expect(
+      sessionTreatmentSchema.safeParse({ category: "TAPING", modality: "LASER", customName: "x" }).success,
+    ).toBe(false);
+    expect(sessionTreatmentSchema.safeParse({ category: "PHYSICAL_AGENT", modality: "LASER", durationMinutes: 121 }).success).toBe(false);
+  });
+
+  it("drops minutes for treatments that do not take them", () => {
+    expect(
+      sessionTreatmentSchema.parse({ category: "TAPING", modality: "KINESIO_TAPE", durationMinutes: 30 })
+        .durationMinutes,
+    ).toBeUndefined();
+  });
+});
 
 describe("createRehabSessionInputSchema", () => {
   it("accepts a valid rehab session payload", () => {

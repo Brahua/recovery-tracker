@@ -6,8 +6,13 @@ import {
   getTodayRitualState,
   type RecentWeekDay,
 } from "@/lib/today-view-model";
-import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import type {
+  LatestTherapistNotes,
+  NightlyCloseout,
+  RehabSession,
+} from "@/types/recovery";
 import { getRecoveryDateKey, recoveryTimeZone } from "@/lib/recovery-date";
+import { formatTreatmentCount } from "@/lib/treatments";
 import {
   getUserDisplayName,
   type DisplayNameUser,
@@ -113,15 +118,28 @@ function PreviewLink({
   );
 }
 
+function TherapistNotesCard({ notes }: { notes: LatestTherapistNotes }) {
+  return (
+    <section aria-labelledby="rr-therapist-notes-title" className="rr-therapist-notes-card">
+      <p id="rr-therapist-notes-title">Indicaciones del fisio</p>
+      <small>Sesion del {shortDateFormatter.format(new Date(notes.occurredAt))}</small>
+      <span>{notes.notes}</span>
+    </section>
+  );
+}
+
 interface TodayOverviewProps {
   recentSessions: RehabSession[];
   recentCloseouts: NightlyCloseout[];
+  /** Notes from the latest physio session; shown until the next one. */
+  therapistNotes: LatestTherapistNotes | null;
   user: DisplayNameUser;
 }
 
 export function TodayOverview({
   recentSessions,
   recentCloseouts,
+  therapistNotes,
   user,
 }: TodayOverviewProps) {
   const now = new Date();
@@ -216,6 +234,8 @@ export function TodayOverview({
         </section>
 
         <aside className="rr-today-rail">
+          {therapistNotes ? <TherapistNotesCard notes={therapistNotes} /> : null}
+
           <section className="rr-milestone-card">
             <div>
               <strong>Proximo hito: 30 dias de registro</strong>
@@ -236,7 +256,11 @@ export function TodayOverview({
               </strong>
               <span>
                 {latestSession
-                  ? `${latestSession.exercises.length} ejercicios · dolor ${latestSession.painAfter}/10`
+                  ? `${latestSession.exercises.length} ejercicios${
+                      latestSession.treatments.length > 0
+                        ? ` · ${formatTreatmentCount(latestSession.treatments.length)}`
+                        : ""
+                    } · dolor ${latestSession.painAfter}/10`
                   : "Tu primera sesion aparecera aqui."}
               </span>
             </article>

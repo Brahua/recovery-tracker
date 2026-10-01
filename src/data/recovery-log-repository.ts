@@ -1,9 +1,12 @@
 import {
   exerciseSetColumns,
   mapSessionExerciseRow,
+  mapSessionTreatmentRow,
   sessionExerciseColumns,
+  sessionTreatmentColumns,
   type ExerciseSetRow,
   type SessionExerciseRow,
+  type SessionTreatmentRow,
 } from "@/data/recovery-log-mappers";
 import {
   requireAuthenticatedSupabase,
@@ -18,6 +21,7 @@ import type {
   CreateNightlyCloseoutInput,
   CreateRehabSessionInput,
   DateRangeParams,
+  LatestTherapistNotes,
   NightlyCloseout,
   RehabSession,
 } from "@/types/recovery";
@@ -33,6 +37,7 @@ type RehabSessionRow = {
   perceived_load: RehabSession["perceivedLoad"];
   final_state: RehabSession["finalState"];
   notes: string | null;
+  therapist_notes: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -54,6 +59,7 @@ type NightlyCloseoutRow = {
 export interface RecoveryLogRepository {
   createRehabSession(input: CreateRehabSessionInput): Promise<RehabSession>;
   listRehabSessions(params: DateRangeParams): Promise<RehabSession[]>;
+  getLatestTherapistNotes(): Promise<LatestTherapistNotes | null>;
   createNightlyCloseout(
     input: CreateNightlyCloseoutInput,
   ): Promise<NightlyCloseout>;
@@ -71,6 +77,7 @@ function mapRehabSessionRow(
   row: RehabSessionRow,
   exercises: SessionExerciseRow[],
   exerciseSets: ExerciseSetRow[],
+  treatments: SessionTreatmentRow[],
 ): RehabSession {
   const setsByExerciseId = new Map<string, ExerciseSetRow[]>();
 
@@ -99,6 +106,11 @@ function mapRehabSessionRow(
       ),
     finalState: row.final_state,
     notes: row.notes ?? undefined,
+    treatments: treatments
+      .slice()
+      .sort((left, right) => left.position - right.position)
+      .map(mapSessionTreatmentRow),
+    therapistNotes: row.therapist_notes ?? undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -120,7 +132,7 @@ function mapNightlyCloseoutRow(row: NightlyCloseoutRow): NightlyCloseout {
 }
 
 const rehabSessionColumns =
-  "id, user_id, occurred_at, session_type, pain_before, pain_during, pain_after, perceived_load, final_state, notes, created_at, updated_at";
+  "id, user_id, occurred_at, session_type, pain_before, pain_during, pain_after, perceived_load, final_state, notes, therapist_notes, created_at, updated_at";
 
 function toNightlyCloseoutInsertRow(
   userId: string,
@@ -180,6 +192,27 @@ async function listExerciseSetsByExerciseIds(
   return (data ?? []) as ExerciseSetRow[];
 }
 
+async function listSessionTreatmentsBySessionIds(
+  supabase: ServerSupabaseClient,
+  sessionIds: string[],
+): Promise<SessionTreatmentRow[]> {
+  if (sessionIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("session_treatments")
+    .select(sessionTreatmentColumns)
+    .in("session_id", sessionIds)
+    .order("position", { ascending: true });
+
+  if (error) {
+    throw new RecoveryRepositoryError(error.message);
+  }
+
+  return (data ?? []) as SessionTreatmentRow[];
+}
+
 export async function createRecoveryLogRepository(): Promise<RecoveryLogRepository> {
   return {
     async createRehabSession(input) {
@@ -209,13 +242,21 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
         );
       }
 
-      const exercises = await listSessionExercisesBySessionIds(supabase, [sessionId]);
+      const [exercises, treatments] = await Promise.all([
+        listSessionExercisesBySessionIds(supabase, [sessionId]),
+        listSessionTreatmentsBySessionIds(supabase, [sessionId]),
+      ]);
       const exerciseSets = await listExerciseSetsByExerciseIds(
         supabase,
         exercises.map((exercise) => exercise.id),
       );
 
-      return mapRehabSessionRow(sessionData as RehabSessionRow, exercises, exerciseSets);
+      return mapRehabSessionRow(
+        sessionData as RehabSessionRow,
+        exercises,
+        exerciseSets,
+        treatments,
+      );
     },
 
     async listRehabSessions(params) {
@@ -233,16 +274,24 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
       }
 
       const sessions = (data ?? []) as RehabSessionRow[];
-      const exercises = await listSessionExercisesBySessionIds(
-        supabase,
-        sessions.map((session) => session.id),
-      );
+      const sessionIds = sessions.map((session) => session.id);
+      const [exercises, treatments] = await Promise.all([
+        listSessionExercisesBySessionIds(supabase, sessionIds),
+        listSessionTreatmentsBySessionIds(supabase, sessionIds),
+      ]);
       const exerciseSets = await listExerciseSetsByExerciseIds(
         supabase,
         exercises.map((exercise) => exercise.id),
       );
       const exercisesBySessionId = new Map<string, SessionExerciseRow[]>();
       const setsByExerciseId = new Map<string, ExerciseSetRow[]>();
+      const treatmentsBySessionId = new Map<string, SessionTreatmentRow[]>();
+
+      for (const treatment of treatments) {
+        const list = treatmentsBySessionId.get(treatment.session_id) ?? [];
+        list.push(treatment);
+        treatmentsBySessionId.set(treatment.session_id, list);
+      }
 
       for (const exercise of exercises) {
         const list = exercisesBySessionId.get(exercise.session_id) ?? [];
@@ -263,8 +312,32 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
           (exercisesBySessionId.get(session.id) ?? []).flatMap(
             (exercise) => setsByExerciseId.get(exercise.id) ?? [],
           ),
+          treatmentsBySessionId.get(session.id) ?? [],
         ),
       );
+    },
+
+    async getLatestTherapistNotes() {
+      const { supabase } = await requireAuthenticatedSupabase();
+      // The latest physio session decides: a newer one without notes clears them.
+      const { data, error } = await supabase
+        .from("rehab_sessions")
+        .select("id, occurred_at, therapist_notes")
+        .eq("session_type", "PHYSIOTHERAPY")
+        .order("occurred_at", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        throw new RecoveryRepositoryError(error.message);
+      }
+
+      const row = data as Pick<RehabSessionRow, "id" | "occurred_at" | "therapist_notes"> | null;
+
+      return row?.therapist_notes
+        ? { sessionId: row.id, occurredAt: row.occurred_at, notes: row.therapist_notes }
+        : null;
     },
 
     async createNightlyCloseout(input) {

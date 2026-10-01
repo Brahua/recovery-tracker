@@ -15,10 +15,11 @@ import {
   toast,
 } from "./exercise-helpers";
 
-// Older than Historial's default window, where no other spec closes a day (they use
-// -1 to -28). Random so a CI retry does not hit the one-closeout-per-day rule.
-const baseOffset = -(40 + Math.floor(Math.random() * 300));
-const dayAt = (step: number) => addRecoveryDays(getRecoveryDateKey(), baseOffset - step);
+// Days older than Historial's default window, where no other spec closes a day (they
+// use -1 to -28). Each worker gets its own block of 10 days: workerIndex is unique in a
+// run (a retry starts a new worker), so parallel tests and retries never share a date.
+const dayAt = (step: number) =>
+  addRecoveryDays(getRecoveryDateKey(), -(40 + test.info().workerIndex * 10 + step));
 
 async function createCloseout(page: Page, date: string, pain: string) {
   await page.goto(`/registrar?mode=closeout&date=${date}`);
@@ -105,8 +106,11 @@ test.describe.serial("edit past closeouts", () => {
   });
 });
 
+// "En casa", not the default physio type: Hoy shows the latest physio session's
+// instructions, and physio-treatments.spec.ts runs in parallel with the same user.
 async function createSession(page: Page) {
   await openSessionForm(page);
+  await page.getByText("En casa", { exact: true }).click();
   await fillSessionBasics(page);
   const exercise = await addExerciseFromCatalog(page, "step-u", "Step-up");
   await exercise.getByRole("button", { name: "+ Añadir serie" }).click();
@@ -176,5 +180,26 @@ test.describe.serial("edit past sessions", () => {
   test("shows the not-found page for a session that does not exist", async ({ page }) => {
     await page.goto("/registrar/sesion/8f14e45f-ceea-4e7a-9b1c-3d5a6f7e8a9b");
     await expect(page.getByText("No encontramos ese registro")).toBeVisible();
+  });
+});
+
+test.describe("correct right after saving", () => {
+  test("opens the session editor from the saved screen", async ({ page }) => {
+    const sessionId = await createSession(page);
+
+    await page.getByRole("link", { name: "Corregir la sesión" }).click();
+
+    await expect(page).toHaveURL(new RegExp(`/registrar/sesion/${sessionId}$`));
+    await expect(page.getByRole("heading", { name: "Editar sesión" })).toBeVisible();
+  });
+
+  test("opens the closeout editor from the closed-day screen", async ({ page }) => {
+    const closeoutId = await createCloseout(page, dayAt(6), "3");
+
+    await page.getByRole("link", { name: "Corregir el cierre" }).click();
+
+    await expect(page).toHaveURL(new RegExp(`/registrar/cierre/${closeoutId}$`));
+    await expect(page.getByRole("heading", { name: "Editar cierre" })).toBeVisible();
+    await expect(page.getByRole("slider", { name: "Dolor" })).toHaveValue("3");
   });
 });

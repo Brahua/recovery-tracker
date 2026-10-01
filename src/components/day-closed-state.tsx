@@ -145,6 +145,13 @@ export function DayClosedState({
           <Link className="rr-day-closed-secondary" href="/historial">
             Ver historial
           </Link>
+          <Link
+            aria-label="Corregir el cierre"
+            className="rr-day-closed-secondary"
+            href={`/registrar/cierre/${closeout.id}`}
+          >
+            Corregir
+          </Link>
         </div>
       </div>
     </section>

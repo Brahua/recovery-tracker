@@ -9,7 +9,7 @@
 
 - MVP terminado y validado con uso real (la semana de validación de julio se cerró el 2026-10-01).
 - El uso real produjo el catálogo de ejercicios, las rutinas, los arreglos de móvil, el nombre de la cuenta y el feedback global de carga; todo está en producción.
-- En curso (desde el 2026-10-01): **editar o corregir registros pasados** (`docs/specs/edit-past-records-spec.md`).
+- No hay una feature en curso ni elegida. La última entregada fue editar o corregir registros pasados (2026-10-01).
 
 ## Ya hecho
 
@@ -37,6 +37,7 @@ Lo que el backlog original tenía como pendiente o diferido y hoy existe.
 | Recordatorios | Sesión y cierre con hora configurable, cada 5 min con `pg_cron`, una vez por día y solo si sigue pendiente | `docs/specs/pwa-and-reminders-spec.md` |
 | Nombre en el saludo | Se elige en `/ajustes` y se mantiene entre inicios de sesión con Google | `src/features/settings/` |
 | Feedback de carga | Barra de progreso global, toasts en cada escritura, pantalla de error | `docs/specs/global-loading-and-feedback-spec.md` |
+| Editar o corregir registros pasados | Sesiones y cierres se editan (fecha incluida) o se eliminan con confirmación, desde Historial o "Corregir" tras guardar | `docs/specs/edit-past-records-spec.md` |
 | Tratamientos del centro (parte de la línea de tiempo de tratamiento) | En Fisio guiada: agentes físicos, terapia manual, invasivas, vendaje e indicaciones del fisio; se ven en Historial, Insights y Reporte | `docs/specs/physio-treatments-spec.md` |
 
 ## Pendiente: producto
@@ -45,7 +46,6 @@ Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justific
 
 | Prioridad | Feature | Por qué importa | Se reabre cuando |
 |---|---|---|---|
-| En curso | **Editar o corregir registros pasados** | Hoy un error de carga no se puede arreglar desde la app | Elegida el 2026-10-01 |
 | Media | **Análisis por ejercicio** (progresión de peso, repeticiones, segundos) | Ver si un ejercicio concreto progresa | Quieras saber "¿cómo voy en X?" |
 | Media | **Guardar qué rutina se usó en cada sesión** | Comparar rutinas en Historial e Insights | Uses varias rutinas y quieras compararlas |
 | Media | Vista de calendario | Conectar sesiones y síntomas de una semana o mes | Te preguntes seguido "¿qué pasó esa semana?" |

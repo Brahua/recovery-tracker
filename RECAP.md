@@ -62,8 +62,8 @@ Vienen de `docs/archive/handoffs/session-handoff-2026-07-17.md`:
 
 - **Terminado:** el MVP, el rediseño con Claude Design (8 pantallas), el historial, las series individuales, los registros con fecha anterior, el CI/CD, el catálogo de ejercicios (`/ejercicios`), las rutinas y el feedback global de carga (barra de progreso, toasts y pantalla de error).
 - **Última verificación documentada (2026-10-01):** CI en verde en `main` (lint, typecheck, unitarios, E2E críticos con axe) y deploy a producción correcto.
-- **Fase actual:** prueba de uso real. **No hay una próxima feature elegida.**
-- **Ideas pendientes sin aprobar:** editar registros pasados, rutinas reutilizables y análisis por ejercicio. El resto está en `docs/ideas/recovery-ritual-backlog.md`.
+- **Fase actual:** la validación de uso real se cerró (2026-10-01) y de ella salieron las features ya entregadas. **No hay una próxima feature elegida.**
+- **Backlog:** todo lo pendiente (producto, diseño y técnico), con lo ya hecho verificado contra el código, está en `docs/ideas/recovery-ritual-backlog.md`.
 - **Entornos:** desde el 2026-09-30 el antiguo staging **es producción** (ADR-004). Hay un solo entorno hospedado: Supabase `pevrupenrzueyzidfeah` y https://recovery-tracker.brahua.com (la URL `recovery-tracker-brahua-lab.vercel.app` sigue funcionando). Tiene los datos reales. Para desarrollar y probar se usa Supabase local.
 
 ## 5. Cómo empezar a desarrollar

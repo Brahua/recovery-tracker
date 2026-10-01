@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-01. Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
+> Última actualización: 2026-10-01 (backlog consolidado). Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
 
 ## Cómo retomar
 
@@ -80,8 +80,8 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 - Los E2E comparten un usuario anónimo por corrida; usar nombres únicos (`uniqueName`) y, con la máquina cargada, `--workers=1`.
 - CI: el job de E2E puede fallar por puertos ocupados en el runner; es infraestructura (`gh run rerun <id> --failed`).
 
-## Próximos pasos sugeridos
+## Próximos pasos
 
-1. Revisión manual del loading y los toasts en móvil (D5 de `tasks/todo-global-loading-feedback.md`).
-2. Retomar la prueba de uso real para elegir la siguiente feature. Ideas sin aprobar: guardar qué rutina se usó, editar registros pasados, análisis por ejercicio.
-3. Más adelante: Prettier en CI y dividir `globals.css` (136 KB) en tokens y componentes, con su propia spec.
+- No hay feature en curso ni elegida. El owner quiere el proyecto ordenado antes de empezar algo nuevo.
+- Todo lo pendiente (producto, diseño y técnico) está en **`docs/ideas/recovery-ritual-backlog.md`**, revisado contra el código el 2026-10-01. Elegir de ahí con una observación real y escribir la spec antes de programar.
+- `tasks/` no tiene casillas abiertas: la validación de uso real y la revisión del feedback de carga (D5) se cerraron el 2026-10-01.

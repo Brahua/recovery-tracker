@@ -85,8 +85,9 @@ Plan: `tasks/plan-global-loading-feedback.md` · Spec: `docs/specs/global-loadin
   - Verify: typecheck; revisión manual en staging
   - Files: `src/app/auth/actions.ts`, `src/components/app-shell.tsx`
 
-- [ ] D5. Cierre
+- [x] D5. Cierre
   - Acceptance: spec marcado como implementado; handoff en `docs/`; revisión manual en staging (desktop + móvil).
+  - Hecho: el owner lo validó en uso real (2026-10-01); handoff en `docs/archive/handoffs/session-handoff-2026-09-18.md`.
   - Files: `docs/specs/global-loading-and-feedback-spec.md`, `docs/session-handoff-*.md`
 
 ## Desvíos respecto del plan

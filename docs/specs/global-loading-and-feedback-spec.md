@@ -1,6 +1,6 @@
 # Spec: Loading global y feedback de acciones
 
-Estado: **implementado (2026-09-17)**, pendiente de revisión en staging — plan en `tasks/plan-global-loading-feedback.md`
+Estado: **implementado (2026-09-17)** y validado por el owner en uso real (cerrado el 2026-10-01) — plan en `tasks/plan-global-loading-feedback.md`
 
 ## Objective
 

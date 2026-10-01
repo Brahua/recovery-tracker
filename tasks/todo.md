@@ -182,7 +182,8 @@ Handoff actual: `docs/HANDOFF.md`.
   - Verify: Run manual browser review plus `npm run build`, `npm run lint`, `npm run typecheck`, and `npm test`.
   - Files: `src/app/`, `src/components/`, `src/features/`, `src/app/globals.css`
 
-- [ ] Task: Complete the one-week field validation window.
+- [x] Task: Complete the one-week field validation window.
+  - Done (closed 2026-10-01): the owner used the app daily and turned the findings into the exercise catalog, routines, mobile fixes, account name and global loading/feedback (all shipped).
   - Acceptance: Daily-use observations from 2026-07-16 through 2026-07-23 are captured with enough context to distinguish defects, friction, and new requirements.
   - Verify: Review the field questions and observation format in `docs/archive/handoffs/session-handoff-2026-07-16.md`, then prioritize the next iteration from evidence.
   - Files: `docs/archive/handoffs/session-handoff-2026-07-16.md`, `tasks/plan.md`, `tasks/todo.md`

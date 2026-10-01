@@ -52,6 +52,14 @@ export function getHistoryWindow(
   };
 }
 
+// Historial link whose 30-day window contains the given day.
+export function getHistoryHrefForDate(
+  date: string,
+  today: string = getRecoveryDateKey(),
+) {
+  return date >= addRecoveryDays(today, -29) ? "/historial" : `/historial?before=${date}`;
+}
+
 export function buildHistoryDays(
   sessions: RehabSession[],
   closeouts: NightlyCloseout[],

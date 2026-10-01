@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildHistoryDays,
   getHistoryDaySummary,
+  getHistoryHrefForDate,
   getHistoryWindow,
 } from "@/lib/history-view-model";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
@@ -57,6 +58,19 @@ describe("getHistoryWindow", () => {
     expect(getHistoryWindow("2026-05-31", now).to).toBe("2026-05-31");
     expect(getHistoryWindow("not-a-date", now).to).toBe("2026-07-16");
     expect(getHistoryWindow("2027-01-01", now).to).toBe("2026-07-16");
+  });
+});
+
+describe("getHistoryHrefForDate", () => {
+  it("opens the default window for days in the last 30 days", () => {
+    expect(getHistoryHrefForDate("2026-07-16", "2026-07-16")).toBe("/historial");
+    expect(getHistoryHrefForDate("2026-06-17", "2026-07-16")).toBe("/historial");
+  });
+
+  it("opens an older window that ends on that day", () => {
+    expect(getHistoryHrefForDate("2026-06-16", "2026-07-16")).toBe(
+      "/historial?before=2026-06-16",
+    );
   });
 });
 

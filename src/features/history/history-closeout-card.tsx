@@ -1,3 +1,4 @@
+import Link from "@/components/app-link";
 import {
   historyTimeFormatter,
   reboundLabels,
@@ -6,7 +7,7 @@ import type { NightlyCloseout } from "@/types/recovery";
 
 export function HistoryCloseoutCard({ closeout }: { closeout: NightlyCloseout }) {
   return (
-    <section className="rr-history-closeout">
+    <section className="rr-history-closeout" data-closeout-id={closeout.id}>
       <header>
         <span aria-hidden="true">☾</span>
         <div>
@@ -23,6 +24,13 @@ export function HistoryCloseoutCard({ closeout }: { closeout: NightlyCloseout })
         <span>Sueño {closeout.sleepHours} h · calidad {closeout.sleepQuality}/5</span>
       </div>
       {closeout.notes && <p>{closeout.notes}</p>}
+      <Link
+        aria-label="Editar cierre del día"
+        className="rr-history-edit"
+        href={`/registrar/cierre/${closeout.id}`}
+      >
+        Editar
+      </Link>
     </section>
   );
 }

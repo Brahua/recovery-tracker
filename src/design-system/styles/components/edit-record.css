@@ -1,0 +1,53 @@
+/* Editing a saved record: delete/cancel actions and the delete confirmation. */
+
+.rr-edit-record-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--rr-border-soft);
+  padding-top: 14px;
+}
+
+.rr-edit-record-actions a {
+  display: inline-flex;
+  align-items: center;
+}
+
+.rr-delete-record {
+  display: grid;
+  gap: 8px;
+}
+
+.rr-delete-record strong {
+  color: var(--rr-ink);
+  font-size: 15px;
+}
+
+.rr-delete-record p {
+  color: var(--rr-text-body);
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+.rr-delete-record .rr-delete-record-error {
+  color: var(--rr-pain-soft);
+}
+
+.rr-history-edit {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  align-self: flex-end;
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-pill);
+  padding: 0 14px;
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.8);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.rr-history-edit:hover {
+  background: var(--rr-wash-soft);
+  color: var(--rr-ink);
+}

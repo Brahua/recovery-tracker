@@ -10,7 +10,7 @@ import {
   sessionExerciseRow,
 } from "./exercise-helpers";
 
-test.describe("read-only history", () => {
+test.describe("history", () => {
   test("keeps the shell and shows progress while history data loads", async ({ page }) => {
     let releaseHistoryRequest = () => {};
     const holdHistoryRequest = new Promise<void>((resolve) => {
@@ -83,6 +83,7 @@ test.describe("read-only history", () => {
       "href",
       /before=\d{4}-\d{2}-\d{2}/,
     );
-    await expect(page.getByRole("button", { name: /editar|eliminar/i })).toHaveCount(0);
+    // Deleting only happens from the edit screen, after a confirmation.
+    await expect(page.getByRole("button", { name: /eliminar/i })).toHaveCount(0);
   });
 });

@@ -9,7 +9,7 @@ src/app/globals.css          solo @import "tailwindcss", @source (excluye docs/,
 styles/
   tokens/                    variables --rr-*: colors, typography, motion, shadows, radius, spacing; theme.css = puente a Tailwind
   base.css                   html, body, encabezados
-  components/                piezas usadas en varias pantallas (tarjetas, botones, sheet, combobox, feedback, skeleton)
+  components/                piezas usadas en varias pantallas (tarjetas, botones, sheet, combobox, feedback, skeleton, edición de registros)
   surfaces/                  una por pantalla o flujo (shell, Hoy, Registrar, cierre, Insights, Reporte, Historial, landing, ejercicios, rutinas)
 ```
 

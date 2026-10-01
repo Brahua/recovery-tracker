@@ -2,25 +2,13 @@
 
 import { useSyncExternalStore } from "react";
 
-type InstallState = "installed" | "ios" | "other";
-
-function readInstallState(): InstallState {
-  const standalone =
-    window.matchMedia("(display-mode: standalone)").matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true;
-  if (standalone) return "installed";
-  // iPadOS reports itself as a Mac; touch support tells them apart.
-  const ios =
-    /iPhone|iPad|iPod/.test(navigator.userAgent) ||
-    (navigator.userAgent.includes("Macintosh") && navigator.maxTouchPoints > 1);
-  return ios ? "ios" : "other";
-}
+import { readBrowserInstallState, type InstallState } from "@/lib/pwa/install-state";
 
 const subscribe = () => () => {};
 
 // How to add the app to the home screen. On iOS, notifications only work once it is installed.
 export function InstallGuide() {
-  const state = useSyncExternalStore<InstallState | null>(subscribe, readInstallState, () => null);
+  const state = useSyncExternalStore<InstallState | null>(subscribe, readBrowserInstallState, () => null);
 
   if (state === null) return null;
 

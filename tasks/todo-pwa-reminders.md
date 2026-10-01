@@ -33,32 +33,32 @@ Verificación en la PC: `npm run lint && npm run design:check && npm run typeche
 
 ## PR 2: ajustes y suscripción
 
-- [ ] R1. Migración de tablas
+- [x] R1. Migración de tablas
   - Acceptance: `push_subscriptions`, `reminder_settings`, `reminder_deliveries` con RLS (dueño), índices y `updated_at`; aditiva.
   - Verify: CI aplica la migración en Supabase local; revisión del SQL; `npm run supabase:push:dry` (lectura) lista solo esta migración.
   - Files: `supabase/migrations/20261001000000_reminders.sql`, `src/types/database.generated.ts` (si aplica)
 
-- [ ] R2. Tipos, validación y hora local
+- [x] R2. Tipos, validación y hora local
   - Acceptance: tipos `ReminderSettings`, `ReminderKind`; Zod para el formulario (`HH:MM`, booleanos); helpers de hora local Lima.
   - Verify: tests unitarios.
   - Files: `src/types/reminders.ts`, `src/lib/reminders/settings.ts`, `src/lib/reminders/*.test.ts`
 
-- [ ] R3. Repositorio y Server Actions
+- [x] R3. Repositorio y Server Actions
   - Acceptance: leer/guardar ajustes (con valores por defecto si no hay fila); guardar/borrar suscripción del dispositivo; acciones con `useActionState` y revalidación.
   - Verify: tests de mapeo; typecheck.
   - Files: `src/data/reminders-repository.ts`, `src/features/reminders/actions.ts`
 
-- [ ] R4. Sección Recordatorios en `/ajustes`
+- [x] R4. Sección Recordatorios en `/ajustes`
   - Acceptance: activar este dispositivo, dos interruptores con hora, estados (no soportado, falta instalar, permiso denegado, activo); estilos en `surfaces/settings.css` con tokens.
   - Verify: `design:check`; E2E en CI (R6).
   - Files: `src/app/(app)/ajustes/page.tsx`, `src/features/reminders/*`, `src/design-system/styles/surfaces/settings.css`
 
-- [ ] R5. Notificación de prueba
+- [x] R5. Notificación de prueba
   - Acceptance: `web-push` + tipos; `src/lib/push/send.ts` (server-only) con VAPID desde env; acción "Enviar prueba" a las suscripciones del usuario; borra suscripciones 404/410.
   - Verify: tests con `web-push` simulado.
   - Files: `package.json`, `src/lib/push/*`, `src/features/reminders/actions.ts`
 
-- [ ] R6. E2E y documentación del PR 2
+- [x] R6. E2E y documentación del PR 2
   - Acceptance: `tests/e2e/settings.spec.ts` (guardar y recuperar horas e interruptores); docs con los pasos del owner (VAPID) y variables nuevas en `docs/deployment.md` y `.env.example`.
   - Verify: owner carga VAPID → CI verde → merge → deploy → el owner activa y recibe la prueba en el iPhone.
   - Files: `tests/e2e/settings.spec.ts`, `tests/e2e/accessibility.spec.ts`, docs

@@ -78,6 +78,22 @@ Project → Settings → Environment Variables. Deben ser de tipo **config** (an
 
 Como `NEXT_PUBLIC_*` se incrusta en el build, cambiar una de estas variables requiere un deploy nuevo.
 
+### Notificaciones push (recordatorios)
+
+| Variable | Entornos | Tipo | Valor |
+|---|---|---|---|
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Production (y Preview/Development si se quiere) | config | Clave pública VAPID |
+| `VAPID_PRIVATE_KEY` | Production | **sensitive** | Clave privada VAPID |
+| `VAPID_SUBJECT` | Production | config | `mailto:` del owner |
+
+Se generan una sola vez, **en una terminal normal** (nunca desde la sesión de Claude):
+
+```bash
+npx web-push generate-vapid-keys
+```
+
+y se cargan en Vercel → Project → Settings → Environment Variables, o con `vercel env add <NOMBRE> production` (`--sensitive` para la privada). Sin estas variables `/ajustes` muestra "Las notificaciones todavía no están configuradas en el servidor" y el resto de la app funciona igual. Cambiar las claves invalida las suscripciones existentes: cada dispositivo tiene que volver a activar las notificaciones.
+
 ## Dominio `recovery-tracker.brahua.com`
 
 - Agregado al proyecto de Vercel con `vercel domains add recovery-tracker.brahua.com recovery-tracker`.

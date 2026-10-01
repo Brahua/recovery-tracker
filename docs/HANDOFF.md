@@ -83,6 +83,6 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 
 ## Próximos pasos
 
-- **En curso: PWA y recordatorios** (`docs/specs/pwa-and-reminders-spec.md`, tareas en `tasks/todo-pwa-reminders.md`). PR 1 (instalable, pantalla offline, `/ajustes` con el nombre) listo; siguen PR 2 (ajustes de recordatorios y notificación de prueba; antes del deploy el owner carga las claves VAPID) y PR 3 (envío programado con `pg_cron`; antes del deploy el owner carga `service_role`, el secreto y Vault).
+- **En curso: PWA y recordatorios** (`docs/specs/pwa-and-reminders-spec.md`, tareas en `tasks/todo-pwa-reminders.md`). PR 1 (instalable, pantalla offline, `/ajustes` con el nombre) y PR 2 (ajustes de recordatorios, suscripción por dispositivo, notificación de prueba) listos; sigue PR 3 (envío programado con `pg_cron`). Antes del deploy del PR 3 el owner carga las claves VAPID, `service_role`, el secreto del endpoint y Vault (`docs/deployment.md`).
 - Ícono de la app: editar `src/design-system/brand/app-icon.svg` y regenerar con `node scripts/pwa/render-icons.mjs`. El service worker es `public/sw.js` (subir `CACHE_VERSION` si cambia `offline.html`).
 - El resto de lo pendiente está en **`docs/ideas/recovery-ritual-backlog.md`**.

@@ -4,15 +4,9 @@ import Link from "@/components/app-link";
 import { useState } from "react";
 
 import { HistoryCloseoutCard } from "@/features/history/history-closeout-card";
-import {
-  formatHistoryDay,
-  formatHistoryRange,
-} from "@/features/history/history-formatters";
+import { formatHistoryDay, formatHistoryRange } from "@/features/history/history-formatters";
 import { HistorySessionCard } from "@/features/history/history-session-card";
-import {
-  getHistoryDaySummary,
-  type HistoryDay,
-} from "@/lib/history-view-model";
+import { getHistoryDaySummary, type HistoryDay } from "@/lib/history-view-model";
 
 interface HistoryListProps {
   days: HistoryDay[];
@@ -66,8 +60,11 @@ export function HistoryList({
                     <HistorySessionCard
                       expanded={expandedSessionId === session.id}
                       key={session.id}
-                      onToggle={() => setExpandedSessionId((current) =>
-                        current === session.id ? null : session.id)}
+                      onToggle={() =>
+                        setExpandedSessionId((current) =>
+                          current === session.id ? null : session.id,
+                        )
+                      }
                       session={session}
                     />
                   ))}

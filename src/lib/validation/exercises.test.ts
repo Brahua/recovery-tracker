@@ -31,7 +31,11 @@ describe("exerciseInputSchema", () => {
   it("rejects empty names, long names and out-of-range defaults", () => {
     expect(exerciseInputSchema.safeParse({ name: "  " }).success).toBe(false);
     expect(exerciseInputSchema.safeParse({ name: "x".repeat(81) }).success).toBe(false);
-    expect(exerciseInputSchema.safeParse({ name: "Step-up", defaultSetCount: 21 }).success).toBe(false);
-    expect(exerciseInputSchema.safeParse({ name: "Step-up", defaultReps: "abc" }).success).toBe(false);
+    expect(exerciseInputSchema.safeParse({ name: "Step-up", defaultSetCount: 21 }).success).toBe(
+      false,
+    );
+    expect(exerciseInputSchema.safeParse({ name: "Step-up", defaultReps: "abc" }).success).toBe(
+      false,
+    );
   });
 });

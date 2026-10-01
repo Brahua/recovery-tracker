@@ -1,9 +1,6 @@
 import Link from "@/components/app-link";
 
-import {
-  getAuthCallbackErrorCopy,
-  normalizeAuthCallbackReason,
-} from "@/lib/auth-callback-error";
+import { getAuthCallbackErrorCopy, normalizeAuthCallbackReason } from "@/lib/auth-callback-error";
 
 export default async function AuthCodeErrorPage({
   searchParams,

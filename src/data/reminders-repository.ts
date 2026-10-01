@@ -8,7 +8,11 @@ import {
 } from "@/data/reminders-mappers";
 import type { ReminderSettingsInput } from "@/lib/reminders/settings";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/authenticated";
-import type { PushSubscriptionInput, ReminderSettings, StoredPushSubscription } from "@/types/reminders";
+import type {
+  PushSubscriptionInput,
+  ReminderSettings,
+  StoredPushSubscription,
+} from "@/types/reminders";
 
 export class RemindersRepositoryError extends Error {
   constructor(message: string) {
@@ -20,7 +24,10 @@ export class RemindersRepositoryError extends Error {
 export interface RemindersRepository {
   getSettings(): Promise<ReminderSettings>;
   saveSettings(input: ReminderSettingsInput): Promise<void>;
-  registerSubscription(subscription: PushSubscriptionInput, userAgent: string | null): Promise<void>;
+  registerSubscription(
+    subscription: PushSubscriptionInput,
+    userAgent: string | null,
+  ): Promise<void>;
   removeSubscription(endpoint: string): Promise<void>;
   removeSubscriptionById(id: string): Promise<void>;
   listSubscriptions(): Promise<StoredPushSubscription[]>;

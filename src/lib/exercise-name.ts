@@ -49,15 +49,10 @@ export function findExerciseByName<T extends NamedExercise>(exercises: T[], name
   const normalizedName = normalizeExerciseName(name);
   if (!normalizedName) return undefined;
 
-  return exercises.find(
-    (exercise) => normalizeExerciseName(exercise.name) === normalizedName,
-  );
+  return exercises.find((exercise) => normalizeExerciseName(exercise.name) === normalizedName);
 }
 
-export function selectMostUsedExercises<T extends RankedExercise>(
-  exercises: T[],
-  limit = 8,
-): T[] {
+export function selectMostUsedExercises<T extends RankedExercise>(exercises: T[], limit = 8): T[] {
   return exercises
     .filter(isActive)
     .slice()

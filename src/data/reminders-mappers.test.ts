@@ -23,11 +23,25 @@ describe("reminders mappers", () => {
         closeout_time: "22:00:00",
         timezone: "America/Lima",
       }),
-    ).toEqual({ sessionEnabled: true, sessionTime: "07:15", closeoutEnabled: false, closeoutTime: "22:00", timeZone: "America/Lima" });
+    ).toEqual({
+      sessionEnabled: true,
+      sessionTime: "07:15",
+      closeoutEnabled: false,
+      closeoutTime: "22:00",
+      timeZone: "America/Lima",
+    });
   });
 
   it("maps a push subscription row to the web-push shape", () => {
-    expect(mapPushSubscriptionRow({ id: "s1", user_id: "u1", endpoint: "https://e", p256dh: "p", auth: "a" })).toEqual({
+    expect(
+      mapPushSubscriptionRow({
+        id: "s1",
+        user_id: "u1",
+        endpoint: "https://e",
+        p256dh: "p",
+        auth: "a",
+      }),
+    ).toEqual({
       id: "s1",
       userId: "u1",
       endpoint: "https://e",

@@ -1,7 +1,4 @@
-import {
-  addRecoveryDays,
-  getRecoveryDateKey,
-} from "@/lib/recovery-date";
+import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
 export interface HistoryWindow {
@@ -35,14 +32,10 @@ function isDateKey(value: string) {
   return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
 }
 
-export function getHistoryWindow(
-  requestedEnd?: string,
-  now: Date = new Date(),
-): HistoryWindow {
+export function getHistoryWindow(requestedEnd?: string, now: Date = new Date()): HistoryWindow {
   const today = getRecoveryDateKey(now);
-  const to = requestedEnd && isDateKey(requestedEnd) && requestedEnd <= today
-    ? requestedEnd
-    : today;
+  const to =
+    requestedEnd && isDateKey(requestedEnd) && requestedEnd <= today ? requestedEnd : today;
   const from = addRecoveryDays(to, -29);
 
   return {
@@ -53,10 +46,7 @@ export function getHistoryWindow(
 }
 
 // Historial link whose 30-day window contains the given day.
-export function getHistoryHrefForDate(
-  date: string,
-  today: string = getRecoveryDateKey(),
-) {
+export function getHistoryHrefForDate(date: string, today: string = getRecoveryDateKey()) {
   return date >= addRecoveryDays(today, -29) ? "/historial" : `/historial?before=${date}`;
 }
 
@@ -83,7 +73,8 @@ export function buildHistoryDays(
     .map((day) => ({
       ...day,
       sessions: day.sessions.toSorted((left, right) =>
-        left.occurredAt.localeCompare(right.occurredAt)),
+        left.occurredAt.localeCompare(right.occurredAt),
+      ),
     }))
     .toSorted((left, right) => right.date.localeCompare(left.date));
 }

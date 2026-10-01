@@ -18,8 +18,12 @@ export function DateField({ display, label, onClick, ...inputProps }: DateFieldP
         <rect height="16" rx="3" width="18" x="3" y="5" />
         <path d="M3 10h18M8 3v4M16 3v4" />
       </svg>
-      <span aria-hidden="true" className="rr-date-field-value">{display}</span>
-      <span aria-hidden="true" className="rr-date-field-hint">Cambiar</span>
+      <span aria-hidden="true" className="rr-date-field-value">
+        {display}
+      </span>
+      <span aria-hidden="true" className="rr-date-field-hint">
+        Cambiar
+      </span>
       <input
         {...inputProps}
         aria-label={label}

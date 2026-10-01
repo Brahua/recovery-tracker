@@ -18,7 +18,10 @@ export default async function AjustesPage() {
   const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || null;
   const identity = { email: user.email, user_metadata: user.user_metadata };
   // The placeholder shows what the app would use if the chosen name is cleared.
-  const fallbackName = getUserDisplayName({ ...identity, user_metadata: { ...user.user_metadata, display_name: null } });
+  const fallbackName = getUserDisplayName({
+    ...identity,
+    user_metadata: { ...user.user_metadata, display_name: null },
+  });
 
   return (
     <section className="rr-settings">

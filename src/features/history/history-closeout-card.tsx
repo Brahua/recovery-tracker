@@ -1,8 +1,5 @@
 import Link from "@/components/app-link";
-import {
-  historyTimeFormatter,
-  reboundLabels,
-} from "@/features/history/history-formatters";
+import { historyTimeFormatter, reboundLabels } from "@/features/history/history-formatters";
 import type { NightlyCloseout } from "@/types/recovery";
 
 export function HistoryCloseoutCard({ closeout }: { closeout: NightlyCloseout }) {
@@ -21,7 +18,9 @@ export function HistoryCloseoutCard({ closeout }: { closeout: NightlyCloseout })
         <span>Dolor final {closeout.endOfDayPain}/10</span>
         <span>Rebote {reboundLabels[closeout.reboundPainLevel].toLocaleLowerCase("es-PE")}</span>
         <span>Energía {closeout.energy}/5</span>
-        <span>Sueño {closeout.sleepHours} h · calidad {closeout.sleepQuality}/5</span>
+        <span>
+          Sueño {closeout.sleepHours} h · calidad {closeout.sleepQuality}/5
+        </span>
       </div>
       {closeout.notes && <p>{closeout.notes}</p>}
       <Link

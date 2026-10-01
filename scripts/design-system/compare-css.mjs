@@ -19,7 +19,10 @@ async function compile(entry = ENTRY) {
   const postcss = require("postcss");
   const tailwind = require("@tailwindcss/postcss");
   const from = path.resolve(entry);
-  const result = await postcss([tailwind({ base: process.cwd() })]).process(readFileSync(from, "utf8"), { from });
+  const result = await postcss([tailwind({ base: process.cwd() })]).process(
+    readFileSync(from, "utf8"),
+    { from },
+  );
   return result.css;
 }
 
@@ -35,9 +38,13 @@ if (command === "snapshot" && file) {
   const [base, next] = [view(readFileSync(file, "utf8")), view(await compile())];
   const diff = firstDifference(base, next);
   if (!diff) {
-    console.log(`${resolve ? "IDENTICAL (tokens resolved)" : "EQUIVALENT"}: ${next.length} normalized chars.`);
+    console.log(
+      `${resolve ? "IDENTICAL (tokens resolved)" : "EQUIVALENT"}: ${next.length} normalized chars.`,
+    );
   } else {
-    console.error(`DIFFERENT at char ${diff.index}\n--- baseline\n${diff.before}\n--- current\n${diff.after}`);
+    console.error(
+      `DIFFERENT at char ${diff.index}\n--- baseline\n${diff.before}\n--- current\n${diff.after}`,
+    );
     process.exit(1);
   }
 } else {

@@ -15,9 +15,7 @@ function toDraftValue(value: number | undefined) {
 
 function hasPlan(item: RoutineExercise) {
   return (
-    item.sets.length > 0 ||
-    item.durationMinutes !== undefined ||
-    item.distanceKm !== undefined
+    item.sets.length > 0 || item.durationMinutes !== undefined || item.distanceKm !== undefined
   );
 }
 
@@ -49,9 +47,7 @@ export function addRoutineToSession(
   catalog: Exercise[],
   nextId: NextId,
 ): { entries: ExerciseEntryDraft[]; added: number; skipped: number } {
-  const used = new Set(
-    entries.flatMap((entry) => resolveEntryExerciseId(entry, catalog) ?? []),
-  );
+  const used = new Set(entries.flatMap((entry) => resolveEntryExerciseId(entry, catalog) ?? []));
   const additions = routine.exercises
     .filter((item) => !used.has(item.exerciseId))
     .map((item) => {
@@ -101,8 +97,7 @@ export function formatRoutineAddedMessage(routineName: string, added: number, sk
       : added === 1
         ? `Se agregó 1 ejercicio de "${routineName}"`
         : `Se agregaron ${added} ejercicios de "${routineName}"`;
-  const skippedText =
-    skipped === 0 ? "" : ` · ${skipped} ya estaba${skipped === 1 ? "" : "n"}`;
+  const skippedText = skipped === 0 ? "" : ` · ${skipped} ya estaba${skipped === 1 ? "" : "n"}`;
 
   return `${addedText}${skippedText}`;
 }
@@ -116,7 +111,20 @@ const sessionTypeNames: Record<SessionType, string> = {
   OTHER: "Otra",
 };
 
-const monthNames = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+const monthNames = [
+  "ene",
+  "feb",
+  "mar",
+  "abr",
+  "may",
+  "jun",
+  "jul",
+  "ago",
+  "sep",
+  "oct",
+  "nov",
+  "dic",
+];
 
 export function suggestRoutineName(sessionType: SessionType, occurredAt: string, timeZone: string) {
   const parts = new Intl.DateTimeFormat("en-US", {

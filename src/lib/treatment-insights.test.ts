@@ -1,17 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  calculateTreatmentFrequency,
-  calculateTreatmentResponse,
-} from "@/lib/treatment-insights";
-import type {
-  NightlyCloseout,
-  PainScore,
-  RehabSession,
-  SessionTreatment,
-} from "@/types/recovery";
+import { calculateTreatmentFrequency, calculateTreatmentResponse } from "@/lib/treatment-insights";
+import type { NightlyCloseout, PainScore, RehabSession, SessionTreatment } from "@/types/recovery";
 
-const laser: SessionTreatment = { category: "PHYSICAL_AGENT", modality: "LASER", bodyZone: "Tendón rotuliano" };
+const laser: SessionTreatment = {
+  category: "PHYSICAL_AGENT",
+  modality: "LASER",
+  bodyZone: "Tendón rotuliano",
+};
 const tecar: SessionTreatment = { category: "PHYSICAL_AGENT", modality: "TECAR" };
 
 function session(
@@ -83,7 +79,12 @@ describe("calculateTreatmentResponse", () => {
       session(5, 3, 4, []),
       session(6, 3, 2, [], "HOME"),
     ];
-    const closeouts = [closeout(1, "NONE"), closeout(2, "MILD"), closeout(4, "STRONG"), closeout(5, "NONE")];
+    const closeouts = [
+      closeout(1, "NONE"),
+      closeout(2, "MILD"),
+      closeout(4, "STRONG"),
+      closeout(5, "NONE"),
+    ];
 
     const [laserResponse, tecarResponse] = calculateTreatmentResponse(sessions, closeouts);
 
@@ -102,7 +103,11 @@ describe("calculateTreatmentResponse", () => {
   });
 
   it("leaves rebound empty when no closeout matches", () => {
-    const sessions = [session(1, 5, 3, [laser]), session(2, 5, 4, [laser]), session(3, 4, 3, [laser])];
+    const sessions = [
+      session(1, 5, 3, [laser]),
+      session(2, 5, 4, [laser]),
+      session(3, 4, 3, [laser]),
+    ];
 
     expect(calculateTreatmentResponse(sessions, [])[0]).toMatchObject({
       reboundRateWith: undefined,

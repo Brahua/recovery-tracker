@@ -78,7 +78,6 @@ Antes de construir cualquiera de estos: los cuatro son features nuevas, no ajust
 | Prioridad | Tarea | Por qué |
 |---|---|---|
 | Baja | Sincronizar los tokens con el proyecto de Claude Design (lockfile que impida editarlos a mano, como `brahua-os`) | Fase 3 del design system; solo si Claude Design vuelve a ser la fuente activa de cambios |
-| Baja | Prettier + `format:check` en CI | Diffs más limpios, igual que `brahua-os`. Reformatea todo el repo: hacerlo sin ramas de feature abiertas |
 | ⏰ | Renovar `SUPABASE_ACCESS_TOKEN` antes del ~30 sep 2027 | Pasos en `docs/deployment.md` → "Vencimientos y renovaciones" |
 
 ## Descartado a propósito

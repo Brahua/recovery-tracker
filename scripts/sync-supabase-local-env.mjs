@@ -25,24 +25,18 @@ function parseEnvBlock(text) {
   return pairs;
 }
 
-const statusOutput = execFileSync(
-  "npx",
-  ["supabase", "status", "--output", "env"],
-  {
-    cwd: process.cwd(),
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-  },
-);
+const statusOutput = execFileSync("npx", ["supabase", "status", "--output", "env"], {
+  cwd: process.cwd(),
+  encoding: "utf8",
+  stdio: ["ignore", "pipe", "pipe"],
+});
 
 const envPairs = parseEnvBlock(statusOutput);
 const supabaseUrl = envPairs.get("API_URL");
 const publishableKey = envPairs.get("ANON_KEY");
 
 if (!supabaseUrl || !publishableKey) {
-  throw new Error(
-    "Could not extract API_URL and ANON_KEY from `supabase status --output env`.",
-  );
+  throw new Error("Could not extract API_URL and ANON_KEY from `supabase status --output env`.");
 }
 
 const envContents = [

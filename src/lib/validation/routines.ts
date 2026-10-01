@@ -10,8 +10,7 @@ const routineSetSchema = z
     holdSeconds: z.number().int().positive().max(3600).optional(),
   })
   .refine(
-    (set) =>
-      set.reps !== undefined || set.weightKg !== undefined || set.holdSeconds !== undefined,
+    (set) => set.reps !== undefined || set.weightKg !== undefined || set.holdSeconds !== undefined,
     "A routine set requires repetitions, weight, or hold seconds.",
   );
 
@@ -26,7 +25,9 @@ const routineExerciseSchema = z
     sets: z.array(routineSetSchema).max(100),
   })
   .refine(
-    (exercise) => exercise.isIsometric || exercise.sets.every((set) => set.reps !== undefined || set.weightKg !== undefined),
+    (exercise) =>
+      exercise.isIsometric ||
+      exercise.sets.every((set) => set.reps !== undefined || set.weightKg !== undefined),
     "Hold seconds are only planned for isometric exercises.",
   )
   .transform((exercise) =>
@@ -49,14 +50,11 @@ export const routineInputSchema = z
       .min(1, "Agrega al menos un ejercicio.")
       .max(20, "Una rutina admite hasta 20 ejercicios."),
   })
-  .refine(
-    (routine) => {
-      const keys = routine.exercises.map(
-        (exercise) => exercise.exerciseId ?? `name:${normalizeExerciseName(exercise.name)}`,
-      );
-      return new Set(keys).size === keys.length;
-    },
-    "La rutina tiene ejercicios repetidos.",
-  );
+  .refine((routine) => {
+    const keys = routine.exercises.map(
+      (exercise) => exercise.exerciseId ?? `name:${normalizeExerciseName(exercise.name)}`,
+    );
+    return new Set(keys).size === keys.length;
+  }, "La rutina tiene ejercicios repetidos.");
 
 export const routineIdSchema = z.uuid();

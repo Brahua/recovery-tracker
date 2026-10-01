@@ -44,7 +44,8 @@ export function ProfileForm({ chosenName, fallbackName }: ProfileFormProps) {
         value={name}
       />
       <p className="rr-settings-hint" id={hintId}>
-        Aparece en el saludo de Hoy y en la barra lateral. Déjalo vacío para usar el nombre de tu cuenta de Google.
+        Aparece en el saludo de Hoy y en la barra lateral. Déjalo vacío para usar el nombre de tu
+        cuenta de Google.
       </p>
       {error ? (
         <p className="rr-settings-error" id={errorId} role="alert">

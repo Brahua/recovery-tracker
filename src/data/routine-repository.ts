@@ -49,7 +49,10 @@ async function loadRoutines(
   supabase: ServerSupabaseClient,
   { routineId, knownNames }: { routineId?: string; knownNames?: Map<string, string> } = {},
 ) {
-  let routineQuery = supabase.from("routines").select(routineColumns).order("name", { ascending: true });
+  let routineQuery = supabase
+    .from("routines")
+    .select(routineColumns)
+    .order("name", { ascending: true });
   if (routineId) routineQuery = routineQuery.eq("id", routineId);
 
   const { data: routineData, error: routineError } = await routineQuery;
@@ -61,7 +64,10 @@ async function loadRoutines(
   const { data: exerciseData, error: exerciseError } = await supabase
     .from("routine_exercises")
     .select(routineExerciseColumns)
-    .in("routine_id", routines.map((routine) => routine.id));
+    .in(
+      "routine_id",
+      routines.map((routine) => routine.id),
+    );
   if (exerciseError) throw new RoutineRepositoryError(exerciseError.message);
 
   const exerciseRows = (exerciseData ?? []) as RoutineExerciseRow[];
@@ -76,13 +82,18 @@ async function loadRoutines(
         : supabase
             .from("routine_exercise_sets")
             .select(routineExerciseSetColumns)
-            .in("routine_exercise_id", exerciseRows.map((row) => row.id)),
+            .in(
+              "routine_exercise_id",
+              exerciseRows.map((row) => row.id),
+            ),
       missingNameIds.length === 0
         ? Promise.resolve({ data: [], error: null })
         : supabase.from("exercises").select("id, name").in("id", missingNameIds),
     ]);
   if (setError || nameError) {
-    throw new RoutineRepositoryError((setError ?? nameError)?.message ?? "Failed to load routines.");
+    throw new RoutineRepositoryError(
+      (setError ?? nameError)?.message ?? "Failed to load routines.",
+    );
   }
 
   const exerciseNameById = new Map([
@@ -128,7 +139,9 @@ export async function createRoutineRepository(): Promise<RoutineRepository> {
       });
 
       if (error || typeof data !== "string") {
-        throw error ? toRepositoryError(error) : new RoutineRepositoryError("Failed to save routine.");
+        throw error
+          ? toRepositoryError(error)
+          : new RoutineRepositoryError("Failed to save routine.");
       }
 
       return data;

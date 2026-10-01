@@ -2,10 +2,7 @@ import { redirect } from "next/navigation";
 
 import { ToastOnMount } from "@/components/feedback/toast-on-mount";
 import { HistoryList } from "@/features/history/history-list";
-import {
-  buildHistoryDays,
-  getHistoryWindow,
-} from "@/lib/history-view-model";
+import { buildHistoryDays, getHistoryWindow } from "@/lib/history-view-model";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -22,16 +19,14 @@ export default async function HistorialPage({
   searchParams: Promise<SearchParams>;
 }) {
   const resolvedSearchParams = await searchParams;
-  const requestedEnd = typeof resolvedSearchParams.before === "string"
-    ? resolvedSearchParams.before
-    : undefined;
+  const requestedEnd =
+    typeof resolvedSearchParams.before === "string" ? resolvedSearchParams.before : undefined;
   const window = getHistoryWindow(requestedEnd);
-  const { supabaseEnv, user, recentSessions, recentCloseouts } =
-    await loadRecoveryPageData({
-      from: window.from,
-      to: window.to,
-      limit: null,
-    });
+  const { supabaseEnv, user, recentSessions, recentCloseouts } = await loadRecoveryPageData({
+    from: window.from,
+    to: window.to,
+    limit: null,
+  });
 
   if (!supabaseEnv || !user) {
     redirect("/");

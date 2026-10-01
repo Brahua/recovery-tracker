@@ -9,7 +9,11 @@ test.describe("PWA", () => {
     const response = await request.get("/manifest.webmanifest");
     expect(response.ok()).toBe(true);
     const manifest = await response.json();
-    expect(manifest).toMatchObject({ name: "Recovery Tracker", display: "standalone", start_url: "/" });
+    expect(manifest).toMatchObject({
+      name: "Recovery Tracker",
+      display: "standalone",
+      start_url: "/",
+    });
 
     for (const icon of manifest.icons as Array<{ src: string }>) {
       const image = await request.get(icon.src);
@@ -31,16 +35,23 @@ test.describe("PWA", () => {
     await page.goto("/offline.html");
     await expect(page.getByRole("heading", { name: "Sin conexion" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Reintentar" })).toHaveAttribute("href", "/");
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+    const results = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+      .analyze();
     expect(results.violations.map(({ id }) => id)).toEqual([]);
   });
 
-  test("shows the offline page when a navigation fails without network", async ({ page, context }) => {
+  test("shows the offline page when a navigation fails without network", async ({
+    page,
+    context,
+  }) => {
     await page.goto("/");
     await page.evaluate(async () => {
       const registration = await navigator.serviceWorker.ready;
       if (!navigator.serviceWorker.controller) {
-        await new Promise((resolve) => navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true }));
+        await new Promise((resolve) =>
+          navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true }),
+        );
       }
       return Boolean(registration.active);
     });

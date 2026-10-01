@@ -32,10 +32,7 @@ import {
   recoveryTimeZone,
   toRecoveryDateTimeLocal,
 } from "@/lib/recovery-date";
-import {
-  sessionToExerciseEntries,
-  sessionToTreatmentDrafts,
-} from "@/lib/session-edit-state";
+import { sessionToExerciseEntries, sessionToTreatmentDrafts } from "@/lib/session-edit-state";
 import { getSessionFormProgress } from "@/lib/session-form-state";
 import {
   countValidTreatments,
@@ -150,7 +147,9 @@ function SaveButton({
   const { pending } = useFormStatus();
   const exerciseLabel = `${exerciseCount} ejercicio${exerciseCount === 1 ? "" : "s"}`;
   const readyLabel =
-    treatmentCount > 0 ? `${exerciseLabel} · ${formatTreatmentCount(treatmentCount)}` : exerciseLabel;
+    treatmentCount > 0
+      ? `${exerciseLabel} · ${formatTreatmentCount(treatmentCount)}`
+      : exerciseLabel;
 
   return (
     <button
@@ -196,15 +195,11 @@ export function PostTherapyForm({
   const [sessionType, setSessionType] = useState<SessionType>(
     editingSession?.sessionType ?? "PHYSIOTHERAPY",
   );
-  const [painBefore, setPainBefore] = useState<PainScore | null>(
-    editingSession?.painBefore ?? 3,
-  );
+  const [painBefore, setPainBefore] = useState<PainScore | null>(editingSession?.painBefore ?? 3);
   const [painDuring, setPainDuring] = useState<PainScore | null>(
     editingSession?.painDuring ?? null,
   );
-  const [painAfter, setPainAfter] = useState<PainScore | null>(
-    editingSession?.painAfter ?? null,
-  );
+  const [painAfter, setPainAfter] = useState<PainScore | null>(editingSession?.painAfter ?? null);
   const [perceivedLoad, setPerceivedLoad] = useState<Rating1To5>(
     editingSession?.perceivedLoad ?? 3,
   );
@@ -259,15 +254,12 @@ export function PostTherapyForm({
     treatmentCount,
     selectedTreatmentCount: isPhysiotherapy ? treatmentDrafts.length : 0,
   });
-  const painComplete =
-    painBefore !== null && painDuring !== null && painAfter !== null;
+  const painComplete = painBefore !== null && painDuring !== null && painAfter !== null;
   return (
     <>
       <form action={formAction} className="rr-session-form">
         <FormPendingReporter />
-        {editingSession ? (
-          <input name="sessionId" type="hidden" value={editingSession.id} />
-        ) : null}
+        {editingSession ? <input name="sessionId" type="hidden" value={editingSession.id} /> : null}
         <header className="rr-registrar-header">
           <div className="rr-registrar-title">
             {editingSession ? (
@@ -332,7 +324,10 @@ export function PostTherapyForm({
             />
             <div className="rr-session-type-grid">
               {sessionTypeOptions.map((option) => (
-                <label className={sessionType === option.value ? "is-selected" : ""} key={option.value}>
+                <label
+                  className={sessionType === option.value ? "is-selected" : ""}
+                  key={option.value}
+                >
                   <input
                     checked={sessionType === option.value}
                     name="sessionType"
@@ -350,21 +345,48 @@ export function PostTherapyForm({
             <SectionHeader
               complete={painComplete}
               title="Dolor"
-              trailing={<span className="rr-slider-hint"><i className="rr-mobile-only">desliza</i><i className="rr-desktop-only">arrastra</i> · 0 a 10</span>}
+              trailing={
+                <span className="rr-slider-hint">
+                  <i className="rr-mobile-only">desliza</i>
+                  <i className="rr-desktop-only">arrastra</i> · 0 a 10
+                </span>
+              }
             />
             <div className="rr-pain-list">
-              <RitualPainSlider label="Antes" name="painBefore" onChange={setPainBefore} value={painBefore} />
-              <RitualPainSlider label="Durante" name="painDuring" onChange={setPainDuring} value={painDuring} />
-              <RitualPainSlider label="Despues" name="painAfter" onChange={setPainAfter} value={painAfter} />
+              <RitualPainSlider
+                label="Antes"
+                name="painBefore"
+                onChange={setPainBefore}
+                value={painBefore}
+              />
+              <RitualPainSlider
+                label="Durante"
+                name="painDuring"
+                onChange={setPainDuring}
+                value={painDuring}
+              />
+              <RitualPainSlider
+                label="Despues"
+                name="painAfter"
+                onChange={setPainAfter}
+                value={painAfter}
+              />
             </div>
           </section>
 
           <section className="rr-form-card rr-load-card">
             <SectionHeader complete title="Esfuerzo de la sesion" />
             <p className="rr-field-question">¿Que tan exigente fue la sesion?</p>
-            <div className="rr-choice-row rr-load-choice-row" role="group" aria-label="Carga percibida">
+            <div
+              className="rr-choice-row rr-load-choice-row"
+              role="group"
+              aria-label="Carga percibida"
+            >
               {loadOptions.map((option) => (
-                <label className={perceivedLoad === option.value ? "is-selected" : ""} key={option.value}>
+                <label
+                  className={perceivedLoad === option.value ? "is-selected" : ""}
+                  key={option.value}
+                >
                   <input
                     checked={perceivedLoad === option.value}
                     name="perceivedLoad"
@@ -381,9 +403,16 @@ export function PostTherapyForm({
           <section className="rr-form-card rr-final-state-card">
             <SectionHeader complete={finalState !== null} title="Estado al terminar" />
             <p className="rr-field-question">¿Como quedo la rodilla justo al terminar?</p>
-            <div className="rr-choice-row rr-final-state-row" role="group" aria-label="Estado de la rodilla al terminar">
+            <div
+              className="rr-choice-row rr-final-state-row"
+              role="group"
+              aria-label="Estado de la rodilla al terminar"
+            >
               {finalStateOptions.map((option) => (
-                <label className={finalState === option.value ? "is-selected" : ""} key={option.value}>
+                <label
+                  className={finalState === option.value ? "is-selected" : ""}
+                  key={option.value}
+                >
                   <input
                     checked={finalState === option.value}
                     name="finalState"
@@ -399,14 +428,13 @@ export function PostTherapyForm({
 
           <section className="rr-form-card rr-exercises-card">
             <SectionHeader
-              complete={
-                exerciseEntries.length > 0 &&
-                exerciseCount === exerciseEntries.length
-              }
+              complete={exerciseEntries.length > 0 && exerciseCount === exerciseEntries.length}
               title={isPhysiotherapy ? "Ejercicios o tratamientos" : "Ejercicios"}
               trailing={
                 <span className="rr-exercise-actions">
-                  <b>{exerciseCount}/{exerciseEntries.length} completos</b>
+                  <b>
+                    {exerciseCount}/{exerciseEntries.length} completos
+                  </b>
                 </span>
               }
             />
@@ -454,7 +482,9 @@ export function PostTherapyForm({
               <>
                 <div>
                   <h2>Nota</h2>
-                  <button onClick={() => setShowNote(false)} type="button">Quitar</button>
+                  <button onClick={() => setShowNote(false)} type="button">
+                    Quitar
+                  </button>
                 </div>
                 <textarea
                   name="notes"
@@ -464,7 +494,9 @@ export function PostTherapyForm({
                 />
               </>
             ) : (
-              <button onClick={() => setShowNote(true)} type="button">+ Añadir nota (opcional)</button>
+              <button onClick={() => setShowNote(true)} type="button">
+                + Añadir nota (opcional)
+              </button>
             )}
           </section>
 
@@ -480,7 +512,9 @@ export function PostTherapyForm({
               >
                 Eliminar sesión
               </button>
-              <Link className="rr-modal-secondary" href={historyHref}>Cancelar</Link>
+              <Link className="rr-modal-secondary" href={historyHref}>
+                Cancelar
+              </Link>
             </div>
           ) : (
             <section className="rr-recent-sessions">
@@ -492,7 +526,9 @@ export function PostTherapyForm({
                   <article key={session.id}>
                     <strong>{formatSessionDay(session.occurredAt)}</strong>
                     <span>
-                      {sessionTypeLabel(session.sessionType)} · {session.exercises.length} ejercicio{session.exercises.length === 1 ? "" : "s"} · dolor {session.painBefore}→{session.painAfter}
+                      {sessionTypeLabel(session.sessionType)} · {session.exercises.length} ejercicio
+                      {session.exercises.length === 1 ? "" : "s"} · dolor {session.painBefore}→
+                      {session.painAfter}
                     </span>
                     <b aria-hidden="true">✓</b>
                   </article>

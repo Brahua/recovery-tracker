@@ -27,7 +27,8 @@ export function remoteWriteRefusal(linkedRef, env) {
   if (env.ALLOW_PROD_DB === "1") {
     return null;
   }
-  const label = linkedRef === PRODUCTION_PROJECT_REF ? "the PRODUCTION project" : "a hosted project";
+  const label =
+    linkedRef === PRODUCTION_PROJECT_REF ? "the PRODUCTION project" : "a hosted project";
   return [
     `Refusing to write to ${label} (${linkedRef}).`,
     "Migrations reach production through CI after every check passes (docs/deployment.md).",

@@ -39,7 +39,8 @@ describe("token resolution", () => {
   });
 
   it("treats moving a literal into a token as no change", () => {
-    const before = ":root{--rr-ink:#f4efe7}.a{border:1px solid rgba(244, 239, 231, 0.08);color:#e5a087}";
+    const before =
+      ":root{--rr-ink:#f4efe7}.a{border:1px solid rgba(244, 239, 231, 0.08);color:#e5a087}";
     const after =
       ":root{--rr-ink:#f4efe7;--rr-ink-rgb:244 239 231;--rr-pain-soft:#e5a087}" +
       ".a{border:1px solid rgb(var(--rr-ink-rgb) / 0.08);color:var(--rr-pain-soft)}";

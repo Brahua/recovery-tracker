@@ -7,10 +7,7 @@ export function toast(page: Page, message: string) {
 export async function openSessionForm(page: Page) {
   await page.goto("/registrar?mode=session");
   await expect(page.getByRole("heading", { name: "Registrar" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Sesion" })).toHaveAttribute(
-    "aria-current",
-    "page",
-  );
+  await expect(page.getByRole("link", { name: "Sesion" })).toHaveAttribute("aria-current", "page");
 }
 
 export async function fillSessionBasics(page: Page) {
@@ -115,7 +112,10 @@ export function routineExerciseRow(page: Page, name: string) {
 }
 
 export function routineListRow(page: Page, name: string) {
-  return page.getByRole("list", { name: "Lista de rutinas" }).getByRole("link").filter({ hasText: name });
+  return page
+    .getByRole("list", { name: "Lista de rutinas" })
+    .getByRole("link")
+    .filter({ hasText: name });
 }
 
 export async function openRoutines(page: Page) {

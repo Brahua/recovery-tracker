@@ -3,10 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import {
-  createRecoveryLogRepository,
-  RecordNotFoundError,
-} from "@/data/recovery-log-repository";
+import { createRecoveryLogRepository, RecordNotFoundError } from "@/data/recovery-log-repository";
 import {
   invalidExercisePayloadMessage,
   parseExercisePayload,
@@ -88,10 +85,8 @@ export interface PostTherapyActionState {
   error: string | null;
 }
 
-const emptySessionMessage =
-  "Agrega al menos un ejercicio (o un tratamiento, si es fisio guiada).";
-const missingSessionMessage =
-  "Esa sesión ya no existe. Vuelve a Historial para ver tus registros.";
+const emptySessionMessage = "Agrega al menos un ejercicio (o un tratamiento, si es fisio guiada).";
+const missingSessionMessage = "Esa sesión ya no existe. Vuelve a Historial para ver tus registros.";
 const expiredSessionMessage = "Tu sesión expiró. Recarga la página e inicia sesión nuevamente.";
 const expectedErrorMessages = new Set([
   invalidExercisePayloadMessage,

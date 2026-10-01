@@ -6,17 +6,10 @@ import {
   getTodayRitualState,
   type RecentWeekDay,
 } from "@/lib/today-view-model";
-import type {
-  LatestTherapistNotes,
-  NightlyCloseout,
-  RehabSession,
-} from "@/types/recovery";
+import type { LatestTherapistNotes, NightlyCloseout, RehabSession } from "@/types/recovery";
 import { getRecoveryDateKey, recoveryTimeZone } from "@/lib/recovery-date";
 import { formatTreatmentCount } from "@/lib/treatments";
-import {
-  getUserDisplayName,
-  type DisplayNameUser,
-} from "@/lib/user-display-name";
+import { getUserDisplayName, type DisplayNameUser } from "@/lib/user-display-name";
 
 const dateFormatter = new Intl.DateTimeFormat("es-PE", {
   weekday: "long",
@@ -57,9 +50,7 @@ function WeekStrip({ days }: { days: RecentWeekDay[] }) {
           >
             {day.completed ? "✓" : day.isToday ? "·" : ""}
           </span>
-          <span className={day.isToday ? "is-today" : ""}>
-            {day.isToday ? "Hoy" : day.label}
-          </span>
+          <span className={day.isToday ? "is-today" : ""}>{day.isToday ? "Hoy" : day.label}</span>
         </div>
       ))}
     </div>
@@ -88,7 +79,8 @@ function ProgressRing({ progress }: { progress: 0 | 50 | 100 }) {
         />
       </svg>
       <span>
-        <strong>{progress}</strong><small>%</small>
+        <strong>{progress}</strong>
+        <small>%</small>
         <em>hoy</em>
       </span>
     </div>
@@ -144,12 +136,8 @@ export function TodayOverview({
 }: TodayOverviewProps) {
   const now = new Date();
   const todayKey = getRecoveryDateKey(now);
-  const hasSessionToday = recentSessions.some(
-    (session) => sessionDateKey(session) === todayKey,
-  );
-  const hasCloseoutToday = recentCloseouts.some(
-    (closeout) => closeout.date === todayKey,
-  );
+  const hasSessionToday = recentSessions.some((session) => sessionDateKey(session) === todayKey);
+  const hasCloseoutToday = recentCloseouts.some((closeout) => closeout.date === todayKey);
   const state = getTodayRitualState(hasSessionToday, hasCloseoutToday);
   const week = buildRecentWeek(recentSessions, recentCloseouts, now);
   const streak = calculateLoggingStreak(recentSessions, recentCloseouts, now);
@@ -198,9 +186,7 @@ export function TodayOverview({
               <div>
                 <strong>Sesion de ejercicios</strong>
                 <small>
-                  {hasSessionToday
-                    ? "Completada hoy"
-                    : "Registra dolor, carga y ejercicios"}
+                  {hasSessionToday ? "Completada hoy" : "Registra dolor, carga y ejercicios"}
                 </small>
               </div>
               <b>{hasSessionToday ? "Hecha" : "Ahora"}</b>
@@ -224,10 +210,7 @@ export function TodayOverview({
                 <b aria-hidden="true">→</b>
               </span>
             </Link>
-            <Link
-              className="rr-button rr-button--secondary"
-              href={state.secondaryHref}
-            >
+            <Link className="rr-button rr-button--secondary" href={state.secondaryHref}>
               {state.secondaryLabel}
             </Link>
           </div>
@@ -241,7 +224,9 @@ export function TodayOverview({
               <strong>Proximo hito: 30 dias de registro</strong>
               <b>{30 - loggedDays} dias</b>
             </div>
-            <span><i style={{ width: `${milestoneProgress}%` }} /></span>
+            <span>
+              <i style={{ width: `${milestoneProgress}%` }} />
+            </span>
             <p>{loggedDays} de 30 dias recientes con actividad registrada</p>
           </section>
 

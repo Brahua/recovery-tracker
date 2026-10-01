@@ -5,7 +5,5 @@ import { loadRoutinePageData } from "../routine-page-data";
 export default async function NuevaRutinaPage() {
   const { catalog } = await loadRoutinePageData();
 
-  return (
-    <RoutineEditor catalog={catalog} />
-  );
+  return <RoutineEditor catalog={catalog} />;
 }

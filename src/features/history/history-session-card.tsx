@@ -21,11 +21,7 @@ function stateClass(session: RehabSession) {
   return "is-same";
 }
 
-export function HistorySessionCard({
-  expanded,
-  onToggle,
-  session,
-}: HistorySessionCardProps) {
+export function HistorySessionCard({ expanded, onToggle, session }: HistorySessionCardProps) {
   const detailId = `history-session-${session.id}`;
 
   return (
@@ -45,14 +41,19 @@ export function HistorySessionCard({
         </span>
         <span className="rr-history-event-title">
           <strong>
-            {sessionTypeLabels[session.sessionType]} · {historyTimeFormatter.format(new Date(session.occurredAt))}
+            {sessionTypeLabels[session.sessionType]} ·{" "}
+            {historyTimeFormatter.format(new Date(session.occurredAt))}
           </strong>
-          <small>Dolor {session.painBefore} → {session.painAfter}</small>
+          <small>
+            Dolor {session.painBefore} → {session.painAfter}
+          </small>
         </span>
         <span className={`rr-history-state ${stateClass(session)}`}>
           {finalStateLabels[session.finalState]}
         </span>
-        <span aria-hidden="true" className="rr-history-chevron">⌄</span>
+        <span aria-hidden="true" className="rr-history-chevron">
+          ⌄
+        </span>
       </button>
 
       {expanded && (
@@ -60,11 +61,16 @@ export function HistorySessionCard({
           <dl className="rr-history-metrics">
             <div>
               <dt>Dolor</dt>
-              <dd>{session.painBefore} · {session.painDuring ?? "—"} · {session.painAfter}</dd>
+              <dd>
+                {session.painBefore} · {session.painDuring ?? "—"} · {session.painAfter}
+              </dd>
             </div>
             <div>
               <dt>Esfuerzo</dt>
-              <dd>{session.perceivedLoad}<small>/5</small></dd>
+              <dd>
+                {session.perceivedLoad}
+                <small>/5</small>
+              </dd>
             </div>
             <div>
               <dt>Al terminar</dt>
@@ -74,50 +80,66 @@ export function HistorySessionCard({
 
           <div className="rr-history-exercises">
             {session.exercises.length === 0 ? (
-              session.treatments.length === 0 ? <p>Sin ejercicios detallados.</p> : null
-            ) : session.exercises.map((exercise, exerciseIndex) => (
-              <section key={`${session.id}-${exercise.name}-${exerciseIndex}`}>
-                <div className="rr-history-exercise-title">
-                  <strong>
-                    {exercise.name}
-                    {exercise.isIsometric ? <small className="rr-history-isometric">Isométrico</small> : null}
-                  </strong>
-                  {(exercise.durationMinutes || exercise.distanceKm) && (
-                    <span>
-                      {exercise.durationMinutes ? `${formatHistoryNumber(exercise.durationMinutes)} min` : ""}
-                      {exercise.durationMinutes && exercise.distanceKm ? " · " : ""}
-                      {exercise.distanceKm ? `${formatHistoryNumber(exercise.distanceKm)} km` : ""}
-                    </span>
-                  )}
-                </div>
-
-                {exercise.sets.length > 0 && (
-                  <ol className="rr-history-sets">
-                    {exercise.sets.map((set) => (
-                      <li key={set.position}>
-                        <span>
-                          Serie {set.position + 1}
-                          {exercise.isIsometric && set.holdSeconds !== undefined ? ` · ${set.holdSeconds} s` : ""}
-                          {set.reps !== undefined ? ` · ${set.reps} rep` : ""}
-                          {set.weightKg !== undefined ? ` · ${formatHistoryNumber(set.weightKg)} kg` : ""}
-                        </span>
-                        {set.notes && <small>{set.notes}</small>}
-                      </li>
-                    ))}
-                  </ol>
-                )}
-
-                {exercise.notes && <p className="rr-history-note">{exercise.notes}</p>}
-                {exercise.legacyPrescription && (
-                  <div className="rr-history-legacy">
-                    <span>Registro anterior</span>
-                    <p>
-                      {exercise.legacyPrescription.setCount ?? "—"} series · {exercise.legacyPrescription.reps ?? "—"} rep · {exercise.legacyPrescription.weightKg ?? "—"} kg
-                    </p>
+              session.treatments.length === 0 ? (
+                <p>Sin ejercicios detallados.</p>
+              ) : null
+            ) : (
+              session.exercises.map((exercise, exerciseIndex) => (
+                <section key={`${session.id}-${exercise.name}-${exerciseIndex}`}>
+                  <div className="rr-history-exercise-title">
+                    <strong>
+                      {exercise.name}
+                      {exercise.isIsometric ? (
+                        <small className="rr-history-isometric">Isométrico</small>
+                      ) : null}
+                    </strong>
+                    {(exercise.durationMinutes || exercise.distanceKm) && (
+                      <span>
+                        {exercise.durationMinutes
+                          ? `${formatHistoryNumber(exercise.durationMinutes)} min`
+                          : ""}
+                        {exercise.durationMinutes && exercise.distanceKm ? " · " : ""}
+                        {exercise.distanceKm
+                          ? `${formatHistoryNumber(exercise.distanceKm)} km`
+                          : ""}
+                      </span>
+                    )}
                   </div>
-                )}
-              </section>
-            ))}
+
+                  {exercise.sets.length > 0 && (
+                    <ol className="rr-history-sets">
+                      {exercise.sets.map((set) => (
+                        <li key={set.position}>
+                          <span>
+                            Serie {set.position + 1}
+                            {exercise.isIsometric && set.holdSeconds !== undefined
+                              ? ` · ${set.holdSeconds} s`
+                              : ""}
+                            {set.reps !== undefined ? ` · ${set.reps} rep` : ""}
+                            {set.weightKg !== undefined
+                              ? ` · ${formatHistoryNumber(set.weightKg)} kg`
+                              : ""}
+                          </span>
+                          {set.notes && <small>{set.notes}</small>}
+                        </li>
+                      ))}
+                    </ol>
+                  )}
+
+                  {exercise.notes && <p className="rr-history-note">{exercise.notes}</p>}
+                  {exercise.legacyPrescription && (
+                    <div className="rr-history-legacy">
+                      <span>Registro anterior</span>
+                      <p>
+                        {exercise.legacyPrescription.setCount ?? "—"} series ·{" "}
+                        {exercise.legacyPrescription.reps ?? "—"} rep ·{" "}
+                        {exercise.legacyPrescription.weightKg ?? "—"} kg
+                      </p>
+                    </div>
+                  )}
+                </section>
+              ))
+            )}
           </div>
 
           {session.treatments.length > 0 && (

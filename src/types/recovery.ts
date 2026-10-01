@@ -167,16 +167,10 @@ export interface DateRangeParams {
   to: ISODateString;
 }
 
-export type CreateRehabSessionInput = Omit<
-  RehabSession,
-  "id" | "createdAt" | "updatedAt"
->;
+export type CreateRehabSessionInput = Omit<RehabSession, "id" | "createdAt" | "updatedAt">;
 
 export type UpdateRehabSessionInput = Partial<CreateRehabSessionInput>;
 
-export type CreateNightlyCloseoutInput = Omit<
-  NightlyCloseout,
-  "id" | "createdAt" | "updatedAt"
->;
+export type CreateNightlyCloseoutInput = Omit<NightlyCloseout, "id" | "createdAt" | "updatedAt">;
 
 export type UpdateNightlyCloseoutInput = Partial<CreateNightlyCloseoutInput>;

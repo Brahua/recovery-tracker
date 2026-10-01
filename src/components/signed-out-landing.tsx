@@ -91,11 +91,7 @@ type SignedOutLandingProps = {
   supabaseEnv: boolean;
 };
 
-export function SignedOutLanding({
-  errorMessage,
-  showDemo,
-  supabaseEnv,
-}: SignedOutLandingProps) {
+export function SignedOutLanding({ errorMessage, showDemo, supabaseEnv }: SignedOutLandingProps) {
   return (
     <main className="rr-landing-shell">
       <div className="rr-landing-photo" aria-hidden="true">
@@ -164,9 +160,15 @@ export function SignedOutLanding({
           </div>
           <div className="rr-landing-peek-copy">
             <span>Dia 24 · Semana 4</span>
-            <strong>Asi se ve<br />tu progreso</strong>
+            <strong>
+              Asi se ve
+              <br />
+              tu progreso
+            </strong>
           </div>
-          <span className="rr-landing-streak">Racha de 6 dias <i /></span>
+          <span className="rr-landing-streak">
+            Racha de 6 dias <i />
+          </span>
         </aside>
 
         <section className="rr-landing-benefits" aria-label="Lo que puedes hacer">
@@ -183,7 +185,8 @@ export function SignedOutLanding({
       </section>
 
       <footer className="rr-landing-footer">
-        Disenado junto a fisioterapeutas <span aria-hidden="true">·</span> No sustituye consejo medico
+        Disenado junto a fisioterapeutas <span aria-hidden="true">·</span> No sustituye consejo
+        medico
       </footer>
     </main>
   );

@@ -84,9 +84,7 @@ test.describe("nightly closeout", () => {
     await page.getByText("Alta", { exact: true }).click();
     await page.getByText("Leve", { exact: true }).click();
     await page.getByText("Buena", { exact: true }).click();
-    const note = page.getByPlaceholder(
-      "Lo que quieras dejar escrito antes de dormir...",
-    );
+    const note = page.getByPlaceholder("Lo que quieras dejar escrito antes de dormir...");
     await note.fill("Conservar el cierre si la fecha es rechazada.");
     // The picker's max blocks this in the browser; drop it to prove the server rejects it too.
     await page.locator('input[name="date"]').evaluate((input, value) => {

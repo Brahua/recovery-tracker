@@ -4,10 +4,7 @@ import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 
 export type TrendDirection = "UP" | "DOWN" | "STABLE" | "NO_DATA";
 export type SleepPainRelationship =
-  | "HIGHER_AFTER_LOW_SLEEP"
-  | "LOWER_AFTER_LOW_SLEEP"
-  | "NO_CLEAR_PATTERN"
-  | "INSUFFICIENT_DATA";
+  "HIGHER_AFTER_LOW_SLEEP" | "LOWER_AFTER_LOW_SLEEP" | "NO_CLEAR_PATTERN" | "INSUFFICIENT_DATA";
 
 export interface DateRangeWindow {
   from: string;
@@ -99,17 +96,11 @@ export function getDateRangeForLastDays(
   };
 }
 
-export function filterSessionsByRange(
-  sessions: RehabSession[],
-  range: DateRangeWindow,
-) {
+export function filterSessionsByRange(sessions: RehabSession[], range: DateRangeWindow) {
   return sessions.filter((session) => inRange(getSessionDateKey(session), range));
 }
 
-export function filterCloseoutsByRange(
-  closeouts: NightlyCloseout[],
-  range: DateRangeWindow,
-) {
+export function filterCloseoutsByRange(closeouts: NightlyCloseout[], range: DateRangeWindow) {
   return closeouts.filter((closeout) => inRange(closeout.date, range));
 }
 
@@ -147,13 +138,7 @@ export function calculatePainTrend(
       ? endAverage - startAverage
       : undefined;
   const direction =
-    typeof delta !== "number"
-      ? "NO_DATA"
-      : delta >= 1
-        ? "UP"
-        : delta <= -1
-          ? "DOWN"
-          : "STABLE";
+    typeof delta !== "number" ? "NO_DATA" : delta >= 1 ? "UP" : delta <= -1 ? "DOWN" : "STABLE";
 
   return {
     windowDays,
@@ -174,18 +159,13 @@ export function calculateWeeklyLoad(
 ): WeeklyLoadSummary {
   const range = getDateRangeForLastDays(windowDays, referenceDate);
   const filtered = filterSessionsByRange(sessions, range);
-  const totalLoad = filtered.reduce(
-    (total, session) => total + session.perceivedLoad,
-    0,
-  );
+  const totalLoad = filtered.reduce((total, session) => total + session.perceivedLoad, 0);
 
   return {
     windowDays,
     sessionCount: filtered.length,
     totalLoad,
-    averageLoad: roundToOneDecimal(
-      filtered.length > 0 ? totalLoad / filtered.length : undefined,
-    ),
+    averageLoad: roundToOneDecimal(filtered.length > 0 ? totalLoad / filtered.length : undefined),
   };
 }
 
@@ -213,9 +193,7 @@ export function calculateReboundSummary(
       (closeout) => closeout.reboundPainLevel === "STRONG",
     ).length,
     reboundRate: roundToOneDecimal(
-      recentSessions.length > 0
-        ? reboundCloseouts.length / recentSessions.length
-        : undefined,
+      recentSessions.length > 0 ? reboundCloseouts.length / recentSessions.length : undefined,
     ),
     latestReboundLevel: recentCloseouts[0]?.reboundPainLevel,
   };
@@ -230,15 +208,10 @@ export function calculateSleepPainComparison(
   const filtered = filterCloseoutsByRange(closeouts, range);
   const lowSleep = filtered.filter((closeout) => closeout.sleepHours < 6);
   const adequateSleep = filtered.filter((closeout) => closeout.sleepHours >= 6);
-  const lowSleepPainAverage = average(
-    lowSleep.map((closeout) => closeout.endOfDayPain),
-  );
-  const adequateSleepPainAverage = average(
-    adequateSleep.map((closeout) => closeout.endOfDayPain),
-  );
+  const lowSleepPainAverage = average(lowSleep.map((closeout) => closeout.endOfDayPain));
+  const adequateSleepPainAverage = average(adequateSleep.map((closeout) => closeout.endOfDayPain));
   const painDelta =
-    typeof lowSleepPainAverage === "number" &&
-    typeof adequateSleepPainAverage === "number"
+    typeof lowSleepPainAverage === "number" && typeof adequateSleepPainAverage === "number"
       ? lowSleepPainAverage - adequateSleepPainAverage
       : undefined;
   const relationship =

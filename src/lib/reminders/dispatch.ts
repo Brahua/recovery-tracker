@@ -33,7 +33,13 @@ export async function dispatchReminders({
   store: DispatchStore;
   sendPush: PushSender;
 }): Promise<DispatchSummary> {
-  const summary: DispatchSummary = { candidates: 0, remindersSent: 0, notificationsSent: 0, subscriptionsRemoved: 0, failures: 0 };
+  const summary: DispatchSummary = {
+    candidates: 0,
+    remindersSent: 0,
+    notificationsSent: 0,
+    subscriptionsRemoved: 0,
+    failures: 0,
+  };
 
   // 1. Only users with a reminder window open right now (pure, no extra queries).
   const candidates = (await store.listActiveSettings()).filter(

@@ -37,6 +37,9 @@ test.describe("mobile fixed action bars", () => {
 
   test("report actions sit above the tab bar", async ({ page }) => {
     await page.goto("/reporte");
-    await expectAboveTabBar(page, page.getByRole("button", { name: /Compartir reporte|Enlace copiado/ }));
+    await expectAboveTabBar(
+      page,
+      page.getByRole("button", { name: /Compartir reporte|Enlace copiado/ }),
+    );
   });
 });

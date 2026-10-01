@@ -25,7 +25,9 @@ describe("isLocalSupabaseUrl", () => {
 describe("remoteWriteRefusal", () => {
   it("refuses production without ALLOW_PROD_DB", () => {
     expect(remoteWriteRefusal(PRODUCTION_PROJECT_REF, {})).toMatch(/PRODUCTION/);
-    expect(remoteWriteRefusal(PRODUCTION_PROJECT_REF, { ALLOW_PROD_DB: "true" })).toMatch(/PRODUCTION/);
+    expect(remoteWriteRefusal(PRODUCTION_PROJECT_REF, { ALLOW_PROD_DB: "true" })).toMatch(
+      /PRODUCTION/,
+    );
   });
 
   it("refuses any other hosted project too", () => {
@@ -33,7 +35,9 @@ describe("remoteWriteRefusal", () => {
   });
 
   it("refuses when nothing is linked", () => {
-    expect(remoteWriteRefusal(null, { ALLOW_PROD_DB: "1" })).toMatch(/No Supabase project is linked/);
+    expect(remoteWriteRefusal(null, { ALLOW_PROD_DB: "1" })).toMatch(
+      /No Supabase project is linked/,
+    );
   });
 
   it("allows the write with ALLOW_PROD_DB=1", () => {
@@ -47,7 +51,9 @@ describe("e2eTargetRefusal", () => {
   });
 
   it("refuses production and unset URLs", () => {
-    expect(e2eTargetRefusal(`https://${PRODUCTION_PROJECT_REF}.supabase.co`)).toMatch(/local Supabase/);
+    expect(e2eTargetRefusal(`https://${PRODUCTION_PROJECT_REF}.supabase.co`)).toMatch(
+      /local Supabase/,
+    );
     expect(e2eTargetRefusal(undefined)).toMatch(/unset/);
   });
 });

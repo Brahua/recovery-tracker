@@ -33,14 +33,8 @@ export default async function RegistrarPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const pageData = await loadRecoveryPageData({ limit: null });
-  const {
-    supabaseEnv,
-    user,
-    recentSessions,
-    recentCloseouts,
-    hasSessionToday,
-    hasCloseoutToday,
-  } = pageData;
+  const { supabaseEnv, user, recentSessions, recentCloseouts, hasSessionToday, hasCloseoutToday } =
+    pageData;
 
   if (!supabaseEnv || !user) {
     redirect("/");
@@ -49,8 +43,7 @@ export default async function RegistrarPage({
   const today = getRecoveryDateKey();
   const requestedCloseoutDate = getSingleSearchParam(resolvedSearchParams, "date");
   const selectedCloseoutDate =
-    requestedCloseoutDate &&
-    !getCloseoutDateError(requestedCloseoutDate, today)
+    requestedCloseoutDate && !getCloseoutDateError(requestedCloseoutDate, today)
       ? requestedCloseoutDate
       : today;
   const selectedDayData =
@@ -69,31 +62,15 @@ export default async function RegistrarPage({
   );
 
   const requestedMode = getSingleSearchParam(resolvedSearchParams, "mode");
-  const mode = resolveRegistrarMode(
-    requestedMode,
-    hasSessionToday,
-    hasCloseoutToday,
-  );
-  const sessionSuccessMessage = getSingleSearchParam(
-    resolvedSearchParams,
-    "sessionSummary",
-  );
+  const mode = resolveRegistrarMode(requestedMode, hasSessionToday, hasCloseoutToday);
+  const sessionSuccessMessage = getSingleSearchParam(resolvedSearchParams, "sessionSummary");
   const sessionSaved = getSingleSearchParam(resolvedSearchParams, "sessionSaved") === "1";
   const savedSessionId = getSingleSearchParam(resolvedSearchParams, "sessionId");
-  const sessionErrorMessage = getSingleSearchParam(
-    resolvedSearchParams,
-    "sessionError",
-  );
-  const nightlySuccessMessage = getSingleSearchParam(
-    resolvedSearchParams,
-    "nightlySummary",
-  );
+  const sessionErrorMessage = getSingleSearchParam(resolvedSearchParams, "sessionError");
+  const nightlySuccessMessage = getSingleSearchParam(resolvedSearchParams, "nightlySummary");
   const nightlySaved = getSingleSearchParam(resolvedSearchParams, "nightlySaved") === "1";
   const savedCloseoutId = getSingleSearchParam(resolvedSearchParams, "closeoutId");
-  const nightlyErrorMessage = getSingleSearchParam(
-    resolvedSearchParams,
-    "nightlyError",
-  );
+  const nightlyErrorMessage = getSingleSearchParam(resolvedSearchParams, "nightlyError");
   const showSessionSuccess = mode === "session" && sessionSaved && !sessionErrorMessage;
   const showNightlySuccess = mode === "closeout" && nightlySaved && !nightlyErrorMessage;
   const streak = calculateLoggingStreak(recentSessions, recentCloseouts);
@@ -124,7 +101,10 @@ export default async function RegistrarPage({
         <ToastOnMount message="Sesión guardada" onceKey={`session:${savedSessionId ?? "latest"}`} />
       ) : null}
       {showNightlySuccess ? (
-        <ToastOnMount message="Cierre guardado" onceKey={`closeout:${savedCloseoutId ?? selectedCloseoutDate}`} />
+        <ToastOnMount
+          message="Cierre guardado"
+          onceKey={`closeout:${savedCloseoutId ?? selectedCloseoutDate}`}
+        />
       ) : null}
       {showSessionSuccess && successState ? (
         <SessionSavedState
@@ -143,13 +123,13 @@ export default async function RegistrarPage({
       ) : (
         <div>
           {mode === "session" ? (
-          <PostTherapyForm
-            catalog={catalog}
-            routines={routines}
-            defaultOccurredAt={new Date().toISOString()}
-            errorMessage={sessionErrorMessage}
-            recentSessions={recentSessions}
-          />
+            <PostTherapyForm
+              catalog={catalog}
+              routines={routines}
+              defaultOccurredAt={new Date().toISOString()}
+              errorMessage={sessionErrorMessage}
+              recentSessions={recentSessions}
+            />
           ) : (
             <NightlyCloseoutForm
               defaultOccurredAt={new Date().toISOString()}

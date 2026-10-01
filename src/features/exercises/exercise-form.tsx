@@ -78,17 +78,18 @@ export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps)
   }
 
   function save() {
-    run(() =>
-      saveExerciseAction(exercise?.id ?? null, {
-        name,
-        defaultIsometric,
-        defaultSetCount: setCount,
-        defaultReps: reps,
-        defaultHoldSeconds: holdSeconds,
-        defaultWeightKg: weightKg,
-        defaultDurationMinutes: durationMinutes,
-        defaultDistanceKm: distanceKm,
-      }),
+    run(
+      () =>
+        saveExerciseAction(exercise?.id ?? null, {
+          name,
+          defaultIsometric,
+          defaultSetCount: setCount,
+          defaultReps: reps,
+          defaultHoldSeconds: holdSeconds,
+          defaultWeightKg: weightKg,
+          defaultDurationMinutes: durationMinutes,
+          defaultDistanceKm: distanceKm,
+        }),
       "Ejercicio guardado",
     );
   }
@@ -116,7 +117,9 @@ export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps)
         />
       </label>
       {exercise ? (
-        <p className="rr-exercise-form-hint">Cambiar el nombre no modifica las sesiones ya registradas.</p>
+        <p className="rr-exercise-form-hint">
+          Cambiar el nombre no modifica las sesiones ya registradas.
+        </p>
       ) : null}
 
       <label className="rr-exercise-isometric">
@@ -132,16 +135,49 @@ export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps)
       </label>
 
       <fieldset className="rr-exercise-form-defaults">
-        <legend>Valores por defecto <small>opcionales</small></legend>
+        <legend>
+          Valores por defecto <small>opcionales</small>
+        </legend>
         <div>
           <NumberField label="Series" onChange={setSetCount} placeholder="3" value={setCount} />
           {defaultIsometric ? (
-            <NumberField label="Segundos" onChange={setHoldSeconds} placeholder="45" value={holdSeconds} />
+            <NumberField
+              label="Segundos"
+              onChange={setHoldSeconds}
+              placeholder="45"
+              value={holdSeconds}
+            />
           ) : null}
-          <NumberField label="Repeticiones" onChange={setReps} placeholder={defaultIsometric ? "—" : "12"} value={reps} />
-          <NumberField label="Peso" onChange={setWeightKg} placeholder="0" step="0.5" unit="kg" value={weightKg} />
-          <NumberField label="Duración" onChange={setDurationMinutes} placeholder="10" step="0.5" unit="min" value={durationMinutes} />
-          <NumberField label="Distancia" onChange={setDistanceKm} placeholder="2" step="0.1" unit="km" value={distanceKm} />
+          <NumberField
+            label="Repeticiones"
+            onChange={setReps}
+            placeholder={defaultIsometric ? "—" : "12"}
+            value={reps}
+          />
+          <NumberField
+            label="Peso"
+            onChange={setWeightKg}
+            placeholder="0"
+            step="0.5"
+            unit="kg"
+            value={weightKg}
+          />
+          <NumberField
+            label="Duración"
+            onChange={setDurationMinutes}
+            placeholder="10"
+            step="0.5"
+            unit="min"
+            value={durationMinutes}
+          />
+          <NumberField
+            label="Distancia"
+            onChange={setDistanceKm}
+            placeholder="2"
+            step="0.1"
+            unit="km"
+            value={distanceKm}
+          />
         </div>
       </fieldset>
 
@@ -174,8 +210,8 @@ export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps)
             <>
               <h3>Fusionar con otro ejercicio</h3>
               <p>
-                Las sesiones de &ldquo;{exercise.name}&rdquo; pasarán al ejercicio que elijas y este se eliminará.
-                El historial conserva los nombres registrados.
+                Las sesiones de &ldquo;{exercise.name}&rdquo; pasarán al ejercicio que elijas y este
+                se eliminará. El historial conserva los nombres registrados.
               </p>
               <label htmlFor={mergeId}>
                 <span>Fusionar en</span>
@@ -195,18 +231,28 @@ export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps)
               </label>
               {mergeTarget ? (
                 <p className="rr-exercise-merge-summary" role="status">
-                  Se moverán {exercise.sessionCount} sesi{exercise.sessionCount === 1 ? "ón" : "ones"} a
-                  &ldquo;{mergeTarget.name}&rdquo;, que conserva su nombre y valores por defecto.
+                  Se moverán {exercise.sessionCount} sesi
+                  {exercise.sessionCount === 1 ? "ón" : "ones"} a &ldquo;{mergeTarget.name}&rdquo;,
+                  que conserva su nombre y valores por defecto.
                 </p>
               ) : null}
               <div className="rr-exercise-form-actions">
-                <button className="rr-modal-secondary" onClick={() => setShowMerge(false)} type="button">
+                <button
+                  className="rr-modal-secondary"
+                  onClick={() => setShowMerge(false)}
+                  type="button"
+                >
                   Cancelar
                 </button>
                 <button
                   className="rr-modal-secondary is-danger"
                   disabled={!mergeTarget || pending}
-                  onClick={() => run(() => mergeExercisesAction(exercise.id, mergeTargetId), "Ejercicios fusionados")}
+                  onClick={() =>
+                    run(
+                      () => mergeExercisesAction(exercise.id, mergeTargetId),
+                      "Ejercicios fusionados",
+                    )
+                  }
                   type="button"
                 >
                   Fusionar y eliminar
@@ -214,7 +260,11 @@ export function ExerciseForm({ exercise, exercises, onDone }: ExerciseFormProps)
               </div>
             </>
           ) : (
-            <button className="rr-exercise-disclosure" onClick={() => setShowMerge(true)} type="button">
+            <button
+              className="rr-exercise-disclosure"
+              onClick={() => setShowMerge(true)}
+              type="button"
+            >
               Fusionar con otro ejercicio…
             </button>
           )}

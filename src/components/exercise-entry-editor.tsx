@@ -56,7 +56,14 @@ function incompleteMessage(repeated: boolean, mode: ExerciseEditorMode) {
   return mode === "routine" ? "Escribe o elige el ejercicio" : "Falta completar este ejercicio";
 }
 
-function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }: ExerciseDetailProps) {
+function ExerciseDetail({
+  catalog,
+  entry,
+  excludeIds,
+  mode,
+  onChange,
+  repeated,
+}: ExerciseDetailProps) {
   const [showMetrics, setShowMetrics] = useState(
     hasText(entry.durationMinutes) || hasText(entry.distanceKm),
   );
@@ -134,10 +141,7 @@ function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }
 
       <div className="rr-exercise-sets-heading">
         <h4>Series</h4>
-        <button
-          onClick={() => onChange(addExerciseSet(entry, nextId("set")))}
-          type="button"
-        >
+        <button onClick={() => onChange(addExerciseSet(entry, nextId("set")))} type="button">
           + Añadir serie
         </button>
       </div>
@@ -154,7 +158,9 @@ function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }
 
             return (
               <li key={set.id}>
-                <span aria-hidden="true" className="rr-exercise-set-index">{number}</span>
+                <span aria-hidden="true" className="rr-exercise-set-index">
+                  {number}
+                </span>
                 <div className="rr-exercise-set-fields">
                   {entry.isIsometric ? (
                     <label>
@@ -164,7 +170,9 @@ function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }
                         inputMode="numeric"
                         min="1"
                         onChange={(event) =>
-                          onChange(updateExerciseSet(entry, set.id, { holdSeconds: event.target.value }))
+                          onChange(
+                            updateExerciseSet(entry, set.id, { holdSeconds: event.target.value }),
+                          )
                         }
                         placeholder="45"
                         step="1"
@@ -176,7 +184,9 @@ function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }
                   <label>
                     <span>{entry.isIsometric ? "Rep." : "Repeticiones"}</span>
                     <input
-                      aria-label={entry.isIsometric ? `Repeticiones serie ${number} (opcional)` : undefined}
+                      aria-label={
+                        entry.isIsometric ? `Repeticiones serie ${number} (opcional)` : undefined
+                      }
                       id={`${set.id}-reps`}
                       inputMode="numeric"
                       min="1"
@@ -190,7 +200,9 @@ function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }
                     />
                   </label>
                   <label>
-                    <span>Peso <small>kg</small></span>
+                    <span>
+                      Peso <small>kg</small>
+                    </span>
                     <input
                       id={`${set.id}-weight`}
                       inputMode="decimal"
@@ -258,7 +270,9 @@ function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }
       {showMetrics ? (
         <div className="rr-exercise-metrics">
           <label>
-            <span>Duración total <small>min</small></span>
+            <span>
+              Duración total <small>min</small>
+            </span>
             <input
               id={`${entry.id}-duration`}
               inputMode="decimal"
@@ -271,7 +285,9 @@ function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }
             />
           </label>
           <label>
-            <span>Distancia total <small>km</small></span>
+            <span>
+              Distancia total <small>km</small>
+            </span>
             <input
               id={`${entry.id}-distance`}
               inputMode="decimal"
@@ -285,7 +301,11 @@ function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }
           </label>
         </div>
       ) : (
-        <button className="rr-exercise-disclosure" onClick={() => setShowMetrics(true)} type="button">
+        <button
+          className="rr-exercise-disclosure"
+          onClick={() => setShowMetrics(true)}
+          type="button"
+        >
           + Duración o distancia
         </button>
       )}
@@ -303,7 +323,11 @@ function ExerciseDetail({ catalog, entry, excludeIds, mode, onChange, repeated }
           />
         </label>
       ) : (
-        <button className="rr-exercise-disclosure" onClick={() => setShowExerciseNote(true)} type="button">
+        <button
+          className="rr-exercise-disclosure"
+          onClick={() => setShowExerciseNote(true)}
+          type="button"
+        >
           + Nota del ejercicio
         </button>
       )}
@@ -329,9 +353,7 @@ export function ExerciseEntryEditor({
 
   function toggleExercise(exercise: Exercise) {
     if (usedExerciseIds.includes(exercise.id)) {
-      onChange(
-        entries.filter((entry) => resolveEntryExerciseId(entry, catalog) !== exercise.id),
-      );
+      onChange(entries.filter((entry) => resolveEntryExerciseId(entry, catalog) !== exercise.id));
       return;
     }
 

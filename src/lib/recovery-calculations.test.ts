@@ -44,7 +44,10 @@ const rehabSessions: RehabSession[] = [
     painBefore: 5,
     painAfter: 4,
     perceivedLoad: 4,
-    exercises: [{ name: "Step-up", sets: [] }, { name: "TKE", sets: [] }],
+    exercises: [
+      { name: "Step-up", sets: [] },
+      { name: "TKE", sets: [] },
+    ],
     finalState: "SAME",
     treatments: [],
     createdAt: "2026-07-09T18:10:00.000Z",
@@ -142,11 +145,7 @@ describe("recovery calculations", () => {
   });
 
   it("detects a downward pain trend from closeouts", () => {
-    const result = calculatePainTrend(
-      nightlyCloseouts,
-      7,
-      "2026-07-10T12:00:00.000Z",
-    );
+    const result = calculatePainTrend(nightlyCloseouts, 7, "2026-07-10T12:00:00.000Z");
 
     expect(result.direction).toBe("DOWN");
     expect(result.sampleCount).toBe(4);
@@ -155,11 +154,7 @@ describe("recovery calculations", () => {
   });
 
   it("summarizes weekly load from recent sessions", () => {
-    const result = calculateWeeklyLoad(
-      rehabSessions,
-      7,
-      "2026-07-10T12:00:00.000Z",
-    );
+    const result = calculateWeeklyLoad(rehabSessions, 7, "2026-07-10T12:00:00.000Z");
 
     expect(result).toEqual({
       windowDays: 7,
@@ -195,11 +190,7 @@ describe("recovery calculations", () => {
   });
 
   it("compares low sleep against adequate sleep", () => {
-    const result = calculateSleepPainComparison(
-      nightlyCloseouts,
-      14,
-      "2026-07-10T12:00:00.000Z",
-    );
+    const result = calculateSleepPainComparison(nightlyCloseouts, 14, "2026-07-10T12:00:00.000Z");
 
     expect(result.relationship).toBe("HIGHER_AFTER_LOW_SLEEP");
     expect(result.lowSleepCount).toBe(2);
@@ -209,11 +200,7 @@ describe("recovery calculations", () => {
 
   it("counts recent exercises by frequency", () => {
     expect(
-      calculateRecentExerciseFrequency(
-        rehabSessions,
-        30,
-        "2026-07-10T12:00:00.000Z",
-      ).slice(0, 3),
+      calculateRecentExerciseFrequency(rehabSessions, 30, "2026-07-10T12:00:00.000Z").slice(0, 3),
     ).toEqual([
       { name: "Bicicleta 5-10 min", count: 2 },
       { name: "Step-up", count: 2 },
@@ -237,7 +224,12 @@ describe("exercise frequency with the catalog", () => {
         id: "new",
         occurredAt: "2026-07-09T10:00:00.000Z",
         exercises: [
-          { name: "Wall sit", exerciseId: "wall-sit", isIsometric: true, sets: [{ position: 0, holdSeconds: 45 }] },
+          {
+            name: "Wall sit",
+            exerciseId: "wall-sit",
+            isIsometric: true,
+            sets: [{ position: 0, holdSeconds: 45 }],
+          },
           { name: "wall  sít", sets: [] },
         ],
       },
@@ -252,11 +244,7 @@ describe("exercise frequency with the catalog", () => {
 
 describe("recovery insights", () => {
   it("keeps pain trend insight observational in Spanish", () => {
-    const trend = calculatePainTrend(
-      nightlyCloseouts,
-      7,
-      "2026-07-10T12:00:00.000Z",
-    );
+    const trend = calculatePainTrend(nightlyCloseouts, 7, "2026-07-10T12:00:00.000Z");
 
     expect(buildPainTrendInsight(trend)).toContain("va bajando");
   });
@@ -268,22 +256,12 @@ describe("recovery insights", () => {
       "2026-07-10T12:00:00.000Z",
     );
 
-    expect(buildSleepPainInsight(summary)).toContain(
-      "Aun no hay suficientes noches",
-    );
+    expect(buildSleepPainInsight(summary)).toContain("Aun no hay suficientes noches");
   });
 
   it("builds a combined weekly story from the pure summaries", () => {
-    const painTrend = calculatePainTrend(
-      nightlyCloseouts,
-      7,
-      "2026-07-10T12:00:00.000Z",
-    );
-    const weeklyLoad = calculateWeeklyLoad(
-      rehabSessions,
-      7,
-      "2026-07-10T12:00:00.000Z",
-    );
+    const painTrend = calculatePainTrend(nightlyCloseouts, 7, "2026-07-10T12:00:00.000Z");
+    const weeklyLoad = calculateWeeklyLoad(rehabSessions, 7, "2026-07-10T12:00:00.000Z");
     const rebound = calculateReboundSummary(
       rehabSessions,
       nightlyCloseouts,
@@ -311,14 +289,10 @@ describe("recovery insights", () => {
 
   it("covers empty-state insight variants", () => {
     expect(
-      buildReboundInsight(
-        calculateReboundSummary([], [], 7, "2026-07-10T12:00:00.000Z"),
-      ),
+      buildReboundInsight(calculateReboundSummary([], [], 7, "2026-07-10T12:00:00.000Z")),
     ).toContain("Sin sesiones recientes");
     expect(
-      buildWeeklyLoadInsight(
-        calculateWeeklyLoad([], 7, "2026-07-10T12:00:00.000Z"),
-      ),
+      buildWeeklyLoadInsight(calculateWeeklyLoad([], 7, "2026-07-10T12:00:00.000Z")),
     ).toContain("Todavia no hay sesiones recientes");
   });
 

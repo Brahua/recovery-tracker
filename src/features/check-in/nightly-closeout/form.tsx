@@ -1,11 +1,7 @@
 "use client";
 
 import Link from "@/components/app-link";
-import {
-  useActionState,
-  useState,
-  type CSSProperties,
-} from "react";
+import { useActionState, useState, type CSSProperties } from "react";
 import { useFormStatus } from "react-dom";
 
 import { DeleteRecordDialog } from "@/components/delete-record-dialog";
@@ -84,10 +80,7 @@ function formatRecentDay(value: string) {
   return new Intl.DateTimeFormat("es-PE", { weekday: "long" }).format(date);
 }
 
-function ratingLabel(
-  value: Rating1To5,
-  options: Array<{ value: Rating1To5; label: string }>,
-) {
+function ratingLabel(value: Rating1To5, options: Array<{ value: Rating1To5; label: string }>) {
   return options.find((option) => option.value === value)?.label ?? `${value}/5`;
 }
 
@@ -111,7 +104,10 @@ function CloseoutSectionHeader({
       <span aria-hidden="true" className={`rr-step-badge ${complete ? "is-complete" : ""}`}>
         {complete ? "✓" : ""}
       </span>
-      <h2><span>{title}</span><span>{desktopTitle}</span></h2>
+      <h2>
+        <span>{title}</span>
+        <span>{desktopTitle}</span>
+      </h2>
       {hint ? <small>{hint}</small> : null}
     </div>
   );
@@ -192,8 +188,7 @@ export function NightlyCloseoutForm({
   const dateLabel = formatCloseoutDateLabel(selectedDate, today);
   const dateHasCloseout = selectedCloseout?.date === selectedDate;
   const sessionForDate =
-    selectedSession &&
-    getRecoveryDateKey(selectedSession.occurredAt) === selectedDate
+    selectedSession && getRecoveryDateKey(selectedSession.occurredAt) === selectedDate
       ? selectedSession
       : undefined;
   const progress = getCloseoutFormProgress({
@@ -248,9 +243,13 @@ export function NightlyCloseoutForm({
         <header className="rr-registrar-header rr-closeout-header">
           <div className="rr-registrar-title">
             {editingCloseout ? (
-              <Link aria-label="Volver a Historial" href={historyHref}><span aria-hidden="true">‹</span></Link>
+              <Link aria-label="Volver a Historial" href={historyHref}>
+                <span aria-hidden="true">‹</span>
+              </Link>
             ) : (
-              <Link aria-label="Volver a Hoy" href="/"><span aria-hidden="true">‹</span></Link>
+              <Link aria-label="Volver a Hoy" href="/">
+                <span aria-hidden="true">‹</span>
+              </Link>
             )}
             <div>
               <p>{headerContext}</p>
@@ -263,13 +262,20 @@ export function NightlyCloseoutForm({
             {editingCloseout ? null : (
               <nav aria-label="Tipo de registro" className="rr-mode-switch">
                 <Link href="/registrar?mode=session">Sesion</Link>
-                <Link aria-current="page" className="is-active" href="/registrar?mode=closeout">Cierre del dia</Link>
+                <Link aria-current="page" className="is-active" href="/registrar?mode=closeout">
+                  Cierre del dia
+                </Link>
               </nav>
             )}
             <div className="rr-closeout-progress" aria-live="polite" style={progressStyle}>
-              <span><i /><em aria-hidden="true">☾</em></span>
+              <span>
+                <i />
+                <em aria-hidden="true">☾</em>
+              </span>
               <b className={progress.isComplete ? "is-complete" : ""}>
-                {progress.isComplete ? "Listo para cerrar" : `${progress.completedSteps} de ${progress.totalSteps}`}
+                {progress.isComplete
+                  ? "Listo para cerrar"
+                  : `${progress.completedSteps} de ${progress.totalSteps}`}
               </b>
             </div>
           </div>
@@ -291,7 +297,8 @@ export function NightlyCloseoutForm({
         />
 
         <p className="rr-closeout-intro">
-          Un minuto para registrar cómo quedó la rodilla {selectedDate === today ? "hoy" : "ese día"}.
+          Un minuto para registrar cómo quedó la rodilla{" "}
+          {selectedDate === today ? "hoy" : "ese día"}.
         </p>
 
         <section className="rr-closeout-recap">
@@ -335,10 +342,23 @@ export function NightlyCloseoutForm({
               />
               <div className="rr-closeout-field-group">
                 <h3>Energía {selectedDate === today ? "hoy" : "ese día"}</h3>
-                <div className="rr-closeout-choice-row rr-five-choice-row" role="group" aria-label="Energia al final del dia">
+                <div
+                  className="rr-closeout-choice-row rr-five-choice-row"
+                  role="group"
+                  aria-label="Energia al final del dia"
+                >
                   {energyOptions.map((option) => (
-                    <label className={energy === option.value ? "is-selected" : ""} key={option.value}>
-                      <input checked={energy === option.value} name="energy" onChange={() => setEnergy(option.value)} type="radio" value={option.value} />
+                    <label
+                      className={energy === option.value ? "is-selected" : ""}
+                      key={option.value}
+                    >
+                      <input
+                        checked={energy === option.value}
+                        name="energy"
+                        onChange={() => setEnergy(option.value)}
+                        type="radio"
+                        value={option.value}
+                      />
                       <span>{option.label}</span>
                     </label>
                   ))}
@@ -346,10 +366,23 @@ export function NightlyCloseoutForm({
               </div>
               <div className="rr-closeout-field-group rr-rebound-field">
                 <h3>¿Se resintio la rodilla despues de la sesion?</h3>
-                <div className="rr-closeout-choice-row rr-rebound-choice-row" role="group" aria-label="Nivel de rebote">
+                <div
+                  className="rr-closeout-choice-row rr-rebound-choice-row"
+                  role="group"
+                  aria-label="Nivel de rebote"
+                >
                   {reboundOptions.map((option) => (
-                    <label className={reboundPainLevel === option.value ? "is-selected" : ""} key={option.value}>
-                      <input checked={reboundPainLevel === option.value} name="reboundPainLevel" onChange={() => setReboundPainLevel(option.value)} type="radio" value={option.value} />
+                    <label
+                      className={reboundPainLevel === option.value ? "is-selected" : ""}
+                      key={option.value}
+                    >
+                      <input
+                        checked={reboundPainLevel === option.value}
+                        name="reboundPainLevel"
+                        onChange={() => setReboundPainLevel(option.value)}
+                        type="radio"
+                        value={option.value}
+                      />
                       <span>{option.label}</span>
                     </label>
                   ))}
@@ -366,18 +399,43 @@ export function NightlyCloseoutForm({
               <div className="rr-sleep-hours">
                 <h3>Horas</h3>
                 <div>
-                  <button aria-label="Restar media hora" onClick={() => changeSleepHours(-0.5)} type="button">−</button>
+                  <button
+                    aria-label="Restar media hora"
+                    onClick={() => changeSleepHours(-0.5)}
+                    type="button"
+                  >
+                    −
+                  </button>
                   <output>{formatSleepHours(sleepHours)} h</output>
-                  <button aria-label="Sumar media hora" onClick={() => changeSleepHours(0.5)} type="button">+</button>
+                  <button
+                    aria-label="Sumar media hora"
+                    onClick={() => changeSleepHours(0.5)}
+                    type="button"
+                  >
+                    +
+                  </button>
                 </div>
                 <input name="sleepHours" type="hidden" value={sleepHours} />
               </div>
               <div className="rr-closeout-field-group">
                 <h3>Calidad</h3>
-                <div className="rr-closeout-choice-row rr-five-choice-row" role="group" aria-label="Calidad del sueno">
+                <div
+                  className="rr-closeout-choice-row rr-five-choice-row"
+                  role="group"
+                  aria-label="Calidad del sueno"
+                >
                   {sleepQualityOptions.map((option) => (
-                    <label className={sleepQuality === option.value ? "is-selected" : ""} key={option.value}>
-                      <input checked={sleepQuality === option.value} name="sleepQuality" onChange={() => setSleepQuality(option.value)} type="radio" value={option.value} />
+                    <label
+                      className={sleepQuality === option.value ? "is-selected" : ""}
+                      key={option.value}
+                    >
+                      <input
+                        checked={sleepQuality === option.value}
+                        name="sleepQuality"
+                        onChange={() => setSleepQuality(option.value)}
+                        type="radio"
+                        value={option.value}
+                      />
                       <span>{option.label}</span>
                     </label>
                   ))}
@@ -388,7 +446,13 @@ export function NightlyCloseoutForm({
 
           <aside className="rr-closeout-side">
             {!showNote ? (
-              <button className="rr-closeout-note-toggle" onClick={() => setShowNote(true)} type="button">+ Añadir nota (opcional)</button>
+              <button
+                className="rr-closeout-note-toggle"
+                onClick={() => setShowNote(true)}
+                type="button"
+              >
+                + Añadir nota (opcional)
+              </button>
             ) : null}
             <section className={`rr-closeout-note ${showNote ? "is-open" : ""}`}>
               <div>
@@ -413,7 +477,10 @@ export function NightlyCloseoutForm({
                     <article key={closeout.id}>
                       <strong>{formatRecentDay(closeout.date)}</strong>
                       <span>
-                        Dolor {closeout.endOfDayPain} · energia {ratingLabel(closeout.energy, energyOptions).toLowerCase()} · {formatSleepHours(closeout.sleepHours)} h {ratingLabel(closeout.sleepQuality, sleepQualityOptions).toLowerCase()}
+                        Dolor {closeout.endOfDayPain} · energia{" "}
+                        {ratingLabel(closeout.energy, energyOptions).toLowerCase()} ·{" "}
+                        {formatSleepHours(closeout.sleepHours)} h{" "}
+                        {ratingLabel(closeout.sleepQuality, sleepQualityOptions).toLowerCase()}
                       </span>
                       <b aria-hidden="true">✓</b>
                     </article>
@@ -433,7 +500,9 @@ export function NightlyCloseoutForm({
                 >
                   Eliminar cierre
                 </button>
-                <Link className="rr-modal-secondary" href={historyHref}>Cancelar</Link>
+                <Link className="rr-modal-secondary" href={historyHref}>
+                  Cancelar
+                </Link>
               </div>
             ) : null}
           </aside>

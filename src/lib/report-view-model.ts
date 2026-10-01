@@ -3,14 +3,8 @@ import {
   filterSessionsByRange,
   getDateRangeForLastDays,
 } from "@/lib/recovery-calculations";
-import {
-  createMedicalReportSummary,
-  type MedicalReportSummary,
-} from "@/lib/recovery-insights";
-import {
-  calculateTreatmentFrequency,
-  type TreatmentFrequencyItem,
-} from "@/lib/treatment-insights";
+import { createMedicalReportSummary, type MedicalReportSummary } from "@/lib/recovery-insights";
+import { calculateTreatmentFrequency, type TreatmentFrequencyItem } from "@/lib/treatment-insights";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 import { getRecoveryDateKey } from "@/lib/recovery-date";
 
@@ -55,7 +49,13 @@ export function createReportViewModel(
     ),
     ...filteredSessions.flatMap((session) =>
       session.notes?.trim()
-        ? [{ date: getRecoveryDateKey(session.occurredAt), source: "Sesion" as const, text: session.notes }]
+        ? [
+            {
+              date: getRecoveryDateKey(session.occurredAt),
+              source: "Sesion" as const,
+              text: session.notes,
+            },
+          ]
         : [],
     ),
     ...filteredSessions.flatMap((session) =>
@@ -74,23 +74,15 @@ export function createReportViewModel(
     .slice(0, 4);
 
   return {
-    summary: createMedicalReportSummary(
-      sessions,
-      closeouts,
-      windowDays,
-      referenceDate,
-    ),
+    summary: createMedicalReportSummary(sessions, closeouts, windowDays, referenceDate),
     recordCount: filteredCloseouts.length,
     sessionCount: filteredSessions.length,
-    improvedSessionCount: filteredSessions.filter(
-      (session) => session.finalState === "BETTER",
-    ).length,
+    improvedSessionCount: filteredSessions.filter((session) => session.finalState === "BETTER")
+      .length,
     averageSessionPainDelta: average(
       filteredSessions.map((session) => session.painAfter - session.painBefore),
     ),
-    averageSleepHours: average(
-      filteredCloseouts.map((closeout) => closeout.sleepHours),
-    ),
+    averageSleepHours: average(filteredCloseouts.map((closeout) => closeout.sleepHours)),
     averageEnergy: average(filteredCloseouts.map((closeout) => closeout.energy)),
     physioSessionCount: filteredSessions.filter(
       (session) => session.sessionType === "PHYSIOTHERAPY",

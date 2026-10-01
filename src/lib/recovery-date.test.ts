@@ -38,9 +38,7 @@ describe("recovery calendar dates", () => {
       fromInclusive: "2026-07-16T05:00:00.000Z",
       toExclusive: "2026-07-17T05:00:00.000Z",
     });
-    expect(eveningSession).toBeGreaterThanOrEqual(
-      new Date(range.fromInclusive).getTime(),
-    );
+    expect(eveningSession).toBeGreaterThanOrEqual(new Date(range.fromInclusive).getTime());
     expect(eveningSession).toBeLessThan(new Date(range.toExclusive).getTime());
   });
 });

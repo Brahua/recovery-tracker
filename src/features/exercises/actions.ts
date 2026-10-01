@@ -2,10 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import {
-  createExerciseRepository,
-  DuplicateExerciseNameError,
-} from "@/data/exercise-repository";
+import { createExerciseRepository, DuplicateExerciseNameError } from "@/data/exercise-repository";
 import { AuthenticationRequiredError } from "@/lib/supabase/authenticated";
 import { exerciseIdSchema, exerciseInputSchema } from "@/lib/validation/exercises";
 

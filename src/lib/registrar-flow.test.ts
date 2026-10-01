@@ -9,14 +9,8 @@ import {
 } from "@/lib/registrar-flow";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
-const sessions = [
-  { id: "latest" },
-  { id: "saved" },
-] as RehabSession[];
-const closeouts = [
-  { id: "latest" },
-  { id: "saved" },
-] as NightlyCloseout[];
+const sessions = [{ id: "latest" }, { id: "saved" }] as RehabSession[];
+const closeouts = [{ id: "latest" }, { id: "saved" }] as NightlyCloseout[];
 
 describe("resolveRegistrarMode", () => {
   it("keeps a valid requested mode", () => {

@@ -55,7 +55,8 @@ export function localClock(now: Date, timeZone: string) {
     minute: "2-digit",
     hourCycle: "h23",
   }).formatToParts(now);
-  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((item) => item.type === type)?.value ?? "00";
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((item) => item.type === type)?.value ?? "00";
   return {
     date: `${part("year")}-${part("month")}-${part("day")}`,
     minutes: Number(part("hour")) * 60 + Number(part("minute")),

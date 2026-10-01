@@ -14,9 +14,7 @@ export interface CloseoutFormProgress {
   totalSteps: 4;
 }
 
-export function getCloseoutFormProgress(
-  state: CloseoutFormState,
-): CloseoutFormProgress {
+export function getCloseoutFormProgress(state: CloseoutFormState): CloseoutFormProgress {
   const completedSteps = [
     state.endOfDayPain !== null,
     state.energy !== null,

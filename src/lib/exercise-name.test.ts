@@ -42,7 +42,9 @@ describe("matchExercises", () => {
   it("returns nothing for an empty query and respects exclusions and limit", () => {
     expect(matchExercises(catalog, "  ")).toEqual([]);
     expect(
-      matchExercises(catalog, "glu", { excludeIds: ["Puente de gluteos"] }).map((item) => item.name),
+      matchExercises(catalog, "glu", { excludeIds: ["Puente de gluteos"] }).map(
+        (item) => item.name,
+      ),
     ).toEqual(["Gluteo medio con banda"]);
     expect(matchExercises(catalog, "e", { limit: 1 })).toHaveLength(1);
   });

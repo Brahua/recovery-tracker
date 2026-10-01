@@ -112,7 +112,9 @@
   border: 1px solid var(--rr-border);
   border-radius: 17px;
   background: rgb(var(--rr-ink-rgb) / 0.035);
-  transition: border-color 180ms ease, background-color 180ms ease;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease;
 }
 
 .rr-history-event.is-expanded {
@@ -400,7 +402,11 @@
   gap: 8px;
   border: 1px solid rgb(var(--rr-night-rgb) / 0.24);
   border-radius: 17px;
-  background: linear-gradient(150deg, rgb(var(--rr-night-rgb) / 0.1), rgb(var(--rr-night-rgb) / 0.03));
+  background: linear-gradient(
+    150deg,
+    rgb(var(--rr-night-rgb) / 0.1),
+    rgb(var(--rr-night-rgb) / 0.03)
+  );
   padding: 13px 15px;
 }
 

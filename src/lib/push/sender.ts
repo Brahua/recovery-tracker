@@ -43,7 +43,10 @@ export function readVapidConfig(env: Record<string, string | undefined>): VapidC
 const TTL_SECONDS = 2 * 60 * 60;
 
 export function createPushSender(client: WebPushClient, vapid: VapidConfig) {
-  return async function sendPush(subscription: PushSubscriptionInput, payload: PushPayload): Promise<PushResult> {
+  return async function sendPush(
+    subscription: PushSubscriptionInput,
+    payload: PushPayload,
+  ): Promise<PushResult> {
     try {
       await client.sendNotification(
         { endpoint: subscription.endpoint, keys: subscription.keys },
@@ -54,7 +57,10 @@ export function createPushSender(client: WebPushClient, vapid: VapidConfig) {
     } catch (error) {
       const statusCode = (error as { statusCode?: number })?.statusCode;
       if (statusCode === 404 || statusCode === 410) return { status: "gone" };
-      const message = (error as { body?: string; message?: string })?.body || (error as Error)?.message || "Unknown error";
+      const message =
+        (error as { body?: string; message?: string })?.body ||
+        (error as Error)?.message ||
+        "Unknown error";
       return { status: "failed", statusCode, message };
     }
   };

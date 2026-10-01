@@ -1,8 +1,4 @@
-import {
-  exerciseColumns,
-  mapExerciseRow,
-  type ExerciseRow,
-} from "@/data/recovery-log-mappers";
+import { exerciseColumns, mapExerciseRow, type ExerciseRow } from "@/data/recovery-log-mappers";
 import { requireAuthenticatedSupabase } from "@/lib/supabase/authenticated";
 import { exerciseIdSchema, exerciseInputSchema } from "@/lib/validation/exercises";
 import type { Exercise, ExerciseInput } from "@/types/recovery";
@@ -70,7 +66,9 @@ export async function createExerciseRepository(): Promise<ExerciseRepository> {
       ]);
 
       if (error || usageError) {
-        throw new ExerciseRepositoryError((error ?? usageError)?.message ?? "Failed to list exercises.");
+        throw new ExerciseRepositoryError(
+          (error ?? usageError)?.message ?? "Failed to list exercises.",
+        );
       }
 
       const sessionCountById = new Map(
@@ -94,7 +92,9 @@ export async function createExerciseRepository(): Promise<ExerciseRepository> {
         .single();
 
       if (error || !data) {
-        throw error ? toRepositoryError(error) : new ExerciseRepositoryError("Failed to create exercise.");
+        throw error
+          ? toRepositoryError(error)
+          : new ExerciseRepositoryError("Failed to create exercise.");
       }
 
       return mapExerciseRow(data as ExerciseRow);

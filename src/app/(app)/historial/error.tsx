@@ -6,7 +6,11 @@ export default function HistorialError({ reset }: { reset: () => void }) {
       <section className="rr-card rr-history-empty" role="alert">
         <strong>No pudimos cargar el historial</strong>
         <p>Intenta nuevamente. Tus registros guardados no se modificaron.</p>
-        <button className="rr-button rr-button--secondary rr-history-more" onClick={reset} type="button">
+        <button
+          className="rr-button rr-button--secondary rr-history-more"
+          onClick={reset}
+          type="button"
+        >
           Reintentar
         </button>
       </section>

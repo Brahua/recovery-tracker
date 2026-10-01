@@ -44,9 +44,7 @@ export function ExerciseNameCombobox({
     ...(exactMatch?.archivedAt && !alreadyInSession
       ? [{ kind: "restore" as const, exercise: exactMatch }]
       : []),
-    ...(value.trim() && !exactMatch
-      ? [{ kind: "create" as const, name: value.trim() }]
-      : []),
+    ...(value.trim() && !exactMatch ? [{ kind: "create" as const, name: value.trim() }] : []),
   ];
   const expanded = open && options.length > 0;
   const optionId = (index: number) => `${baseId}-option-${index}`;

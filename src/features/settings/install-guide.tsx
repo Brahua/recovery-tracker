@@ -8,7 +8,11 @@ const subscribe = () => () => {};
 
 // How to add the app to the home screen. On iOS, notifications only work once it is installed.
 export function InstallGuide() {
-  const state = useSyncExternalStore<InstallState | null>(subscribe, readBrowserInstallState, () => null);
+  const state = useSyncExternalStore<InstallState | null>(
+    subscribe,
+    readBrowserInstallState,
+    () => null,
+  );
 
   if (state === null) return null;
 

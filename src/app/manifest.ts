@@ -8,7 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/",
     name: "Recovery Tracker",
     short_name: "Recovery",
-    description: "Tu ritual diario de recuperacion de rodilla: sesiones, cierres, insights y reporte.",
+    description:
+      "Tu ritual diario de recuperacion de rodilla: sesiones, cierres, insights y reporte.",
     lang: "es",
     start_url: "/",
     scope: "/",
@@ -19,7 +20,12 @@ export default function manifest(): MetadataRoute.Manifest {
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
       { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-      { src: "/icons/icon-maskable-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+      {
+        src: "/icons/icon-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
+      },
     ],
   };
 }

@@ -173,7 +173,9 @@ test.describe("routines", () => {
     await expect(routineExerciseRow(page, "Wall sit")).toBeVisible();
   });
 
-  test("shows not found for a routine that does not exist or is not the user's", async ({ page }) => {
+  test("shows not found for a routine that does not exist or is not the user's", async ({
+    page,
+  }) => {
     // Another user's routine is filtered out by RLS exactly like a missing id.
     for (const id of [randomUUID(), "no-es-un-id"]) {
       await page.goto(`/ejercicios/rutinas/${id}`);

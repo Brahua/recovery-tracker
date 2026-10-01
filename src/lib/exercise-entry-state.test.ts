@@ -208,9 +208,12 @@ describe("exercise entry state", () => {
     const typedNewAgain = createExerciseEntry("d", "prensa ");
     const unnamed = createExerciseEntry("e");
 
-    expect(
-      [...findRepeatedEntryIds([linked, typedSame, typedNew, typedNewAgain, unnamed, createExerciseEntry("f")], [wallSit])],
-    ).toEqual(["b", "d"]);
+    expect([
+      ...findRepeatedEntryIds(
+        [linked, typedSame, typedNew, typedNewAgain, unnamed, createExerciseEntry("f")],
+        [wallSit],
+      ),
+    ]).toEqual(["b", "d"]);
   });
 
   it("accepts a named entry without plan only in routine mode", () => {

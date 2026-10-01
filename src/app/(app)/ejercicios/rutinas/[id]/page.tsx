@@ -15,7 +15,5 @@ export default async function RutinaPage({ params }: { params: Promise<{ id: str
     notFound();
   }
 
-  return (
-    <RoutineEditor catalog={catalog} key={routine.updatedAt} routine={routine} />
-  );
+  return <RoutineEditor catalog={catalog} key={routine.updatedAt} routine={routine} />;
 }

@@ -196,7 +196,9 @@ export function buildAppointmentQuestions(summary: MedicalReportSummary) {
   }
 
   if (summary.highPainDays.length > 0) {
-    questions.push("Hay algo en comun en los dias con dolor mas alto que valga la pena revisar en consulta?");
+    questions.push(
+      "Hay algo en comun en los dias con dolor mas alto que valga la pena revisar en consulta?",
+    );
   }
 
   if (summary.reboundAssociationText.includes("coincidieron con rebote")) {
@@ -204,11 +206,15 @@ export function buildAppointmentQuestions(summary: MedicalReportSummary) {
   }
 
   if (summary.sleepEnergyText.includes("sueno promedio")) {
-    questions.push("Conviene observar alguna relacion entre noches cortas, energia y respuesta del dia siguiente?");
+    questions.push(
+      "Conviene observar alguna relacion entre noches cortas, energia y respuesta del dia siguiente?",
+    );
   }
 
   if (questions.length === 0) {
-    questions.push("Que variable conviene vigilar mejor en la siguiente semana: dolor, carga, rebote o sueno?");
+    questions.push(
+      "Que variable conviene vigilar mejor en la siguiente semana: dolor, carga, rebote o sueno?",
+    );
   }
 
   return questions.slice(0, 3);
@@ -226,7 +232,10 @@ export function createMedicalReportSummary(
   const averagePain = average(filteredCloseouts.map((closeout) => closeout.endOfDayPain));
   const highPainDays = filteredCloseouts
     .filter((closeout) => closeout.endOfDayPain >= 6)
-    .sort((left, right) => right.endOfDayPain - left.endOfDayPain || left.date.localeCompare(right.date))
+    .sort(
+      (left, right) =>
+        right.endOfDayPain - left.endOfDayPain || left.date.localeCompare(right.date),
+    )
     .slice(0, 3)
     .map((closeout) => ({
       date: closeout.date,

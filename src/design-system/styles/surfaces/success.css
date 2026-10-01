@@ -158,7 +158,11 @@
   margin-top: 14px;
   border: 1px solid rgb(var(--rr-accent-rgb) / 0.28);
   border-radius: 18px;
-  background: linear-gradient(150deg, rgb(var(--rr-accent-rgb) / 0.12), rgb(var(--rr-ink-rgb) / 0.03));
+  background: linear-gradient(
+    150deg,
+    rgb(var(--rr-accent-rgb) / 0.12),
+    rgb(var(--rr-ink-rgb) / 0.03)
+  );
   padding: 15px 17px;
   animation: rr-rise 500ms 450ms ease both;
 }
@@ -248,7 +252,9 @@
   padding-inline: 20px;
   color: var(--rr-ink);
   font-size: 16.5px;
-  transition: filter 150ms ease, transform 120ms ease;
+  transition:
+    filter 150ms ease,
+    transform 120ms ease;
 }
 
 .rr-success-primary b {
@@ -274,7 +280,9 @@
   color: var(--rr-text-muted);
   font-size: 13.5px;
   font-weight: 600;
-  transition: color 150ms ease, background-color 150ms ease;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
 }
 
 .rr-success-secondary:hover {
@@ -397,7 +405,12 @@
   position: relative;
   min-height: 100dvh;
   overflow: hidden;
-  background: linear-gradient(180deg, var(--rr-night-surface) 0%, var(--rr-night-surface-mid) 45%, var(--rr-surface-deep) 100%);
+  background: linear-gradient(
+    180deg,
+    var(--rr-night-surface) 0%,
+    var(--rr-night-surface-mid) 45%,
+    var(--rr-surface-deep) 100%
+  );
   color: var(--rr-ink-secondary);
 }
 
@@ -587,7 +600,9 @@
   background: rgb(var(--rr-ink-rgb) / 0.09);
   color: var(--rr-ink);
   font-size: 16px;
-  transition: background-color 150ms ease, transform 120ms ease;
+  transition:
+    background-color 150ms ease,
+    transform 120ms ease;
 }
 
 .rr-day-closed-primary:hover {
@@ -604,7 +619,9 @@
   color: var(--rr-text-muted);
   font-size: 13.5px;
   font-weight: 600;
-  transition: background-color 150ms ease, color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
 }
 
 .rr-day-closed-secondary:hover {
@@ -617,7 +634,12 @@
     display: grid;
     min-height: 100dvh;
     place-items: center;
-    background: linear-gradient(180deg, var(--rr-night-surface) 0%, var(--rr-night-surface-mid) 55%, var(--rr-surface-deep) 100%);
+    background: linear-gradient(
+      180deg,
+      var(--rr-night-surface) 0%,
+      var(--rr-night-surface-mid) 55%,
+      var(--rr-surface-deep) 100%
+    );
     padding: 40px 24px;
   }
 

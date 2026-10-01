@@ -137,15 +137,61 @@ describe("recovery log mappers", () => {
     const routine = mapRoutineRows(
       { id: "r1", user_id: "user-1", name: "Core", created_at: timestamp, updated_at: timestamp },
       [
-        { id: "re2", routine_id: "r1", user_id: "user-1", exercise_id: "ex2", position: 1, is_isometric: false, duration_minutes: "10.00", distance_km: null },
-        { id: "re1", routine_id: "r1", user_id: "user-1", exercise_id: "ex1", position: 0, is_isometric: true, duration_minutes: null, distance_km: null },
-        { id: "other", routine_id: "r2", user_id: "user-1", exercise_id: "ex3", position: 0, is_isometric: false, duration_minutes: null, distance_km: null },
+        {
+          id: "re2",
+          routine_id: "r1",
+          user_id: "user-1",
+          exercise_id: "ex2",
+          position: 1,
+          is_isometric: false,
+          duration_minutes: "10.00",
+          distance_km: null,
+        },
+        {
+          id: "re1",
+          routine_id: "r1",
+          user_id: "user-1",
+          exercise_id: "ex1",
+          position: 0,
+          is_isometric: true,
+          duration_minutes: null,
+          distance_km: null,
+        },
+        {
+          id: "other",
+          routine_id: "r2",
+          user_id: "user-1",
+          exercise_id: "ex3",
+          position: 0,
+          is_isometric: false,
+          duration_minutes: null,
+          distance_km: null,
+        },
       ],
       [
-        { id: "s2", routine_exercise_id: "re1", user_id: "user-1", position: 1, reps: null, weight_kg: "2.50", hold_seconds: 40 },
-        { id: "s1", routine_exercise_id: "re1", user_id: "user-1", position: 0, reps: null, weight_kg: null, hold_seconds: 45 },
+        {
+          id: "s2",
+          routine_exercise_id: "re1",
+          user_id: "user-1",
+          position: 1,
+          reps: null,
+          weight_kg: "2.50",
+          hold_seconds: 40,
+        },
+        {
+          id: "s1",
+          routine_exercise_id: "re1",
+          user_id: "user-1",
+          position: 0,
+          reps: null,
+          weight_kg: null,
+          hold_seconds: 45,
+        },
       ],
-      new Map([["ex1", "Wall sit"], ["ex2", "Bicicleta"]]),
+      new Map([
+        ["ex1", "Wall sit"],
+        ["ex2", "Bicicleta"],
+      ]),
     );
 
     expect(routine.exercises).toEqual([

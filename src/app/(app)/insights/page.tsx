@@ -12,11 +12,10 @@ export default async function InsightsPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const range = resolvedSearchParams.range === "all" ? "all" : "four-weeks";
-  const { supabaseEnv, user, recentSessions, recentCloseouts } =
-    await loadRecoveryPageData({
-      from: range === "all" ? "2000-01-01" : undefined,
-      limit: null,
-    });
+  const { supabaseEnv, user, recentSessions, recentCloseouts } = await loadRecoveryPageData({
+    from: range === "all" ? "2000-01-01" : undefined,
+    limit: null,
+  });
 
   if (!supabaseEnv || !user) {
     redirect("/");

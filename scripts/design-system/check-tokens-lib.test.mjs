@@ -35,7 +35,9 @@ describe("findViolations", () => {
   });
 
   it("ignores comments and ids in selectors", () => {
-    expect(findViolations("/* was #e5a087 and rgba(0, 0, 0, 1) */ .a{color:var(--rr-ink)}")).toEqual([]);
+    expect(
+      findViolations("/* was #e5a087 and rgba(0, 0, 0, 1) */ .a{color:var(--rr-ink)}"),
+    ).toEqual([]);
     expect(findViolations("#main .a{color:var(--rr-ink)}")).toEqual([]);
   });
 });

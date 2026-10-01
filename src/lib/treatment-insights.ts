@@ -54,7 +54,11 @@ export function calculateTreatmentFrequency(sessions: RehabSession[]): Treatment
   for (const session of physioSessionsWithTreatments(sessions)) {
     for (const treatment of session.treatments) {
       const key = treatmentKey(treatment);
-      const item = items.get(key) ?? { label: treatmentLabel(treatment), count: 0, zones: new Map() };
+      const item = items.get(key) ?? {
+        label: treatmentLabel(treatment),
+        count: 0,
+        zones: new Map(),
+      };
       item.count += 1;
 
       const zone = treatment.bodyZone?.trim();
@@ -68,7 +72,12 @@ export function calculateTreatmentFrequency(sessions: RehabSession[]): Treatment
   }
 
   return [...items.entries()]
-    .map(([key, item]) => ({ key, label: item.label, count: item.count, zones: [...item.zones.values()] }))
+    .map(([key, item]) => ({
+      key,
+      label: item.label,
+      count: item.count,
+      zones: [...item.zones.values()],
+    }))
     .sort((left, right) => right.count - left.count || left.label.localeCompare(right.label, "es"));
 }
 

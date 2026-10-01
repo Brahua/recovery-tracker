@@ -19,6 +19,11 @@ import {
   buildFourWeekSessionCounts,
   buildReboundDistribution,
 } from "@/lib/insights-view-model";
+import {
+  calculateTreatmentResponse,
+  minTreatmentSessionsForComparison,
+  type TreatmentResponseItem,
+} from "@/lib/treatment-insights";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
 type InsightsRange = "four-weeks" | "all";
@@ -177,6 +182,57 @@ function ExerciseBars({ items }: { items: Array<{ name: string; count: number }>
   );
 }
 
+function formatSigned(value?: number) {
+  if (typeof value !== "number") return "--";
+  const formatted = formatNumber(Math.abs(value));
+  return value > 0 ? `+${formatted}` : value < 0 ? `−${formatted}` : formatted;
+}
+
+function formatRate(value?: number) {
+  return typeof value === "number" ? `${value}%` : "--";
+}
+
+function TreatmentResponse({ items }: { items: TreatmentResponseItem[] }) {
+  if (items.length === 0) {
+    return <EmptyChart>Registra tratamientos en tus sesiones de fisio para compararlos.</EmptyChart>;
+  }
+
+  return (
+    <ul className="rr-treatment-response">
+      {items.slice(0, 6).map((item) => (
+        <li key={item.key}>
+          <p>
+            <strong>{item.label}</strong>
+            <span>
+              {item.sessionCount} sesion{item.sessionCount === 1 ? "" : "es"}
+            </span>
+          </p>
+          {item.hasEnoughData ? (
+            <dl>
+              <div>
+                <dt>Dolor en la sesion</dt>
+                <dd>
+                  <b>{formatSigned(item.painDeltaWith)}</b> con · {formatSigned(item.painDeltaWithout)} sin
+                </dd>
+              </div>
+              <div>
+                <dt>Rebote esa noche</dt>
+                <dd>
+                  <b>{formatRate(item.reboundRateWith)}</b> con · {formatRate(item.reboundRateWithout)} sin
+                </dd>
+              </div>
+            </dl>
+          ) : (
+            <small>
+              Aun pocos datos: {item.sessionCount} de {minTreatmentSessionsForComparison} sesiones para comparar.
+            </small>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 function InsightCard({
   children,
   title,
@@ -214,6 +270,8 @@ export function RecoveryDashboard({
   const sleepCloseouts = filterCloseoutsByRange(selectedCloseouts, sleepWindow);
   const sleepPain = calculateSleepPainComparison(selectedCloseouts, 14, now);
   const exercises = calculateRecentExerciseFrequency(selectedSessions, rangeDays, now);
+  const hasPhysioSessions = selectedSessions.some((session) => session.sessionType === "PHYSIOTHERAPY");
+  const treatmentResponse = calculateTreatmentResponse(selectedSessions, selectedCloseouts);
   const weeklyStory = [
     buildPainTrendInsight(calculatePainTrend(recentCloseouts, 7, now)),
     buildReboundInsight(
@@ -273,6 +331,15 @@ export function RecoveryDashboard({
           <InsightCard title="Ejercicios mas frecuentes">
             <ExerciseBars items={exercises} />
           </InsightCard>
+
+          {hasPhysioSessions ? (
+            <InsightCard title="Tratamientos del centro">
+              <TreatmentResponse items={treatmentResponse} />
+              <p className="rr-insights-caption">
+                Cambio medio de dolor (despues − antes) y noches con rebote, en sesiones de fisio con y sin cada tratamiento. Es una coincidencia, no una causa.
+              </p>
+            </InsightCard>
+          ) : null}
         </section>
       </div>
     </div>

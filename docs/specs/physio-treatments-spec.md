@@ -2,7 +2,7 @@
 
 ## Estado
 
-Aprobada el 2026-10-01. Fase 1 en curso en `feat/physio-treatments`.
+Aprobada el 2026-10-01. Fase 1: PR #23. Fase 2 (Insights y Reporte): rama `feat/physio-treatments-insights`.
 
 ## Decisiones validadas (owner, 2026-10-01)
 
@@ -116,10 +116,16 @@ Si la última sesión de fisio (por fecha) tiene indicaciones, Hoy muestra una t
 
 ### Fase 2: Insights y Reporte
 
-Se especifica en detalle al terminar la fase 1, con datos reales. Idea base:
+No necesita migración: usa los datos de la fase 1.
 
-- **Reporte médico:** por periodo, sesiones de fisio y cuántas veces se aplicó cada tratamiento (con zonas). Es un dato, no una interpretación.
-- **Insights:** para cada tratamiento con al menos 3 sesiones, la variación media de dolor (después − antes) y el rebote de esa noche, comparados con las sesiones de fisio sin ese tratamiento. Con pocas sesiones se muestra "Aún pocos datos".
+- **Insights → tarjeta "Tratamientos del centro"** (solo si hay sesiones de fisio en el rango). Por cada tratamiento (máx. 6, los más frecuentes):
+  - cuántas sesiones lo incluyeron;
+  - con **3 o más sesiones**: el cambio medio de dolor en la sesión (después − antes) y el % de noches con rebote (cierre del mismo día), **con** el tratamiento frente a las demás sesiones de fisio **sin** él;
+  - con menos: "Aún pocos datos: N de 3 sesiones para comparar".
+  - Leyenda: "Es una coincidencia, no una causa."
+- **Reporte → tarjeta "Respuesta a las sesiones"**: bloque "Tratamientos del centro · N sesiones de fisio" con cada tratamiento, cuántas veces se aplicó y las zonas registradas. Solo datos, sin interpretación.
+- **Reporte → Notas destacadas**: incluye las indicaciones del fisio, con la fuente "Indicaciones del fisio".
+- Lógica pura en `src/lib/treatment-insights.ts` (`calculateTreatmentFrequency`, `calculateTreatmentResponse`), con tests.
 
 ## Modelo de datos
 

@@ -96,4 +96,37 @@ describe("createReportViewModel", () => {
     expect(report.averageEnergy).toBeUndefined();
     expect(report.notes).toEqual([]);
   });
+
+  it("lists physio treatments and therapist instructions inside the window", () => {
+    const physio: RehabSession = {
+      ...sessions[0]!,
+      id: "session-physio",
+      occurredAt: "2026-07-14T15:00:00.000Z",
+      sessionType: "PHYSIOTHERAPY",
+      notes: undefined,
+      treatments: [
+        { category: "PHYSICAL_AGENT", modality: "SHOCKWAVE", bodyZone: "Tendón rotuliano" },
+        { category: "TAPING", modality: "KINESIO_TAPE" },
+      ],
+      therapistNotes: "Bajar carga en sentadilla.",
+    };
+    const report = createReportViewModel(
+      [...sessions, physio],
+      closeouts,
+      14,
+      "2026-07-16T12:00:00.000Z",
+    );
+
+    expect(report.physioSessionCount).toBe(1);
+    expect(report.treatments.map((item) => [item.label, item.count, item.zones])).toEqual([
+      ["Kinesiotape", 1, []],
+      ["Ondas de choque", 1, ["Tendón rotuliano"]],
+    ]);
+    expect(report.notes).toContainEqual({
+      date: "2026-07-14",
+      source: "Indicaciones del fisio",
+      text: "Bajar carga en sentadilla.",
+    });
+  });
 });
+

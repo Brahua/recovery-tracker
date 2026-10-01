@@ -69,6 +69,17 @@ test.describe("physio treatments", () => {
     await expect(treatments).toContainText(otherName);
     await expect(session).toContainText(instructions);
     await expect(session).not.toContainText("Sin ejercicios detallados.");
+
+    await page.goto("/insights");
+    const insightsCard = page.getByRole("article").filter({
+      has: page.getByRole("heading", { name: "Tratamientos del centro" }),
+    });
+    await expect(insightsCard).toContainText("Ondas de choque");
+
+    await page.goto("/reporte");
+    const reportTreatments = page.locator(".rr-report-treatments");
+    await expect(reportTreatments).toContainText("Ondas de choque");
+    await expect(reportTreatments).toContainText("Tendón rotuliano");
   });
 
   test("hides treatments for other session types and does not send them", async ({ page }) => {

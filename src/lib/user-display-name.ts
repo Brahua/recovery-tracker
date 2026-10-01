@@ -7,9 +7,19 @@ function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-// Prefers the name saved on the Supabase account; falls back to the email's
-// local part (up to the first ".", "_" or "-") when none is set.
+// The name the user chose in Ajustes (user_metadata.display_name), as typed.
+export function getChosenDisplayName(user?: DisplayNameUser | null) {
+  const chosen = user?.user_metadata?.display_name;
+  return typeof chosen === "string" && chosen.trim() ? chosen.trim() : null;
+}
+
+// Prefers the name chosen in Ajustes; then the first word of the Google name (full_name, which
+// Google may rewrite on every sign-in); then the email's local part (up to the first ".", "_" or
+// "-").
 export function getUserDisplayName(user?: DisplayNameUser | null) {
+  const chosen = getChosenDisplayName(user);
+  if (chosen) return chosen;
+
   const metadataName = user?.user_metadata?.full_name;
 
   if (typeof metadataName === "string" && metadataName.trim()) {

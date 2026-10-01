@@ -38,6 +38,7 @@ const SIGNED_IN_SCREENS = [
   { name: "Reporte", path: "/reporte", ready: null },
   { name: "Ejercicios", path: "/ejercicios", ready: null },
   { name: "Nueva rutina", path: "/ejercicios/rutinas/nueva", ready: null },
+  { name: "Ajustes", path: "/ajustes", ready: null },
 ] as const;
 
 // Populated screens render far more than empty states (history rows, metrics, sets),

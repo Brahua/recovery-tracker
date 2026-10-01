@@ -258,9 +258,21 @@
     font-size: 13px;
   }
 
-  .rr-user-row div span {
+  .rr-user-row div span,
+  .rr-user-settings-link {
     color: var(--rr-text-muted);
     font-size: 11px;
+  }
+
+  .rr-user-settings-link {
+    display: inline-block;
+    text-decoration: underline;
+    text-decoration-color: rgb(var(--rr-ink-rgb) / 0.25);
+    text-underline-offset: 2px;
+  }
+
+  .rr-user-settings-link:hover {
+    color: var(--rr-ink);
   }
 
   .rr-user-row button {

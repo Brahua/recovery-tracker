@@ -33,6 +33,7 @@ Lo que el backlog original tenía como pendiente o diferido y hoy existe.
 | Design system CSS | Tokens por tipo, componentes y un archivo por pantalla; `design:check` impide valores sueltos | `src/design-system/` |
 | Historial | Solo lectura, ventanas de 30 días, varias sesiones por día, series individuales | `/historial` |
 | Registros con fecha anterior | Sesiones y cierres de días pasados, sin fechas futuras ni cierres duplicados | Registrar |
+| Nombre en el saludo | Se elige en `/ajustes` y se mantiene entre inicios de sesión con Google | `src/features/settings/` |
 | Feedback de carga | Barra de progreso global, toasts en cada escritura, pantalla de error | `docs/specs/global-loading-and-feedback-spec.md` |
 
 ## Pendiente: producto
@@ -41,8 +42,7 @@ Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justific
 
 | Prioridad | Feature | Por qué importa | Se reabre cuando |
 |---|---|---|---|
-| Alta | **PWA instalable** (ícono en el inicio, pantalla completa) | Uso diario desde el celular sin abrir el navegador | Quieras abrirla como una app más |
-| Alta | **Recordatorios / notificaciones** | Sostener el hábito de sesión y cierre | Se te olviden registros con frecuencia |
+| Alta | **PWA y recordatorios — en curso** | Instalable y pantalla offline hechas (PR 1); faltan recordatorios (PR 2 y 3) | `docs/specs/pwa-and-reminders-spec.md` |
 | Media | **Editar o corregir registros pasados** | Hoy un error de carga no se puede arreglar desde la app | Aparezca un registro mal cargado que importe |
 | Media | **Análisis por ejercicio** (progresión de peso, repeticiones, segundos) | Ver si un ejercicio concreto progresa | Quieras saber "¿cómo voy en X?" |
 | Media | **Guardar qué rutina se usó en cada sesión** | Comparar rutinas en Historial e Insights | Uses varias rutinas y quieras compararlas |
@@ -51,7 +51,6 @@ Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justific
 | Media | PDF real del reporte (archivo generado, no impresión del navegador) | Enviar el reporte por correo o WhatsApp | El fisio o el médico pida un archivo |
 | Media | Zonas de dolor / mapa de la rodilla | La ubicación del dolor en las citas | La ubicación del dolor sea tema en las citas |
 | Media | Resumen semanal y preguntas para la cita con IA | Mejores resúmenes que las reglas actuales | Los textos por reglas se queden cortos (con límites médicos claros) |
-| Baja | Editar el nombre de la cuenta desde la app | Hoy solo se cambia por SQL | Quieras cambiarlo |
 | Baja | Registrar rigidez en el cierre nocturno | Hoy el cierre registra dolor, energía, sueño y rebote; la rigidez solo cabe en la nota | La rigidez sea un dato que el fisio pida seguir |
 | Baja | Exportar a CSV | Análisis propio en una hoja de cálculo | Hagas análisis a mano seguido |
 | Baja | Apple Health / wearables (sueño, pasos) | Datos sin cargarlos a mano | El registro manual de sueño sea poco fiable |

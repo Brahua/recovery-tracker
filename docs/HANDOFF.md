@@ -83,6 +83,6 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 
 ## Próximos pasos
 
-- **Design system CSS terminado** (`docs/specs/design-system-css-spec.md`): estilos en `src/design-system/styles/` (tokens por tipo, base, componentes, una carpeta por pantalla), sin valores sueltos fuera de `tokens/` (`npm run design:check` en CI), tema claro legado retirado. Guía: `src/design-system/README.md`.
-- Para cualquier refactor de CSS: línea base con `npm run -s css:compare -- snapshot <archivo fuera del repo>` desde `main` y comparación después de cada paso.
+- **En curso: PWA y recordatorios** (`docs/specs/pwa-and-reminders-spec.md`, tareas en `tasks/todo-pwa-reminders.md`). PR 1 (instalable, pantalla offline, `/ajustes` con el nombre) listo; siguen PR 2 (ajustes de recordatorios y notificación de prueba; antes del deploy el owner carga las claves VAPID) y PR 3 (envío programado con `pg_cron`; antes del deploy el owner carga `service_role`, el secreto y Vault).
+- Ícono de la app: editar `src/design-system/brand/app-icon.svg` y regenerar con `node scripts/pwa/render-icons.mjs`. El service worker es `public/sw.js` (subir `CACHE_VERSION` si cambia `offline.html`).
 - El resto de lo pendiente está en **`docs/ideas/recovery-ritual-backlog.md`**.

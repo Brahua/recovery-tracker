@@ -7,7 +7,7 @@
 
 App en español, pensada primero para el celular, para llevar el control de la rehabilitación después de una cirugía de rodilla. Tiene cuatro flujos principales:
 
-- **Registrar sesión:** lo que se anota al salir de terapia.
+- **Registrar sesión:** lo que se anota al salir de terapia; en Fisio guiada, también los tratamientos del centro (agentes físicos, terapia manual, punción, vendaje) y las indicaciones del fisio.
 - **Cierre del día:** el registro de cada noche.
 - **Insights:** tendencias de dolor, carga, sueño y ejercicios.
 - **Reporte:** un resumen para llevar a la cita con el médico o el fisio.
@@ -40,7 +40,7 @@ src/
   lib/            Lógica pura con tests: view-models, cálculos, insights, fechas (America/Lima), validación Zod, clientes Supabase
   data/           recovery-log-repository.ts (acceso a la BD) + mappers
   types/          Tipos del dominio
-supabase/migrations/   Migraciones: esquema base, series de ejercicios e historial, permisos de API, catálogo de ejercicios y rutinas
+supabase/migrations/   Migraciones: esquema base, series de ejercicios e historial, permisos de API, catálogo de ejercicios, rutinas, recordatorios y tratamientos del centro
 proxy.ts          Refresca la sesión de Supabase en cada request
 ```
 
@@ -61,7 +61,7 @@ Vienen de `docs/archive/handoffs/session-handoff-2026-07-17.md`:
 
 ## 4. En qué fase está
 
-- **Terminado:** el MVP, el rediseño con Claude Design (8 pantallas), el historial, las series individuales, los registros con fecha anterior, el CI/CD, el catálogo de ejercicios (`/ejercicios`), las rutinas, el feedback global de carga, el design system CSS (`src/design-system/`), la app instalable (PWA con pantalla offline), `/ajustes` (nombre, instalación y recordatorios) y los recordatorios push programados con `pg_cron`.
+- **Terminado:** el MVP, el rediseño con Claude Design (8 pantallas), el historial, las series individuales, los registros con fecha anterior, el CI/CD, el catálogo de ejercicios (`/ejercicios`), las rutinas, el feedback global de carga, el design system CSS (`src/design-system/`), la app instalable (PWA con pantalla offline), `/ajustes` (nombre, instalación y recordatorios) los recordatorios push programados con `pg_cron` y los tratamientos del centro en Fisio guiada (registro, Historial, Hoy, Insights y Reporte; `docs/specs/physio-treatments-spec.md`).
 - **Última verificación documentada (2026-10-01):** CI en verde en `main` (lint, typecheck, unitarios, E2E críticos con axe) y deploy a producción correcto.
 - **Fase actual:** la validación de uso real se cerró (2026-10-01) y de ella salieron las features ya entregadas. **No hay una próxima feature elegida.**
 - **Backlog:** todo lo pendiente (producto, diseño y técnico), con lo ya hecho verificado contra el código, está en `docs/ideas/recovery-ritual-backlog.md`.

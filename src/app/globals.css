@@ -1,5 +1,9 @@
 @import "tailwindcss";
 @source not "../../playwright/.chrome-profile";
+/* Docs and tooling mention class names in prose; they must not generate utilities. */
+@source not "../../docs";
+@source not "../../tasks";
+@source not "../../scripts";
 @import "../design-system/styles/tokens/root.css";
 @import "../design-system/styles/tokens/theme.css";
 @import "../design-system/styles/base.css";
@@ -13,7 +17,6 @@
 @import "../design-system/styles/surfaces/insights.css";
 @import "../design-system/styles/surfaces/report.css";
 @import "../design-system/styles/surfaces/landing.css";
-@import "../design-system/styles/legacy.css";
 @import "../design-system/styles/surfaces/history.css";
 @import "../design-system/styles/surfaces/shell-mobile-nav.css";
 @import "../design-system/styles/surfaces/exercise-entry.css";

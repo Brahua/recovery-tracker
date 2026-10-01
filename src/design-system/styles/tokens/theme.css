@@ -1,8 +1,6 @@
 /* Bridge from design tokens to Tailwind theme variables. */
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
   --color-ritual-bg: var(--rr-bg);
   --color-ritual-surface: var(--rr-surface);
   --color-ritual-ink: var(--rr-ink);

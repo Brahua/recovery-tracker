@@ -69,23 +69,6 @@
   /* Space taken by the fixed mobile tab bar (7px + 50px + 7px + 1px border). */
   --rr-bottom-nav-offset: calc(65px + env(safe-area-inset-bottom, 0px));
 
-  /* Legacy light-screen aliases stay in place until each screen is migrated. */
-  --background: #f5f3ea;
-  --background-strong: #fbfaf4;
-  --surface: rgba(255, 252, 245, 0.84);
-  --surface-strong: #fffdf8;
-  --surface-muted: #f2f4ec;
-  --border: rgba(88, 102, 76, 0.14);
-  --border-strong: rgba(64, 81, 54, 0.2);
-  --foreground: #18201a;
-  --muted: #5a6858;
-  --accent: #254131;
-  --accent-soft: #8cb46c;
-  --accent-warm: #caa46a;
-  --success-bg: #edf6e8;
-  --success-border: #c8ddbc;
-  --error-bg: #fff1ec;
-  --error-border: #e4c1b6;
-  --shadow-soft: 0 22px 60px rgba(43, 58, 34, 0.08);
-  --shadow-card: 0 18px 40px rgba(42, 57, 34, 0.06);
+  /* Text selection on the dark theme. */
+  --rr-selection: rgba(46, 125, 91, 0.45);
 }

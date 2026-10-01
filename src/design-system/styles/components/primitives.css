@@ -1,4 +1,4 @@
-/* Shared primitives: cards, buttons, controls. */
+/* Shared primitives: cards, buttons and focus rings. */
 
 .rr-card {
   border: 1px solid var(--rr-border);
@@ -11,18 +11,6 @@
   border-radius: var(--rr-radius-hero);
   background: var(--rr-hero-card);
   box-shadow: var(--rr-shadow-hero);
-}
-
-.rr-card--featured {
-  border-color: rgba(46, 125, 91, 0.3);
-  background: var(--rr-accent-card);
-}
-
-.rr-card--paper {
-  border-radius: var(--rr-radius-button);
-  background: var(--rr-ink);
-  color: var(--rr-paper-ink);
-  box-shadow: var(--rr-shadow-paper);
 }
 
 .rr-button {
@@ -69,14 +57,6 @@
 
 .rr-button--secondary:hover {
   background: rgba(244, 239, 231, 0.05);
-}
-
-.rr-control {
-  min-height: var(--rr-hit-target);
-  border: 1px solid var(--rr-border-strong);
-  border-radius: var(--rr-radius-control);
-  background: var(--rr-input-bg);
-  color: var(--rr-ink);
 }
 
 .rr-theme :where(a, button, input, select, textarea):focus-visible {

@@ -51,3 +51,12 @@
   background: var(--rr-wash-soft);
   color: var(--rr-ink);
 }
+
+@media (min-width: 64rem) {
+  /* Takes the place of "Recientes" in the session form. */
+  .rr-session-grid > .rr-edit-record-actions {
+    grid-column: 2;
+    grid-row: 5;
+    align-self: start;
+  }
+}

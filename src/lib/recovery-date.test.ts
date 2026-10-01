@@ -5,6 +5,8 @@ import {
   getRecoveryDateKey,
   getRecoveryUtcRange,
   getRecoveryWeekKeys,
+  parseRecoveryDateTimeLocal,
+  toRecoveryDateTimeLocal,
 } from "@/lib/recovery-date";
 
 describe("recovery calendar dates", () => {
@@ -40,5 +42,28 @@ describe("recovery calendar dates", () => {
       new Date(range.fromInclusive).getTime(),
     );
     expect(eveningSession).toBeLessThan(new Date(range.toExclusive).getTime());
+  });
+});
+
+describe("Lima datetime-local values", () => {
+  it("formats a timestamp in Lima time", () => {
+    expect(toRecoveryDateTimeLocal("2026-10-02T01:30:00.000Z")).toBe("2026-10-01T20:30");
+    expect(toRecoveryDateTimeLocal(new Date("2026-10-01T05:00:00.000Z"))).toBe("2026-10-01T00:00");
+  });
+
+  it("reads a datetime-local value as Lima time", () => {
+    expect(parseRecoveryDateTimeLocal("2026-10-01T20:30")).toBe("2026-10-02T01:30:00.000Z");
+    expect(parseRecoveryDateTimeLocal("2026-10-01T00:15:30")).toBe("2026-10-01T05:15:30.000Z");
+  });
+
+  it("round-trips without drifting", () => {
+    const saved = "2026-09-29T23:45:00.000Z";
+    expect(parseRecoveryDateTimeLocal(toRecoveryDateTimeLocal(saved))).toBe(saved);
+  });
+
+  it("rejects malformed values", () => {
+    expect(parseRecoveryDateTimeLocal("")).toBeNull();
+    expect(parseRecoveryDateTimeLocal("2026-10-01")).toBeNull();
+    expect(parseRecoveryDateTimeLocal("2026-13-45T25:00")).toBeNull();
   });
 });

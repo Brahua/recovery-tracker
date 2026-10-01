@@ -5,13 +5,12 @@ Estilos globales de Recovery Ritual, con clases `rr-*` y variables `--rr-*`. La 
 ## Estructura
 
 ```
-src/app/globals.css          solo @import "tailwindcss", @source y los @import de abajo, EN ORDEN
+src/app/globals.css          solo @import "tailwindcss", @source (excluye docs/, tasks/ y scripts/) y los @import de abajo, EN ORDEN
 styles/
   tokens/                    variables --rr-* y el puente a Tailwind (@theme inline)
   base.css                   html, body, encabezados
   components/                piezas usadas en varias pantallas (tarjetas, botones, sheet, combobox, feedback, skeleton)
   surfaces/                  una por pantalla o flujo (shell, Hoy, Registrar, cierre, Insights, Reporte, Historial, landing, ejercicios, rutinas)
-  legacy.css                 estilos de antes del rediseño, en retiro
 ```
 
 ## Reglas

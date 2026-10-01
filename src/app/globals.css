@@ -15,6 +15,7 @@
 @import "../design-system/styles/tokens/theme.css";
 @import "../design-system/styles/base.css";
 @import "../design-system/styles/components/primitives.css";
+@import "../design-system/styles/components/date-field.css";
 @import "../design-system/styles/surfaces/shell.css";
 @import "../design-system/styles/surfaces/today.css";
 @import "../design-system/styles/surfaces/registrar.css";

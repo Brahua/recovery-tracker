@@ -70,9 +70,8 @@
   padding: 12px 20px 0;
 }
 
-.rr-closeout-date-context .rr-context-time {
+.rr-closeout-date-context .rr-date-field {
   margin-top: 0;
-  border: 1px solid var(--rr-border);
   background: var(--rr-card-bg);
 }
 

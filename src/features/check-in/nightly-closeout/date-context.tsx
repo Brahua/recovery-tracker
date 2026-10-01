@@ -1,7 +1,6 @@
 "use client";
 
-import { useState } from "react";
-
+import { DateField } from "@/components/date-field";
 import { duplicateCloseoutDateMessage } from "@/lib/closeout-date";
 import { addRecoveryDays, recoveryTimeZone } from "@/lib/recovery-date";
 
@@ -35,35 +34,21 @@ export function CloseoutDateContext({
   selectedDate,
   today,
 }: CloseoutDateContextProps) {
-  const [showDate, setShowDate] = useState(false);
-
   return (
     <section aria-label="Fecha del cierre" className="rr-closeout-date-context">
-      <button
-        aria-expanded={showDate}
-        className="rr-context-time"
-        onClick={() => setShowDate((visible) => !visible)}
-        type="button"
-      >
-        <span>{dateLabel}</span>
-        <small>{showDate ? "cerrar" : "cambiar"}</small>
-      </button>
-      {showDate ? (
-        <label className="rr-date-control">
-          <span>Fecha del cierre</span>
-          <input
-            defaultValue={selectedDate}
-            key={selectedDate}
-            max={today}
-            name="date"
-            onChange={(event) => onChange(event.target.value)}
-            required
-            type="date"
-          />
-        </label>
-      ) : (
-        <input name="date" type="hidden" value={selectedDate} />
-      )}
+      <DateField
+        defaultValue={selectedDate}
+        display={dateLabel}
+        key={selectedDate}
+        label="Fecha del cierre"
+        max={today}
+        name="date"
+        onChange={(event) => {
+          if (event.target.value) onChange(event.target.value);
+        }}
+        required
+        type="date"
+      />
       {isPending ? <p role="status">Buscando registros de ese día…</p> : null}
       {hasCloseout ? (
         <p className="rr-closeout-date-warning" role="alert">

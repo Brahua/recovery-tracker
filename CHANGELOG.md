@@ -37,6 +37,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Project-owned rehabilitation hero image and a canonical inventory of the 19 implemented design references.
 
 ### Changed
+- Date pickers in Registrar (session) and the nightly closeout are a single large row: the row itself opens the phone's date picker, instead of a "cambiar" button that revealed a second, small field.
 - Styles split from `src/app/globals.css` into `src/design-system/styles/` (tokens, base, components, one file per screen), imported in cascade order; compiled CSS unchanged (`npm run css:compare`).
 - Design tokens split by kind (colors, typography, motion, shadows, radius, spacing); every literal color, easing and font stack outside `tokens/` now uses a token (`rgb(var(--rr-*-rgb) / alpha)` for transparency). Compiled values unchanged.
 - The former staging Supabase project and Vercel app are now production, served at https://recovery-tracker.brahua.com (ADR-004).

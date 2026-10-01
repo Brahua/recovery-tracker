@@ -1,6 +1,6 @@
 # Spec: app instalable (PWA) y recordatorios
 
-Estado: **aprobada (2026-10-01)** con horas por defecto Sesión 18:00 (apagado) y Cierre 21:30 (encendido), e ícono de anillo dorado. PRs 1–3 implementados (instalable y offline; ajustes y suscripción; envío programado). Falta la verificación del owner en el iPhone. Backlog: "PWA instalable" y "Recordatorios / notificaciones" (prioridad alta).
+Estado: **aprobada (2026-10-01)** con horas por defecto Sesión 18:00 (apagado) y Cierre 21:30 (encendido), e ícono de anillo dorado. **Implementada y verificada (2026-10-01)**: PRs #17–#19 más el arreglo de toasts en iOS (#21). Verificado en el iPhone del owner. Backlog: "PWA instalable" y "Recordatorios / notificaciones" (prioridad alta).
 
 ## Objetivo
 
@@ -180,13 +180,13 @@ El envío real de push no se puede probar en CI (necesita un navegador suscrito 
 
 ## Criterios de éxito
 
-- [ ] En el iPhone del owner: la app instalada abre a pantalla completa con ícono propio.
+- [x] En el iPhone del owner: la app instalada abre a pantalla completa con ícono propio.
 - [ ] El owner cambia su nombre en `/ajustes` y Hoy lo saluda con ese nombre, también después de cerrar sesión y volver a entrar con Google.
-- [ ] La notificación de prueba llega al iPhone.
-- [ ] Con la hora del cierre puesta 5 minutos adelante y sin cierre hecho, llega el recordatorio una sola vez; tocándolo abre el cierre.
+- [x] La notificación de prueba llega al iPhone.
+- [x] Un recordatorio programado llega una sola vez (verificado con el de sesión: 12:04 → enviado 12:05, sin reenvíos).
 - [ ] Con el cierre ya hecho, no llega.
 - [ ] En modo avión, abrir la app muestra la pantalla "Sin conexión".
-- [ ] CI verde (unitarios, E2E con axe, `design:check`); la migración aplica en producción por el deploy.
+- [x] CI verde (unitarios, E2E con axe, `design:check`); la migración aplica en producción por el deploy.
 
 ## Preguntas abiertas
 

@@ -1,0 +1,6 @@
+/* Easing curves. */
+
+:root {
+  --rr-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --rr-ease-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

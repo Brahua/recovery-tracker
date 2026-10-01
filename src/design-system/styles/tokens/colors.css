@@ -1,7 +1,6 @@
-/* Design tokens (custom properties). Phase 2 splits them by kind. */
+/* Color tokens: brand, text, surfaces, washes, borders, named colors and RGB channels. Claude Design is the visual source of truth. */
 
 :root {
-  /* Recovery Ritual design system: Claude Design is the visual source of truth. */
   --rr-bg: #0e0c0a;
   --rr-bg-night: #131217;
   --rr-surface: #14110e;
@@ -45,30 +44,41 @@
     rgba(244, 239, 231, 0.11),
     rgba(244, 239, 231, 0.04)
   );
-  --rr-radius-control: 13px;
-  --rr-radius-button: 16px;
-  --rr-radius-card: 20px;
-  --rr-radius-hero: 22px;
-  --rr-radius-pill: 99px;
-  --rr-shadow-cta:
-    0 18px 36px -12px rgba(46, 125, 91, 0.5),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.22);
-  --rr-shadow-hero: 0 28px 56px -22px rgba(0, 0, 0, 0.55);
-  --rr-shadow-paper: 0 20px 40px -16px rgba(0, 0, 0, 0.6);
-  --rr-shadow-thumb:
-    0 4px 14px rgba(0, 0, 0, 0.45),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.12);
-  --rr-glow-night: 0 0 14px rgba(126, 144, 186, 0.25);
-  --rr-content-max: 1040px;
-  --rr-sidebar-width: 248px;
-  --rr-page-padding: 40px;
-  --rr-page-padding-mobile: 24px;
-  --rr-card-padding: 24px;
-  --rr-hit-target: 44px;
-  /* Space taken by the fixed mobile tab bar (7px + 50px + 7px + 1px border). */
-  --rr-bottom-nav-offset: calc(65px + env(safe-area-inset-bottom, 0px));
-
   /* Text selection on the dark theme. */
   --rr-selection: rgba(46, 125, 91, 0.45);
+
+  /* Named colors that used to be literals in the screens. */
+  --rr-white: #fff;
+  --rr-ink-bright: #fffaf1;
+  --rr-ink-on-light: #17130f;
+  --rr-surface-deep: #12100e;
+  --rr-popover-bg: #1b1713;
+  --rr-photo-placeholder: #332d25;
+  --rr-night-surface: #16151b;
+  --rr-night-surface-mid: #131110;
+  --rr-night-light: #aebee0;
+  --rr-accent-text: #69ad8b;
+  --rr-gold: #c9aa70;
+  --rr-pain-soft: #e5a087;
+  --rr-pain-worse: #e08b67;
+  --rr-pain-rising: #dd805e;
+  --rr-pain-high: #d97757;
+
+  /* RGB channels for translucent colors: rgb(var(--rr-ink-rgb) / 0.08). */
+  --rr-ink-rgb: 244 239 231;
+  --rr-ink-secondary-rgb: 232 226 214;
+  --rr-bg-rgb: 14 12 10;
+  --rr-surface-rgb: 20 17 14;
+  --rr-surface-deep-rgb: 18 16 14;
+  --rr-accent-rgb: 46 125 91;
+  --rr-accent-light-rgb: 88 152 122;
+  --rr-night-rgb: 126 144 186;
+  --rr-night-light-rgb: 174 190 224;
+  --rr-pain-rgb: 201 85 46;
+  --rr-amber-rgb: 176 138 46;
+  --rr-gold-rgb: 201 170 112;
+  --rr-white-rgb: 255 255 255;
+  --rr-black-rgb: 0 0 0;
+  --rr-backdrop-rgb: 8 7 6;
+  --rr-overlay-warm-rgb: 28 24 20;
 }

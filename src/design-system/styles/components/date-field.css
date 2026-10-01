@@ -1,0 +1,73 @@
+/* Date picker row: the whole row is the native date input (Registrar and closeout). */
+
+.rr-date-field {
+  position: relative;
+  display: flex;
+  min-height: 58px;
+  align-items: center;
+  gap: 12px;
+  margin-top: 13px;
+  border: 1px solid var(--rr-border-strong);
+  border-radius: 15px;
+  background: rgb(var(--rr-surface-rgb) / 0.42);
+  padding-inline: 16px;
+  color: var(--rr-ink);
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.rr-date-field:hover {
+  background: rgb(var(--rr-surface-rgb) / 0.6);
+}
+
+.rr-date-field:focus-within {
+  border-color: var(--rr-accent);
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 2px;
+}
+
+.rr-date-field-icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  fill: none;
+  stroke: var(--rr-accent-light);
+  stroke-linecap: round;
+  stroke-width: 1.8;
+}
+
+.rr-date-field-value {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  font-size: 16.5px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rr-date-field-hint {
+  flex: none;
+  color: var(--rr-accent-light);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Transparent but on top of the row, so taps and clicks reach the native picker. */
+.rr-date-field-input {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  opacity: 0;
+  appearance: none;
+  color-scheme: dark;
+  cursor: pointer;
+  /* 16px or more keeps iOS from zooming in on focus. */
+  font-size: 16px;
+}

@@ -15,7 +15,6 @@ test.describe("nightly closeout", () => {
   test("saves a closeout and keeps it visible after reload", async ({ page }) => {
     await ensureAuthenticated(page);
     const yesterday = addRecoveryDays(getRecoveryDateKey(), -1);
-    await page.getByRole("button", { name: /cambiar/i }).click();
     const dateInput = page.getByRole("textbox", { name: "Fecha del cierre" });
     await expect(dateInput).toHaveAttribute("max", getRecoveryDateKey());
     await dateInput.fill(yesterday);
@@ -46,7 +45,6 @@ test.describe("nightly closeout", () => {
   test("blocks a second closeout for a date that is already closed", async ({ page }) => {
     await ensureAuthenticated(page);
     const closedDate = addRecoveryDays(getRecoveryDateKey(), -2);
-    await page.getByRole("button", { name: /cambiar/i }).click();
     await page.getByRole("textbox", { name: "Fecha del cierre" }).fill(closedDate);
     await page.getByRole("slider", { name: "Dolor" }).fill("2");
     await page.getByText("Media", { exact: true }).click();
@@ -58,7 +56,6 @@ test.describe("nightly closeout", () => {
     ).toBeVisible();
 
     await ensureAuthenticated(page);
-    await page.getByRole("button", { name: /cambiar/i }).click();
     await page.getByRole("textbox", { name: "Fecha del cierre" }).fill(closedDate);
 
     await expect(

@@ -4,6 +4,7 @@ import Link from "@/components/app-link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { DateField } from "@/components/date-field";
 import { DeleteRecordDialog } from "@/components/delete-record-dialog";
 import { ExerciseEntryEditor } from "@/components/exercise-entry-editor";
 import { FormPendingReporter } from "@/components/feedback/form-pending-reporter";
@@ -192,7 +193,6 @@ export function PostTherapyForm({
   const [occurredAt, setOccurredAt] = useState(() =>
     toRecoveryDateTimeLocal(editingSession?.occurredAt ?? defaultOccurredAt),
   );
-  const [showDateTime, setShowDateTime] = useState(false);
   const [sessionType, setSessionType] = useState<SessionType>(
     editingSession?.sessionType ?? "PHYSIOTHERAPY",
   );
@@ -317,29 +317,19 @@ export function PostTherapyForm({
         <div className="rr-session-grid">
           <section className="rr-form-card rr-context-card">
             <SectionHeader complete title="Contexto" />
-            <button
-              className="rr-context-time"
-              onClick={() => setShowDateTime((visible) => !visible)}
-              type="button"
-            >
-              <span>{contextDate}</span>
-              <small>{showDateTime ? "cerrar" : "cambiar"}</small>
-            </button>
-            {showDateTime ? (
-              <label className="rr-date-control">
-                <span>Fecha y hora</span>
-                <input
-                  name="occurredAt"
-                  onChange={(event) => setOccurredAt(event.target.value)}
-                  max={`${today}T23:59`}
-                  required
-                  type="datetime-local"
-                  value={occurredAt}
-                />
-              </label>
-            ) : (
-              <input name="occurredAt" type="hidden" value={occurredAt} />
-            )}
+            <DateField
+              display={contextDate}
+              label="Fecha y hora"
+              max={`${today}T23:59`}
+              name="occurredAt"
+              // Clearing the picker keeps the last valid date and time.
+              onChange={(event) => {
+                if (event.target.value) setOccurredAt(event.target.value);
+              }}
+              required
+              type="datetime-local"
+              value={occurredAt}
+            />
             <div className="rr-session-type-grid">
               {sessionTypeOptions.map((option) => (
                 <label className={sessionType === option.value ? "is-selected" : ""} key={option.value}>

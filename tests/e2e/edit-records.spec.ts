@@ -54,7 +54,6 @@ test.describe.serial("edit past closeouts", () => {
     await expectNoAxeViolations(page);
 
     await page.getByRole("slider", { name: "Dolor" }).fill("6");
-    await page.getByRole("button", { name: /cambiar/i }).click();
     await page.getByRole("textbox", { name: "Fecha del cierre" }).fill(newDate);
     await expect(page).toHaveURL(new RegExp(`date=${newDate}`));
     await page.getByRole("button", { name: "Guardar cambios" }).click();
@@ -72,7 +71,6 @@ test.describe.serial("edit past closeouts", () => {
     const closeoutId = await createCloseout(page, movingDate, "4");
 
     await openCloseoutEditor(page, movingDate, closeoutId);
-    await page.getByRole("button", { name: /cambiar/i }).click();
     await page.getByRole("textbox", { name: "Fecha del cierre" }).fill(takenDate);
 
     await expect(
@@ -147,7 +145,6 @@ test.describe.serial("edit past sessions", () => {
     await sessionExerciseRow(page, "Step-up").click();
     await exerciseDialog(page).getByLabel("Repeticiones").fill("12");
     await closeExerciseDialog(page);
-    await page.getByRole("button", { name: /cambiar/i }).click();
     await page.getByLabel("Fecha y hora").fill(`${newDate}T09:15`);
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 

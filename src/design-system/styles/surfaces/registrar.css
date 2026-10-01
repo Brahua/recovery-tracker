@@ -180,37 +180,6 @@
   background: var(--rr-accent);
 }
 
-.rr-context-time {
-  display: flex;
-  width: 100%;
-  min-height: 40px;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 13px;
-  border-radius: 12px;
-  background: rgb(var(--rr-surface-rgb) / 0.42);
-  padding-inline: 13px;
-  color: var(--rr-ink);
-  font-size: 13px;
-  font-weight: 650;
-}
-
-.rr-context-time small {
-  color: var(--rr-accent-light);
-  font-size: 11.5px;
-  font-weight: 700;
-}
-
-.rr-date-control {
-  display: grid;
-  gap: 6px;
-  margin-top: 8px;
-  color: var(--rr-text-muted);
-  font-size: 11.5px;
-  font-weight: 650;
-}
-
-.rr-date-control input,
 .rr-note-card textarea {
   min-width: 0;
   border: 1px solid var(--rr-border-strong);
@@ -221,13 +190,6 @@
   outline: none;
 }
 
-.rr-date-control input {
-  min-height: 44px;
-  padding-inline: 12px;
-  color-scheme: dark;
-}
-
-.rr-date-control input:focus,
 .rr-note-card textarea:focus {
   border-color: var(--rr-accent);
 }

@@ -30,7 +30,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 
 ### Changed
 - The former staging Supabase project and Vercel app are now production, served at https://recovery-tracker.brahua.com (ADR-004).
-- Trunk-based CI/CD like `brahua-os`: PRs run CI only; pushes to `main` never cancel, deploy one at a time, check the deploy secrets first, and migrate + deploy only when every check passes. CI runs on Node 24 (`.nvmrc`) with a pinned Vercel CLI.
+- Trunk-based CI/CD like `brahua-os`: PRs run CI only; pushes to `main` never cancel, deploy one at a time, check the deploy secrets first, and migrate + deploy only when every check passes. CI runs on Node 24 (`.nvmrc`) with a pinned Vercel CLI and the same action versions as `brahua-os` (`checkout`, `setup-node`, `upload-artifact` @v7).
 - Vercel Git deployments are fully disabled (no previews); GitHub Actions is the only deployer.
 - Local development and E2E default to the local Supabase stack; tests never touch production.
 - Greeting and sidebar show the name saved on the account (`user_metadata.full_name`), falling back to the email local part.

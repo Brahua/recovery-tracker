@@ -29,6 +29,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Project-owned rehabilitation hero image and a canonical inventory of the 19 implemented design references.
 
 ### Changed
+- Styles split from `src/app/globals.css` into `src/design-system/styles/` (tokens, base, components, one file per screen), imported in cascade order; compiled CSS unchanged (`npm run css:compare`).
 - The former staging Supabase project and Vercel app are now production, served at https://recovery-tracker.brahua.com (ADR-004).
 - Trunk-based CI/CD like `brahua-os`: PRs run CI only; pushes to `main` never cancel, deploy one at a time, check the deploy secrets first, and migrate + deploy only when every check passes. CI runs on Node 24 (`.nvmrc`) with a pinned Vercel CLI and the same action versions as `brahua-os` (`checkout`, `setup-node`, `upload-artifact` @v7).
 - Vercel Git deployments are fully disabled (no previews); GitHub Actions is the only deployer.
@@ -58,6 +59,10 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Prevented open redirects and surfaced callback failures through a dedicated auth error state.
 - Corrected the weekly strip, which previously rendered a rolling seven-day window ending on today.
 - Unified recovery calendar dates in `America/Lima` so evening sessions and closeouts remain on the correct local day.
+
+### Removed
+- Pre-redesign light theme: the unused `RitualSuccessState` component, the legacy stylesheet (classes without `rr-`, light `body` background, legacy keyframes and tokens) and three unused `rr-` classes. Text selection now uses the dark-theme `--rr-selection`.
+- Tailwind no longer scans `docs/`, `tasks/` or `scripts/`, so class names mentioned in prose stop generating unused utilities.
 
 ## [0.1.0] - 2026-07-10
 ### Added

@@ -9,6 +9,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+::selection {
+  background: var(--rr-selection);
+}
+
 h1,
 h2,
 h3 {

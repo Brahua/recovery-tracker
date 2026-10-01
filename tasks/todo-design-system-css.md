@@ -35,17 +35,17 @@ Verificación común: `npm run lint && npm run typecheck && npm test` y la compa
 
 ## Limpieza (PR B)
 
-- [ ] C1. Código muerto y clases sin uso
+- [x] C1. Código muerto y clases sin uso
   - Acceptance: se borra `src/components/ritual-success-state.tsx` (no se importa) y las clases `rr-card--featured`, `rr-card--paper`, `rr-control`.
   - Verify: typecheck/test; el diff del CSS compilado solo quita esas reglas.
   - Files: `src/components/ritual-success-state.tsx`, `src/design-system/styles/components/primitives.css`
 
-- [ ] C2. Clases legadas sin uso
+- [x] C2. Clases legadas sin uso
   - Acceptance: `legacy.css` sin las clases que ya nada usa (tras C1, todas salvo `body` y `::selection`).
   - Verify: el diff del CSS compilado solo quita esas reglas; búsqueda de cada clase en `src/` sin resultados.
   - Files: `src/design-system/styles/legacy.css`
 
-- [ ] C3. `body` y `::selection` legados — **requiere OK del owner**
+- [x] C3. `body` y `::selection` legados — OK del owner el 2026-10-01 ("trabaja hasta terminar todo" sobre la propuesta)
   - Acceptance: decisión registrada. Propuesta: borrar el `body` claro (queda el de `base.css`) y pasar `::selection` a un token del tema oscuro; `legacy.css` desaparece.
   - Verify: diff del CSS compilado acotado a esas reglas; revisión del owner en producción (selección de texto y bordes de pantalla en móvil).
   - Files: `src/design-system/styles/legacy.css`, `src/app/globals.css`, `src/design-system/styles/tokens/root.css`

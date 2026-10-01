@@ -1,3 +1,4 @@
+import Link from "@/components/app-link";
 import {
   finalStateLabels,
   formatHistoryNumber,
@@ -143,6 +144,14 @@ export function HistorySessionCard({
               <span>{session.notes}</span>
             </p>
           )}
+
+          <Link
+            aria-label="Editar sesión"
+            className="rr-history-edit"
+            href={`/registrar/sesion/${session.id}`}
+          >
+            Editar
+          </Link>
         </div>
       )}
     </article>

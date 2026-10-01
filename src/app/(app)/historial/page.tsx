@@ -11,7 +11,10 @@ import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 type SearchParams = Record<string, string | string[] | undefined>;
 
 // Set by the edit actions when they redirect back here.
-const updatedToastMessages = new Map([["closeout", "Cierre actualizado"]]);
+const updatedToastMessages = new Map([
+  ["closeout", "Cierre actualizado"],
+  ["session", "Sesión actualizada"],
+]);
 
 export default async function HistorialPage({
   searchParams,
@@ -37,6 +40,7 @@ export default async function HistorialPage({
   const updated = resolvedSearchParams.updated;
   const updatedToast = typeof updated === "string" ? updatedToastMessages.get(updated) : undefined;
   const updatedKey = resolvedSearchParams.key;
+  const focusedSession = resolvedSearchParams.session;
 
   return (
     <>
@@ -45,8 +49,9 @@ export default async function HistorialPage({
       ) : null}
       <HistoryList
         days={buildHistoryDays(recentSessions, recentCloseouts)}
+        expandedSessionId={typeof focusedSession === "string" ? focusedSession : undefined}
         from={window.from}
-        key={window.to}
+        key={`${window.to}:${typeof updatedKey === "string" ? updatedKey : ""}`}
         previousTo={window.previousTo}
         to={window.to}
       />

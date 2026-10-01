@@ -58,6 +58,9 @@ type NightlyCloseoutRow = {
 
 export interface RecoveryLogRepository {
   createRehabSession(input: CreateRehabSessionInput): Promise<RehabSession>;
+  getRehabSession(id: string): Promise<RehabSession | null>;
+  updateRehabSession(id: string, input: CreateRehabSessionInput): Promise<RehabSession>;
+  deleteRehabSession(id: string): Promise<void>;
   listRehabSessions(params: DateRangeParams): Promise<RehabSession[]>;
   getLatestTherapistNotes(): Promise<LatestTherapistNotes | null>;
   createNightlyCloseout(
@@ -96,6 +99,8 @@ export class DuplicateCloseoutDateError extends Error {
 }
 
 const uniqueViolationCode = "23505";
+// Raised by update_rehab_session when the session is missing or not the caller's.
+const noDataFoundCode = "P0002";
 
 function mapRehabSessionRow(
   row: RehabSessionRow,
@@ -236,6 +241,42 @@ async function listSessionTreatmentsBySessionIds(
   return (data ?? []) as SessionTreatmentRow[];
 }
 
+// One session with its children, or null when RLS hides it or it does not exist.
+async function loadRehabSession(
+  supabase: ServerSupabaseClient,
+  sessionId: string,
+): Promise<RehabSession | null> {
+  const { data: sessionData, error: sessionError } = await supabase
+    .from("rehab_sessions")
+    .select(rehabSessionColumns)
+    .eq("id", sessionId)
+    .maybeSingle();
+
+  if (sessionError) {
+    throw new RecoveryRepositoryError(sessionError.message);
+  }
+
+  if (!sessionData) {
+    return null;
+  }
+
+  const [exercises, treatments] = await Promise.all([
+    listSessionExercisesBySessionIds(supabase, [sessionId]),
+    listSessionTreatmentsBySessionIds(supabase, [sessionId]),
+  ]);
+  const exerciseSets = await listExerciseSetsByExerciseIds(
+    supabase,
+    exercises.map((exercise) => exercise.id),
+  );
+
+  return mapRehabSessionRow(
+    sessionData as RehabSessionRow,
+    exercises,
+    exerciseSets,
+    treatments,
+  );
+}
+
 export async function createRecoveryLogRepository(): Promise<RecoveryLogRepository> {
   return {
     async createRehabSession(input) {
@@ -253,33 +294,62 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
         );
       }
 
-      const { data: sessionData, error: sessionError } = await supabase
-        .from("rehab_sessions")
-        .select(rehabSessionColumns)
-        .eq("id", sessionId)
-        .single();
+      const session = await loadRehabSession(supabase, sessionId);
 
-      if (sessionError || !sessionData) {
-        throw new RecoveryRepositoryError(
-          sessionError?.message ?? "Failed to load the created rehab session.",
-        );
+      if (!session) {
+        throw new RecoveryRepositoryError("Failed to load the created rehab session.");
       }
 
-      const [exercises, treatments] = await Promise.all([
-        listSessionExercisesBySessionIds(supabase, [sessionId]),
-        listSessionTreatmentsBySessionIds(supabase, [sessionId]),
-      ]);
-      const exerciseSets = await listExerciseSetsByExerciseIds(
-        supabase,
-        exercises.map((exercise) => exercise.id),
-      );
+      return session;
+    },
 
-      return mapRehabSessionRow(
-        sessionData as RehabSessionRow,
-        exercises,
-        exerciseSets,
-        treatments,
-      );
+    async getRehabSession(id) {
+      const { supabase } = await requireAuthenticatedSupabase();
+      return loadRehabSession(supabase, id);
+    },
+
+    async updateRehabSession(id, input) {
+      const parsed = createRehabSessionInputSchema.parse(input);
+      const { supabase } = await requireAuthenticatedSupabase();
+
+      const { error: updateError } = await supabase.rpc("update_rehab_session", {
+        target_session_id: id,
+        payload: parsed,
+      });
+
+      if (updateError?.code === noDataFoundCode) {
+        throw new RecordNotFoundError();
+      }
+
+      if (updateError) {
+        throw new RecoveryRepositoryError(updateError.message);
+      }
+
+      const session = await loadRehabSession(supabase, id);
+
+      if (!session) {
+        throw new RecordNotFoundError();
+      }
+
+      return session;
+    },
+
+    async deleteRehabSession(id) {
+      const { supabase } = await requireAuthenticatedSupabase();
+      // Exercises, sets and treatments go with it (on delete cascade).
+      const { data, error } = await supabase
+        .from("rehab_sessions")
+        .delete()
+        .eq("id", id)
+        .select("id");
+
+      if (error) {
+        throw new RecoveryRepositoryError(error.message);
+      }
+
+      if (!data || data.length === 0) {
+        throw new RecordNotFoundError();
+      }
     },
 
     async listRehabSessions(params) {

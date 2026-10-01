@@ -16,14 +16,22 @@ import {
 
 interface HistoryListProps {
   days: HistoryDay[];
+  // Session to open first, e.g. the one just edited; defaults to the latest.
+  expandedSessionId?: string;
   from: string;
   to: string;
   previousTo: string;
 }
 
-export function HistoryList({ days, from, to, previousTo }: HistoryListProps) {
+export function HistoryList({
+  days,
+  expandedSessionId: initialExpandedSessionId,
+  from,
+  to,
+  previousTo,
+}: HistoryListProps) {
   const [expandedSessionId, setExpandedSessionId] = useState<string | null>(
-    days[0]?.sessions[0]?.id ?? null,
+    initialExpandedSessionId ?? days[0]?.sessions[0]?.id ?? null,
   );
 
   return (

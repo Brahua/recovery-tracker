@@ -24,6 +24,8 @@ Aprobada por el owner el 2026-10-01. En construcción en `feat/edit-past-records
 9. Tras editar o eliminar se recalculan la racha, Hoy, Insights y Reporte (`revalidatePath("/", "layout")` y las rutas). Si se elimina el registro de hoy, el recordatorio de ese día puede volver a salir, porque vuelve a estar pendiente.
 10. No hay control de edición concurrente: hay una sola persona y un solo dispositivo a la vez. Gana el último guardado.
 11. Mobile-first y accesible (axe en E2E), igual que el resto de la app.
+12. **Registros antiguos con "N series × reps × kg" en una sola fila** (antes de las series individuales): al editarlos se convierten en N series iguales, para que guardar no pierda el dato.
+13. **Hora de la sesión en hora de Lima:** el formulario muestra y envía la hora de Lima, y el servidor (que corre en UTC) la interpreta como Lima (UTC-5, sin horario de verano). Editar no corre la hora de la sesión.
 
 ## Objetivo
 

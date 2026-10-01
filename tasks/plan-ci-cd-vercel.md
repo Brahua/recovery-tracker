@@ -61,6 +61,8 @@ PR           ─┴─► quality + e2e  (SIN deploy)                       (sol
 
 ## Checkpoints de verificación
 
-- [ ] Parse del YAML sin errores (`actionlint` o similar).
-- [ ] PR de prueba: gates verdes, sin deploy.
-- [ ] Merge a main: migración aplicada + URL de Vercel viva apuntando a staging.
+- [x] Parse del YAML sin errores (`actionlint` o similar).
+- [x] PR de prueba: gates verdes, sin deploy.
+- [x] Merge a main: migración aplicada + URL de Vercel viva apuntando a staging.
+
+Desde el 2026-09-30 ese proyecto es producción (ADR-004); el pipeline vigente está en `docs/deployment.md`.

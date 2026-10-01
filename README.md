@@ -83,7 +83,7 @@ Notes:
 
 - Quick project recap (start here): `RECAP.md`
 - Product direction: `docs/ideas/recovery-ritual.md`
-- Deferred ideas and design backlog: `docs/ideas/recovery-ritual-backlog.md`
+- Backlog (done, pending and parked; verified against the code on 2026-10-01): `docs/ideas/recovery-ritual-backlog.md`
 - MVP spec: `docs/specs/recovery-ritual-mvp-spec.md`
 - UX redesign spec and Claude Design prompt pack: `docs/specs/recovery-ritual-ux-redesign-spec.md`
 - Implemented Claude Design inventory and recorded deviations: `docs/design/claude-design-reference.md`
@@ -158,7 +158,7 @@ Latest redesign verification also included:
 
 ## Current Milestone
 
-The MVP, UX redesign, individual-series capture, read-only history, robust session validation, and backdated closeouts are implemented and browser-reviewed. Since then the exercise catalog, routines and global loading/feedback have shipped. Regression coverage is green. The former staging project is now production at https://recovery-tracker.brahua.com and holds the single real user's data. The current milestone remains the real-use trial.
+The MVP, UX redesign, individual-series capture, read-only history, robust session validation, and backdated closeouts are implemented and browser-reviewed. Since then the exercise catalog, routines and global loading/feedback have shipped. Regression coverage is green. The former staging project is now production at https://recovery-tracker.brahua.com and holds the single real user's data. The real-use trial is closed; there is no next feature chosen yet (see the backlog).
 
 ## Documentation Practice
 

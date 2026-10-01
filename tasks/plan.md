@@ -311,15 +311,17 @@ Redesign spec approval
 
 ## Phase 5: One-Week Field Validation
 
-- [ ] Use the staging application daily from 2026-07-16 through 2026-07-23.
-- [ ] Record friction, incorrect assumptions, confusing copy, missing history, and data-quality issues as they occur.
-- [ ] Prioritize fixes and additions from observed use after the trial instead of expanding the product spec during the observation window.
+- [x] Use the staging application daily from 2026-07-16 through 2026-07-23.
+- [x] Record friction, incorrect assumptions, confusing copy, missing history, and data-quality issues as they occur.
+- [x] Prioritize fixes and additions from observed use after the trial instead of expanding the product spec during the observation window.
 
 ### Checkpoint: Field Evidence Collected
 
-- [ ] The session and nightly closeout rituals have been exercised under normal daily use.
-- [ ] Week boundaries, multiple same-day sessions, timestamps, insights, and reports have been observed with real data.
-- [ ] Findings are classified as defects, usability improvements, or new product requirements.
+Closed 2026-10-01: real use produced the exercise catalog, routines, mobile fixes, account name and global loading/feedback, each with its own spec and plan.
+
+- [x] The session and nightly closeout rituals have been exercised under normal daily use.
+- [x] Week boundaries, multiple same-day sessions, timestamps, insights, and reports have been observed with real data.
+- [x] Findings are classified as defects, usability improvements, or new product requirements.
 
 ## Risks and Mitigations
 

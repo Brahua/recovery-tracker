@@ -50,6 +50,10 @@ push a main ─────────┬─ quality
 
 Nunca editar una migración ya aplicada en producción; agregar una nueva.
 
+### Chequeo de drift del esquema
+
+`.github/workflows/schema-drift.yml` corre los lunes a las 08:00 (Lima), y también a mano desde Actions → "Schema drift" → Run workflow. Compara el esquema `public` de producción con `supabase/migrations/` (`supabase db diff --linked`, solo lectura) y falla si difieren: algo se cambió fuera de una migración, por ejemplo desde el dashboard. El resumen del run muestra el SQL de la diferencia; hay que convertirlo en una migración nueva o revertir el cambio en producción. Usa los mismos secrets de Supabase que el deploy.
+
 ## Secrets de GitHub
 
 Repo → Settings → Secrets and variables → Actions. El job `deploy` falla al inicio si falta alguno.
@@ -59,7 +63,7 @@ Repo → Settings → Secrets and variables → Actions. El job `deploy` falla a
 | `VERCEL_TOKEN` | Autenticación de la CLI de Vercel (https://vercel.com/account/tokens) |
 | `VERCEL_ORG_ID` | Scope de Vercel (`team_…`) |
 | `VERCEL_PROJECT_ID` | Proyecto de Vercel (`prj_…`) |
-| `SUPABASE_ACCESS_TOKEN` | `supabase link` / `db push`. Token de **proyecto** (solo `recovery-tracker-staging`), nombre `github-actions-recovery-tracker`, **vence en un año** (ver "Vencimientos") |
+| `SUPABASE_ACCESS_TOKEN` | `supabase link` / `db push` / chequeo de drift. Token de **proyecto** (solo `recovery-tracker-staging`), nombre `github-actions-recovery-tracker`, **vence en un año** (ver "Vencimientos") |
 | `SUPABASE_DB_PASSWORD` | Contraseña de la base de producción para `db push` |
 
 Los secrets se cargan desde la web de GitHub, una terminal normal o, si los configura Claude, por `stdin` sin imprimirlos: `gh secret set` desde el `!` de la sesión de Claude los guarda vacíos.

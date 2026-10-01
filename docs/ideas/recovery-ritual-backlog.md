@@ -27,7 +27,7 @@ Lo que el backlog original tenía como pendiente o diferido y hoy existe.
 | Reporte para la cita | Rangos de 7 y 30 días, evolución del dolor, preguntas para la cita (por reglas) | `/reporte`, `buildAppointmentQuestions` |
 | Exportar el reporte | "Generar PDF" (imprimir del navegador) y "Compartir reporte" (compartir nativo o copiar enlace) | `src/components/report-actions.tsx` |
 | Sliders táctiles de dolor | Slider propio para dolor antes/durante/después | `src/components/ritual-pain-slider.tsx` |
-| Momento de cierre animado | Estados de éxito tras sesión y cierre, con animación que respeta movimiento reducido | `src/components/ritual-success-state.tsx` |
+| Momento de cierre animado | Estados de éxito tras sesión y cierre, con animación que respeta movimiento reducido | `src/components/session-saved-state.tsx`, `src/components/day-closed-state.tsx` |
 | Diseño mobile-first con escritorio | Rediseño con Claude Design (8 pantallas), revisado en móvil, tablet y escritorio | `docs/specs/recovery-ritual-ux-redesign-spec.md` |
 | Modo oscuro | La app es oscura por diseño (no hay tema claro) | `src/app/globals.css` |
 | Historial | Solo lectura, ventanas de 30 días, varias sesiones por día, series individuales | `/historial` |

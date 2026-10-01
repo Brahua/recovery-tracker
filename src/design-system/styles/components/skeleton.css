@@ -1,0 +1,65 @@
+/* Route loading skeleton inside the app shell. */
+
+.rr-skeleton-page {
+  display: grid;
+  gap: 14px;
+  padding: 26px 20px calc(30px + var(--rr-bottom-nav-offset));
+}
+
+.rr-skeleton {
+  display: block;
+  border-radius: 12px;
+  background: linear-gradient(
+    100deg,
+    var(--rr-wash-soft) 30%,
+    rgba(244, 239, 231, 0.11) 50%,
+    var(--rr-wash-soft) 70%
+  );
+  background-size: 200% 100%;
+  animation: rr-skeleton-shimmer 1.3s ease-in-out infinite;
+}
+
+.rr-skeleton--eyebrow {
+  width: 38%;
+  height: 12px;
+}
+
+.rr-skeleton--title {
+  width: 62%;
+  height: 30px;
+  margin-bottom: 8px;
+}
+
+.rr-skeleton--hero {
+  height: 220px;
+  border-radius: var(--rr-radius-hero);
+}
+
+.rr-skeleton-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.rr-skeleton--card {
+  height: 96px;
+  border-radius: var(--rr-radius-card);
+}
+
+@keyframes rr-skeleton-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (min-width: 64rem) {
+  .rr-skeleton-page {
+    padding: 0;
+  }
+
+  .rr-skeleton-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

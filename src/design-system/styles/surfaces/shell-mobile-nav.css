@@ -1,0 +1,16 @@
+/* Compact mobile navigation labels (six tabs). */
+
+.rr-mobile-nav a > span:last-child {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 360px) {
+  .rr-mobile-nav a,
+  .rr-app-shell.is-history .rr-mobile-nav a {
+    font-size: 8.5px;
+    letter-spacing: 0;
+  }
+}

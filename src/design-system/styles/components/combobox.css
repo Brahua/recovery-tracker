@@ -1,0 +1,73 @@
+/* Exercise name combobox and suggestions. */
+
+.rr-combobox {
+  position: relative;
+  display: grid;
+  gap: 5px;
+}
+
+.rr-combobox > label {
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.rr-combobox-list {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 4px);
+  right: 0;
+  left: 0;
+  display: grid;
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid var(--rr-border-hero);
+  border-radius: var(--rr-radius-control);
+  background: #1b1713;
+  padding: 4px;
+  box-shadow: var(--rr-shadow-paper);
+  list-style: none;
+}
+
+.rr-combobox-list[hidden] {
+  display: none;
+}
+
+.rr-combobox-list > li {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 9px;
+  padding: 8px 10px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-weight: 650;
+}
+
+.rr-combobox-list > li small {
+  flex: none;
+  color: var(--rr-text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.rr-combobox-list > li:hover,
+.rr-combobox-list > li.is-active {
+  background: var(--rr-accent-tint);
+}
+
+.rr-combobox-list > li.is-create {
+  color: var(--rr-accent-light);
+}
+
+.rr-combobox-list > li.is-create small {
+  flex: 1;
+  text-align: right;
+}
+
+.rr-combobox-hint {
+  color: var(--rr-text-muted);
+  font-size: 11.5px;
+}

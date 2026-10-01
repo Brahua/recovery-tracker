@@ -1,0 +1,134 @@
+/* Exercise detail inside the sheet: sets, holds, totals. */
+
+.rr-modal-sheet .rr-exercise-detail {
+  gap: 16px;
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.rr-exercise-isometric {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.rr-exercise-detail .rr-exercise-isometric input {
+  width: 20px;
+  min-height: 0;
+  height: 20px;
+  flex: none;
+  padding: 0;
+  accent-color: var(--rr-accent);
+}
+
+.rr-exercise-isometric span {
+  display: grid;
+  gap: 2px;
+}
+
+.rr-exercise-isometric strong {
+  font-size: 13.5px;
+}
+
+.rr-exercise-isometric small {
+  color: var(--rr-text-muted);
+  font-size: 11.5px;
+}
+
+.rr-exercise-isometric:has(input:checked) {
+  border-color: rgba(126, 144, 186, 0.45);
+  background: rgba(126, 144, 186, 0.1);
+}
+
+.rr-exercise-isometric:has(input:focus-visible) {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 2px;
+}
+
+.rr-exercise-sets-heading h4 {
+  margin: 0;
+}
+
+.rr-exercise-set-index {
+  display: grid;
+  height: 42px;
+  place-items: center;
+  color: var(--rr-text-dim);
+  font-family: var(--font-archivo), sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.rr-exercise-set-list .rr-exercise-set-fields {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.rr-exercise-set-list.is-isometric .rr-exercise-set-fields {
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr) minmax(0, 1fr);
+}
+
+.rr-exercise-set-list > li:not(:first-child) .rr-exercise-set-fields label > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.rr-exercise-set-actions {
+  display: flex;
+  height: 42px;
+  align-items: center;
+}
+
+.rr-exercise-set-actions button {
+  display: grid;
+  width: 30px;
+  height: 36px;
+  place-items: center;
+  border-radius: 9px;
+  color: var(--rr-text-muted);
+  font-size: 13px;
+}
+
+.rr-exercise-set-actions button:hover,
+.rr-exercise-set-actions button[aria-expanded="true"] {
+  background: var(--rr-wash);
+  color: var(--rr-ink);
+}
+
+.rr-exercise-set-actions button.has-value {
+  color: var(--rr-accent-light);
+}
+
+.rr-exercise-set-list .rr-exercise-set-note {
+  display: grid;
+  grid-column: 2 / -1;
+  gap: 5px;
+}
+
+.rr-exercise-set-note > span {
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.rr-exercise-disclosure {
+  justify-self: start;
+  min-height: 36px;
+  color: var(--rr-text-muted);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.rr-exercise-disclosure:hover {
+  color: var(--rr-ink);
+}

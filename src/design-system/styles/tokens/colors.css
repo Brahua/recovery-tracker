@@ -2,17 +2,14 @@
 
 :root {
   --rr-bg: #0e0c0a;
-  --rr-bg-night: #131217;
   --rr-surface: #14110e;
   --rr-ink: #f4efe7;
   --rr-ink-secondary: #e8e2d6;
-  --rr-paper-ink: #1c1915;
   --rr-accent: #2e7d5b;
   --rr-accent-light: rgb(88, 152, 122);
   /* Accent text on --rr-accent-tint backgrounds; --rr-accent-light falls below 4.5:1 there. */
   --rr-accent-on-tint: #6aa98a;
   --rr-pain: #c9552e;
-  --rr-amber: #b08a2e;
   --rr-night: #7e90ba;
   --rr-text-body: rgba(232, 226, 214, 0.65);
   --rr-text-muted: rgba(232, 226, 214, 0.55);

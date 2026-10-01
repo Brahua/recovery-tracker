@@ -74,6 +74,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Unified recovery calendar dates in `America/Lima` so evening sessions and closeouts remain on the correct local day.
 
 ### Removed
+- Unused design tokens: `--rr-bg-night`, `--rr-paper-ink`, `--rr-amber`, `--rr-page-padding`, `--rr-page-padding-mobile`, `--rr-card-padding` and the `ritual-*` colors of the Tailwind bridge (no class used them). The compiled stylesheet only loses those six declarations.
 - Pre-redesign light theme: the unused `RitualSuccessState` component, the legacy stylesheet (classes without `rr-`, light `body` background, legacy keyframes and tokens) and three unused `rr-` classes. Text selection now uses the dark-theme `--rr-selection`.
 - Tailwind no longer scans `docs/`, `tasks/` or `scripts/`, so class names mentioned in prose stop generating unused utilities.
 

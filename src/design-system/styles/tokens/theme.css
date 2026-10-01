@@ -1,13 +1,6 @@
 /* Bridge from design tokens to Tailwind theme variables. */
 
 @theme inline {
-  --color-ritual-bg: var(--rr-bg);
-  --color-ritual-surface: var(--rr-surface);
-  --color-ritual-ink: var(--rr-ink);
-  --color-ritual-muted: var(--rr-ink-secondary);
-  --color-ritual-accent: var(--rr-accent);
-  --color-ritual-pain: var(--rr-pain);
-  --color-ritual-night: var(--rr-night);
   --font-sans: var(--font-instrument-sans);
   --font-display: var(--font-archivo);
   --font-mono: ui-monospace, Menlo, monospace;

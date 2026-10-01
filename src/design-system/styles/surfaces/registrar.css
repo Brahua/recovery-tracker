@@ -1,0 +1,449 @@
+/* Registrar: page, mode switch, session form, pain sliders, load and final state. */
+
+.rr-session-form {
+  min-height: 100dvh;
+  color: var(--rr-ink);
+  background: var(--rr-surface);
+}
+
+.rr-registrar-header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  padding: 20px 20px 10px;
+  background: linear-gradient(
+    180deg,
+    var(--rr-surface) 0%,
+    var(--rr-surface) 78%,
+    rgba(20, 17, 14, 0) 100%
+  );
+}
+
+.rr-registrar-title {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.rr-registrar-title > a {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid var(--rr-border-strong);
+  border-radius: 11px;
+  background: var(--rr-card-bg);
+  color: var(--rr-ink);
+  font-size: 25px;
+  line-height: 1;
+}
+
+.rr-registrar-title h1 {
+  font-size: 21px;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.rr-registrar-title p {
+  display: none;
+}
+
+.rr-registrar-title > span {
+  color: var(--rr-text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.rr-registrar-controls {
+  display: grid;
+  gap: 12px;
+  margin-top: 13px;
+}
+
+.rr-mode-switch {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  border: 1px solid rgba(244, 239, 231, 0.09);
+  border-radius: 14px;
+  background: var(--rr-wash-soft);
+  padding: 4px;
+}
+
+.rr-mode-switch a {
+  display: grid;
+  height: 38px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--rr-text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rr-mode-switch a.is-active {
+  background: rgba(244, 239, 231, 0.14);
+  color: var(--rr-ink);
+}
+
+.rr-form-progress {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.rr-form-progress > span {
+  height: 4px;
+  overflow: hidden;
+  border-radius: var(--rr-radius-pill);
+  background: var(--rr-wash);
+}
+
+.rr-form-progress i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--rr-accent), var(--rr-accent-light));
+  transition: width 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.rr-form-progress b {
+  min-width: 44px;
+  color: var(--rr-text-muted);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.rr-form-progress b.is-complete {
+  color: var(--rr-accent-light);
+}
+
+.rr-session-error {
+  margin: 4px 20px 0;
+  border: 1px solid rgba(201, 85, 46, 0.4);
+  border-radius: 14px;
+  background: rgba(201, 85, 46, 0.12);
+  padding: 12px 14px;
+  color: #e5a087;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.rr-session-grid {
+  display: grid;
+  gap: 12px;
+  padding: 12px 20px calc(120px + var(--rr-bottom-nav-offset));
+}
+
+.rr-form-card {
+  border: 1px solid var(--rr-border);
+  border-radius: var(--rr-radius-card);
+  background: var(--rr-card-bg);
+  padding: 16px;
+}
+
+.rr-form-section-heading {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+}
+
+.rr-form-section-heading h2,
+.rr-note-card h2,
+.rr-recent-sessions h2 {
+  color: var(--rr-ink-secondary);
+  font-family: var(--font-instrument-sans), sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rr-step-badge {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border: 1.5px solid rgba(244, 239, 231, 0.25);
+  border-radius: 50%;
+  color: var(--rr-surface);
+  font-size: 11px;
+  font-weight: 900;
+  transition: all 300ms ease;
+}
+
+.rr-step-badge.is-complete {
+  border-color: var(--rr-accent);
+  background: var(--rr-accent);
+}
+
+.rr-context-time {
+  display: flex;
+  width: 100%;
+  min-height: 40px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 13px;
+  border-radius: 12px;
+  background: rgba(20, 17, 14, 0.42);
+  padding-inline: 13px;
+  color: var(--rr-ink);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.rr-context-time small {
+  color: var(--rr-accent-light);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.rr-date-control {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--rr-text-muted);
+  font-size: 11.5px;
+  font-weight: 650;
+}
+
+.rr-date-control input,
+.rr-note-card textarea {
+  min-width: 0;
+  border: 1px solid var(--rr-border-strong);
+  border-radius: 13px;
+  background: rgba(20, 17, 14, 0.5);
+  color: var(--rr-ink);
+  font: inherit;
+  outline: none;
+}
+
+.rr-date-control input {
+  min-height: 44px;
+  padding-inline: 12px;
+  color-scheme: dark;
+}
+
+.rr-date-control input:focus,
+.rr-note-card textarea:focus {
+  border-color: var(--rr-accent);
+}
+
+.rr-session-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+  margin-top: 10px;
+}
+
+.rr-session-type-grid label,
+.rr-choice-row label {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.rr-session-type-grid input,
+.rr-choice-row input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rr-session-type-grid label > span,
+.rr-choice-row label > span {
+  display: grid;
+  min-height: 44px;
+  place-items: center;
+  border: 1px solid var(--rr-border-strong);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  padding: 5px 7px;
+  color: var(--rr-text-body);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.15;
+  text-align: center;
+  transition: transform 100ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+
+.rr-session-type-grid label.is-selected > span,
+.rr-choice-row label.is-selected > span {
+  border-color: var(--rr-accent-border);
+  background: var(--rr-accent-tint);
+  color: var(--rr-ink);
+}
+
+.rr-session-type-grid label:active > span,
+.rr-choice-row label:active > span {
+  transform: scale(0.96);
+}
+
+.rr-session-type-grid input:focus-visible + span,
+.rr-choice-row input:focus-visible + span {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 3px;
+}
+
+.rr-pain-card,
+.rr-load-card,
+.rr-final-state-card {
+  display: grid;
+  gap: 13px;
+}
+
+.rr-slider-hint {
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.rr-slider-hint i {
+  font-style: normal;
+}
+
+.rr-desktop-only {
+  display: none;
+}
+
+.rr-pain-list {
+  display: grid;
+  gap: 6px;
+}
+
+.rr-pain-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  color: var(--rr-ink-secondary);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.rr-pain-control {
+  position: relative;
+  height: 44px;
+}
+
+.rr-pain-control::before {
+  position: absolute;
+  top: 15px;
+  right: 0;
+  left: 0;
+  height: 14px;
+  border-radius: var(--rr-radius-pill);
+  background: linear-gradient(
+    90deg,
+    var(--rr-accent) 0%,
+    var(--rr-accent-light) var(--rr-range-progress),
+    rgba(244, 239, 231, 0.1) var(--rr-range-progress),
+    rgba(201, 85, 46, 0.28) 100%
+  );
+  content: "";
+}
+
+.rr-pain-control input {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 44px;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.rr-pain-control input::-webkit-slider-runnable-track {
+  height: 14px;
+  background: transparent;
+}
+
+.rr-pain-control input::-webkit-slider-thumb {
+  width: 34px;
+  height: 34px;
+  margin-top: -10px;
+  appearance: none;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.rr-pain-control input::-moz-range-track {
+  height: 14px;
+  background: transparent;
+}
+
+.rr-pain-control input::-moz-range-thumb {
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: transparent;
+}
+
+.rr-pain-control output {
+  position: absolute;
+  top: 5px;
+  left: calc((100% - 34px) * var(--rr-slider-position));
+  z-index: 1;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--rr-ink);
+  box-shadow: var(--rr-shadow-thumb);
+  color: var(--rr-surface);
+  font-family: var(--font-archivo), sans-serif;
+  font-size: 14px;
+  font-weight: 850;
+  pointer-events: none;
+}
+
+.rr-pain-row.is-unset .rr-pain-control::before {
+  background: linear-gradient(90deg, rgba(244, 239, 231, 0.1), rgba(201, 85, 46, 0.28));
+}
+
+.rr-pain-row.is-unset output {
+  opacity: 0.25;
+}
+
+.rr-pain-control:has(input:focus-visible) output {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 3px;
+}
+
+.rr-choice-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.rr-load-choice-row {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.rr-load-choice-row label > span {
+  padding-inline: 3px;
+  font-size: 10.5px;
+}
+
+.rr-final-state-row label > span {
+  min-height: 48px;
+}
+
+.rr-field-question {
+  color: var(--rr-text-body);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.rr-exercises-card {
+  display: grid;
+  gap: 13px;
+}

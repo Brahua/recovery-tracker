@@ -1,0 +1,537 @@
+/* Registrar: exercise list, notes and recent sessions. */
+
+.rr-exercise-actions {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.rr-exercise-actions b {
+  color: var(--rr-accent-light);
+  font-family: var(--font-archivo), sans-serif;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.rr-exercise-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.rr-exercise-list > button {
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--rr-border-strong);
+  border-radius: var(--rr-radius-pill);
+  background: var(--rr-input-bg);
+  padding: 0 14px;
+  color: var(--rr-text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  transition: transform 100ms ease, border-color 150ms ease, background-color 150ms ease;
+}
+
+.rr-exercise-list > button.is-selected {
+  border-color: var(--rr-accent-border);
+  background: var(--rr-accent-tint);
+  color: var(--rr-ink);
+}
+
+.rr-exercise-list > button > b {
+  width: 12px;
+  color: var(--rr-accent-light);
+  font-size: 12px;
+  text-align: center;
+}
+
+.rr-exercise-list > button:active {
+  transform: scale(0.96);
+}
+
+.rr-exercise-list > button:focus-visible {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 3px;
+}
+
+.rr-exercise-detail {
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--rr-border-strong);
+  border-radius: var(--rr-radius-button);
+  background: rgba(14, 12, 10, 0.42);
+  padding: 14px;
+}
+
+.rr-exercise-detail.is-incomplete {
+  border-color: rgba(201, 85, 46, 0.38);
+}
+
+.rr-exercise-incomplete {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  border-radius: 10px;
+  background: rgba(201, 85, 46, 0.1);
+  padding: 8px 10px;
+  color: #e5a087;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.rr-exercise-incomplete span {
+  display: grid;
+  width: 17px;
+  height: 17px;
+  flex: none;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.rr-exercise-detail-heading,
+.rr-exercise-sets-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rr-exercise-note,
+.rr-exercise-metrics label,
+.rr-exercise-set-fields label {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.rr-exercise-detail-heading small,
+.rr-exercise-note > span,
+.rr-exercise-metrics label > span,
+.rr-exercise-set-fields label > span {
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.rr-exercise-detail-heading h3 {
+  margin-top: 2px;
+  color: var(--rr-ink);
+  font-size: 16px;
+}
+
+.rr-exercise-detail-heading > button {
+  min-height: 36px;
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rr-exercise-metrics,
+.rr-exercise-set-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rr-exercise-detail input,
+.rr-exercise-detail textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  padding: 10px 11px;
+  color: var(--rr-ink);
+  font: inherit;
+  outline: none;
+}
+
+.rr-exercise-detail input {
+  min-height: 42px;
+}
+
+.rr-exercise-detail textarea {
+  min-height: 62px;
+  resize: vertical;
+}
+
+.rr-exercise-detail input:focus,
+.rr-exercise-detail textarea:focus {
+  border-color: var(--rr-accent-light);
+}
+
+.rr-exercise-sets-heading h4 {
+  color: var(--rr-ink);
+  font-family: var(--font-archivo), sans-serif;
+  font-size: 14px;
+}
+
+.rr-exercise-sets-empty {
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.rr-exercise-sets-heading > button,
+.rr-add-custom-exercise {
+  min-height: 40px;
+  border: 1px solid var(--rr-accent-border);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-accent-tint);
+  padding: 0 12px;
+  color: var(--rr-ink);
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.rr-exercise-set-list {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+}
+
+.rr-exercise-set-list > li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.rr-add-custom-exercise {
+  width: 100%;
+  border-style: dashed;
+  background: transparent;
+  color: var(--rr-text-body);
+}
+
+.rr-note-card {
+  border: 1px dashed rgba(244, 239, 231, 0.16);
+  border-radius: 16px;
+}
+
+.rr-note-card > button {
+  width: 100%;
+  min-height: 46px;
+  color: var(--rr-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rr-note-card.is-open {
+  display: grid;
+  gap: 11px;
+  border-style: solid;
+  border-color: var(--rr-border);
+  background: var(--rr-card-bg);
+  padding: 15px 16px;
+}
+
+.rr-note-card.is-open > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rr-note-card.is-open > div button {
+  min-height: 32px;
+  color: var(--rr-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.rr-note-card textarea {
+  min-height: 70px;
+  resize: vertical;
+  padding: 12px 13px;
+  font-size: 14px;
+}
+
+.rr-recent-sessions {
+  display: grid;
+  gap: 8px;
+  padding: 4px;
+}
+
+.rr-recent-sessions > p {
+  border-radius: 13px;
+  background: rgba(244, 239, 231, 0.02);
+  padding: 11px 12px;
+  color: var(--rr-text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.rr-recent-sessions article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  border-radius: 13px;
+  background: rgba(244, 239, 231, 0.02);
+  padding: 9px 12px;
+  font-size: 12px;
+}
+
+.rr-recent-sessions article strong {
+  color: var(--rr-text-body);
+  text-transform: capitalize;
+}
+
+.rr-recent-sessions article span {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--rr-text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rr-recent-sessions article > b {
+  color: var(--rr-accent-light);
+}
+
+.rr-session-save-bar {
+  position: fixed;
+  right: 0;
+  bottom: var(--rr-bottom-nav-offset);
+  left: 50%;
+  z-index: 30;
+  width: 100%;
+  max-width: 430px;
+  padding: 26px 20px 14px;
+  background: linear-gradient(180deg, rgba(20, 17, 14, 0), var(--rr-surface) 45%);
+  transform: translateX(-50%);
+}
+
+.rr-session-save {
+  display: flex;
+  width: 100%;
+  height: 60px;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 18px;
+  background: var(--rr-wash);
+  padding: 0 20px;
+  color: var(--rr-text-muted);
+  font-size: 16.5px;
+  font-weight: 700;
+  transition: filter 150ms ease, transform 120ms ease, background 350ms ease;
+}
+
+.rr-session-save > span:last-child {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rr-session-save small {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+.rr-session-save b {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.rr-session-save.is-ready {
+  background: var(--rr-accent-gradient);
+  box-shadow: var(--rr-shadow-cta);
+  color: var(--rr-ink);
+}
+
+.rr-session-save.is-ready b {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.rr-session-save.is-ready:hover {
+  filter: brightness(1.07);
+}
+
+.rr-session-save.is-ready:active {
+  transform: translateY(2px) scale(0.99);
+}
+
+@media (min-width: 64rem) {
+  .rr-session-form {
+    width: 100%;
+    max-width: 920px;
+    min-height: auto;
+    margin-inline: auto;
+    background: transparent;
+  }
+
+  .rr-registrar-header {
+    position: static;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 28px;
+    padding: 0;
+    background: none;
+  }
+
+  .rr-registrar-title {
+    display: block;
+  }
+
+  .rr-registrar-title > a,
+  .rr-registrar-title > span {
+    display: none;
+  }
+
+  .rr-registrar-title p {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--rr-text-muted);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .rr-registrar-title h1 {
+    font-size: 30px;
+    letter-spacing: -0.025em;
+  }
+
+  .rr-registrar-controls {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-top: 0;
+  }
+
+  .rr-mode-switch {
+    grid-template-columns: repeat(2, auto);
+  }
+
+  .rr-mode-switch a {
+    padding-inline: 26px;
+  }
+
+  .rr-form-progress {
+    min-width: 170px;
+  }
+
+  .rr-session-error {
+    margin: 18px 0 0;
+  }
+
+  .rr-session-grid {
+    grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr);
+    grid-auto-rows: min-content;
+    gap: 14px 20px;
+    margin-top: 26px;
+    padding: 0 0 100px;
+  }
+
+  .rr-form-card {
+    padding: 18px;
+    animation: rr-rise 400ms ease both;
+  }
+
+  .rr-context-card {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .rr-pain-card {
+    grid-column: 1;
+    grid-row: 2;
+    animation-delay: 80ms;
+  }
+
+  .rr-load-card {
+    grid-column: 1;
+    grid-row: 3;
+    animation-delay: 120ms;
+  }
+
+  .rr-final-state-card {
+    grid-column: 1;
+    grid-row: 4;
+    animation-delay: 140ms;
+  }
+
+  .rr-exercises-card {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+    animation-delay: 160ms;
+  }
+
+  .rr-note-card {
+    grid-column: 1;
+    grid-row: 5;
+  }
+
+  .rr-recent-sessions {
+    grid-column: 2;
+    grid-row: 5;
+  }
+
+  .rr-session-type-grid label > span,
+  .rr-choice-row label > span {
+    min-height: 46px;
+    font-size: 13px;
+  }
+
+  .rr-load-choice-row label > span {
+    font-size: 11.5px;
+  }
+
+  .rr-pain-row {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+
+  .rr-mobile-only {
+    display: none;
+  }
+
+  .rr-desktop-only {
+    display: inline;
+  }
+
+  .rr-exercise-list {
+    display: grid;
+    gap: 7px;
+  }
+
+  .rr-exercise-list > button {
+    min-height: 42px;
+    border-radius: 12px;
+  }
+
+  .rr-session-save-bar {
+    right: 0;
+    left: var(--rr-sidebar-width);
+    width: auto;
+    max-width: none;
+    padding: 26px 40px 24px;
+    background: linear-gradient(180deg, rgba(14, 12, 10, 0), var(--rr-bg) 55%);
+    transform: none;
+  }
+
+  .rr-session-save {
+    max-width: 840px;
+    margin-inline: auto;
+    padding-inline: 22px;
+  }
+}
+
+.rr-session-saved {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--rr-surface);
+  color: var(--rr-ink);
+}

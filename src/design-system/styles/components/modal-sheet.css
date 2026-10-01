@@ -14,7 +14,7 @@
 }
 
 .rr-modal-sheet::backdrop {
-  background: rgba(8, 7, 6, 0.66);
+  background: rgb(var(--rr-backdrop-rgb) / 0.66);
   backdrop-filter: blur(3px);
 }
 
@@ -88,7 +88,7 @@
   min-width: 120px;
   background: var(--rr-accent-gradient);
   box-shadow: var(--rr-shadow-cta);
-  color: #fff;
+  color: var(--rr-white);
 }
 
 .rr-modal-primary:disabled {
@@ -100,7 +100,7 @@
 }
 
 .rr-modal-secondary.is-danger {
-  color: #e5a087;
+  color: var(--rr-pain-soft);
 }
 
 .rr-modal-secondary:hover {

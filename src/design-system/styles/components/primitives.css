@@ -44,7 +44,7 @@
 
 .rr-button--primary:disabled {
   background: var(--rr-wash);
-  color: rgba(232, 226, 214, 0.5);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.5);
   box-shadow: none;
   cursor: not-allowed;
 }
@@ -52,11 +52,11 @@
 .rr-button--secondary {
   min-height: 48px;
   border: 1px solid var(--rr-border-control);
-  color: rgba(232, 226, 214, 0.75);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.75);
 }
 
 .rr-button--secondary:hover {
-  background: rgba(244, 239, 231, 0.05);
+  background: rgb(var(--rr-ink-rgb) / 0.05);
 }
 
 .rr-theme :where(a, button, input, select, textarea):focus-visible {

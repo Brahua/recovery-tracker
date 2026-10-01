@@ -61,12 +61,12 @@
   gap: 14px;
   border: 1px solid var(--rr-border-strong);
   border-radius: var(--rr-radius-button);
-  background: rgba(14, 12, 10, 0.42);
+  background: rgb(var(--rr-bg-rgb) / 0.42);
   padding: 14px;
 }
 
 .rr-exercise-detail.is-incomplete {
-  border-color: rgba(201, 85, 46, 0.38);
+  border-color: rgb(var(--rr-pain-rgb) / 0.38);
 }
 
 .rr-exercise-incomplete {
@@ -74,9 +74,9 @@
   align-items: center;
   gap: 7px;
   border-radius: 10px;
-  background: rgba(201, 85, 46, 0.1);
+  background: rgb(var(--rr-pain-rgb) / 0.1);
   padding: 8px 10px;
-  color: #e5a087;
+  color: var(--rr-pain-soft);
   font-size: 12px;
   font-weight: 650;
 }
@@ -210,7 +210,7 @@
 }
 
 .rr-note-card {
-  border: 1px dashed rgba(244, 239, 231, 0.16);
+  border: 1px dashed rgb(var(--rr-ink-rgb) / 0.16);
   border-radius: 16px;
 }
 
@@ -259,7 +259,7 @@
 
 .rr-recent-sessions > p {
   border-radius: 13px;
-  background: rgba(244, 239, 231, 0.02);
+  background: rgb(var(--rr-ink-rgb) / 0.02);
   padding: 11px 12px;
   color: var(--rr-text-muted);
   font-size: 12px;
@@ -272,7 +272,7 @@
   align-items: center;
   gap: 7px;
   border-radius: 13px;
-  background: rgba(244, 239, 231, 0.02);
+  background: rgb(var(--rr-ink-rgb) / 0.02);
   padding: 9px 12px;
   font-size: 12px;
 }
@@ -303,7 +303,7 @@
   width: 100%;
   max-width: 430px;
   padding: 26px 20px 14px;
-  background: linear-gradient(180deg, rgba(20, 17, 14, 0), var(--rr-surface) 45%);
+  background: linear-gradient(180deg, rgb(var(--rr-surface-rgb) / 0), var(--rr-surface) 45%);
   transform: translateX(-50%);
 }
 
@@ -340,7 +340,7 @@
   height: 30px;
   place-items: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgb(var(--rr-white-rgb) / 0.1);
 }
 
 .rr-session-save.is-ready {
@@ -350,7 +350,7 @@
 }
 
 .rr-session-save.is-ready b {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgb(var(--rr-white-rgb) / 0.16);
 }
 
 .rr-session-save.is-ready:hover {
@@ -517,7 +517,7 @@
     width: auto;
     max-width: none;
     padding: 26px 40px 24px;
-    background: linear-gradient(180deg, rgba(14, 12, 10, 0), var(--rr-bg) 55%);
+    background: linear-gradient(180deg, rgb(var(--rr-bg-rgb) / 0), var(--rr-bg) 55%);
     transform: none;
   }
 

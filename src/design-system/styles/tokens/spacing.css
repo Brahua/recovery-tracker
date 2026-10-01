@@ -1,11 +1,8 @@
-/* Layout sizes: content width, sidebar, paddings, hit target and mobile tab bar offset. */
+/* Layout sizes: content width, sidebar, hit target and mobile tab bar offset. */
 
 :root {
   --rr-content-max: 1040px;
   --rr-sidebar-width: 248px;
-  --rr-page-padding: 40px;
-  --rr-page-padding-mobile: 24px;
-  --rr-card-padding: 24px;
   --rr-hit-target: 44px;
   /* Space taken by the fixed mobile tab bar (7px + 50px + 7px + 1px border). */
   --rr-bottom-nav-offset: calc(65px + env(safe-area-inset-bottom, 0px));

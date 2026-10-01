@@ -7,6 +7,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 ## [Unreleased]
 
 ### Added
+- `npm run design:check` (in CI): fails when a stylesheet outside `src/design-system/styles/tokens/` uses a literal color, easing or font stack.
 - Security headers on every route (`frame-ancestors 'none'`, `X-Frame-Options`, `Referrer-Policy`, `nosniff`, `Permissions-Policy`) and no `X-Powered-By`.
 - Production database guard: `supabase:push` scripts refuse to write to a linked hosted project without `ALLOW_PROD_DB=1` (only CI sets it); Playwright refuses to run unless Supabase is local.
 - Automated accessibility checks with axe (WCAG 2.1 A/AA) on every main screen, with seeded data, in `e2e:critical`.
@@ -30,6 +31,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 
 ### Changed
 - Styles split from `src/app/globals.css` into `src/design-system/styles/` (tokens, base, components, one file per screen), imported in cascade order; compiled CSS unchanged (`npm run css:compare`).
+- Design tokens split by kind (colors, typography, motion, shadows, radius, spacing); every literal color, easing and font stack outside `tokens/` now uses a token (`rgb(var(--rr-*-rgb) / alpha)` for transparency). Compiled values unchanged.
 - The former staging Supabase project and Vercel app are now production, served at https://recovery-tracker.brahua.com (ADR-004).
 - Trunk-based CI/CD like `brahua-os`: PRs run CI only; pushes to `main` never cancel, deploy one at a time, check the deploy secrets first, and migrate + deploy only when every check passes. CI runs on Node 24 (`.nvmrc`) with a pinned Vercel CLI and the same action versions as `brahua-os` (`checkout`, `setup-node`, `upload-artifact` @v7).
 - Vercel Git deployments are fully disabled (no previews); GitHub Actions is the only deployer.

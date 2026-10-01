@@ -29,7 +29,8 @@ Lo que el backlog original tenía como pendiente o diferido y hoy existe.
 | Sliders táctiles de dolor | Slider propio para dolor antes/durante/después | `src/components/ritual-pain-slider.tsx` |
 | Momento de cierre animado | Estados de éxito tras sesión y cierre, con animación que respeta movimiento reducido | `src/components/session-saved-state.tsx`, `src/components/day-closed-state.tsx` |
 | Diseño mobile-first con escritorio | Rediseño con Claude Design (8 pantallas), revisado en móvil, tablet y escritorio | `docs/specs/recovery-ritual-ux-redesign-spec.md` |
-| Modo oscuro | La app es oscura por diseño (no hay tema claro) | `src/app/globals.css` |
+| Modo oscuro | La app es oscura por diseño; el tema claro legado se retiró el 2026-10-01 | `src/design-system/styles/tokens/colors.css` |
+| Design system CSS | Tokens por tipo, componentes y un archivo por pantalla; `design:check` impide valores sueltos | `src/design-system/` |
 | Historial | Solo lectura, ventanas de 30 días, varias sesiones por día, series individuales | `/historial` |
 | Registros con fecha anterior | Sesiones y cierres de días pasados, sin fechas futuras ni cierres duplicados | Registrar |
 | Feedback de carga | Barra de progreso global, toasts en cada escritura, pantalla de error | `docs/specs/global-loading-and-feedback-spec.md` |
@@ -68,7 +69,8 @@ Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justific
 
 | Prioridad | Tarea | Por qué |
 |---|---|---|
-| Media | Dividir `globals.css` (136 KB) en tokens y componentes, como el design system de `brahua-os` | Es el mayor problema de mantenimiento; necesita su propia spec |
+| Baja | Sincronizar los tokens con el proyecto de Claude Design (lockfile que impida editarlos a mano, como `brahua-os`) | Fase 3 del design system; solo si Claude Design vuelve a ser la fuente activa de cambios |
+| Baja | Revisar los tokens sin uso (`--rr-bg-night`, `--rr-paper-ink`, `--rr-amber`, `--rr-accent-card`, `--rr-page-padding*`, `--rr-card-padding`) | Vienen del design system de Claude Design; decidir si se usan o se quitan |
 | Media | Detectar en CI cambios de esquema sin migración (`supabase db diff`) | Evita desfasar la base respecto de `supabase/migrations/` |
 | Baja | Prettier + `format:check` en CI | Diffs más limpios, igual que `brahua-os` |
 | Baja | Vigilar el cambio de `ubuntu-latest` a Ubuntu 26 (19 oct 2026) | Aviso de GitHub; no debería afectar |

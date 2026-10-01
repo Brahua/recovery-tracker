@@ -23,7 +23,7 @@ Decisión: `docs/decisions/ADR-004-promote-staging-to-production.md`.
 ## Pipeline
 
 ```
-PR (cualquier rama) ─┬─ quality  (lint · typecheck · vitest)
+PR (cualquier rama) ─┬─ quality  (lint · design:check · typecheck · vitest)
                      └─ e2e      (Supabase local en Docker · Playwright e2e:critical)
 
 push a main ─────────┬─ quality

@@ -4,6 +4,7 @@
 @source not "../../docs";
 @source not "../../tasks";
 @source not "../../scripts";
+@source not "../design-system/README.md";
 @import "../design-system/styles/tokens/colors.css";
 @import "../design-system/styles/tokens/typography.css";
 @import "../design-system/styles/tokens/motion.css";

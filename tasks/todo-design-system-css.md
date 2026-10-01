@@ -52,27 +52,27 @@ Verificación común: `npm run lint && npm run typecheck && npm test` y la compa
 
 ## Fase 2: tokens (PR C)
 
-- [ ] T6. Tokens por archivo y comparación con valores resueltos
-  - Acceptance: `tokens/colors.css`, `typography.css`, `motion.css`, `shadows.css`, `radius.css` reemplazan a `root.css`; canales `--rr-*-rgb` para los ~15 colores con alfa; `compare-css --resolve` resuelve `var()` y normaliza `rgb()/rgba()`.
+- [x] T6. Tokens por archivo y comparación con valores resueltos
+  - Acceptance: `tokens/colors.css`, `typography.css`, `motion.css`, `shadows.css`, `radius.css` y `spacing.css` reemplazan a `root.css`; canales `--rr-*-rgb` para los ~15 colores con alfa; `compare-css --resolve` resuelve `var()` y normaliza `rgb()/rgba()`.
   - Verify: `--resolve` IDÉNTICO; test del resolvedor.
   - Files: `src/design-system/styles/tokens/*`, `scripts/design-system/*`
 
-- [ ] T7. Hex sueltos → tokens con nombre
+- [x] T7. Hex sueltos → tokens con nombre
   - Acceptance: 0 hex fuera de `tokens/`.
   - Verify: `--resolve` IDÉNTICO.
   - Files: `src/design-system/styles/surfaces/*`, `components/*`, `tokens/colors.css`
 
-- [ ] T8. `rgba()` sueltos → canales de tokens
+- [x] T8. `rgba()` sueltos → canales de tokens
   - Acceptance: 0 `rgb()/rgba()` literales fuera de `tokens/` (pantalla por pantalla).
   - Verify: `--resolve` IDÉNTICO tras cada archivo.
   - Files: `src/design-system/styles/surfaces/*`, `components/*`
 
-- [ ] T9. Curvas y fuentes
+- [x] T9. Curvas y fuentes
   - Acceptance: 0 `cubic-bezier(` y 0 `font-family` con nombre de fuente fuera de `tokens/`.
   - Verify: `--resolve` IDÉNTICO.
   - Files: `src/design-system/styles/**`
 
-- [ ] T10. `design:check` en CI y documentación
+- [x] T10. `design:check` en CI y documentación
   - Acceptance: `scripts/design-system/check-tokens.mjs` falla con hex, `rgb(a)`, `cubic-bezier` o fuentes fuera de `tokens/`; `npm run design:check` en el job `quality`; README del design system con cómo agregar un token; spec marcada como implementada; `CHANGELOG`, `HANDOFF` y backlog actualizados.
   - Verify: test unitario del chequeo; agregar un `#fff` a una pantalla lo hace fallar; CI verde → merge → deploy → revisión del owner.
   - Files: `scripts/design-system/check-tokens.mjs`, `scripts/design-system/check-tokens.test.mjs`, `package.json`, `.github/workflows/ci-cd.yml`, `src/design-system/README.md`, docs

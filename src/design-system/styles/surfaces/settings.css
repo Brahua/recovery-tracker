@@ -1,4 +1,4 @@
-/* Ajustes: profile (display name), install guide and reminders. */
+/* Ajustes: profile (display name), install guide and reminders (device state, switches, times). */
 
 .rr-settings {
   display: grid;
@@ -130,6 +130,136 @@
 .rr-settings-steps li::marker {
   color: var(--rr-gold);
   font-weight: 700;
+}
+
+.rr-reminders {
+  display: grid;
+  gap: 16px;
+}
+
+.rr-reminders-device {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.rr-reminders-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rr-reminders-form {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid var(--rr-border);
+  padding-top: 16px;
+}
+
+.rr-reminders-form .rr-modal-primary {
+  justify-self: start;
+  margin-top: 4px;
+}
+
+.rr-reminder-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "copy switch"
+    "time time";
+  align-items: center;
+  gap: 10px 12px;
+  border: 1px solid var(--rr-border);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-wash-soft);
+  padding: 12px 14px;
+}
+
+.rr-reminder-row > div {
+  grid-area: copy;
+  min-width: 0;
+}
+
+.rr-reminder-row > div label {
+  color: var(--rr-ink);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.rr-reminder-row > div p {
+  margin-top: 2px;
+  color: var(--rr-text-muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.rr-switch {
+  position: relative;
+  grid-area: switch;
+  width: 52px;
+  height: 32px;
+  flex: none;
+  appearance: none;
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-pill);
+  background: rgb(var(--rr-ink-rgb) / 0.12);
+  cursor: pointer;
+  transition: background-color 180ms var(--rr-ease-out);
+}
+
+.rr-switch::after {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--rr-ink);
+  box-shadow: var(--rr-shadow-thumb);
+  content: "";
+  transition: transform 180ms var(--rr-ease-out);
+}
+
+.rr-switch:checked {
+  border-color: var(--rr-accent-border);
+  background: var(--rr-accent);
+}
+
+.rr-switch:checked::after {
+  transform: translateX(20px);
+}
+
+.rr-switch:focus-visible,
+.rr-reminder-time:focus-visible {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 2px;
+}
+
+.rr-reminder-time {
+  grid-area: time;
+  justify-self: start;
+  min-height: var(--rr-hit-target);
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  padding: 8px 12px;
+  color: var(--rr-ink);
+  color-scheme: dark;
+  font: inherit;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.rr-reminder-time:disabled {
+  color: var(--rr-text-muted);
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rr-switch,
+  .rr-switch::after {
+    transition: none;
+  }
 }
 
 @media (min-width: 64rem) {

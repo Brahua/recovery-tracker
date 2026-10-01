@@ -7,6 +7,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 ## [Unreleased]
 
 ### Added
+- Reminders setup in `/ajustes`: turn on notifications per device (push subscription stored with RLS), choose time and on/off for the session and closeout reminders (defaults: session off at 18:00, closeout on at 21:30), and send a test notification (`web-push` with VAPID keys). New tables `push_subscriptions`, `reminder_settings` and `reminder_deliveries`.
 - Installable app (PWA): web manifest, app icon (gold progress ring) for the home screen, browser tab and iOS, dark status bar, and a service worker that shows a self-contained offline page when a navigation fails without network.
 - `/ajustes`: choose the name the app greets you with (`user_metadata.display_name`, kept across Google sign-ins; empty falls back to the Google name) and a guide to install the app on the iPhone. Reached from the sidebar and from the avatar in Hoy on mobile.
 - `npm run design:check` (in CI): fails when a stylesheet outside `src/design-system/styles/tokens/` uses a literal color, easing or font stack.

@@ -5,6 +5,7 @@ import {
   sessionTypeGlyphs,
   sessionTypeLabels,
 } from "@/features/history/history-formatters";
+import { formatTreatment } from "@/lib/treatments";
 import type { RehabSession } from "@/types/recovery";
 
 interface HistorySessionCardProps {
@@ -72,7 +73,7 @@ export function HistorySessionCard({
 
           <div className="rr-history-exercises">
             {session.exercises.length === 0 ? (
-              <p>Sin ejercicios detallados.</p>
+              session.treatments.length === 0 ? <p>Sin ejercicios detallados.</p> : null
             ) : session.exercises.map((exercise, exerciseIndex) => (
               <section key={`${session.id}-${exercise.name}-${exerciseIndex}`}>
                 <div className="rr-history-exercise-title">
@@ -117,6 +118,24 @@ export function HistorySessionCard({
               </section>
             ))}
           </div>
+
+          {session.treatments.length > 0 && (
+            <section aria-label="Tratamientos" className="rr-history-treatments">
+              <strong>Tratamientos</strong>
+              <ul>
+                {session.treatments.map((treatment, index) => (
+                  <li key={`${session.id}-treatment-${index}`}>{formatTreatment(treatment)}</li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {session.therapistNotes && (
+            <p className="rr-history-session-note">
+              <strong>Indicaciones del fisio</strong>
+              <span>{session.therapistNotes}</span>
+            </p>
+          )}
 
           {session.notes && (
             <p className="rr-history-session-note">

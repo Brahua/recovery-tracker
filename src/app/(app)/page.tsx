@@ -1,4 +1,5 @@
 import { SignedOutLanding } from "@/components/signed-out-landing";
+import { createRecoveryLogRepository } from "@/data/recovery-log-repository";
 import { TodayOverview } from "@/features/today/overview";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 
@@ -24,10 +25,13 @@ export default async function Home({
     );
   }
 
+  const therapistNotes = await (await createRecoveryLogRepository()).getLatestTherapistNotes();
+
   return (
     <TodayOverview
       recentCloseouts={recentCloseouts}
       recentSessions={recentSessions}
+      therapistNotes={therapistNotes}
       user={user}
     />
   );

@@ -8,6 +8,7 @@ import { ExerciseEntryEditor } from "@/components/exercise-entry-editor";
 import { FormPendingReporter } from "@/components/feedback/form-pending-reporter";
 import { RitualPainSlider } from "@/components/ritual-pain-slider";
 import { createPostTherapySessionAction } from "@/features/check-in/post-therapy/actions";
+import { TreatmentsCard } from "@/features/check-in/post-therapy/treatments-card";
 import { RoutinePicker } from "@/features/routines/routine-picker";
 import {
   findRepeatedEntryIds,
@@ -16,6 +17,12 @@ import {
   type ExerciseEntryDraft,
 } from "@/lib/exercise-entry-state";
 import { getSessionFormProgress } from "@/lib/session-form-state";
+import {
+  countValidTreatments,
+  formatTreatmentCount,
+  toTreatmentPayload,
+  type TreatmentDraft,
+} from "@/lib/treatments";
 import type {
   Exercise,
   FinalState,
@@ -108,12 +115,17 @@ function SaveButton({
   exerciseCount,
   isComplete,
   missingSteps,
+  treatmentCount,
 }: {
   exerciseCount: number;
   isComplete: boolean;
   missingSteps: number;
+  treatmentCount: number;
 }) {
   const { pending } = useFormStatus();
+  const exerciseLabel = `${exerciseCount} ejercicio${exerciseCount === 1 ? "" : "s"}`;
+  const readyLabel =
+    treatmentCount > 0 ? `${exerciseLabel} · ${formatTreatmentCount(treatmentCount)}` : exerciseLabel;
 
   return (
     <button
@@ -123,7 +135,7 @@ function SaveButton({
     >
       <span>{pending ? "Guardando..." : "Guardar sesion"}</span>
       <span>
-        <small>{isComplete ? `${exerciseCount} ejercicio${exerciseCount === 1 ? "" : "s"}` : `faltan ${missingSteps}`}</small>
+        <small>{isComplete ? readyLabel : `faltan ${missingSteps}`}</small>
         <b aria-hidden="true">→</b>
       </span>
     </button>
@@ -162,11 +174,16 @@ export function PostTherapyForm({
   const [exerciseEntries, setExerciseEntries] = useState<ExerciseEntryDraft[]>([]);
   const [showNote, setShowNote] = useState(false);
   const [sessionNote, setSessionNote] = useState("");
+  // Kept while switching session type, but only sent for physio sessions.
+  const [treatmentDrafts, setTreatmentDrafts] = useState<TreatmentDraft[]>([]);
+  const [therapistNotes, setTherapistNotes] = useState("");
+  const isPhysiotherapy = sessionType === "PHYSIOTHERAPY";
 
   const repeatedEntryIds = findRepeatedEntryIds(exerciseEntries, catalog);
   const exerciseCount = exerciseEntries.filter(
     (entry) => isExerciseEntryComplete(entry) && !repeatedEntryIds.has(entry.id),
   ).length;
+  const treatmentCount = isPhysiotherapy ? countValidTreatments(treatmentDrafts) : 0;
   const progress = getSessionFormProgress({
     painBefore,
     painDuring,
@@ -174,6 +191,8 @@ export function PostTherapyForm({
     finalState,
     exerciseCount,
     selectedExerciseCount: exerciseEntries.length,
+    treatmentCount,
+    selectedTreatmentCount: isPhysiotherapy ? treatmentDrafts.length : 0,
   });
   const painComplete =
     painBefore !== null && painDuring !== null && painAfter !== null;
@@ -316,7 +335,7 @@ export function PostTherapyForm({
               exerciseEntries.length > 0 &&
               exerciseCount === exerciseEntries.length
             }
-            title="Ejercicios"
+            title={isPhysiotherapy ? "Ejercicios o tratamientos" : "Ejercicios"}
             trailing={
               <span className="rr-exercise-actions">
                 <b>{exerciseCount}/{exerciseEntries.length} completos</b>
@@ -342,6 +361,22 @@ export function PostTherapyForm({
             value={JSON.stringify(toExercisePayload(exerciseEntries))}
           />
         </section>
+
+        {isPhysiotherapy ? (
+          <>
+            <TreatmentsCard
+              drafts={treatmentDrafts}
+              onChange={setTreatmentDrafts}
+              onTherapistNotesChange={setTherapistNotes}
+              therapistNotes={therapistNotes}
+            />
+            <input
+              name="treatmentsPayload"
+              type="hidden"
+              value={JSON.stringify(toTreatmentPayload(treatmentDrafts))}
+            />
+          </>
+        ) : null}
 
         <section className={`rr-note-card ${showNote ? "is-open" : ""}`}>
           {showNote ? (
@@ -385,6 +420,7 @@ export function PostTherapyForm({
           exerciseCount={exerciseCount}
           isComplete={progress.isComplete}
           missingSteps={progress.missingSteps}
+          treatmentCount={treatmentCount}
         />
       </footer>
     </form>

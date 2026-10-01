@@ -3,9 +3,9 @@ import { z } from "zod";
 import { sessionExerciseSchema } from "@/lib/validation/recovery";
 import type { SessionExercise } from "@/types/recovery";
 
+// The session schema decides whether an empty list is allowed (physio with treatments).
 const exercisePayloadSchema = z
   .array(sessionExerciseSchema)
-  .min(1, "At least one exercise is required.")
   .max(20, "Too many exercises for one session.");
 
 export const invalidExercisePayloadMessage =

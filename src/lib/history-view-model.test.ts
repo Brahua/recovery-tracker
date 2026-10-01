@@ -21,6 +21,7 @@ function session(
     perceivedLoad: 3,
     exercises: [],
     finalState: "SAME",
+    treatments: [],
     createdAt: occurredAt,
     updatedAt: occurredAt,
     ...overrides,

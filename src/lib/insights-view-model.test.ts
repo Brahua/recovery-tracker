@@ -16,6 +16,7 @@ function sessionOn(id: string, date: string): RehabSession {
     perceivedLoad: 3,
     exercises: [],
     finalState: "BETTER",
+    treatments: [],
     createdAt: `${date}T18:10:00.000Z`,
     updatedAt: `${date}T18:10:00.000Z`,
   };

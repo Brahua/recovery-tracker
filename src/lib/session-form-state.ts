@@ -7,6 +7,9 @@ export interface SessionFormState {
   finalState: FinalState | null;
   exerciseCount: number;
   selectedExerciseCount: number;
+  /** Only physio sessions record treatments; other types leave these out. */
+  treatmentCount?: number;
+  selectedTreatmentCount?: number;
 }
 
 export interface SessionFormProgress {
@@ -17,9 +20,13 @@ export interface SessionFormProgress {
 }
 
 export function getSessionFormProgress(state: SessionFormState): SessionFormProgress {
+  const treatmentCount = state.treatmentCount ?? 0;
+  const selectedTreatmentCount = state.selectedTreatmentCount ?? 0;
+  // Step 5: at least one exercise or treatment, and nothing selected left incomplete.
   const exercisesComplete =
-    state.selectedExerciseCount > 0 &&
-    state.exerciseCount === state.selectedExerciseCount;
+    state.exerciseCount + treatmentCount > 0 &&
+    state.exerciseCount === state.selectedExerciseCount &&
+    treatmentCount === selectedTreatmentCount;
   const completedSteps = [
     state.painBefore !== null,
     state.painDuring !== null,

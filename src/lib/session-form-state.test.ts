@@ -54,4 +54,49 @@ describe("getSessionFormProgress", () => {
       }),
     ).toEqual({ completedSteps: 4, isComplete: false, missingSteps: 1, totalSteps: 5 });
   });
+
+  it("completes a physio session with treatments and no exercises", () => {
+    expect(
+      getSessionFormProgress({
+        painBefore: 3,
+        painDuring: 4,
+        painAfter: 2,
+        finalState: "BETTER",
+        exerciseCount: 0,
+        selectedExerciseCount: 0,
+        treatmentCount: 2,
+        selectedTreatmentCount: 2,
+      }).isComplete,
+    ).toBe(true);
+  });
+
+  it("requires every selected treatment to be valid", () => {
+    expect(
+      getSessionFormProgress({
+        painBefore: 3,
+        painDuring: 4,
+        painAfter: 2,
+        finalState: "BETTER",
+        exerciseCount: 1,
+        selectedExerciseCount: 1,
+        treatmentCount: 1,
+        selectedTreatmentCount: 2,
+      }).isComplete,
+    ).toBe(false);
+  });
+
+  it("still requires selected exercises to be complete when there are treatments", () => {
+    expect(
+      getSessionFormProgress({
+        painBefore: 3,
+        painDuring: 4,
+        painAfter: 2,
+        finalState: "BETTER",
+        exerciseCount: 0,
+        selectedExerciseCount: 1,
+        treatmentCount: 1,
+        selectedTreatmentCount: 1,
+      }).isComplete,
+    ).toBe(false);
+  });
 });

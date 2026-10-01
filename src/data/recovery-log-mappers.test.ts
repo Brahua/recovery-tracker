@@ -4,6 +4,7 @@ import {
   mapExerciseRow,
   mapRoutineRows,
   mapSessionExerciseRow,
+  mapSessionTreatmentRow,
   type ExerciseSetRow,
   type SessionExerciseRow,
 } from "@/data/recovery-log-mappers";
@@ -159,5 +160,27 @@ describe("recovery log mappers", () => {
       },
       { exerciseId: "ex2", name: "Bicicleta", isIsometric: false, durationMinutes: 10, sets: [] },
     ]);
+  });
+
+  it("maps a treatment row turning nulls into missing fields", () => {
+    expect(
+      mapSessionTreatmentRow({
+        id: "t1",
+        session_id: "s1",
+        user_id: "u1",
+        position: 0,
+        category: "INVASIVE",
+        modality: "OTHER",
+        custom_name: "Indiba",
+        body_zone: null,
+        duration_minutes: 10,
+      }),
+    ).toEqual({
+      category: "INVASIVE",
+      modality: "OTHER",
+      customName: "Indiba",
+      bodyZone: undefined,
+      durationMinutes: 10,
+    });
   });
 });

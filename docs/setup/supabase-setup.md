@@ -31,7 +31,8 @@ Avoid `npm run supabase:push:linked` from a laptop: let CI apply migrations afte
 Hosted-only settings (Dashboard):
 
 - Authentication → URL Configuration: see `docs/deployment.md`.
-- Authentication → Providers: Google enabled; **Anonymous Sign-Ins disabled**.
+- Authentication → Providers: Google enabled; **Email and Anonymous Sign-Ins disabled** (verified 2026-10-01).
+- The CI access token expires around 2027-09-30; renewal steps in `docs/deployment.md`.
 
 ## Known local blocker
 

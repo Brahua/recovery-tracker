@@ -30,20 +30,22 @@ push a main ─────────┬─ quality
                      ├─ e2e
                      └─ deploy   (solo si los dos anteriores pasan)
                           1. revisa que existan los secrets
-                          2. supabase db push  → migraciones en producción
+                          2. npm run supabase:push:linked (ALLOW_PROD_DB=1) → migraciones en producción
                           3. vercel pull / build / deploy --prebuilt --prod
 ```
 
 - Los runs de PR se cancelan si llega un commit nuevo; los de `main` nunca, porque pueden estar desplegando.
 - Solo corre un deploy a la vez (`concurrency: deploy-production`), en el orden de los merges.
 - Si la migración falla, el job falla y la app no se despliega con un esquema viejo.
-- La CLI de Vercel está fijada a `vercel@61.1.0`, igual que en `brahua-os`.
+- La CLI de Vercel está fijada a `vercel@61.1.0` y las acciones de GitHub (`checkout`, `setup-node`, `upload-artifact`) en `@v7`, igual que en `brahua-os`.
+- `e2e:critical` incluye `tests/e2e/accessibility.spec.ts` (axe, WCAG 2.1 A/AA).
 
 ## Cambios con migraciones
 
 1. Rama corta + PR. CI aplica todas las migraciones a su propio Supabase y corre los E2E, sin desplegar.
 2. Las migraciones deben ser **aditivas**. Algo destructivo (borrar columnas, tablas o datos) necesita el OK del owner y un backup antes.
 3. Opcional antes del merge: `npm run supabase:push:dry` (enlazado a producción) debe listar solo la migración nueva.
+   `npm run supabase:push` y `supabase:push:linked` se niegan a escribir en un proyecto hospedado sin `ALLOW_PROD_DB=1` (`scripts/check-db-target.mjs`); solo el job `deploy` lo define.
 4. Merge con CI en verde. El job `deploy` aplica la migración y luego despliega la app.
 
 Nunca editar una migración ya aplicada en producción; agregar una nueva.
@@ -57,10 +59,12 @@ Repo → Settings → Secrets and variables → Actions. El job `deploy` falla a
 | `VERCEL_TOKEN` | Autenticación de la CLI de Vercel (https://vercel.com/account/tokens) |
 | `VERCEL_ORG_ID` | Scope de Vercel (`team_…`) |
 | `VERCEL_PROJECT_ID` | Proyecto de Vercel (`prj_…`) |
-| `SUPABASE_ACCESS_TOKEN` | `supabase link` / `db push` |
+| `SUPABASE_ACCESS_TOKEN` | `supabase link` / `db push`. Token de **proyecto** (solo `recovery-tracker-staging`), nombre `github-actions-recovery-tracker`, **vence en un año** (ver "Vencimientos") |
 | `SUPABASE_DB_PASSWORD` | Contraseña de la base de producción para `db push` |
 
 Los secrets se cargan desde una terminal normal o desde la web de GitHub: `gh secret set` desde el `!` de la sesión de Claude los guarda vacíos.
+
+GitHub nunca muestra el valor de un secret, solo su fecha de actualización (`gh secret list`). Para comprobar que funcionan sin desplegar: rama temporal con un workflow `on: push` solo para esa rama que haga un `GET https://api.supabase.com/v1/projects/<ref>` con el token y `supabase link` + `supabase db push --linked --dry-run`; luego borrar la rama. Así se verificó el 2026-10-01.
 
 ## Variables de entorno en Vercel
 
@@ -100,9 +104,44 @@ Dashboard → Authentication → URL Configuration:
 
 En Google Cloud Console no hay que cambiar nada: el callback de Google es el de Supabase (`https://pevrupenrzueyzidfeah.supabase.co/auth/v1/callback`).
 
-## Login anónimo
+## Proveedores de Auth en producción
 
-El login anónimo existía solo para los E2E. Los E2E ya no tocan este proyecto (usan Supabase local, donde `supabase/config.toml` lo habilita), así que en producción debe estar **apagado**: Dashboard → Authentication → Sign In / Providers → Anonymous Sign-Ins. La app además oculta la entrada de demo si no está `ENABLE_DEMO_MODE`, que nunca se define en Vercel.
+Solo **Google** está activo (verificado el 2026-10-01). Dashboard → Authentication → Sign In / Providers:
+
+| Proveedor | Estado | Por qué |
+|---|---|---|
+| Google | ✅ activo | Único login de la app (ADR-002) |
+| Email | ❌ apagado | La app no lo usa; con la publishable key (pública) cualquiera podría registrarse por la API |
+| Anonymous Sign-Ins | ❌ apagado | Solo servía para E2E; ahora usan Supabase local, donde `supabase/config.toml` lo habilita. Activo, cualquiera podría crear usuarios basura con la publishable key |
+
+La app además oculta la entrada de demo si no está `ENABLE_DEMO_MODE`, que nunca se define en Vercel.
+
+## Cabeceras de seguridad
+
+`next.config.ts` aplica a todas las rutas `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Content-Type-Options: nosniff` y `Permissions-Policy`, y quita `X-Powered-By`. Vercel agrega `Strict-Transport-Security`. Comprobar con `curl -sI https://recovery-tracker.brahua.com/`.
+
+## Vencimientos y renovaciones
+
+| Qué | Vence | Cómo renovar |
+|---|---|---|
+| `SUPABASE_ACCESS_TOKEN` (secret de GitHub) | **~30 sep 2027** (creado el 2026-10-01 con 1 año; la fecha exacta está en Supabase → Account → Access Tokens) | Ver abajo. Renovar **un mes antes** (inicio de septiembre de 2027) |
+| Certificado HTTPS del dominio | Cada ~90 días | Automático en Vercel mientras el `CNAME` apunte a Vercel. Si el dominio deja de responder por HTTPS: `vercel certs issue recovery-tracker.brahua.com` |
+| `VERCEL_TOKEN` (secret de GitHub) | **No vence** (token `recovery-tracker-staging` en https://vercel.com/account/tokens, creado el 2026-07-18) | Solo si se filtra o se revoca: crear uno nuevo, actualizar el secret, revocar el viejo |
+
+Si el token de Supabase vence, el job `deploy` falla en "Apply migrations to production Supabase" con un error de autenticación (HTTP 401) y no se publica nada; la app que ya está en producción sigue funcionando.
+
+### Renovar `SUPABASE_ACCESS_TOKEN`
+
+1. https://supabase.com/dashboard/account/tokens → **Generate token**:
+   - Name: `github-actions-recovery-tracker`
+   - Expires in: 1 año
+   - Resource access: **Project** → la organización → `recovery-tracker-staging` (ref `pevrupenrzueyzidfeah`)
+   - Permissions: preset **Read-only** y escritura solo en lo de migraciones dentro de **Database**
+2. Copiar el valor (`sbp_…`; se muestra una sola vez).
+3. https://github.com/Brahua/recovery-tracker/settings/secrets/actions → `SUPABASE_ACCESS_TOKEN` → pegar → **Update secret** (desde la web, no desde la sesión de Claude).
+4. Verificar el secret con la rama temporal descrita en "Secrets de GitHub".
+5. Revocar el token viejo en la misma página de Supabase.
+6. Actualizar la fecha de vencimiento en esta tabla y en `docs/HANDOFF.md`.
 
 ## Protección del deploy
 

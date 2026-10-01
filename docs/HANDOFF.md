@@ -83,6 +83,6 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 
 ## Próximos pasos
 
-- **En curso: PWA y recordatorios** (`docs/specs/pwa-and-reminders-spec.md`, tareas en `tasks/todo-pwa-reminders.md`). PR 1 (instalable, pantalla offline, `/ajustes` con el nombre) y PR 2 (ajustes de recordatorios, suscripción por dispositivo, notificación de prueba) listos; sigue PR 3 (envío programado con `pg_cron`). Antes del deploy del PR 3 el owner carga las claves VAPID, `service_role`, el secreto del endpoint y Vault (`docs/deployment.md`).
+- **En curso: PWA y recordatorios** (`docs/specs/pwa-and-reminders-spec.md`, tareas en `tasks/todo-pwa-reminders.md`). Los 3 PR están hechos (instalable y offline; `/ajustes` con nombre y recordatorios; envío programado con `pg_cron` cada 5 min). **Pendiente del owner:** cargar claves VAPID, `SUPABASE_SERVICE_ROLE_KEY` y `REMINDERS_DISPATCH_SECRET` en Vercel y los dos secretos de Vault (pasos y SQL en `docs/deployment.md` → "Envío programado de recordatorios"), redeploy, y probar en el iPhone (lista en `tasks/todo-pwa-reminders.md` → D4). Diagnóstico del cron: mismo apartado de `docs/deployment.md`.
 - Ícono de la app: editar `src/design-system/brand/app-icon.svg` y regenerar con `node scripts/pwa/render-icons.mjs`. El service worker es `public/sw.js` (subir `CACHE_VERSION` si cambia `offline.html`).
 - El resto de lo pendiente está en **`docs/ideas/recovery-ritual-backlog.md`**.

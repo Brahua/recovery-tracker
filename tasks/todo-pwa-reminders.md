@@ -65,17 +65,17 @@ Verificación en la PC: `npm run lint && npm run design:check && npm run typeche
 
 ## PR 3: envío programado
 
-- [ ] D1. Qué recordatorio toca
+- [x] D1. Qué recordatorio toca
   - Acceptance: `dueReminders()` pura (ventana de 2 h, una vez por día, condición pendiente, Lima, día local); contenido y URL de cada tipo.
   - Verify: tests unitarios con casos de borde (justo a la hora, +2 h, medianoche, ya enviado, ya hecho, apagado).
   - Files: `src/lib/reminders/due-reminders.ts`, `src/lib/reminders/due-reminders.test.ts`, `src/lib/reminders/messages.ts`
 
-- [ ] D2. Endpoint `/api/reminders/dispatch`
+- [x] D2. Endpoint `/api/reminders/dispatch`
   - Acceptance: `POST` con secreto en tiempo constante; cliente `service_role` server-only; lee ajustes, suscripciones, sesiones/cierres de hoy y envíos; reserva el envío y luego manda; limpia 404/410; responde solo contadores.
   - Verify: tests del handler con dependencias simuladas (401, 405, envío, idempotencia, limpieza).
   - Files: `src/app/api/reminders/dispatch/route.ts`, `src/app/api/reminders/dispatch/route.test.ts`, `src/lib/supabase/admin.ts`, `src/data/reminders-repository.ts`
 
-- [ ] D3. Migración del cron
+- [x] D3. Migración del cron
   - Acceptance: `pg_cron` + `pg_net`; `public.dispatch_reminders()` (`security definer`, lee Vault, no hace nada si faltan secretos); job `dispatch-reminders` `*/5 * * * *`; idempotente.
   - Verify: CI aplica la migración en Supabase local sin llamar a nada.
   - Files: `supabase/migrations/20261001010000_reminders_dispatch.sql`

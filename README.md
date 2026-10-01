@@ -25,7 +25,7 @@ There is a single hosted environment: **production**.
 
 Trunk-based workflow: short branches and PRs against `main`; every push to `main` runs CI and, only if every check passes, migrates Supabase and deploys to production. Details: `docs/deployment.md`.
 
-Local development and tests use the local Supabase stack (see below), never production.
+E2E always run against a throwaway local Supabase (in CI), never production. On the owner's PC Docker, `next build` and E2E are avoided (see `AGENTS.md`); visual checks use `npm run dev` against production only when asked, without creating test data.
 
 Detailed guide: `docs/setup/supabase-cloud-step-by-step.md`
 
@@ -70,7 +70,7 @@ npm run supabase:stop
 
 Notes:
 
-- Local Supabase (Docker) is the default for development and E2E; CI uses the same stack.
+- Local Supabase (Docker) is what CI uses for E2E. Locally it needs Docker, which is avoided on the owner's PC unless asked.
 - `supabase/config.toml` is already initialized for this repo.
 - `supabase/seed.sql` is intentionally empty so resets work now and can be expanded later.
 - For local Google OAuth, also fill `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID` and `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET`.
@@ -85,7 +85,7 @@ Notes:
 - MVP spec: `docs/specs/recovery-ritual-mvp-spec.md`
 - UX redesign spec and Claude Design prompt pack: `docs/specs/recovery-ritual-ux-redesign-spec.md`
 - Implemented Claude Design inventory and recorded deviations: `docs/design/claude-design-reference.md`
-- Current handoff: `docs/specs/session-handoff-2026-09-17.md`
+- Current handoff (read first when resuming): `docs/HANDOFF.md`; older handoffs in `docs/archive/handoffs/`
 - Exercise catalog spec: `docs/specs/exercise-catalog-spec.md`
 - Routines spec: `docs/specs/routines-spec.md`
 - Deployment and migration workflow: `docs/deployment.md`

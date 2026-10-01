@@ -7,6 +7,10 @@ The format is based on Keep a Changelog and this project currently follows Seman
 ## [Unreleased]
 
 ### Added
+- Security headers on every route (`frame-ancestors 'none'`, `X-Frame-Options`, `Referrer-Policy`, `nosniff`, `Permissions-Policy`) and no `X-Powered-By`.
+- Production database guard: `supabase:push` scripts refuse to write to a linked hosted project without `ALLOW_PROD_DB=1` (only CI sets it); Playwright refuses to run unless Supabase is local.
+- Automated accessibility checks with axe (WCAG 2.1 A/AA) on every main screen, with seeded data, in `e2e:critical`.
+- Single `docs/HANDOFF.md` as the session entry point; dated handoffs moved to `docs/archive/handoffs/`.
 - Global loading feedback: a top progress bar fed by every server round-trip (links, programmatic navigation, form submissions and server actions) plus a route skeleton, and floating toasts confirming every write (session, closeout, exercise save/archive/reactivate/merge, routine save/delete, session→routine).
 - Fallback error screen for failures no form handled, keeping the shell and offering a retry.
 - Per-user exercise catalog (`/ejercicios`) with defaults, "isometric by default", archive/reactivate and merge; each user starts with 10 exercises.
@@ -42,6 +46,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Aligned the responsive Historial with its mobile and desktop Claude Design references, including the date rail, single-open session accordion, two-column exercise details, separate closeout cards, and viewport-specific navigation.
 
 ### Fixed
+- Color contrast below 4.5:1 on small text in Registrar, Ejercicios and Historial (new `--rr-accent-on-tint` for green text on tinted backgrounds).
 - Kept the session, closeout and report action bars above the mobile tab bar and reserved its height at the end of each screen.
 - Showed the full catalog on a new user's first Registrar visit (a repeated GET in the same server render returned a memoized empty list).
 - Prevented incomplete selected exercises from enabling session saves, identified each unfinished exercise in the form, and preserved all entered values when server validation rejects a submission.

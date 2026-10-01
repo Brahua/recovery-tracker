@@ -108,7 +108,7 @@ Ideas ya identificadas pero no aprobadas incluyen edición histórica, rutinas r
 
 1. `AGENTS.md`
 2. `README.md`
-3. `docs/specs/session-handoff-2026-07-17.md`
+3. `docs/archive/handoffs/session-handoff-2026-07-17.md`
 4. `tasks/plan.md`
 5. `tasks/todo.md`
 6. `CHANGELOG.md`

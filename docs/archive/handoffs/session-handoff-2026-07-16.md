@@ -113,7 +113,7 @@ Después de las pruebas se eliminaron todos los usuarios anónimos y sus datos. 
 - `README.md`
 - `tasks/plan.md`
 - `tasks/todo.md`
-- `docs/specs/session-handoff-2026-07-16.md`
+- `docs/archive/handoffs/session-handoff-2026-07-16.md`
 - `docs/design/claude-design-reference.md`
 - `src/lib/recovery-page-data.ts`
 - `src/lib/today-view-model.ts`

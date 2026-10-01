@@ -26,7 +26,8 @@
     "test:unit": "vitest run",
     "test:recovery": "vitest run src/lib/recovery-calculations.test.ts src/lib/recovery-insights.test.ts",
     "test:validation": "vitest run src/lib/validation/recovery.test.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "css:compare": "node scripts/design-system/compare-css.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",

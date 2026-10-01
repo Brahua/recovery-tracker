@@ -19,8 +19,8 @@
 
 - **Producción:** https://recovery-tracker.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
 - **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01).
-- **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo y feedback global de carga. Detalle en `CHANGELOG.md`.
-- **Fase:** prueba de uso real. Tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`): fase 1 en producción (PR #23, 2026-10-01); fase 2 (Insights y Reporte) en PR.
+- **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo, feedback global de carga y tratamientos del centro en Fisio guiada. Detalle en `CHANGELOG.md`.
+- **Fase:** prueba de uso real. Tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`) en producción desde el 2026-10-01: fase 1 (PR #23, migración `20261002000000_session_treatments.sql`) y fase 2, Insights y Reporte (PR #24). No hay una próxima feature elegida.
 
 ### Paso a producción (2026-09-30) ✅
 
@@ -29,9 +29,7 @@
 - Token viejo de Supabase revocado; `SUPABASE_ACCESS_TOKEN` nuevo (token de proyecto, vence en ~1 año: renovarlo antes y actualizar el secret). Probado con un workflow temporal: API 200 y `link` + `db push --dry-run` OK.
 - PR #9 integrado y desplegado: cabeceras de seguridad (comprobadas en el dominio), guardia de la base de producción, axe en E2E y acciones de GitHub en `@v7`.
 
-| Rama | Qué | Estado |
-|---|---|---|
-| `feat/physio-treatments-insights` | Tratamientos del centro, fase 2: tarjeta en Insights (con/sin cada tratamiento, desde 3 sesiones), tratamientos y zonas en Reporte, indicaciones del fisio en Notas destacadas. Sin migración | Lint, design:check, typecheck y unitarios en verde en local; E2E en CI |
+No hay ramas abiertas.
 
 ## ⏰ Vencimientos
 

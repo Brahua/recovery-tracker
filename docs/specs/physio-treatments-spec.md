@@ -2,7 +2,7 @@
 
 ## Estado
 
-Aprobada el 2026-10-01. Fase 1: PR #23. Fase 2 (Insights y Reporte): rama `feat/physio-treatments-insights`.
+Aprobada el 2026-10-01. Implementada y desplegada en producción el 2026-10-01: fase 1 (PR #23, migración `20261002000000_session_treatments.sql`) y fase 2 (PR #24).
 
 ## Decisiones validadas (owner, 2026-10-01)
 

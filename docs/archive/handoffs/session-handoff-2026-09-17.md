@@ -90,7 +90,7 @@ Ideas ya mencionadas, no aprobadas: guardar en la sesión qué rutina se usó (h
 
 1. `AGENTS.md`
 2. `README.md`
-3. `docs/specs/session-handoff-2026-09-17.md`
+3. `docs/archive/handoffs/session-handoff-2026-09-17.md`
 4. `docs/deployment.md`
 5. `CHANGELOG.md`
 6. La spec de la feature a tocar (`docs/specs/exercise-catalog-spec.md`, `docs/specs/routines-spec.md`).

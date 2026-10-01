@@ -4,17 +4,17 @@ Two Supabase targets exist for this project:
 
 | Target | Used for |
 |---|---|
-| **Local** (Supabase CLI in Docker) | Day-to-day development, Playwright E2E, CI |
+| **Local** (Supabase CLI in Docker) | Playwright E2E in CI; locally only on a machine that can run Docker (not the owner's PC unless asked) |
 | **Production** (hosted, ref `pevrupenrzueyzidfeah`, formerly `staging`) | The live app at https://recovery-tracker.brahua.com; real data |
 
 There is no separate staging project anymore (see `docs/decisions/ADR-004-promote-staging-to-production.md`).
 Migrations reach production only through the `deploy` job in `.github/workflows/ci-cd.yml` (see `docs/deployment.md`).
 
-## Local Workflow (default)
+## Local Workflow (Docker)
 
 1. Make sure Docker Desktop is healthy.
 2. Run `npm run supabase:start` (applies every migration in `supabase/migrations/` and `supabase/seed.sql`).
-3. Run `npm run supabase:env:local` to write the local URL and keys into `.env.local`.
+3. Run `npm run supabase:env:local` to write the local URL and keys into `.env.local` (this overwrites it; back it up if it points at production). Alternatively export `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in the shell: process env wins over `.env.local`.
 4. Run `npm run dev`. The dev-only anonymous entry (`Entrar anonimo para pruebas`) works because `supabase/config.toml` enables anonymous sign-ins locally.
 5. Run `npm run supabase:types` after schema changes, and `npm run supabase:reset` to start clean.
 

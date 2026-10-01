@@ -117,9 +117,12 @@ jobs:
       # Migrations are additive and run before the app deploy; a failed migration
       # fails the job, so the app never ships against an old schema.
       - name: Apply migrations to production Supabase
+        env:
+          # The only place allowed to write to production (scripts/check-db-target.mjs).
+          ALLOW_PROD_DB: "1"
         run: |
           npx supabase link --project-ref "$SUPABASE_PROJECT_REF"
-          npx supabase db push
+          npm run supabase:push:linked
 
       - name: Pull production settings and env
         run: npx vercel@61.1.0 pull --yes --environment=production --token="$VERCEL_TOKEN"

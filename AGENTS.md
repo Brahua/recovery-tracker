@@ -8,13 +8,15 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Spanish, mobile-first knee rehab tracker. Production: https://recovery-tracker.brahua.com
 
-Read first when resuming: `RECAP.md`, then `docs/deployment.md`, `tasks/todo.md` and the spec of the feature in progress.
+Read first when resuming: `docs/HANDOFF.md` (exact status, work in flight and machine limits), then `RECAP.md`, `docs/deployment.md`, `tasks/todo.md` and the spec of the feature in progress.
 
 ## Rules
 
 - Code, file names, commits: **English**. UI copy, specs, docs: **Spanish**.
 - Node 24 (`.nvmrc`) + npm. Run `nvm use` first.
-- Before committing: `npm run lint && npm run typecheck && npm test && npm run build`.
+- Before committing: `npm run lint && npm run typecheck && npm test`. `next build` and E2E run in CI.
+- **Machine limits:** on the owner's PC do not run Docker (local Supabase), `next build` or E2E unless the
+  owner asks for it in that session; it has hung the machine before. `npm run dev` is fine when asked.
 - GitHub: personal account `Brahua` only (`gh auth switch -u Brahua` if another account is active).
 
 ## Workflow (trunk-based)

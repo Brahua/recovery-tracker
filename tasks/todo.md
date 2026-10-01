@@ -13,7 +13,7 @@ Plan: `tasks/plan.md`
 - [x] Restaurar staging eliminando solo usuarios anónimos y conservar los datos reales.
 - [x] Seleccionar la próxima feature a partir de una observación real y crear su spec/plan antes de implementarla (catálogo de ejercicios y rutinas: `tasks/todo-exercise-catalog.md`, `tasks/todo-routines.md`).
 
-Handoff actual: `docs/specs/session-handoff-2026-09-17.md`.
+Handoff actual: `docs/HANDOFF.md`.
 
 ## Fase 1: Contrato y persistencia
 
@@ -184,5 +184,5 @@ Handoff actual: `docs/specs/session-handoff-2026-09-17.md`.
 
 - [ ] Task: Complete the one-week field validation window.
   - Acceptance: Daily-use observations from 2026-07-16 through 2026-07-23 are captured with enough context to distinguish defects, friction, and new requirements.
-  - Verify: Review the field questions and observation format in `docs/specs/session-handoff-2026-07-16.md`, then prioritize the next iteration from evidence.
-  - Files: `docs/specs/session-handoff-2026-07-16.md`, `tasks/plan.md`, `tasks/todo.md`
+  - Verify: Review the field questions and observation format in `docs/archive/handoffs/session-handoff-2026-07-16.md`, then prioritize the next iteration from evidence.
+  - Files: `docs/archive/handoffs/session-handoff-2026-07-16.md`, `tasks/plan.md`, `tasks/todo.md`

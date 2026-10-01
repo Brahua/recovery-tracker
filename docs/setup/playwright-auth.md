@@ -21,6 +21,18 @@ npm run supabase:env:local
 
 Anonymous sign-ins stay **disabled** in the production project.
 
+`playwright.config.ts` refuses to start unless `NEXT_PUBLIC_SUPABASE_URL` (process env or `.env*`) is the local stack, and only reuses an already-running server with `E2E_REUSE_SERVER=1`. `E2E_PORT` (default 3000) avoids clashing with another dev server.
+
+Example without touching `.env.local`:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 \
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=<ANON_KEY from `npx supabase status`> \
+E2E_PORT=3100 npm run e2e:critical -- --workers=1
+```
+
+On a loaded machine run with `--workers=1`: in parallel the specs share one anonymous user and time out.
+
 ## How the suite works
 
 1. Playwright opens the app
@@ -49,3 +61,4 @@ npm run e2e:critical
 - Reload and verify persistence
 - Save a session with a custom exercise only
 - Verify the server-side validation error when no exercise is provided
+- Accessibility: `tests/e2e/accessibility.spec.ts` logs a session and a closeout, then runs axe (WCAG 2.1 A/AA) with reduced motion on Hoy, Registrar (session and closeout), Historial, Insights, Reporte, Ejercicios, Nueva rutina and the signed-out landing. Part of `npm run e2e:critical`.

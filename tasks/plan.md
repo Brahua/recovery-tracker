@@ -15,7 +15,7 @@ Después de completar este plan se entregaron y verificaron:
 - cierres retrospectivos con contexto de la sesión del día elegido
 - rechazo seguro de fechas inválidas, futuras o duplicadas
 
-El estado canónico y el protocolo para iniciar la próxima feature están en `docs/specs/session-handoff-2026-07-17.md`. No existe una nueva feature aprobada; el siguiente plan debe reemplazar este alcance archivado solo después de priorizar una observación de uso real.
+El estado canónico y el protocolo para iniciar la próxima feature están en `docs/archive/handoffs/session-handoff-2026-07-17.md`. No existe una nueva feature aprobada; el siguiente plan debe reemplazar este alcance archivado solo después de priorizar una observación de uso real.
 
 Especificación aprobada: `docs/specs/recovery-history-and-exercise-sets-spec.md`.
 

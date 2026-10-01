@@ -49,7 +49,7 @@ proxy.ts          Refresca la sesión de Supabase en cada request
 
 ### Reglas que no hay que romper
 
-Vienen de `docs/specs/session-handoff-2026-07-17.md`:
+Vienen de `docs/archive/handoffs/session-handoff-2026-07-17.md`:
 
 - Se permiten varias sesiones por día. Solo puede haber **un cierre por usuario y fecha**, y la base de datos también lo impide.
 - No se aceptan cierres con fecha futura.
@@ -105,14 +105,14 @@ npm run supabase:push:dry   # enlazado a producción: ver migraciones pendientes
 
 ### Pendientes detectados
 
-- `.env.example` tenía un token real en `SUPABASE_ACCESS_TOKEN` (nunca se commiteó). Ya se reemplazó por un valor vacío, pero conviene revocarlo en Supabase → Account → Access Tokens.
-- Pasos manuales del paso a producción (DNS, URLs de Auth, login anónimo): ver `docs/deployment.md`.
+- Ninguno del paso a producción: dominio, HTTPS, Auth, login anónimo y token quedaron resueltos el 2026-09-30 (detalle en `docs/HANDOFF.md`).
+- El token de CI (`SUPABASE_ACCESS_TOKEN`) vence en ~1 año: renovarlo antes y actualizar el secret de GitHub.
 
 ### Archivos para leer al empezar cada sesión
 
 1. `AGENTS.md`
 2. `RECAP.md` (este archivo)
-3. `docs/deployment.md` y el último handoff en `docs/specs/`
+3. `docs/HANDOFF.md` (estado exacto y trabajo en curso) y `docs/deployment.md`
 4. `tasks/plan.md` y `tasks/todo.md`
 5. `CHANGELOG.md`
 6. La spec relacionada con la feature elegida

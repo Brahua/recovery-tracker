@@ -15,10 +15,11 @@ import {
   toast,
 } from "./exercise-helpers";
 
-// Older than Historial's default window, where no other spec closes a day (they use
-// -1 to -28). Random so a CI retry does not hit the one-closeout-per-day rule.
-const baseOffset = -(40 + Math.floor(Math.random() * 300));
-const dayAt = (step: number) => addRecoveryDays(getRecoveryDateKey(), baseOffset - step);
+// Days older than Historial's default window, where no other spec closes a day (they
+// use -1 to -28). Each worker gets its own block of 10 days: workerIndex is unique in a
+// run (a retry starts a new worker), so parallel tests and retries never share a date.
+const dayAt = (step: number) =>
+  addRecoveryDays(getRecoveryDateKey(), -(40 + test.info().workerIndex * 10 + step));
 
 async function createCloseout(page: Page, date: string, pain: string) {
   await page.goto(`/registrar?mode=closeout&date=${date}`);

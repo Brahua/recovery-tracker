@@ -7,12 +7,16 @@ import {
   createMedicalReportSummary,
   type MedicalReportSummary,
 } from "@/lib/recovery-insights";
+import {
+  calculateTreatmentFrequency,
+  type TreatmentFrequencyItem,
+} from "@/lib/treatment-insights";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 import { getRecoveryDateKey } from "@/lib/recovery-date";
 
 export interface ReportNote {
   date: string;
-  source: "Cierre nocturno" | "Sesion";
+  source: "Cierre nocturno" | "Sesion" | "Indicaciones del fisio";
   text: string;
 }
 
@@ -24,6 +28,8 @@ export interface ReportViewModel {
   averageSessionPainDelta?: number;
   averageSleepHours?: number;
   averageEnergy?: number;
+  physioSessionCount: number;
+  treatments: TreatmentFrequencyItem[];
   notes: ReportNote[];
 }
 
@@ -52,6 +58,17 @@ export function createReportViewModel(
         ? [{ date: getRecoveryDateKey(session.occurredAt), source: "Sesion" as const, text: session.notes }]
         : [],
     ),
+    ...filteredSessions.flatMap((session) =>
+      session.therapistNotes?.trim()
+        ? [
+            {
+              date: getRecoveryDateKey(session.occurredAt),
+              source: "Indicaciones del fisio" as const,
+              text: session.therapistNotes,
+            },
+          ]
+        : [],
+    ),
   ]
     .sort((left, right) => right.date.localeCompare(left.date))
     .slice(0, 4);
@@ -75,6 +92,10 @@ export function createReportViewModel(
       filteredCloseouts.map((closeout) => closeout.sleepHours),
     ),
     averageEnergy: average(filteredCloseouts.map((closeout) => closeout.energy)),
+    physioSessionCount: filteredSessions.filter(
+      (session) => session.sessionType === "PHYSIOTHERAPY",
+    ).length,
+    treatments: calculateTreatmentFrequency(filteredSessions),
     notes,
   };
 }

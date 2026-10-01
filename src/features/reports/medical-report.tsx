@@ -148,6 +148,22 @@ export function MedicalReport({
               <div><strong>{formatNumber(report.averageSessionPainDelta)}</strong><span>cambio medio de dolor</span></div>
             </div>
             <p className="rr-report-copy">{summary.sessionResponseText}</p>
+            {report.physioSessionCount > 0 ? (
+              <div className="rr-report-treatments">
+                <h3>Tratamientos del centro · {report.physioSessionCount} sesion{report.physioSessionCount === 1 ? "" : "es"} de fisio</h3>
+                {report.treatments.length > 0 ? (
+                  <ul>
+                    {report.treatments.map((item) => (
+                      <li key={item.key}>
+                        <strong>{item.label}</strong>
+                        <span>{item.count} {item.count === 1 ? "vez" : "veces"}</span>
+                        {item.zones.length > 0 ? <small>{item.zones.join(", ")}</small> : null}
+                      </li>
+                    ))}
+                  </ul>
+                ) : <p>No se registraron tratamientos en este rango.</p>}
+              </div>
+            ) : null}
           </ReportCard>
 
           <ReportCard number="03" title="Rebote y asociaciones">

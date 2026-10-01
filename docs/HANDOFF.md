@@ -20,7 +20,7 @@
 - **Producción:** https://recovery-tracker.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
 - **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01).
 - **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo y feedback global de carga. Detalle en `CHANGELOG.md`.
-- **Fase:** prueba de uso real. En curso: tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`), fase 1.
+- **Fase:** prueba de uso real. Tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`): fase 1 en producción (PR #23, 2026-10-01); fase 2 (Insights y Reporte) en PR.
 
 ### Paso a producción (2026-09-30) ✅
 
@@ -31,7 +31,7 @@
 
 | Rama | Qué | Estado |
 |---|---|---|
-| `feat/physio-treatments` | Tratamientos del centro (fase 1): tarjeta en Registrar, Historial, indicaciones del fisio en Hoy. Migración `20261002000000_session_treatments.sql` | Lint, design:check, typecheck y unitarios en verde en local; E2E y build en CI. Fase 2 (Insights y Reporte) pendiente |
+| `feat/physio-treatments-insights` | Tratamientos del centro, fase 2: tarjeta en Insights (con/sin cada tratamiento, desde 3 sesiones), tratamientos y zonas en Reporte, indicaciones del fisio en Notas destacadas. Sin migración | Lint, design:check, typecheck y unitarios en verde en local; E2E en CI |
 
 ## ⏰ Vencimientos
 

@@ -4,7 +4,7 @@ Spec: `docs/specs/pwa-and-reminders-spec.md` · Plan: `tasks/plan-pwa-reminders.
 
 Verificación en la PC: `npm run lint && npm run design:check && npm run typecheck && npm test`. Build y E2E en CI.
 
-## PR 1: app instalable + offline
+## PR 1: app instalable, offline y /ajustes con tu nombre
 
 - [ ] P1. Ícono de la app
   - Acceptance: `src/design-system/brand/app-icon.svg` (anillo dorado sobre fondo oscuro) y script `scripts/pwa/render-icons.mjs` que genera `public/icons/icon-192.png`, `icon-512.png`, `icon-maskable-512.png` y `src/app/apple-icon.png` (180); `src/app/favicon.ico` sigue igual o se regenera.
@@ -21,9 +21,14 @@ Verificación en la PC: `npm run lint && npm run design:check && npm run typeche
   - Verify: tests de cabeceras; E2E en CI (P4).
   - Files: `public/sw.js`, `src/components/pwa/*`, `src/app/offline/page.tsx`, `src/app/layout.tsx`, `next.config.ts`, `proxy.ts`, `src/design-system/styles/surfaces/offline.css`
 
+- [ ] A1. Pantalla `/ajustes`: perfil y guía de instalación
+  - Acceptance: ruta `src/app/(app)/ajustes/page.tsx`; enlace desde el perfil del shell (escritorio y avatar en móvil); sección "Perfil" con el nombre (Server Action + Zod + `auth.updateUser` con `display_name`, `revalidatePath("/", "layout")`, toast de éxito); sección "Instalar en tu iPhone" visible si es iOS y no está instalada; `getUserDisplayName` prefiere `display_name`; estilos en `surfaces/settings.css` con tokens.
+  - Verify: tests de validación y de `getUserDisplayName`; `design:check`; E2E en P4.
+  - Files: `src/app/(app)/ajustes/page.tsx`, `src/features/settings/*`, `src/lib/user-display-name.ts`, `src/lib/validation/profile.ts`, `src/components/app-shell.tsx`, `src/design-system/styles/surfaces/settings.css`, `src/app/globals.css`
+
 - [ ] P4. E2E y documentación del PR 1
-  - Acceptance: `tests/e2e/pwa.spec.ts` (manifest válido, `sw.js` con cabeceras, `/offline` visible y sin violaciones de axe, el service worker queda activo); `e2e:critical` lo incluye; `CHANGELOG`, `HANDOFF`, backlog.
-  - Verify: CI verde → merge → deploy → el owner instala en el iPhone y prueba modo avión.
+  - Acceptance: `tests/e2e/pwa.spec.ts` (manifest válido, `sw.js` con cabeceras, `/offline` visible y sin violaciones de axe, el service worker queda activo); `tests/e2e/settings.spec.ts` (cambiar el nombre → Hoy saluda con el nuevo; vaciarlo vuelve al anterior); axe en `/ajustes`; `e2e:critical` los incluye; `CHANGELOG`, `HANDOFF`, backlog ("Editar el nombre" hecho).
+  - Verify: CI verde → merge → deploy → el owner instala en el iPhone, cambia su nombre y prueba modo avión.
   - Files: `tests/e2e/pwa.spec.ts`, `package.json`, docs
 
 ## PR 2: ajustes y suscripción
@@ -43,10 +48,10 @@ Verificación en la PC: `npm run lint && npm run design:check && npm run typeche
   - Verify: tests de mapeo; typecheck.
   - Files: `src/data/reminders-repository.ts`, `src/features/reminders/actions.ts`
 
-- [ ] R4. Pantalla `/ajustes`
-  - Acceptance: ruta en `(app)`; enlace desde el perfil del shell (escritorio y móvil); secciones Instalación (guía iOS si no está instalada) y Recordatorios (activar dispositivo, dos interruptores con hora, estados); estilos en `surfaces/settings.css` con tokens.
+- [ ] R4. Sección Recordatorios en `/ajustes`
+  - Acceptance: activar este dispositivo, dos interruptores con hora, estados (no soportado, falta instalar, permiso denegado, activo); estilos en `surfaces/settings.css` con tokens.
   - Verify: `design:check`; E2E en CI (R6).
-  - Files: `src/app/(app)/ajustes/page.tsx`, `src/features/reminders/*`, `src/components/app-shell.tsx`, `src/design-system/styles/surfaces/settings.css`, `src/app/globals.css`
+  - Files: `src/app/(app)/ajustes/page.tsx`, `src/features/reminders/*`, `src/design-system/styles/surfaces/settings.css`
 
 - [ ] R5. Notificación de prueba
   - Acceptance: `web-push` + tipos; `src/lib/push/send.ts` (server-only) con VAPID desde env; acción "Enviar prueba" a las suscripciones del usuario; borra suscripciones 404/410.
@@ -54,7 +59,7 @@ Verificación en la PC: `npm run lint && npm run design:check && npm run typeche
   - Files: `package.json`, `src/lib/push/*`, `src/features/reminders/actions.ts`
 
 - [ ] R6. E2E y documentación del PR 2
-  - Acceptance: `tests/e2e/settings.spec.ts` (guardar y recuperar ajustes; axe en `/ajustes`); docs con los pasos del owner (VAPID) y variables nuevas en `docs/deployment.md` y `.env.example`.
+  - Acceptance: `tests/e2e/settings.spec.ts` (guardar y recuperar horas e interruptores); docs con los pasos del owner (VAPID) y variables nuevas en `docs/deployment.md` y `.env.example`.
   - Verify: owner carga VAPID → CI verde → merge → deploy → el owner activa y recibe la prueba en el iPhone.
   - Files: `tests/e2e/settings.spec.ts`, `tests/e2e/accessibility.spec.ts`, docs
 

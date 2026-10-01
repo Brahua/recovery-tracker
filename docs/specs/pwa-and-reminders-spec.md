@@ -14,6 +14,7 @@ Queremos:
    - **Cierre nocturno:** a la hora elegida, solo si el cierre de hoy no está hecho.
    - Cada uno se activa por separado y con hora configurable desde la app.
 3. **Sin conexión:** en vez del error del navegador, una pantalla clara de "sin conexión". Registrar sigue necesitando internet.
+4. **Tu nombre:** elegir desde `/ajustes` cómo te llama la app ("Hola, …" en Hoy y el nombre de la barra lateral). Hoy solo se puede cambiar por SQL.
 
 **Usuario:** el owner (una cuenta real con Google), en iPhone. La solución funciona también en Android y escritorio, pero solo se prueba a fondo en iPhone.
 
@@ -35,13 +36,19 @@ Queremos:
 7. Tocar la notificación abre la app en la pantalla correcta: `/registrar?mode=session` o `/registrar?mode=closeout`.
 8. Si el navegador invalida una suscripción (la app se borró, permiso revocado), se elimina sola en el siguiente envío.
 
+**Perfil (nombre)**
+9. `/ajustes` → "Perfil": campo "¿Cómo quieres que te llamemos?" con el nombre actual; guardar actualiza al momento el saludo de Hoy ("Hola, …") y el nombre de la barra lateral.
+10. Se guarda en `user_metadata.display_name` con `supabase.auth.updateUser` (sin migración). Es un campo propio porque Google puede reescribir `full_name` en cada inicio de sesión. Se usa tal como se escribe (sin cortar a la primera palabra).
+11. Validación en el servidor: se recortan espacios, entre 1 y 30 caracteres, sin saltos de línea ni caracteres de control. Si se deja vacío, se borra y se vuelve al nombre de Google (primera palabra de `full_name`) o al del correo.
+12. `getUserDisplayName` prefiere `display_name`, después `full_name` y después el correo.
+
 **Sin conexión**
-9. Un service worker guarda la pantalla `/offline` y la muestra cuando una navegación falla por falta de red. No guarda datos del usuario ni páginas autenticadas en caché.
+13. Un service worker guarda la pantalla `/offline` y la muestra cuando una navegación falla por falta de red. No guarda datos del usuario ni páginas autenticadas en caché.
 
 **Seguridad y privacidad**
-10. Las suscripciones y los ajustes tienen RLS: cada usuario solo ve y cambia lo suyo.
-11. El endpoint que envía recordatorios exige un secreto (`Authorization: Bearer …`, comparación en tiempo constante), solo acepta `POST` y no devuelve datos de usuarios.
-12. Los secretos (clave privada VAPID, `service_role` de Supabase, secreto del endpoint) solo viven en Vercel (Production, *sensitive*) y en Supabase Vault. **Nunca pasan por la sesión del agente ni por el repo**: el owner los crea en su terminal o en los paneles.
+14. Las suscripciones y los ajustes tienen RLS: cada usuario solo ve y cambia lo suyo.
+15. El endpoint que envía recordatorios exige un secreto (`Authorization: Bearer …`, comparación en tiempo constante), solo acepta `POST` y no devuelve datos de usuarios.
+16. Los secretos (clave privada VAPID, `service_role` de Supabase, secreto del endpoint) solo viven en Vercel (Production, *sensitive*) y en Supabase Vault. **Nunca pasan por la sesión del agente ni por el repo**: el owner los crea en su terminal o en los paneles.
 
 ### Fuera de alcance
 
@@ -107,7 +114,8 @@ Además: extensiones `pg_cron` y `pg_net`, función `public.dispatch_reminders()
 src/app/manifest.ts                         manifest
 src/app/apple-icon.png, public/icons/*      íconos (generados desde un SVG del repo)
 src/app/offline/page.tsx                    pantalla sin conexión (pública, estática)
-src/app/(app)/ajustes/page.tsx              ajustes: instalación + recordatorios
+src/app/(app)/ajustes/page.tsx              ajustes: perfil (nombre) + instalación + recordatorios
+src/features/settings/                      UI y acción del nombre
 src/app/api/reminders/dispatch/route.ts     endpoint del cron
 src/features/reminders/                     UI de ajustes (cliente: permiso, suscripción, formulario)
 src/lib/reminders/                          lógica pura con tests: qué recordatorio toca, hora local, payloads
@@ -149,8 +157,9 @@ npx web-push generate-vapid-keys                                        # el own
 | Nivel | Qué | Dónde |
 |---|---|---|
 | Unitario | Qué recordatorio toca (hora, ventana de 2 h, una vez por día, condición pendiente, zona Lima, cambio de día); validación de ajustes; payload y URL de cada notificación; comparación del secreto | `src/lib/reminders/*.test.ts` |
+| Unitario | Nombre: validación (recorte, largo, vacío = borrar) y prioridad `display_name` → `full_name` → correo | `src/lib/user-display-name.test.ts`, `src/lib/validation/*` |
 | Unitario | Endpoint: rechaza sin secreto o con secreto incorrecto; con dependencias simuladas, envía, registra y limpia 404/410 | `src/app/api/reminders/dispatch/route.test.ts` |
-| E2E (CI, Supabase local) | `/ajustes` guarda y recupera horas e interruptores; manifest y `sw.js` se sirven; `/offline` se ve y pasa axe | `tests/e2e/settings.spec.ts` |
+| E2E (CI, Supabase local) | `/ajustes` cambia el nombre y Hoy saluda con el nuevo; guarda y recupera horas e interruptores; manifest y `sw.js` se sirven; `/offline` se ve y pasa axe | `tests/e2e/settings.spec.ts` |
 | Base de datos (CI) | La migración aplica en el Supabase local; RLS impide leer ajustes ajenos | E2E + revisión de la migración |
 | Manual (owner, iPhone) | Instalar, activar, prueba, recibir los dos recordatorios reales, tocar y llegar a la pantalla correcta, modo avión → pantalla offline | Lista en el PR |
 
@@ -172,6 +181,7 @@ El envío real de push no se puede probar en CI (necesita un navegador suscrito 
 ## Criterios de éxito
 
 - [ ] En el iPhone del owner: la app instalada abre a pantalla completa con ícono propio.
+- [ ] El owner cambia su nombre en `/ajustes` y Hoy lo saluda con ese nombre, también después de cerrar sesión y volver a entrar con Google.
 - [ ] La notificación de prueba llega al iPhone.
 - [ ] Con la hora del cierre puesta 5 minutos adelante y sin cierre hecho, llega el recordatorio una sola vez; tocándolo abre el cierre.
 - [ ] Con el cierre ya hecho, no llega.

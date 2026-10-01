@@ -5,15 +5,15 @@ Spec: `docs/specs/pwa-and-reminders-spec.md`.
 ## Fases (un PR cada una, en orden)
 
 ```
-PR 1 — App instalable + pantalla offline     (sin dependencias nuevas, sin secretos)
-  P1 íconos → P2 manifest + metadata iOS → P3 service worker + /offline → P4 E2E + docs
+PR 1 — App instalable, pantalla offline y /ajustes con tu nombre   (sin dependencias nuevas, sin secretos)
+  P1 íconos → P2 manifest + metadata iOS → P3 service worker + /offline → A1 /ajustes (perfil + guía de instalación) → P4 E2E + docs
 PR 2 — Ajustes y suscripción                 (requiere claves VAPID del owner antes del deploy)
-  R1 migración tablas + RLS → R2 lógica pura + validación → R3 repositorio + actions → R4 /ajustes UI → R5 notificación de prueba (web-push) → R6 E2E + docs
+  R1 migración tablas + RLS → R2 lógica pura + validación → R3 repositorio + actions → R4 sección Recordatorios en /ajustes → R5 notificación de prueba (web-push) → R6 E2E + docs
 PR 3 — Envío programado                      (requiere service_role + secreto + Vault antes del deploy)
   D1 decisión de qué toca (pura) → D2 endpoint /api/reminders/dispatch → D3 migración pg_cron + pg_net + función → D4 docs + verificación con el owner
 ```
 
-Cada PR deja la app funcionando: el PR 1 ya permite instalarla; el PR 2 deja guardar ajustes y probar una notificación; el PR 3 activa los envíos automáticos.
+Cada PR deja la app funcionando: el PR 1 ya permite instalarla y cambiar tu nombre; el PR 2 deja guardar ajustes y probar una notificación; el PR 3 activa los envíos automáticos.
 
 ## Decisiones técnicas
 
@@ -22,6 +22,7 @@ Cada PR deja la app funcionando: el PR 1 ya permite instalarla; el PR 2 deja gua
 - **Cabeceras** de `/sw.js` en `next.config.ts`: `Cache-Control: no-cache, no-store, must-revalidate` y `Content-Type: application/javascript`, según la guía de Next.
 - **Íconos**: un SVG del repo (`src/design-system/brand/app-icon.svg`) renderizado a PNG con Playwright (ya instalado) mediante un script reproducible; los PNG se commitean.
 - **Ajustes**: Server Actions con `useActionState` y Zod, como el resto de formularios.
+- **Nombre**: `supabase.auth.updateUser({ data: { display_name } })` desde una Server Action y `revalidatePath("/", "layout")` (el shell y Hoy leen el usuario con `getUser()`, que ya trae el valor nuevo). Campo propio porque Google puede reescribir `full_name` al iniciar sesión.
 - **Hora local**: `Intl.DateTimeFormat` con `America/Lima` (mismo enfoque que `src/lib/recovery-date.ts`).
 - **Ventana de envío**: se envía si `hora_elegida <= ahora_local < hora_elegida + 2 h`, es el mismo día local, no hay envío registrado y la acción sigue pendiente.
 - **Idempotencia**: `insert` en `reminder_deliveries` con `on conflict do nothing` **antes** de enviar; si el insert no crea fila, otro proceso ya lo envió.
@@ -40,6 +41,6 @@ Cada PR deja la app funcionando: el PR 1 ya permite instalarla; el PR 2 deja gua
 
 ## Checkpoints
 
-- **PR 1:** CI verde → deploy → el owner instala en el iPhone y prueba modo avión.
+- **PR 1:** CI verde → deploy → el owner instala en el iPhone, cambia su nombre y prueba modo avión.
 - **PR 2:** owner carga VAPID → CI verde → deploy → el owner activa notificaciones y recibe la prueba.
 - **PR 3:** owner carga `service_role`, secreto y Vault → CI verde → deploy (aplica la migración) → recordatorio real recibido y no repetido.

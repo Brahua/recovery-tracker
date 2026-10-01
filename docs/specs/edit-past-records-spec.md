@@ -2,7 +2,7 @@
 
 ## Estado
 
-Aprobada por el owner el 2026-10-01. En construcción en `feat/edit-past-records`.
+Aprobada por el owner el 2026-10-01. Implementada y desplegada en producción el 2026-10-01: cierres (PR #27), sesiones con la migración `20261003000000_edit_past_records.sql` (PR #28) y "Corregir" en las pantallas de éxito con la documentación (PR 3).
 
 ## Decisiones validadas (owner, 2026-10-01)
 

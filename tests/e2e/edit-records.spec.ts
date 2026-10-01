@@ -178,3 +178,24 @@ test.describe.serial("edit past sessions", () => {
     await expect(page.getByText("No encontramos ese registro")).toBeVisible();
   });
 });
+
+test.describe("correct right after saving", () => {
+  test("opens the session editor from the saved screen", async ({ page }) => {
+    const sessionId = await createSession(page);
+
+    await page.getByRole("link", { name: "Corregir la sesión" }).click();
+
+    await expect(page).toHaveURL(new RegExp(`/registrar/sesion/${sessionId}$`));
+    await expect(page.getByRole("heading", { name: "Editar sesión" })).toBeVisible();
+  });
+
+  test("opens the closeout editor from the closed-day screen", async ({ page }) => {
+    const closeoutId = await createCloseout(page, dayAt(6), "3");
+
+    await page.getByRole("link", { name: "Corregir el cierre" }).click();
+
+    await expect(page).toHaveURL(new RegExp(`/registrar/cierre/${closeoutId}$`));
+    await expect(page.getByRole("heading", { name: "Editar cierre" })).toBeVisible();
+    await expect(page.getByRole("slider", { name: "Dolor" })).toHaveValue("3");
+  });
+});

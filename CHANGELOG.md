@@ -7,6 +7,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 ## [Unreleased]
 
 ### Added
+- Edit or delete past records: sessions (`/registrar/sesion/[id]`) and nightly closeouts (`/registrar/cierre/[id]`) open the Registrar forms with their saved values, from an "Editar" button in Historial or "Corregir" on the saved screens. Every field can change, dates included (no future dates, one closeout per day). Deleting asks for confirmation. New `update_rehab_session` replaces a session with its exercises, sets and treatments in one transaction; the child inserts are shared with `create_rehab_session` (`insert_rehab_session_children`). Old aggregated exercise rows become equal sets when edited. App-level not-found page.
 - Physio treatments in Insights and Report: an Insights card compares, for each treatment with 3+ sessions, the average pain change and same-night rebound against physio sessions without it; the Report lists treatments applied with their zones, and its highlighted notes include the therapist's instructions.
 - Physio treatments: a "Tratamientos del centro" card in Registrar for *Fisio guiada* sessions to log physical agents (tecar, shockwave, laser…), manual therapy, invasive techniques and taping, each with an optional zone and minutes, plus the therapist's instructions. A physio session can be saved with exercises or treatments. Shown in Historial; the latest physio instructions appear in Hoy until the next physio session. New table `session_treatments` and column `rehab_sessions.therapist_notes`; `create_rehab_session` saves both atomically.
 - Scheduled reminders: Supabase `pg_cron` calls `POST /api/reminders/dispatch` every 5 minutes (Bearer secret from Vault); the endpoint sends the session and closeout reminders that are due, still pending and not sent today (window of two hours after the chosen time, Lima time), reserves each delivery before sending and removes subscriptions the browser dropped.
@@ -55,6 +56,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Aligned the responsive Historial with its mobile and desktop Claude Design references, including the date rail, single-open session accordion, two-column exercise details, separate closeout cards, and viewport-specific navigation.
 
 ### Fixed
+- Session times are read as Lima time on the server: it runs in UTC and parsed the form's `datetime-local` value as UTC, five hours off. Future session dates are rejected.
 - Toasts on iOS: the popover viewport could stretch over the whole screen, turning the toast into a full-height dark card that hid the page. Its position now uses longhands with a content height, toasts never stretch, and the viewport ignores taps.
 - Remaining small text using `--rr-text-dim` (date in Hoy, streak card, progress ring label, pending ritual, history range, set actions, form hints) now uses `--rr-text-muted` to reach 4.5:1; decorative glyphs keep the dim color.
 - Landing copy for the nightly closeout now matches what it records ("Dolor, energia y sueno antes de dormir."); it promised stiffness and mood, which the closeout does not capture.

@@ -139,6 +139,15 @@ export function SessionSavedState({
           <Link className="rr-success-secondary" href="/historial">
             Ver historial
           </Link>
+          {session ? (
+            <Link
+              aria-label="Corregir la sesión"
+              className="rr-success-secondary"
+              href={`/registrar/sesion/${session.id}`}
+            >
+              Corregir
+            </Link>
+          ) : null}
           {session && session.exercises.length > 0 ? (
             <SaveSessionAsRoutine
               sessionId={session.id}

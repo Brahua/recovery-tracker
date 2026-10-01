@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-01 (backlog consolidado). Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
+> Última actualización: 2026-10-01 (edición de registros pasados). Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
 
 ## Cómo retomar
 
@@ -19,9 +19,9 @@
 
 - **Producción:** https://recovery-tracker.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
 - **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01).
-- **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo, feedback global de carga y tratamientos del centro en Fisio guiada. Detalle en `CHANGELOG.md`.
+- **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo, feedback global de carga, tratamientos del centro en Fisio guiada y edición de sesiones y cierres. Detalle en `CHANGELOG.md`.
 - **Fase:** prueba de uso real. Tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`) en producción desde el 2026-10-01: fase 1 (PR #23, migración `20261002000000_session_treatments.sql`) y fase 2, Insights y Reporte (PR #24). Probado por el owner en producción el 2026-10-01.
-- **En curso:** editar o corregir registros pasados (`docs/specs/edit-past-records-spec.md`, aprobada el 2026-10-01). Se entrega en tres PRs: 1) cierres, 2) sesiones (con migración), 3) "Corregir" en la pantalla de éxito y documentación. PR 1 (cierres) integrado y desplegado (#27). Rama del PR 2: `feat/edit-past-sessions` (migración `20261003000000_edit_past_records.sql`).
+- **Editar o corregir registros pasados** (`docs/specs/edit-past-records-spec.md`): en producción desde el 2026-10-01. Cierres (PR #27), sesiones con la migración `20261003000000_edit_past_records.sql` (PR #28) y "Corregir" en las pantallas de éxito (PR 3). Incluye el arreglo de la hora de la sesión (el servidor la leía en UTC). **Falta que el owner lo pruebe en producción.** No hay una próxima feature elegida.
 
 ### Paso a producción (2026-09-30) ✅
 
@@ -30,7 +30,7 @@
 - Token viejo de Supabase revocado; `SUPABASE_ACCESS_TOKEN` nuevo (token de proyecto, vence en ~1 año: renovarlo antes y actualizar el secret). Probado con un workflow temporal: API 200 y `link` + `db push --dry-run` OK.
 - PR #9 integrado y desplegado: cabeceras de seguridad (comprobadas en el dominio), guardia de la base de producción, axe en E2E y acciones de GitHub en `@v7`.
 
-Rama abierta: `feat/edit-past-sessions` (PR 2, sesiones).
+No hay ramas abiertas.
 
 ## ⏰ Vencimientos
 
@@ -56,7 +56,9 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 
 - Varias sesiones por día; **un cierre por usuario y fecha** (también en la base). No hay cierres con fecha futura.
 - El "día" se calcula en `America/Lima`; los timestamps se guardan en UTC.
-- Historial solo muestra datos; las interpretaciones van en Insights y Reporte.
+- Historial solo muestra datos (y lleva a editarlos); las interpretaciones van en Insights y Reporte.
+- Editar una sesión la reemplaza entera en una transacción (`update_rehab_session`, que comparte `insert_rehab_session_children` con `create_rehab_session`): un cambio en cómo se guardan los hijos va en esa función.
+- Las horas del formulario de sesión son de Lima y el servidor corre en UTC: convertir con `parseRecoveryDateTimeLocal` / `toRecoveryDateTimeLocal`, nunca con `new Date(valor)`.
 - Lecturas por lotes, nunca N+1. Un archivo `"use server"` solo exporta funciones async.
 - Migraciones aditivas; algo destructivo necesita el OK del owner y un backup.
 

@@ -8,7 +8,7 @@
 
 .rr-exercise-actions b {
   color: var(--rr-accent-light);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 13px;
   font-weight: 800;
 }
@@ -167,7 +167,7 @@
 
 .rr-exercise-sets-heading h4 {
   color: var(--rr-ink);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 14px;
 }
 

@@ -37,7 +37,7 @@
   border-radius: 50%;
   background: var(--rr-wash);
   color: var(--rr-ink);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 13px;
   font-weight: 800;
 }
@@ -81,7 +81,7 @@
   border-radius: 12px;
   background: rgb(var(--rr-ink-rgb) / 0.04);
   color: var(--rr-text-faint);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 13px;
   font-weight: 800;
 }
@@ -111,7 +111,7 @@
 
 .rr-mobile-momentum > p strong {
   color: var(--rr-accent-light);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 15px;
   font-weight: 850;
 }
@@ -177,7 +177,7 @@
 .rr-progress-ring-value {
   stroke: var(--rr-accent);
   stroke-linecap: round;
-  transition: stroke-dashoffset 1s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: stroke-dashoffset 1s var(--rr-ease-out);
 }
 
 .rr-progress-ring > span {
@@ -190,7 +190,7 @@
 
 .rr-progress-ring strong {
   color: var(--rr-ink);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 24px;
   font-weight: 880;
 }
@@ -430,7 +430,7 @@
   place-items: center;
   border-radius: 9px;
   background: var(--rr-wash);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 11px;
   font-weight: 800;
 }

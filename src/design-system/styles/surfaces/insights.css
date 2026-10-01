@@ -101,7 +101,7 @@
 
 .rr-insights-summary p,
 .rr-insight-card h2 {
-  font-family: var(--font-instrument-sans), sans-serif;
+  font-family: var(--rr-font-body);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -154,7 +154,7 @@
 
 .rr-pain-metric > strong {
   color: var(--rr-ink);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 32px;
   font-weight: 880;
   letter-spacing: -0.025em;
@@ -234,7 +234,7 @@
   align-self: end;
   border-radius: 7px 7px 3px 3px;
   background: rgb(var(--rr-accent-rgb) / 0.28);
-  transition: height 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: height 600ms var(--rr-ease-out);
 }
 
 .rr-load-bars span.is-current {
@@ -276,7 +276,7 @@
 
 .rr-rebound-bars > div > p strong {
   color: rgb(var(--rr-ink-secondary-rgb) / 0.72);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 12px;
   font-weight: 800;
 }
@@ -382,7 +382,7 @@
 
 .rr-exercise-frequency strong {
   color: rgb(var(--rr-ink-secondary-rgb) / 0.65);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 12px;
   font-weight: 800;
   text-align: right;

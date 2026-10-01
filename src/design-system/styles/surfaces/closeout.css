@@ -44,7 +44,7 @@
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, var(--rr-accent), var(--rr-accent-light));
-  transition: width 450ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width 450ms var(--rr-ease-out);
 }
 
 .rr-closeout-progress em {
@@ -138,7 +138,7 @@
 
 .rr-closeout-section-heading h2 {
   color: var(--rr-text-body);
-  font-family: var(--font-instrument-sans), sans-serif;
+  font-family: var(--rr-font-body);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -172,7 +172,7 @@
 .rr-closeout-field-group h3,
 .rr-sleep-hours h3 {
   color: var(--rr-text-body);
-  font-family: var(--font-instrument-sans), sans-serif;
+  font-family: var(--rr-font-body);
   font-size: 12.5px;
   font-weight: 650;
 }
@@ -261,7 +261,7 @@
 
 .rr-sleep-hours output {
   color: var(--rr-ink);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 22px;
   font-weight: 850;
   text-align: center;
@@ -300,7 +300,7 @@
 .rr-closeout-note h2,
 .rr-closeout-recent h2 {
   color: var(--rr-text-body);
-  font-family: var(--font-instrument-sans), sans-serif;
+  font-family: var(--rr-font-body);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.1em;

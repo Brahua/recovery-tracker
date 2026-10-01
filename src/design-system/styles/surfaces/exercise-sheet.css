@@ -60,7 +60,7 @@
   height: 42px;
   place-items: center;
   color: var(--rr-text-dim);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 13px;
   font-weight: 800;
 }

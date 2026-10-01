@@ -110,7 +110,7 @@
     gap: 10px;
     padding-inline: 10px;
     color: var(--rr-ink);
-    font-family: var(--font-archivo), sans-serif;
+    font-family: var(--rr-font-display);
     font-size: 15px;
     font-weight: 800;
     letter-spacing: -0.02em;
@@ -169,7 +169,7 @@
     border-radius: 8px;
     background: var(--rr-wash-soft);
     color: var(--rr-text-body);
-    font-family: var(--font-archivo), sans-serif;
+    font-family: var(--rr-font-display);
     font-size: 10.5px;
     font-weight: 800;
   }
@@ -208,7 +208,7 @@
     display: block;
     margin-top: 5px;
     color: var(--rr-ink);
-    font-family: var(--font-archivo), sans-serif;
+    font-family: var(--rr-font-display);
     font-size: 19px;
     font-weight: 850;
   }
@@ -243,7 +243,7 @@
     border-radius: 50%;
     background: var(--rr-wash);
     color: var(--rr-ink);
-    font-family: var(--font-archivo), sans-serif;
+    font-family: var(--rr-font-display);
     font-size: 12.5px;
     font-weight: 800;
   }

@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-09-30. Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
+> Última actualización: 2026-10-01. Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
 
 ## Cómo retomar
 
@@ -18,21 +18,28 @@
 ## Estado
 
 - **Producción:** https://recovery-tracker.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
+- **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01).
 - **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo y feedback global de carga. Detalle en `CHANGELOG.md`.
 - **Fase:** prueba de uso real. No hay una próxima feature elegida.
 
 ### Paso a producción (2026-09-30) ✅
 
 - PR #8 integrado y desplegado desde CI: dominio con HTTPS, `NEXT_PUBLIC_SITE_URL` del dominio nuevo, Site URL y Redirect URLs en Supabase, login anónimo apagado.
-- Verificado: el login con Google arranca desde el dominio nuevo y Supabase acepta volver a `https://recovery-tracker.brahua.com/auth/callback`. Falta que el owner complete un login real.
+- Verificado: el owner inició sesión con Google en el dominio nuevo (2026-10-01).
 - Token viejo de Supabase revocado; `SUPABASE_ACCESS_TOKEN` nuevo (token de proyecto, vence en ~1 año: renovarlo antes y actualizar el secret). Probado con un workflow temporal: API 200 y `link` + `db push --dry-run` OK.
-- Opcional pendiente: apagar el proveedor Email en Supabase (la app solo usa Google).
+- PR #9 integrado y desplegado: cabeceras de seguridad (comprobadas en el dominio), guardia de la base de producción, axe en E2E y acciones de GitHub en `@v7`.
 
-### Rama abierta
+No hay ramas abiertas.
 
-| Rama | Contenido |
-|---|---|
-| `chore/security-headers-db-guard-a11y` | Cabeceras de seguridad, guardia contra escribir en la base de producción, axe en E2E con correcciones de contraste, este handoff |
+## ⏰ Vencimientos
+
+| Qué | Cuándo | Acción |
+|---|---|---|
+| `SUPABASE_ACCESS_TOKEN` (secret de GitHub) | **~30 sep 2027** | Renovar a inicios de septiembre de 2027. Pasos en `docs/deployment.md` → "Vencimientos y renovaciones" |
+| Certificado HTTPS | Cada ~90 días, automático | Nada, salvo que el dominio deje de responder por HTTPS |
+| `VERCEL_TOKEN` | No vence | Nada |
+
+Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publica nada; producción sigue funcionando.
 
 ## Protecciones automáticas
 
@@ -75,7 +82,6 @@
 
 ## Próximos pasos sugeridos
 
-1. Merge de `chore/security-headers-db-guard-a11y` con CI en verde; comprobar las cabeceras en el dominio.
-2. Revisión manual del loading y los toasts en móvil (D5 de `tasks/todo-global-loading-feedback.md`).
-3. Retomar la prueba de uso real para elegir la siguiente feature. Ideas sin aprobar: guardar qué rutina se usó, editar registros pasados, análisis por ejercicio.
-4. Más adelante: Prettier en CI y dividir `globals.css` (136 KB) en tokens y componentes, con su propia spec.
+1. Revisión manual del loading y los toasts en móvil (D5 de `tasks/todo-global-loading-feedback.md`).
+2. Retomar la prueba de uso real para elegir la siguiente feature. Ideas sin aprobar: guardar qué rutina se usó, editar registros pasados, análisis por ejercicio.
+3. Más adelante: Prettier en CI y dividir `globals.css` (136 KB) en tokens y componentes, con su propia spec.

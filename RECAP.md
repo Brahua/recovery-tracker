@@ -1,7 +1,7 @@
 # Recap — Recovery Ritual (`recovery-tracker`)
 
 > Resumen rápido del proyecto: de qué va, cómo está construido, en qué fase está y cómo empezar a desarrollar.
-> Última actualización: 2026-09-30. Para el detalle, seguir los enlaces a `README.md`, `docs/` y `tasks/`.
+> Última actualización: 2026-10-01. Para el detalle, seguir los enlaces a `README.md`, `docs/` y `tasks/`.
 
 ## 1. Qué es
 
@@ -21,8 +21,8 @@ Brief original: `recovery_tracker_app_brief.md`. Visión del producto: `docs/ide
 | Framework | **Next.js 16.2.10** (App Router, carpeta `src/`, Server Actions, `proxy.ts` en lugar de `middleware.ts`) |
 | UI | React 19.2, Tailwind CSS 4 |
 | Validación | Zod 4 |
-| Backend y datos | **Supabase** (Postgres con RLS, Auth con Google OAuth; login anónimo solo para tests), usando `@supabase/ssr` directamente, sin API propia |
-| Tests | Vitest (94 tests unitarios), Playwright (9 E2E) |
+| Backend y datos | **Supabase** (Postgres con RLS, Auth solo con Google OAuth; login anónimo solo en el Supabase local de los tests), usando `@supabase/ssr` directamente, sin API propia |
+| Tests | Vitest (154 tests unitarios), Playwright (38 E2E críticos, incluido axe de accesibilidad) |
 | CI/CD | GitHub Actions → Supabase + Vercel (trunk-based, igual que `brahua-os`) |
 | Hosting | Vercel: `brahua-lab/recovery-tracker`, en **https://recovery-tracker.brahua.com** |
 | Node | 24 (`.nvmrc`) |
@@ -61,7 +61,7 @@ Vienen de `docs/archive/handoffs/session-handoff-2026-07-17.md`:
 ## 4. En qué fase está
 
 - **Terminado:** el MVP, el rediseño con Claude Design (8 pantallas), el historial, las series individuales, los registros con fecha anterior, el CI/CD, el catálogo de ejercicios (`/ejercicios`), las rutinas y el feedback global de carga (barra de progreso, toasts y pantalla de error).
-- **Última verificación documentada (2026-07-17):** todo pasaba (tests, typecheck, lint, build, E2E). Lighthouse dio 100 en accesibilidad.
+- **Última verificación documentada (2026-10-01):** CI en verde en `main` (lint, typecheck, unitarios, E2E críticos con axe) y deploy a producción correcto.
 - **Fase actual:** prueba de uso real. **No hay una próxima feature elegida.**
 - **Ideas pendientes sin aprobar:** editar registros pasados, rutinas reutilizables y análisis por ejercicio. El resto está en `docs/ideas/recovery-ritual-backlog.md`.
 - **Entornos:** desde el 2026-09-30 el antiguo staging **es producción** (ADR-004). Hay un solo entorno hospedado: Supabase `pevrupenrzueyzidfeah` y https://recovery-tracker.brahua.com (la URL `recovery-tracker-brahua-lab.vercel.app` sigue funcionando). Tiene los datos reales. Para desarrollar y probar se usa Supabase local.
@@ -81,12 +81,12 @@ Vienen de `docs/archive/handoffs/session-handoff-2026-07-17.md`:
 ### Comandos
 
 ```bash
-npm run supabase:start && npm run supabase:env:local   # Supabase local en .env.local
-npm run dev
-npm run lint && npm run typecheck && npm test && npm run build
-npm run e2e:critical
-npm run supabase:push:dry   # enlazado a producción: ver migraciones pendientes (no aplica nada)
+npm run lint && npm run typecheck && npm test   # lo que se corre en la PC antes de commitear
+npm run dev                                     # solo si el owner lo pide; .env.local apunta a producción
+npm run supabase:push:dry                       # ver migraciones pendientes en producción (no aplica nada)
 ```
+
+`next build`, Supabase local (Docker) y `npm run e2e:critical` corren en CI. En la PC del owner no se corren salvo que lo pida (ver `AGENTS.md`).
 
 ### CI/CD (`.github/workflows/ci-cd.yml`)
 
@@ -105,8 +105,8 @@ npm run supabase:push:dry   # enlazado a producción: ver migraciones pendientes
 
 ### Pendientes detectados
 
-- Ninguno del paso a producción: dominio, HTTPS, Auth, login anónimo y token quedaron resueltos el 2026-09-30 (detalle en `docs/HANDOFF.md`).
-- El token de CI (`SUPABASE_ACCESS_TOKEN`) vence en ~1 año: renovarlo antes y actualizar el secret de GitHub.
+- Ninguno del paso a producción: dominio, HTTPS, Auth (solo Google), login anónimo y token quedaron resueltos entre el 2026-09-30 y el 2026-10-01 (detalle en `docs/HANDOFF.md`).
+- ⏰ **El token de CI (`SUPABASE_ACCESS_TOKEN`) vence ~30 sep 2027.** Renovarlo a inicios de septiembre de 2027: pasos en `docs/deployment.md` → "Vencimientos y renovaciones".
 
 ### Archivos para leer al empezar cada sesión
 

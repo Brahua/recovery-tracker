@@ -20,7 +20,7 @@ Desde julio de 2026 solo existía un entorno hospedado, llamado `staging` (Supab
   - los runs de `main` nunca se cancelan y los deploys van de uno en uno;
   - el auto-deploy de Vercel por Git está apagado, sin previews.
 - Los tests (unitarios y E2E) nunca usan producción: CI levanta Supabase local y en local se usa `npm run supabase:start`.
-- El login anónimo, que solo servía para los E2E, se apaga en producción.
+- El login anónimo, que solo servía para los E2E, se apaga en producción. También el login por email: la app solo usa Google.
 - Las migraciones son aditivas; algo destructivo necesita el OK del owner y un backup.
 - Node 24 (`.nvmrc`) en CI, igual que en Vercel y en `brahua-os`.
 

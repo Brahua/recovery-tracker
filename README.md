@@ -21,7 +21,9 @@ There is a single hosted environment: **production**.
 
 - App: https://recovery-tracker.brahua.com (Vercel project `brahua-lab/recovery-tracker`)
 - Supabase: `pevrupenrzueyzidfeah` (formerly `recovery-tracker-staging`; promoted to production on 2026-09-30, see `docs/decisions/ADR-004-promote-staging-to-production.md`)
-- Google OAuth is configured in that project. Anonymous sign-in is off in production; it is only enabled in local Supabase for Playwright.
+- Google OAuth is the only sign-in provider in production (email and anonymous sign-ins are off). Anonymous sign-in is only enabled in local Supabase for Playwright.
+- Security headers on every route (`next.config.ts`); scripts and Playwright refuse to write to the production database (`scripts/check-db-target.mjs`).
+- ⏰ The CI Supabase token (`SUPABASE_ACCESS_TOKEN`) expires around 2027-09-30; renew it in early September 2027 (`docs/deployment.md` → "Vencimientos y renovaciones").
 
 Trunk-based workflow: short branches and PRs against `main`; every push to `main` runs CI and, only if every check passes, migrates Supabase and deploys to production. Details: `docs/deployment.md`.
 

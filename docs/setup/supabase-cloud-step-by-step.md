@@ -30,9 +30,14 @@ Dashboard → Authentication → URL Configuration:
 - Site URL: `https://recovery-tracker.brahua.com`
 - Redirect URLs: `https://recovery-tracker.brahua.com/**`, `https://recovery-tracker-brahua-lab.vercel.app/**` and, only if you log in locally against production, `http://localhost:3000/**`.
 
-## 5. Anonymous Sign-Ins
+## 5. Other Providers
 
-Disabled in production. They are only for Playwright and are enabled in the local stack via `supabase/config.toml`.
+- **Email**: disabled. The app only signs in with Google, and the publishable key is public.
+- **Anonymous Sign-Ins**: disabled in production. They are only for Playwright and are enabled in the local stack via `supabase/config.toml`.
+
+## 5b. CI Access Token
+
+GitHub Actions uses a project-scoped token (`github-actions-recovery-tracker`, expires around 2027-09-30) in the `SUPABASE_ACCESS_TOKEN` secret. Renewal steps: `docs/deployment.md` → "Vencimientos y renovaciones".
 
 ## 6. App Environment
 

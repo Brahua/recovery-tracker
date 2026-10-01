@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0e0c0a" />
+    <title>Sin conexion · Recovery Tracker</title>
+    <!-- Served by the service worker when a navigation fails offline. Self-contained on purpose:
+         the app's CSS, fonts and scripts are not cached, so everything this page needs is inline.
+         Colors mirror the design tokens (--rr-bg, --rr-ink, --rr-text-muted, --rr-gold). -->
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      html, body { height: 100%; margin: 0; }
+      body {
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        background: linear-gradient(180deg, #16151b 0%, #0e0c0a 100%);
+        color: #f4efe7;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+      main { width: 100%; max-width: 360px; text-align: center; }
+      img { width: 88px; height: 88px; border-radius: 22px; }
+      h1 { margin: 24px 0 8px; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; }
+      p { margin: 0; color: rgba(232, 226, 214, 0.75); font-size: 16px; line-height: 1.5; }
+      a {
+        display: inline-flex;
+        min-height: 48px;
+        margin-top: 28px;
+        padding: 0 24px;
+        align-items: center;
+        justify-content: center;
+        border-radius: 16px;
+        background: #f4efe7;
+        color: #17130f;
+        font-weight: 700;
+        text-decoration: none;
+      }
+      a:focus-visible { outline: 2px solid #c9aa70; outline-offset: 3px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/icons/icon-192.png" alt="" />
+      <h1>Sin conexion</h1>
+      <p>Recovery Tracker necesita internet para cargar y guardar tus registros. Revisa tu conexion y vuelve a intentarlo.</p>
+      <a href="/">Reintentar</a>
+    </main>
+  </body>
+</html>

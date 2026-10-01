@@ -117,7 +117,9 @@ export function AppShell({ user, streak, children }: AppShellProps) {
             </span>
             <div>
               <strong>{identity.name}</strong>
-              <span>Tu recuperacion</span>
+              <Link className="rr-user-settings-link" href="/ajustes">
+                Ajustes
+              </Link>
             </div>
             <form action={signOutAction}>
               <FormPendingReporter />

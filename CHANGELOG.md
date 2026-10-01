@@ -7,6 +7,8 @@ The format is based on Keep a Changelog and this project currently follows Seman
 ## [Unreleased]
 
 ### Added
+- Installable app (PWA): web manifest, app icon (gold progress ring) for the home screen, browser tab and iOS, dark status bar, and a service worker that shows a self-contained offline page when a navigation fails without network.
+- `/ajustes`: choose the name the app greets you with (`user_metadata.display_name`, kept across Google sign-ins; empty falls back to the Google name) and a guide to install the app on the iPhone. Reached from the sidebar and from the avatar in Hoy on mobile.
 - `npm run design:check` (in CI): fails when a stylesheet outside `src/design-system/styles/tokens/` uses a literal color, easing or font stack.
 - Security headers on every route (`frame-ancestors 'none'`, `X-Frame-Options`, `Referrer-Policy`, `nosniff`, `Permissions-Policy`) and no `X-Powered-By`.
 - Production database guard: `supabase:push` scripts refuse to write to a linked hosted project without `ALLOW_PROD_DB=1` (only CI sets it); Playwright refuses to run unless Supabase is local.

@@ -148,9 +148,9 @@ export function TodayOverview({
           <p>{capitalize(dateFormatter.format(now))}</p>
           <h1>Hola, {firstName}</h1>
         </div>
-        <span className="rr-mobile-avatar" aria-hidden="true">
-          {firstName.charAt(0)}
-        </span>
+        <Link aria-label="Ajustes" className="rr-mobile-avatar" href="/ajustes">
+          <span aria-hidden="true">{firstName.charAt(0)}</span>
+        </Link>
         <div className="rr-desktop-week">
           <WeekStrip days={week} />
         </div>

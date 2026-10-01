@@ -1,0 +1,144 @@
+/* Ajustes: profile (display name), install guide and reminders. */
+
+.rr-settings {
+  display: grid;
+  min-height: 100dvh;
+  align-content: start;
+  gap: 16px;
+  padding: 24px 24px calc(32px + var(--rr-bottom-nav-offset));
+  color: var(--rr-ink-secondary);
+}
+
+.rr-settings-header {
+  display: grid;
+  gap: 4px;
+}
+
+.rr-settings-header h1 {
+  color: var(--rr-ink);
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.rr-settings-header > p:last-child {
+  color: var(--rr-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.rr-settings-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--rr-border);
+  border-radius: var(--rr-radius-card);
+  background: var(--rr-card-bg);
+  padding: 20px;
+}
+
+.rr-settings-card h2 {
+  color: var(--rr-ink);
+  font-family: var(--rr-font-display);
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.rr-settings-form {
+  display: grid;
+  gap: 8px;
+}
+
+.rr-settings-form label {
+  color: var(--rr-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rr-settings-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--rr-hit-target);
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  padding: 10px 12px;
+  color: var(--rr-ink);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.rr-settings-form input::placeholder {
+  color: var(--rr-text-muted);
+}
+
+.rr-settings-form input:focus {
+  border-color: var(--rr-accent-light);
+}
+
+.rr-settings-form input[aria-invalid="true"] {
+  border-color: var(--rr-pain-soft);
+}
+
+.rr-settings-form .rr-modal-primary {
+  justify-self: start;
+  margin-top: 6px;
+}
+
+.rr-settings-hint {
+  color: var(--rr-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.rr-settings-hint strong,
+.rr-settings-steps strong {
+  color: var(--rr-ink);
+}
+
+.rr-settings-error {
+  color: var(--rr-pain-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rr-settings-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--rr-ink-secondary);
+  font-size: 14px;
+}
+
+.rr-settings-status.is-ok span {
+  color: var(--rr-accent-text);
+  font-weight: 800;
+}
+
+.rr-settings-steps {
+  display: grid;
+  gap: 8px;
+  padding-left: 20px;
+  color: var(--rr-text-body);
+  font-size: 14px;
+  line-height: 1.5;
+  list-style: decimal;
+}
+
+.rr-settings-steps li::marker {
+  color: var(--rr-gold);
+  font-weight: 700;
+}
+
+@media (min-width: 64rem) {
+  .rr-settings {
+    max-width: 760px;
+    padding: 40px 40px 64px;
+  }
+
+  .rr-settings-card {
+    padding: 24px;
+  }
+}

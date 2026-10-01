@@ -1,6 +1,6 @@
 # Spec: app instalable (PWA) y recordatorios
 
-Estado: **borrador para revisión (2026-10-01)**. Backlog: "PWA instalable" y "Recordatorios / notificaciones" (prioridad alta).
+Estado: **aprobada (2026-10-01)** con horas por defecto Sesión 18:00 (apagado) y Cierre 21:30 (encendido), e ícono de anillo dorado. PR 1 (instalable, offline, `/ajustes` con perfil) implementado. Backlog: "PWA instalable" y "Recordatorios / notificaciones" (prioridad alta).
 
 ## Objetivo
 
@@ -112,8 +112,8 @@ Además: extensiones `pg_cron` y `pg_net`, función `public.dispatch_reminders()
 
 ```
 src/app/manifest.ts                         manifest
-src/app/apple-icon.png, public/icons/*      íconos (generados desde un SVG del repo)
-src/app/offline/page.tsx                    pantalla sin conexión (pública, estática)
+src/app/apple-icon.png, src/app/icon.png, public/icons/*   íconos (generados desde src/design-system/brand/app-icon.svg con scripts/pwa/render-icons.mjs)
+public/offline.html                         pantalla sin conexión (autocontenida, la guarda el service worker)
 src/app/(app)/ajustes/page.tsx              ajustes: perfil (nombre) + instalación + recordatorios
 src/features/settings/                      UI y acción del nombre
 src/app/api/reminders/dispatch/route.ts     endpoint del cron

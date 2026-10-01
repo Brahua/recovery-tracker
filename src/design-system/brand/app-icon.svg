@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Recovery Tracker app icon: the landing's gold progress ring on the dark theme.
+       Full-bleed square (iOS and maskable icons apply their own mask); the mark sits
+       inside the central 80% safe zone. Colors: --rr-bg, --rr-night-surface, --rr-gold,
+       --rr-ink, --rr-accent-light. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#16151b"/>
+      <stop offset="1" stop-color="#0e0c0a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#c9aa70" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#c9aa70" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="190" fill="url(#glow)"/>
+  <g transform="rotate(-90 256 256)" fill="none" stroke-width="34">
+    <circle cx="256" cy="256" r="128" stroke="#f4efe7" stroke-opacity="0.12"/>
+    <circle cx="256" cy="256" r="128" stroke="#c9aa70" stroke-linecap="round"
+            pathLength="100" stroke-dasharray="72 100"/>
+  </g>
+  <!-- Small green dot: the streak indicator from the landing card. -->
+  <circle cx="256" cy="256" r="22" fill="#58987a"/>
+</svg>

@@ -63,6 +63,12 @@ export interface RecoveryLogRepository {
   createNightlyCloseout(
     input: CreateNightlyCloseoutInput,
   ): Promise<NightlyCloseout>;
+  getNightlyCloseout(id: string): Promise<NightlyCloseout | null>;
+  updateNightlyCloseout(
+    id: string,
+    input: CreateNightlyCloseoutInput,
+  ): Promise<NightlyCloseout>;
+  deleteNightlyCloseout(id: string): Promise<void>;
   listNightlyCloseouts(params: DateRangeParams): Promise<NightlyCloseout[]>;
 }
 
@@ -72,6 +78,24 @@ class RecoveryRepositoryError extends Error {
     this.name = "RecoveryRepositoryError";
   }
 }
+
+// The record does not exist or belongs to another user (RLS hides it).
+export class RecordNotFoundError extends Error {
+  constructor() {
+    super("Record not found.");
+    this.name = "RecordNotFoundError";
+  }
+}
+
+// Another closeout already uses that date (unique user_id + date).
+export class DuplicateCloseoutDateError extends Error {
+  constructor() {
+    super("Another closeout already uses that date.");
+    this.name = "DuplicateCloseoutDateError";
+  }
+}
+
+const uniqueViolationCode = "23505";
 
 function mapRehabSessionRow(
   row: RehabSessionRow,
@@ -131,15 +155,14 @@ function mapNightlyCloseoutRow(row: NightlyCloseoutRow): NightlyCloseout {
   };
 }
 
+const nightlyCloseoutColumns =
+  "id, user_id, date, end_of_day_pain, energy, sleep_hours, sleep_quality, rebound_pain_level, notes, created_at, updated_at";
+
 const rehabSessionColumns =
   "id, user_id, occurred_at, session_type, pain_before, pain_during, pain_after, perceived_load, final_state, notes, therapist_notes, created_at, updated_at";
 
-function toNightlyCloseoutInsertRow(
-  userId: string,
-  input: CreateNightlyCloseoutInput,
-) {
+function toNightlyCloseoutRow(input: CreateNightlyCloseoutInput) {
   return {
-    user_id: userId,
     date: input.date,
     end_of_day_pain: input.endOfDayPain,
     energy: input.energy,
@@ -346,10 +369,8 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
 
       const { data, error } = await supabase
         .from("nightly_closeouts")
-        .insert(toNightlyCloseoutInsertRow(userId, parsed))
-        .select(
-          "id, user_id, date, end_of_day_pain, energy, sleep_hours, sleep_quality, rebound_pain_level, notes, created_at, updated_at",
-        )
+        .insert({ user_id: userId, ...toNightlyCloseoutRow(parsed) })
+        .select(nightlyCloseoutColumns)
         .single();
 
       if (error || !data) {
@@ -361,13 +382,69 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
       return mapNightlyCloseoutRow(data as NightlyCloseoutRow);
     },
 
+    async getNightlyCloseout(id) {
+      const { supabase } = await requireAuthenticatedSupabase();
+      const { data, error } = await supabase
+        .from("nightly_closeouts")
+        .select(nightlyCloseoutColumns)
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error) {
+        throw new RecoveryRepositoryError(error.message);
+      }
+
+      return data ? mapNightlyCloseoutRow(data as NightlyCloseoutRow) : null;
+    },
+
+    async updateNightlyCloseout(id, input) {
+      const parsed = createNightlyCloseoutInputSchema.parse(input);
+      const { supabase } = await requireAuthenticatedSupabase();
+
+      const { data, error } = await supabase
+        .from("nightly_closeouts")
+        .update(toNightlyCloseoutRow(parsed))
+        .eq("id", id)
+        .select(nightlyCloseoutColumns)
+        .maybeSingle();
+
+      if (error?.code === uniqueViolationCode) {
+        throw new DuplicateCloseoutDateError();
+      }
+
+      if (error) {
+        throw new RecoveryRepositoryError(error.message);
+      }
+
+      if (!data) {
+        throw new RecordNotFoundError();
+      }
+
+      return mapNightlyCloseoutRow(data as NightlyCloseoutRow);
+    },
+
+    async deleteNightlyCloseout(id) {
+      const { supabase } = await requireAuthenticatedSupabase();
+      const { data, error } = await supabase
+        .from("nightly_closeouts")
+        .delete()
+        .eq("id", id)
+        .select("id");
+
+      if (error) {
+        throw new RecoveryRepositoryError(error.message);
+      }
+
+      if (!data || data.length === 0) {
+        throw new RecordNotFoundError();
+      }
+    },
+
     async listNightlyCloseouts(params) {
       const { supabase } = await requireAuthenticatedSupabase();
       const { data, error } = await supabase
         .from("nightly_closeouts")
-        .select(
-          "id, user_id, date, end_of_day_pain, energy, sleep_hours, sleep_quality, rebound_pain_level, notes, created_at, updated_at",
-        )
+        .select(nightlyCloseoutColumns)
         .gte("date", params.from)
         .lte("date", params.to)
         .order("date", { ascending: false });

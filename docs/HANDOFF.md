@@ -20,7 +20,8 @@
 - **Producción:** https://recovery-tracker.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
 - **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01).
 - **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo, feedback global de carga y tratamientos del centro en Fisio guiada. Detalle en `CHANGELOG.md`.
-- **Fase:** prueba de uso real. Tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`) en producción desde el 2026-10-01: fase 1 (PR #23, migración `20261002000000_session_treatments.sql`) y fase 2, Insights y Reporte (PR #24). Probado por el owner en producción el 2026-10-01. No hay una próxima feature elegida.
+- **Fase:** prueba de uso real. Tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`) en producción desde el 2026-10-01: fase 1 (PR #23, migración `20261002000000_session_treatments.sql`) y fase 2, Insights y Reporte (PR #24). Probado por el owner en producción el 2026-10-01.
+- **En curso:** editar o corregir registros pasados (`docs/specs/edit-past-records-spec.md`, aprobada el 2026-10-01). Se entrega en tres PRs: 1) cierres, 2) sesiones (con migración), 3) "Corregir" en la pantalla de éxito y documentación. Rama del PR 1: `feat/edit-past-records`.
 
 ### Paso a producción (2026-09-30) ✅
 
@@ -29,7 +30,7 @@
 - Token viejo de Supabase revocado; `SUPABASE_ACCESS_TOKEN` nuevo (token de proyecto, vence en ~1 año: renovarlo antes y actualizar el secret). Probado con un workflow temporal: API 200 y `link` + `db push --dry-run` OK.
 - PR #9 integrado y desplegado: cabeceras de seguridad (comprobadas en el dominio), guardia de la base de producción, axe en E2E y acciones de GitHub en `@v7`.
 
-No hay ramas abiertas.
+Rama abierta: `feat/edit-past-records` (PR 1, cierres).
 
 ## ⏰ Vencimientos
 

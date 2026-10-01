@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   createNightlyCloseoutInputSchema,
   createRehabSessionInputSchema,
+  recordIdSchema,
   sessionExerciseSchema,
   sessionTreatmentSchema,
 } from "@/lib/validation/recovery";
@@ -223,6 +224,14 @@ describe("sessionExerciseSchema", () => {
     });
 
     expect(result.success).toBe(false);
+  });
+});
+
+describe("recordIdSchema", () => {
+  it("accepts a UUID and rejects anything else", () => {
+    expect(recordIdSchema.safeParse("8f14e45f-ceea-4e7a-9b1c-3d5a6f7e8a9b").success).toBe(true);
+    expect(recordIdSchema.safeParse("").success).toBe(false);
+    expect(recordIdSchema.safeParse("1 or 1=1").success).toBe(false);
   });
 });
 

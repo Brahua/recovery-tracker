@@ -3,20 +3,34 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { createRecoveryLogRepository } from "@/data/recovery-log-repository";
+import {
+  createRecoveryLogRepository,
+  DuplicateCloseoutDateError,
+  RecordNotFoundError,
+} from "@/data/recovery-log-repository";
 import {
   duplicateCloseoutDateMessage,
   futureCloseoutDateMessage,
   getCloseoutDateError,
   invalidCloseoutDateMessage,
 } from "@/lib/closeout-date";
+import { getHistoryHrefForDate } from "@/lib/history-view-model";
 import { AuthenticationRequiredError } from "@/lib/supabase/authenticated";
-import type { PainScore, Rating1To5, ReboundLevel } from "@/types/recovery";
+import { recordIdSchema } from "@/lib/validation/recovery";
+import type {
+  CreateNightlyCloseoutInput,
+  PainScore,
+  Rating1To5,
+  ReboundLevel,
+} from "@/types/recovery";
 
 const expiredSessionMessage =
   "Tu sesión expiró. Recarga la página e inicia sesión nuevamente.";
 const genericCloseoutErrorMessage =
   "No se pudo guardar el cierre. Revisa los datos e intenta otra vez.";
+const missingCloseoutMessage =
+  "Ese cierre ya no existe. Vuelve a Historial para ver tus registros.";
+const genericDeleteErrorMessage = "No se pudo eliminar el cierre. Intenta otra vez.";
 
 function getSingleValue(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -63,7 +77,36 @@ export interface NightlyCloseoutActionState {
   error: string | null;
 }
 
+function readCloseoutForm(formData: FormData): CreateNightlyCloseoutInput {
+  return {
+    date: getSingleValue(formData, "date"),
+    endOfDayPain: parsePainScore(getSingleValue(formData, "endOfDayPain")),
+    energy: parseRating1To5(getSingleValue(formData, "energy")),
+    sleepHours: Number(getSingleValue(formData, "sleepHours")),
+    sleepQuality: parseRating1To5(getSingleValue(formData, "sleepQuality")),
+    reboundPainLevel: parseReboundLevel(getSingleValue(formData, "reboundPainLevel")),
+    notes: getSingleValue(formData, "notes") || undefined,
+  };
+}
+
+function revalidateRecoveryViews() {
+  // The (app) layout renders the streak, so refresh it along with the pages.
+  revalidatePath("/", "layout");
+  revalidatePath("/registrar");
+  revalidatePath("/historial");
+  revalidatePath("/insights");
+  revalidatePath("/reporte");
+}
+
 function getSaveErrorMessage(error: unknown) {
+  if (error instanceof DuplicateCloseoutDateError) {
+    return duplicateCloseoutDateMessage;
+  }
+
+  if (error instanceof RecordNotFoundError) {
+    return missingCloseoutMessage;
+  }
+
   if (error instanceof Error) {
     if (
       error.message === duplicateCloseoutDateMessage ||
@@ -107,26 +150,16 @@ export async function createNightlyCloseoutAction(
       throw new Error(duplicateCloseoutDateMessage);
     }
 
-    const endOfDayPain = parsePainScore(getSingleValue(formData, "endOfDayPain"));
-    const energy = parseRating1To5(getSingleValue(formData, "energy"));
-    const sleepQuality = parseRating1To5(getSingleValue(formData, "sleepQuality"));
-    const reboundPainLevel = parseReboundLevel(
-      getSingleValue(formData, "reboundPainLevel"),
-    );
-
-    const savedCloseout = await repository.createNightlyCloseout({
-      date,
-      endOfDayPain,
-      energy,
-      sleepHours: Number(getSingleValue(formData, "sleepHours")),
-      sleepQuality,
-      reboundPainLevel,
-      notes: getSingleValue(formData, "notes") || undefined,
-    });
+    const input = readCloseoutForm(formData);
+    const savedCloseout = await repository.createNightlyCloseout(input);
 
     savedCloseoutId = savedCloseout.id;
     savedCloseoutDate = savedCloseout.date;
-    summary = buildCloseoutSummary(endOfDayPain, energy, reboundPainLevel);
+    summary = buildCloseoutSummary(
+      input.endOfDayPain,
+      input.energy,
+      input.reboundPainLevel,
+    );
   } catch (error) {
     const errorMessage = getSaveErrorMessage(error);
 
@@ -139,13 +172,82 @@ export async function createNightlyCloseoutAction(
     return { error: errorMessage };
   }
 
-  // The (app) layout renders the streak, so refresh it along with the pages.
-  revalidatePath("/", "layout");
-  revalidatePath("/registrar");
-  revalidatePath("/historial");
-  revalidatePath("/insights");
-  revalidatePath("/reporte");
+  revalidateRecoveryViews();
   redirect(
     `/registrar?mode=closeout&date=${encodeURIComponent(savedCloseoutDate)}&nightlySaved=1&closeoutId=${encodeURIComponent(savedCloseoutId)}&nightlySummary=${encodeURIComponent(summary)}`,
   );
+}
+
+export async function updateNightlyCloseoutAction(
+  _previousState: NightlyCloseoutActionState,
+  formData: FormData,
+): Promise<NightlyCloseoutActionState> {
+  const id = getSingleValue(formData, "closeoutId");
+  let historyHref = "";
+
+  if (!recordIdSchema.safeParse(id).success) {
+    return { error: missingCloseoutMessage };
+  }
+
+  try {
+    const repository = await createRecoveryLogRepository();
+    const date = getSingleValue(formData, "date");
+    const dateError = getCloseoutDateError(date);
+
+    if (dateError) {
+      throw new Error(dateError);
+    }
+
+    const closeoutsOnDate = await repository.listNightlyCloseouts({ from: date, to: date });
+
+    if (closeoutsOnDate.some((closeout) => closeout.id !== id)) {
+      throw new DuplicateCloseoutDateError();
+    }
+
+    const saved = await repository.updateNightlyCloseout(id, readCloseoutForm(formData));
+    const href = getHistoryHrefForDate(saved.date);
+    const toastKey = encodeURIComponent(`${saved.id}:${saved.updatedAt}`);
+    historyHref = `${href}${href.includes("?") ? "&" : "?"}updated=closeout&key=${toastKey}`;
+  } catch (error) {
+    const errorMessage = getSaveErrorMessage(error);
+
+    if (errorMessage === genericCloseoutErrorMessage) {
+      console.error("Failed to update nightly closeout.", error);
+    }
+
+    return { error: errorMessage };
+  }
+
+  revalidateRecoveryViews();
+  redirect(historyHref);
+}
+
+export interface DeleteRecordResult {
+  ok: boolean;
+  error?: string;
+}
+
+export async function deleteNightlyCloseoutAction(id: string): Promise<DeleteRecordResult> {
+  if (!recordIdSchema.safeParse(id).success) {
+    return { ok: false, error: missingCloseoutMessage };
+  }
+
+  try {
+    const repository = await createRecoveryLogRepository();
+    await repository.deleteNightlyCloseout(id);
+  } catch (error) {
+    if (error instanceof RecordNotFoundError) {
+      return { ok: false, error: missingCloseoutMessage };
+    }
+
+    if (error instanceof AuthenticationRequiredError) {
+      return { ok: false, error: expiredSessionMessage };
+    }
+
+    console.error("Failed to delete nightly closeout.", error);
+    return { ok: false, error: genericDeleteErrorMessage };
+  }
+
+  revalidateRecoveryViews();
+  return { ok: true };
 }

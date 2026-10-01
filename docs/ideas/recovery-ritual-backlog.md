@@ -9,7 +9,7 @@
 
 - MVP terminado y validado con uso real (la semana de validación de julio se cerró el 2026-10-01).
 - El uso real produjo el catálogo de ejercicios, las rutinas, los arreglos de móvil, el nombre de la cuenta y el feedback global de carga; todo está en producción.
-- No hay una feature en curso ni elegida.
+- En curso (desde el 2026-10-01): **editar o corregir registros pasados** (`docs/specs/edit-past-records-spec.md`).
 
 ## Ya hecho
 
@@ -37,6 +37,7 @@ Lo que el backlog original tenía como pendiente o diferido y hoy existe.
 | Recordatorios | Sesión y cierre con hora configurable, cada 5 min con `pg_cron`, una vez por día y solo si sigue pendiente | `docs/specs/pwa-and-reminders-spec.md` |
 | Nombre en el saludo | Se elige en `/ajustes` y se mantiene entre inicios de sesión con Google | `src/features/settings/` |
 | Feedback de carga | Barra de progreso global, toasts en cada escritura, pantalla de error | `docs/specs/global-loading-and-feedback-spec.md` |
+| Tratamientos del centro (parte de la línea de tiempo de tratamiento) | En Fisio guiada: agentes físicos, terapia manual, invasivas, vendaje e indicaciones del fisio; se ven en Historial, Insights y Reporte | `docs/specs/physio-treatments-spec.md` |
 
 ## Pendiente: producto
 
@@ -44,7 +45,7 @@ Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justific
 
 | Prioridad | Feature | Por qué importa | Se reabre cuando |
 |---|---|---|---|
-| Media | **Editar o corregir registros pasados** | Hoy un error de carga no se puede arreglar desde la app | Aparezca un registro mal cargado que importe |
+| En curso | **Editar o corregir registros pasados** | Hoy un error de carga no se puede arreglar desde la app | Elegida el 2026-10-01 |
 | Media | **Análisis por ejercicio** (progresión de peso, repeticiones, segundos) | Ver si un ejercicio concreto progresa | Quieras saber "¿cómo voy en X?" |
 | Media | **Guardar qué rutina se usó en cada sesión** | Comparar rutinas en Historial e Insights | Uses varias rutinas y quieras compararlas |
 | Media | Vista de calendario | Conectar sesiones y síntomas de una semana o mes | Te preguntes seguido "¿qué pasó esa semana?" |
@@ -63,16 +64,23 @@ Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justific
 - Camino de recuperación con hitos semanales.
 - Tarjeta de estado o "readiness" del día.
 - Insignias por constancia: descanso, notas completas, preparación de citas (nunca por intensidad).
-- Contraste visual entre síntomas, carga, sueño y eventos de tratamiento.
+- Contraste visual entre síntomas, carga, sueño y eventos de tratamiento (ahora también los tratamientos del centro).
+
+Antes de construir cualquiera de estos: los cuatro son features nuevas, no ajustes visuales. Cada uno necesita una observación de uso real, decisiones del owner y una spec, igual que el resto del producto. Para cada uno hay que definir:
+
+- **Hitos semanales:** qué cuenta como hito (constancia, nunca dolor o intensidad) y dónde se ve (Hoy o Insights).
+- **Readiness del día:** con qué datos se calcula (dolor final, rebote, sueño, energía del cierre anterior) y cómo evitar que parezca una recomendación médica.
+- **Insignias:** qué conductas premian (descanso, notas completas, preparar la cita) y cómo se muestran sin infantilizar.
+- **Contraste visual:** qué paleta separa síntomas, carga, sueño y tratamientos en las gráficas de Insights y Reporte (tokens nuevos en `src/design-system/styles/tokens/`).
 
 ## Pendiente: técnico
 
 | Prioridad | Tarea | Por qué |
 |---|---|---|
 | Baja | Sincronizar los tokens con el proyecto de Claude Design (lockfile que impida editarlos a mano, como `brahua-os`) | Fase 3 del design system; solo si Claude Design vuelve a ser la fuente activa de cambios |
-| Baja | Revisar los tokens sin uso (`--rr-bg-night`, `--rr-paper-ink`, `--rr-amber`, `--rr-accent-card`, `--rr-page-padding*`, `--rr-card-padding`) | Vienen del design system de Claude Design; decidir si se usan o se quitan |
-| Media | Detectar en CI cambios de esquema sin migración (`supabase db diff`) | Evita desfasar la base respecto de `supabase/migrations/` |
-| Baja | Prettier + `format:check` en CI | Diffs más limpios, igual que `brahua-os` |
+| Baja | Revisar los tokens sin uso (`--rr-bg-night`, `--rr-paper-ink`, `--rr-amber`, `--rr-accent-card`, `--rr-page-padding*`, `--rr-card-padding`) | Vienen del design system de Claude Design; decidir si se usan o se quitan. Primero un informe, sin borrar; hacerlo cuando no haya una feature tocando CSS |
+| Media | Detectar en CI cambios de esquema sin migración (`supabase db diff`) | Evita desfasar la base respecto de `supabase/migrations/`. Necesita Docker: se prueba solo en CI, no en la PC del owner |
+| Baja | Prettier + `format:check` en CI | Diffs más limpios, igual que `brahua-os`. Reformatea todo el repo: hacerlo sin ramas de feature abiertas |
 | Baja | Vigilar el cambio de `ubuntu-latest` a Ubuntu 26 (19 oct 2026) | Aviso de GitHub; no debería afectar |
 | ⏰ | Renovar `SUPABASE_ACCESS_TOKEN` antes del ~30 sep 2027 | Pasos en `docs/deployment.md` → "Vencimientos y renovaciones" |
 

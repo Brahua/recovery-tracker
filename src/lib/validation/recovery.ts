@@ -222,6 +222,9 @@ export const createNightlyCloseoutInputSchema = z.object({
   notes: optionalTextSchema,
 });
 
+// Ids of saved sessions and closeouts that arrive from the client.
+export const recordIdSchema = z.uuid();
+
 const persistedFieldsSchema = {
   id: z.string().trim().min(1),
   createdAt: requiredDateTimeSchema,

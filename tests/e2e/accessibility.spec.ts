@@ -1,8 +1,8 @@
-import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 
+import { expectNoAxeViolations } from "./axe-helpers";
 import {
   addExerciseFromCatalog,
   addQuickExercise,
@@ -13,21 +13,6 @@ import {
   saveSession,
   sessionExerciseRow,
 } from "./exercise-helpers";
-
-// Automated WCAG 2.1 A/AA checks with axe on every main screen, so the accessibility
-// verified by hand (Lighthouse 100) does not regress silently.
-const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
-
-async function expectNoAxeViolations(page: Page) {
-  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
-  const summary = results.violations.map(({ id, impact, help, nodes }) => ({
-    id,
-    impact,
-    help,
-    targets: nodes.map((node) => node.target.join(" ")),
-  }));
-  expect(summary).toEqual([]);
-}
 
 const SIGNED_IN_SCREENS = [
   { name: "Hoy", path: "/", ready: /^Hola,/ },

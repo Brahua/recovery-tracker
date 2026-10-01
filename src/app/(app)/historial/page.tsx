@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { ToastOnMount } from "@/components/feedback/toast-on-mount";
 import { HistoryList } from "@/features/history/history-list";
 import {
   buildHistoryDays,
@@ -8,6 +9,9 @@ import {
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 
 type SearchParams = Record<string, string | string[] | undefined>;
+
+// Set by the edit actions when they redirect back here.
+const updatedToastMessages = new Map([["closeout", "Cierre actualizado"]]);
 
 export default async function HistorialPage({
   searchParams,
@@ -30,13 +34,22 @@ export default async function HistorialPage({
     redirect("/");
   }
 
+  const updated = resolvedSearchParams.updated;
+  const updatedToast = typeof updated === "string" ? updatedToastMessages.get(updated) : undefined;
+  const updatedKey = resolvedSearchParams.key;
+
   return (
-    <HistoryList
-      days={buildHistoryDays(recentSessions, recentCloseouts)}
-      from={window.from}
-      key={window.to}
-      previousTo={window.previousTo}
-      to={window.to}
-    />
+    <>
+      {updatedToast && typeof updatedKey === "string" ? (
+        <ToastOnMount message={updatedToast} onceKey={`updated:${updatedKey}`} />
+      ) : null}
+      <HistoryList
+        days={buildHistoryDays(recentSessions, recentCloseouts)}
+        from={window.from}
+        key={window.to}
+        previousTo={window.previousTo}
+        to={window.to}
+      />
+    </>
   );
 }

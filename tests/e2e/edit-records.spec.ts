@@ -105,8 +105,11 @@ test.describe.serial("edit past closeouts", () => {
   });
 });
 
+// "En casa", not the default physio type: Hoy shows the latest physio session's
+// instructions, and physio-treatments.spec.ts runs in parallel with the same user.
 async function createSession(page: Page) {
   await openSessionForm(page);
+  await page.getByText("En casa", { exact: true }).click();
   await fillSessionBasics(page);
   const exercise = await addExerciseFromCatalog(page, "step-u", "Step-up");
   await exercise.getByRole("button", { name: "+ Añadir serie" }).click();

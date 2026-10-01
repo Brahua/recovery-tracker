@@ -1,6 +1,6 @@
 # Spec: design system CSS (dividir `globals.css` y tokenizar)
 
-Estado: **aprobada (2026-10-01)**: se borran las 3 clases sin uso en un commit aparte y el chequeo no revisa estilos inline de TSX. Plan: `tasks/plan-design-system-css.md`; tareas: `tasks/todo-design-system-css.md`. Backlog: "Dividir `globals.css`" en `docs/ideas/recovery-ritual-backlog.md`.
+Estado: **implementada (2026-10-01)** — PRs #14 (división), #15 (limpieza del tema claro) y fase 2 (tokens + `design:check`). Aprobada con estas decisiones: se borran las 3 clases sin uso en un commit aparte y el chequeo no revisa estilos inline de TSX. Plan: `tasks/plan-design-system-css.md`; tareas: `tasks/todo-design-system-css.md`. Backlog: "Dividir `globals.css`" en `docs/ideas/recovery-ritual-backlog.md`.
 
 ## Objetivo
 
@@ -63,6 +63,7 @@ src/design-system/
       motion.css                     curvas (--rr-ease-*) y duraciones repetidas
       shadows.css                    sombras
       radius.css                     radios (ya existen como --rr-radius-*)
+      spacing.css                    medidas de layout (ancho de contenido, sidebar, barra móvil)
       theme.css                      @theme inline (puente a Tailwind)
     base.css                         html, body, encabezados, utilidades base
     animations.css                   @keyframes compartidos
@@ -126,10 +127,10 @@ node scripts/design-system/compare-css.mjs <base> <nuevo>   # nuevo: compila con
 
 ## Criterios de éxito (resumen verificable)
 
-- [ ] `wc -l src/app/globals.css` ≤ 40 y ningún archivo de `src/design-system/styles/` > ~800 líneas.
-- [ ] `compare-css.mjs` da EQUIVALENTE al final de la fase 1 e IDÉNTICO (valores resueltos) al final de la fase 2.
-- [ ] `npm run design:check` en verde y en CI; con un `#fff` agregado a una pantalla, falla.
-- [ ] `grep -rE "#[0-9a-fA-F]{3,8}|rgba?\(|cubic-bezier" src/design-system/styles --exclude-dir=tokens` sin resultados.
+- [x] `wc -l src/app/globals.css` ≤ 40 y ningún archivo de `src/design-system/styles/` > ~800 líneas.
+- [x] `compare-css.mjs` da EQUIVALENTE al final de la fase 1 e IDÉNTICO (valores resueltos) al final de la fase 2.
+- [x] `npm run design:check` en verde y en CI; con un `#fff` agregado a una pantalla, falla.
+- [x] Sin hex, `rgb()/rgba()` literales ni `cubic-bezier` fuera de `tokens/` (lo verifica `design:check`).
 - [ ] CI en verde y deploy correcto; la app se ve igual en producción.
 
 ## Decisiones

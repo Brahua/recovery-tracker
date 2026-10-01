@@ -36,6 +36,7 @@ src/
   app/            Rutas: / (Hoy o landing), /registrar, /historial, /insights, /reporte, /ejercicios, /auth/*
   features/       UI por dominio: check-in (post-therapy, nightly-closeout, test-auth), history, today, dashboard, reports
   components/     Shell, landing, estados de éxito, editor de ejercicios, slider de dolor
+  design-system/  CSS global: tokens --rr-*, base, componentes y un archivo por pantalla (ver su README)
   lib/            Lógica pura con tests: view-models, cálculos, insights, fechas (America/Lima), validación Zod, clientes Supabase
   data/           recovery-log-repository.ts (acceso a la BD) + mappers
   types/          Tipos del dominio

@@ -14,7 +14,7 @@ Read first when resuming: `docs/HANDOFF.md` (exact status, work in flight and ma
 
 - Code, file names, commits: **English**. UI copy, specs, docs: **Spanish**.
 - Node 24 (`.nvmrc`) + npm. Run `nvm use` first.
-- Before committing: `npm run lint && npm run typecheck && npm test`. `next build` and E2E run in CI.
+- Before committing: `npm run lint && npm run design:check && npm run typecheck && npm test`. `next build` and E2E run in CI.
 - **Machine limits:** on the owner's PC do not run Docker (local Supabase), `next build` or E2E unless the
   owner asks for it in that session; it has hung the machine before. `npm run dev` is fine when asked.
 - GitHub: personal account `Brahua` only (`gh auth switch -u Brahua` if another account is active).
@@ -33,4 +33,5 @@ Read first when resuming: `docs/HANDOFF.md` (exact status, work in flight and ma
 
 - CSS lives in `src/design-system/styles/` (see `src/design-system/README.md`); `src/app/globals.css` only imports it,
   and the import order is the cascade order.
+- No literal colors, easings or font stacks outside `src/design-system/styles/tokens/`: `npm run design:check` (also in CI).
 - CSS refactors must prove the compiled stylesheet is unchanged: `npm run -s css:compare -- compare <baseline> [--resolve]`.

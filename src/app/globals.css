@@ -4,7 +4,12 @@
 @source not "../../docs";
 @source not "../../tasks";
 @source not "../../scripts";
-@import "../design-system/styles/tokens/root.css";
+@import "../design-system/styles/tokens/colors.css";
+@import "../design-system/styles/tokens/typography.css";
+@import "../design-system/styles/tokens/motion.css";
+@import "../design-system/styles/tokens/shadows.css";
+@import "../design-system/styles/tokens/radius.css";
+@import "../design-system/styles/tokens/spacing.css";
 @import "../design-system/styles/tokens/theme.css";
 @import "../design-system/styles/base.css";
 @import "../design-system/styles/components/primitives.css";

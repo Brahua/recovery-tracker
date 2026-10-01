@@ -1,0 +1,9 @@
+/* Corner radii. */
+
+:root {
+  --rr-radius-control: 13px;
+  --rr-radius-button: 16px;
+  --rr-radius-card: 20px;
+  --rr-radius-hero: 22px;
+  --rr-radius-pill: 99px;
+}

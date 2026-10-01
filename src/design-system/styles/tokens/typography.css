@@ -1,0 +1,7 @@
+/* Font family tokens (next/font variables plus fallbacks). */
+
+:root {
+  --rr-font-display: var(--font-archivo), sans-serif;
+  --rr-font-body: var(--font-instrument-sans), sans-serif;
+  --rr-font-body-system: var(--font-instrument-sans), system-ui, sans-serif;
+}

@@ -1,0 +1,70 @@
+name: Schema drift
+
+# Compares the production database schema with supabase/migrations/ (read-only).
+# A difference means the schema changed outside a migration (e.g. in the dashboard),
+# so the next migration or a fresh local stack would not match production.
+on:
+  schedule:
+    # Mondays 13:00 UTC (08:00 in Lima).
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+  pull_request:
+    # Only when this check itself changes, to validate it before merging.
+    paths:
+      - .github/workflows/schema-drift.yml
+
+concurrency:
+  group: schema-drift
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  # Production Supabase project (formerly "staging").
+  SUPABASE_PROJECT_REF: pevrupenrzueyzidfeah
+
+jobs:
+  drift:
+    name: Production schema matches migrations
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - name: Check secrets
+        run: |
+          missing=0
+          for name in SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing $name repository secret"
+              missing=1
+            fi
+          done
+          exit $missing
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+
+      # Read-only: builds a shadow database from the migrations (Docker) and diffs it
+      # against production. Nothing is written to production.
+      - name: Diff production schema against migrations
+        run: |
+          npx supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          npx supabase db diff --linked --schema public > drift.sql
+          if [ -s drift.sql ] && grep -q '[^[:space:]]' drift.sql; then
+            echo "::error::Production schema differs from supabase/migrations/. Turn the change into a migration or revert it."
+            cat drift.sql
+            {
+              echo '### Schema drift in production'
+              echo '```sql'
+              cat drift.sql
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 1
+          fi
+          echo "No schema drift: production matches supabase/migrations/."

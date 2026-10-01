@@ -55,7 +55,7 @@
 
 .rr-landing-brand {
   color: var(--rr-ink);
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 1rem;
   font-weight: 800;
   letter-spacing: -0.025em;
@@ -265,7 +265,7 @@
 }
 
 .rr-landing-progress strong {
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 0.875rem;
 }
 
@@ -283,7 +283,7 @@
 }
 
 .rr-landing-peek-copy strong {
-  font-family: var(--font-archivo), sans-serif;
+  font-family: var(--rr-font-display);
   font-size: 1.1rem;
   letter-spacing: -0.025em;
   line-height: 1.05;
@@ -345,7 +345,7 @@
 .rr-landing-benefits h2 {
   margin: 0;
   color: rgb(var(--rr-ink-rgb) / 0.9);
-  font-family: var(--font-instrument-sans), sans-serif;
+  font-family: var(--rr-font-body);
   font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0;

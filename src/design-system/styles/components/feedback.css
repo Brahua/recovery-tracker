@@ -71,7 +71,7 @@
   padding: 10px 8px 10px 12px;
   box-shadow: 0 12px 32px rgb(var(--rr-black-rgb) / 0.45);
   color: var(--rr-ink);
-  font-family: var(--font-instrument-sans), sans-serif;
+  font-family: var(--rr-font-body);
   font-size: 14px;
   line-height: 1.4;
   animation: rr-toast-in 0.2s ease-out;

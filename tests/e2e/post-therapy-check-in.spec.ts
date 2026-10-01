@@ -97,7 +97,7 @@ test.describe("post-therapy check-in", () => {
 
     await expect(page).toHaveURL(/\/registrar\?mode=session$/);
     await expect(page.locator(".rr-session-error")).toContainText(
-      "Completa o elimina todos los ejercicios seleccionados",
+      "Agrega al menos un ejercicio",
     );
     await expect(page.getByRole("slider", { name: "Durante" })).toHaveValue("3");
     await expect(sessionExerciseRow(page, "Wall sit")).toContainText("1 × 45 s");

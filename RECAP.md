@@ -61,7 +61,7 @@ Vienen de `docs/archive/handoffs/session-handoff-2026-07-17.md`:
 
 ## 4. En qué fase está
 
-- **Terminado:** el MVP, el rediseño con Claude Design (8 pantallas), el historial, las series individuales, los registros con fecha anterior, el CI/CD, el catálogo de ejercicios (`/ejercicios`), las rutinas y el feedback global de carga (barra de progreso, toasts y pantalla de error).
+- **Terminado:** el MVP, el rediseño con Claude Design (8 pantallas), el historial, las series individuales, los registros con fecha anterior, el CI/CD, el catálogo de ejercicios (`/ejercicios`), las rutinas, el feedback global de carga, el design system CSS (`src/design-system/`), la app instalable (PWA con pantalla offline), `/ajustes` (nombre, instalación y recordatorios) y los recordatorios push programados con `pg_cron`.
 - **Última verificación documentada (2026-10-01):** CI en verde en `main` (lint, typecheck, unitarios, E2E críticos con axe) y deploy a producción correcto.
 - **Fase actual:** la validación de uso real se cerró (2026-10-01) y de ella salieron las features ya entregadas. **No hay una próxima feature elegida.**
 - **Backlog:** todo lo pendiente (producto, diseño y técnico), con lo ya hecho verificado contra el código, está en `docs/ideas/recovery-ritual-backlog.md`.

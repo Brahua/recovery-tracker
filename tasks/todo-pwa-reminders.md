@@ -80,8 +80,8 @@ Verificación en la PC: `npm run lint && npm run design:check && npm run typeche
   - Verify: CI aplica la migración en Supabase local sin llamar a nada.
   - Files: `supabase/migrations/20261001010000_reminders_dispatch.sql`
 
-- [ ] D4. Documentación y verificación final
+- [x] D4. Documentación y verificación final
   - Acceptance: `docs/deployment.md` (secretos, SQL de Vault, cómo ver el historial del cron), `HANDOFF`, `RECAP`, backlog (PWA y recordatorios hechos), `CHANGELOG`; spec implementada.
   - Verify: owner carga `service_role`, secreto y Vault → CI verde → merge → deploy → recordatorio real recibido una sola vez en el iPhone.
-  - Estado (2026-10-01): configuración hecha y verificada (cron → `200` con contadores). Falta la prueba del owner en el iPhone: instalar, nombre, activar + prueba, recordatorio real, modo avión.
+  - Hecho (2026-10-01): configuración verificada (cron → `200`); el owner instaló la app, activó las notificaciones y recibió la prueba en el iPhone; el recordatorio de sesión programado a las 12:04 salió a las 12:05 una sola vez (las ejecuciones siguientes no reenviaron).
   - Files: docs

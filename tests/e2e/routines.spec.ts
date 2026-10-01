@@ -177,7 +177,7 @@ test.describe("routines", () => {
     // Another user's routine is filtered out by RLS exactly like a missing id.
     for (const id of [randomUUID(), "no-es-un-id"]) {
       await page.goto(`/ejercicios/rutinas/${id}`);
-      await expect(page.getByText("This page could not be found.")).toBeVisible();
+      await expect(page.getByText("No encontramos ese registro")).toBeVisible();
       await expect(page.getByRole("heading", { name: "Editar rutina" })).toHaveCount(0);
     }
   });

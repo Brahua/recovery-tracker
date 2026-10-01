@@ -62,7 +62,7 @@ Repo → Settings → Secrets and variables → Actions. El job `deploy` falla a
 | `SUPABASE_ACCESS_TOKEN` | `supabase link` / `db push`. Token de **proyecto** (solo `recovery-tracker-staging`), nombre `github-actions-recovery-tracker`, **vence en un año** (ver "Vencimientos") |
 | `SUPABASE_DB_PASSWORD` | Contraseña de la base de producción para `db push` |
 
-Los secrets se cargan desde una terminal normal o desde la web de GitHub: `gh secret set` desde el `!` de la sesión de Claude los guarda vacíos.
+Los secrets se cargan desde la web de GitHub, una terminal normal o, si los configura Claude, por `stdin` sin imprimirlos: `gh secret set` desde el `!` de la sesión de Claude los guarda vacíos.
 
 GitHub nunca muestra el valor de un secret, solo su fecha de actualización (`gh secret list`). Para comprobar que funcionan sin desplegar: rama temporal con un workflow `on: push` solo para esa rama que haga un `GET https://api.supabase.com/v1/projects/<ref>` con el token y `supabase link` + `supabase db push --linked --dry-run`; luego borrar la rama. Así se verificó el 2026-10-01.
 
@@ -86,7 +86,7 @@ Como `NEXT_PUBLIC_*` se incrusta en el build, cambiar una de estas variables req
 | `VAPID_PRIVATE_KEY` | Production | **sensitive** | Clave privada VAPID |
 | `VAPID_SUBJECT` | Production | config | `mailto:` del owner |
 
-Se generan una sola vez, **en una terminal normal** (nunca desde la sesión de Claude):
+Configuradas el 2026-10-01. Para regenerarlas, Claude las genera y carga con comandos que **nunca imprimen los valores** (directo por `stdin` a `vercel env add --type secret`); a mano, en una terminal normal:
 
 ```bash
 npx web-push generate-vapid-keys
@@ -101,11 +101,11 @@ Cada 5 minutos, `pg_cron` en Supabase ejecuta `public.dispatch_reminders()`, que
 | Dónde | Nombre | Tipo / valor |
 |---|---|---|
 | Vercel (Production) | `SUPABASE_SERVICE_ROLE_KEY` | **sensitive** · Supabase → Project Settings → API → `service_role` |
-| Vercel (Production) | `REMINDERS_DISPATCH_SECRET` | **sensitive** · `openssl rand -base64 32` (en una terminal normal) |
+| Vercel (Production) | `REMINDERS_DISPATCH_SECRET` | **sensitive** · `openssl rand -base64 32` |
 | Supabase Vault | `reminders_dispatch_secret` | el mismo valor que `REMINDERS_DISPATCH_SECRET` |
 | Supabase Vault | `reminders_dispatch_url` | `https://recovery-tracker.brahua.com/api/reminders/dispatch` |
 
-Vault se carga una vez desde Supabase → SQL Editor (el secreto lo pega el owner; nunca va al repo):
+Configurado el 2026-10-01. Vault se carga con la API de administración de Supabase o desde el SQL Editor; el valor nunca va al repo ni se muestra en la conversación:
 
 ```sql
 select vault.create_secret('https://recovery-tracker.brahua.com/api/reminders/dispatch', 'reminders_dispatch_url', 'Reminders endpoint');

@@ -15,6 +15,11 @@ test.describe("settings", () => {
     await page.getByRole("button", { name: "Guardar nombre" }).click();
     await expect(toast(page, "Nombre guardado")).toBeVisible();
 
+    // The toast stays a compact card at the top: it once stretched over the whole screen on iOS.
+    const toastBox = await toast(page, "Nombre guardado").boundingBox();
+    expect(toastBox?.height).toBeLessThan(120);
+    expect(toastBox?.y).toBeLessThan(100);
+
     await page.goto("/");
     await expect(page.getByRole("heading", { name: `Hola, ${name}` })).toBeVisible();
 

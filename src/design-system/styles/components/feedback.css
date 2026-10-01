@@ -43,17 +43,30 @@
   }
 }
 
+/*
+ * The viewport is a manual popover (top layer). iOS Safari can leave the user-agent
+ * `[popover] { inset: 0 }` in effect, which stretched it (and the toast) over the whole screen.
+ * So: every side set with longhands, height from content, toasts pinned to the top and never
+ * stretched, and the viewport itself ignores taps so it can never block the page.
+ */
 .rr-toast-viewport {
   position: fixed;
-  inset: calc(12px + env(safe-area-inset-top, 0px)) 16px auto auto;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: 16px;
+  bottom: auto;
+  left: auto;
   display: grid;
   width: min(380px, calc(100vw - 32px));
+  height: auto;
+  max-height: calc(100dvh - 24px);
+  align-content: start;
   gap: 8px;
   margin: 0;
   border: 0;
   background: transparent;
   padding: 0;
   overflow: visible;
+  pointer-events: none;
 }
 
 .rr-toast-viewport:empty {
@@ -62,6 +75,8 @@
 
 .rr-toast {
   display: grid;
+  align-self: start;
+  pointer-events: auto;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 10px;
@@ -129,7 +144,9 @@
 
 @media (max-width: 63.99rem) {
   .rr-toast-viewport {
-    inset: calc(10px + env(safe-area-inset-top, 0px)) 16px auto 16px;
+    top: calc(10px + env(safe-area-inset-top, 0px));
+    right: 16px;
+    left: 16px;
     width: auto;
   }
 }

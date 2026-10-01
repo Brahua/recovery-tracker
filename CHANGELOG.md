@@ -46,6 +46,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Aligned the responsive Historial with its mobile and desktop Claude Design references, including the date rail, single-open session accordion, two-column exercise details, separate closeout cards, and viewport-specific navigation.
 
 ### Fixed
+- Landing copy for the nightly closeout now matches what it records ("Dolor, energia y sueno antes de dormir."); it promised stiffness and mood, which the closeout does not capture.
 - Color contrast below 4.5:1 on small text in Registrar, Ejercicios and Historial (new `--rr-accent-on-tint` for green text on tinted backgrounds).
 - Kept the session, closeout and report action bars above the mobile tab bar and reserved its height at the end of each screen.
 - Showed the full catalog on a new user's first Registrar visit (a repeated GET in the same server render returned a memoized empty list).

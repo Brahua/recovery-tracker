@@ -12,7 +12,7 @@ const benefits = [
   {
     icon: "moon",
     title: "Cierre nocturno",
-    description: "Dolor, rigidez y animo antes de dormir.",
+    description: "Dolor, energia y sueno antes de dormir.",
   },
   {
     icon: "insights",

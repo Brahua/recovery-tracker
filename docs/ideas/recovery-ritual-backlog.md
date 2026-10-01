@@ -51,7 +51,7 @@ Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justific
 | Media | Zonas de dolor / mapa de la rodilla | La ubicación del dolor en las citas | La ubicación del dolor sea tema en las citas |
 | Media | Resumen semanal y preguntas para la cita con IA | Mejores resúmenes que las reglas actuales | Los textos por reglas se queden cortos (con límites médicos claros) |
 | Baja | Editar el nombre de la cuenta desde la app | Hoy solo se cambia por SQL | Quieras cambiarlo |
-| Baja | Registrar rigidez y ánimo en el cierre nocturno | La landing promete "Dolor, rigidez y ánimo" pero el cierre registra dolor, energía, sueño y rebote | Decidir si se agrega el dato o se ajusta el texto de la landing |
+| Baja | Registrar rigidez en el cierre nocturno | Hoy el cierre registra dolor, energía, sueño y rebote; la rigidez solo cabe en la nota | La rigidez sea un dato que el fisio pida seguir |
 | Baja | Exportar a CSV | Análisis propio en una hoja de cálculo | Hagas análisis a mano seguido |
 | Baja | Apple Health / wearables (sueño, pasos) | Datos sin cargarlos a mano | El registro manual de sueño sea poco fiable |
 | Baja | Sugerencias de progresión de carga | Guiar el entrenamiento | El fisio quiera usar los datos contigo (tema médico sensible) |

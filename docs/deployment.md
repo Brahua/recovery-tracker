@@ -94,6 +94,43 @@ npx web-push generate-vapid-keys
 
 y se cargan en Vercel → Project → Settings → Environment Variables, o con `vercel env add <NOMBRE> production` (`--sensitive` para la privada). Sin estas variables `/ajustes` muestra "Las notificaciones todavía no están configuradas en el servidor" y el resto de la app funciona igual. Cambiar las claves invalida las suscripciones existentes: cada dispositivo tiene que volver a activar las notificaciones.
 
+### Envío programado de recordatorios
+
+Cada 5 minutos, `pg_cron` en Supabase ejecuta `public.dispatch_reminders()`, que hace `POST https://recovery-tracker.brahua.com/api/reminders/dispatch` con `Authorization: Bearer <secreto>`. El endpoint (con `service_role`) decide a quién avisar y envía. Sin los secretos de Vault la función no hace nada (así es en local y en CI).
+
+| Dónde | Nombre | Tipo / valor |
+|---|---|---|
+| Vercel (Production) | `SUPABASE_SERVICE_ROLE_KEY` | **sensitive** · Supabase → Project Settings → API → `service_role` |
+| Vercel (Production) | `REMINDERS_DISPATCH_SECRET` | **sensitive** · `openssl rand -base64 32` (en una terminal normal) |
+| Supabase Vault | `reminders_dispatch_secret` | el mismo valor que `REMINDERS_DISPATCH_SECRET` |
+| Supabase Vault | `reminders_dispatch_url` | `https://recovery-tracker.brahua.com/api/reminders/dispatch` |
+
+Vault se carga una vez desde Supabase → SQL Editor (el secreto lo pega el owner; nunca va al repo):
+
+```sql
+select vault.create_secret('https://recovery-tracker.brahua.com/api/reminders/dispatch', 'reminders_dispatch_url', 'Reminders endpoint');
+select vault.create_secret('<EL_MISMO_SECRETO_DE_VERCEL>', 'reminders_dispatch_secret', 'Bearer secret for the reminders endpoint');
+
+-- Para cambiarlo más adelante (y actualizar Vercel con el mismo valor):
+-- select vault.update_secret((select id from vault.secrets where name = 'reminders_dispatch_secret'), '<NUEVO_SECRETO>');
+```
+
+Diagnóstico (SQL Editor, solo lectura):
+
+```sql
+-- ¿Corre el cron?
+select status, return_message, start_time
+from cron.job_run_details
+where jobid = (select jobid from cron.job where jobname = 'dispatch-reminders')
+order by start_time desc limit 10;
+
+-- ¿Qué respondió el endpoint? (200 con contadores, 401 secreto distinto, 503 falta configurar Vercel)
+select status_code, content, created from net._http_response order by created desc limit 10;
+
+-- ¿Qué se envió?
+select * from public.reminder_deliveries order by sent_at desc limit 20;
+```
+
 ## Dominio `recovery-tracker.brahua.com`
 
 - Agregado al proyecto de Vercel con `vercel domains add recovery-tracker.brahua.com recovery-tracker`.
@@ -142,6 +179,7 @@ La app además oculta la entrada de demo si no está `ENABLE_DEMO_MODE`, que nun
 |---|---|---|
 | `SUPABASE_ACCESS_TOKEN` (secret de GitHub) | **~30 sep 2027** (creado el 2026-10-01 con 1 año; la fecha exacta está en Supabase → Account → Access Tokens) | Ver abajo. Renovar **un mes antes** (inicio de septiembre de 2027) |
 | Certificado HTTPS del dominio | Cada ~90 días | Automático en Vercel mientras el `CNAME` apunte a Vercel. Si el dominio deja de responder por HTTPS: `vercel certs issue recovery-tracker.brahua.com` |
+| Claves VAPID, `SUPABASE_SERVICE_ROLE_KEY`, `REMINDERS_DISPATCH_SECRET` | No vencen | Solo si se filtran: VAPID → regenerar (los dispositivos vuelven a activar notificaciones); `service_role` → rotar en Supabase y actualizar Vercel; secreto del endpoint → `openssl rand -base64 32` en Vercel **y** en Vault (`vault.update_secret`) |
 | `VERCEL_TOKEN` (secret de GitHub) | **No vence** (token `recovery-tracker-staging` en https://vercel.com/account/tokens, creado el 2026-07-18) | Solo si se filtra o se revoca: crear uno nuevo, actualizar el secret, revocar el viejo |
 
 Si el token de Supabase vence, el job `deploy` falla en "Apply migrations to production Supabase" con un error de autenticación (HTTP 401) y no se publica nada; la app que ya está en producción sigue funcionando.

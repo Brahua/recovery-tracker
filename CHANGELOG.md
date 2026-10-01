@@ -7,6 +7,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 ## [Unreleased]
 
 ### Added
+- Scheduled reminders: Supabase `pg_cron` calls `POST /api/reminders/dispatch` every 5 minutes (Bearer secret from Vault); the endpoint sends the session and closeout reminders that are due, still pending and not sent today (window of two hours after the chosen time, Lima time), reserves each delivery before sending and removes subscriptions the browser dropped.
 - Reminders setup in `/ajustes`: turn on notifications per device (push subscription stored with RLS), choose time and on/off for the session and closeout reminders (defaults: session off at 18:00, closeout on at 21:30), and send a test notification (`web-push` with VAPID keys). New tables `push_subscriptions`, `reminder_settings` and `reminder_deliveries`.
 - Installable app (PWA): web manifest, app icon (gold progress ring) for the home screen, browser tab and iOS, dark status bar, and a service worker that shows a self-contained offline page when a navigation fails without network.
 - `/ajustes`: choose the name the app greets you with (`user_metadata.display_name`, kept across Google sign-ins; empty falls back to the Google name) and a guide to install the app on the iPhone. Reached from the sidebar and from the avatar in Hoy on mobile.

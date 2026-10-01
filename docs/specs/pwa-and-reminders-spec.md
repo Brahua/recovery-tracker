@@ -1,6 +1,6 @@
 # Spec: app instalable (PWA) y recordatorios
 
-Estado: **aprobada (2026-10-01)** con horas por defecto Sesión 18:00 (apagado) y Cierre 21:30 (encendido), e ícono de anillo dorado. PR 1 (instalable, offline, `/ajustes` con perfil) implementado. Backlog: "PWA instalable" y "Recordatorios / notificaciones" (prioridad alta).
+Estado: **aprobada (2026-10-01)** con horas por defecto Sesión 18:00 (apagado) y Cierre 21:30 (encendido), e ícono de anillo dorado. PRs 1–3 implementados (instalable y offline; ajustes y suscripción; envío programado). Falta la verificación del owner en el iPhone. Backlog: "PWA instalable" y "Recordatorios / notificaciones" (prioridad alta).
 
 ## Objetivo
 

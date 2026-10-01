@@ -1,0 +1,85 @@
+/* Shared primitives: cards, buttons, controls. */
+
+.rr-card {
+  border: 1px solid var(--rr-border);
+  border-radius: var(--rr-radius-card);
+  background: var(--rr-card-bg);
+}
+
+.rr-card--hero {
+  border-color: var(--rr-border-hero);
+  border-radius: var(--rr-radius-hero);
+  background: var(--rr-hero-card);
+  box-shadow: var(--rr-shadow-hero);
+}
+
+.rr-card--featured {
+  border-color: rgba(46, 125, 91, 0.3);
+  background: var(--rr-accent-card);
+}
+
+.rr-card--paper {
+  border-radius: var(--rr-radius-button);
+  background: var(--rr-ink);
+  color: var(--rr-paper-ink);
+  box-shadow: var(--rr-shadow-paper);
+}
+
+.rr-button {
+  display: inline-flex;
+  min-height: var(--rr-hit-target);
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--rr-radius-button);
+  font-weight: 700;
+  transition:
+    filter 180ms ease,
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+
+.rr-button--primary {
+  min-height: 58px;
+  background: var(--rr-accent-gradient);
+  color: var(--rr-ink);
+  box-shadow: var(--rr-shadow-cta);
+}
+
+.rr-button--primary:hover {
+  filter: brightness(1.07);
+}
+
+.rr-button--primary:active {
+  transform: translateY(2px) scale(0.99);
+}
+
+.rr-button--primary:disabled {
+  background: var(--rr-wash);
+  color: rgba(232, 226, 214, 0.5);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.rr-button--secondary {
+  min-height: 48px;
+  border: 1px solid var(--rr-border-control);
+  color: rgba(232, 226, 214, 0.75);
+}
+
+.rr-button--secondary:hover {
+  background: rgba(244, 239, 231, 0.05);
+}
+
+.rr-control {
+  min-height: var(--rr-hit-target);
+  border: 1px solid var(--rr-border-strong);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  color: var(--rr-ink);
+}
+
+.rr-theme :where(a, button, input, select, textarea):focus-visible {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 3px;
+}

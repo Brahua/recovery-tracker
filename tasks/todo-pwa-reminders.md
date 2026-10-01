@@ -83,4 +83,5 @@ Verificación en la PC: `npm run lint && npm run design:check && npm run typeche
 - [ ] D4. Documentación y verificación final
   - Acceptance: `docs/deployment.md` (secretos, SQL de Vault, cómo ver el historial del cron), `HANDOFF`, `RECAP`, backlog (PWA y recordatorios hechos), `CHANGELOG`; spec implementada.
   - Verify: owner carga `service_role`, secreto y Vault → CI verde → merge → deploy → recordatorio real recibido una sola vez en el iPhone.
+  - Estado (2026-10-01): configuración hecha y verificada (cron → `200` con contadores). Falta la prueba del owner en el iPhone: instalar, nombre, activar + prueba, recordatorio real, modo avión.
   - Files: docs

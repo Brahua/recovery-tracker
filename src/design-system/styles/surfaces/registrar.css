@@ -15,7 +15,7 @@
     180deg,
     var(--rr-surface) 0%,
     var(--rr-surface) 78%,
-    rgba(20, 17, 14, 0) 100%
+    rgb(var(--rr-surface-rgb) / 0) 100%
   );
 }
 
@@ -65,7 +65,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px;
-  border: 1px solid rgba(244, 239, 231, 0.09);
+  border: 1px solid rgb(var(--rr-ink-rgb) / 0.09);
   border-radius: 14px;
   background: var(--rr-wash-soft);
   padding: 4px;
@@ -82,7 +82,7 @@
 }
 
 .rr-mode-switch a.is-active {
-  background: rgba(244, 239, 231, 0.14);
+  background: rgb(var(--rr-ink-rgb) / 0.14);
   color: var(--rr-ink);
 }
 
@@ -122,11 +122,11 @@
 
 .rr-session-error {
   margin: 4px 20px 0;
-  border: 1px solid rgba(201, 85, 46, 0.4);
+  border: 1px solid rgb(var(--rr-pain-rgb) / 0.4);
   border-radius: 14px;
-  background: rgba(201, 85, 46, 0.12);
+  background: rgb(var(--rr-pain-rgb) / 0.12);
   padding: 12px 14px;
-  color: #e5a087;
+  color: var(--rr-pain-soft);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -167,7 +167,7 @@
   width: 20px;
   height: 20px;
   place-items: center;
-  border: 1.5px solid rgba(244, 239, 231, 0.25);
+  border: 1.5px solid rgb(var(--rr-ink-rgb) / 0.25);
   border-radius: 50%;
   color: var(--rr-surface);
   font-size: 11px;
@@ -188,7 +188,7 @@
   justify-content: space-between;
   margin-top: 13px;
   border-radius: 12px;
-  background: rgba(20, 17, 14, 0.42);
+  background: rgb(var(--rr-surface-rgb) / 0.42);
   padding-inline: 13px;
   color: var(--rr-ink);
   font-size: 13px;
@@ -215,7 +215,7 @@
   min-width: 0;
   border: 1px solid var(--rr-border-strong);
   border-radius: 13px;
-  background: rgba(20, 17, 14, 0.5);
+  background: rgb(var(--rr-surface-rgb) / 0.5);
   color: var(--rr-ink);
   font: inherit;
   outline: none;
@@ -340,8 +340,8 @@
     90deg,
     var(--rr-accent) 0%,
     var(--rr-accent-light) var(--rr-range-progress),
-    rgba(244, 239, 231, 0.1) var(--rr-range-progress),
-    rgba(201, 85, 46, 0.28) 100%
+    rgb(var(--rr-ink-rgb) / 0.1) var(--rr-range-progress),
+    rgb(var(--rr-pain-rgb) / 0.28) 100%
   );
   content: "";
 }
@@ -405,7 +405,7 @@
 }
 
 .rr-pain-row.is-unset .rr-pain-control::before {
-  background: linear-gradient(90deg, rgba(244, 239, 231, 0.1), rgba(201, 85, 46, 0.28));
+  background: linear-gradient(90deg, rgb(var(--rr-ink-rgb) / 0.1), rgb(var(--rr-pain-rgb) / 0.28));
 }
 
 .rr-pain-row.is-unset output {

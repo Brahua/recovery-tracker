@@ -116,7 +116,7 @@
   z-index: 2;
   border: 1px solid var(--rr-border-strong);
   border-radius: var(--rr-radius-button);
-  background: rgba(20, 17, 14, 0.94);
+  background: rgb(var(--rr-surface-rgb) / 0.94);
   padding: 8px;
   backdrop-filter: blur(12px);
 }

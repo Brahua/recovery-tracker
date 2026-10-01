@@ -42,8 +42,8 @@
 }
 
 .rr-exercise-isometric:has(input:checked) {
-  border-color: rgba(126, 144, 186, 0.45);
-  background: rgba(126, 144, 186, 0.1);
+  border-color: rgb(var(--rr-night-rgb) / 0.45);
+  background: rgb(var(--rr-night-rgb) / 0.1);
 }
 
 .rr-exercise-isometric:has(input:focus-visible) {

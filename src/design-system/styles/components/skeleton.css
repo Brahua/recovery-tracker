@@ -12,7 +12,7 @@
   background: linear-gradient(
     100deg,
     var(--rr-wash-soft) 30%,
-    rgba(244, 239, 231, 0.11) 50%,
+    rgb(var(--rr-ink-rgb) / 0.11) 50%,
     var(--rr-wash-soft) 70%
   );
   background-size: 200% 100%;

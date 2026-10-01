@@ -35,7 +35,7 @@
 .rr-insights-header p {
   overflow: hidden;
   margin-top: 2px;
-  color: rgba(232, 226, 214, 0.6);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.6);
   font-size: 12.5px;
   font-weight: 600;
   text-overflow: ellipsis;
@@ -49,7 +49,7 @@
   place-items: center;
   border: 1px solid var(--rr-border-hero);
   border-radius: 11px;
-  background: rgba(244, 239, 231, 0.05);
+  background: rgb(var(--rr-ink-rgb) / 0.05);
   color: var(--rr-ink-secondary);
   font-size: 25px;
   line-height: 1;
@@ -57,13 +57,13 @@
 }
 
 .rr-insights-back:hover {
-  background: rgba(244, 239, 231, 0.09);
-  color: #fff;
+  background: rgb(var(--rr-ink-rgb) / 0.09);
+  color: var(--rr-white);
 }
 
 .rr-insights-range {
   display: flex;
-  border: 1px solid rgba(244, 239, 231, 0.09);
+  border: 1px solid rgb(var(--rr-ink-rgb) / 0.09);
   border-radius: 11px;
   background: var(--rr-wash-soft);
   padding: 3px;
@@ -75,13 +75,13 @@
   place-items: center;
   border-radius: 8px;
   padding-inline: 11px;
-  color: rgba(232, 226, 214, 0.55);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.55);
   font-size: 12px;
   font-weight: 650;
 }
 
 .rr-insights-range a.is-active {
-  background: rgba(244, 239, 231, 0.14);
+  background: rgb(var(--rr-ink-rgb) / 0.14);
   color: var(--rr-ink);
 }
 
@@ -92,9 +92,9 @@
 }
 
 .rr-insights-summary {
-  border: 1px solid rgba(46, 125, 91, 0.3);
+  border: 1px solid rgb(var(--rr-accent-rgb) / 0.3);
   border-radius: var(--rr-radius-card);
-  background: linear-gradient(150deg, rgba(46, 125, 91, 0.16), rgba(46, 125, 91, 0.04));
+  background: linear-gradient(150deg, rgb(var(--rr-accent-rgb) / 0.16), rgb(var(--rr-accent-rgb) / 0.04));
   padding: 17px 18px;
   animation: rr-rise 400ms ease both;
 }
@@ -115,7 +115,7 @@
 .rr-insights-summary > strong {
   display: block;
   margin-top: 7px;
-  color: rgba(232, 226, 214, 0.78);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.78);
   font-size: 14.5px;
   font-weight: 500;
   line-height: 1.55;
@@ -136,7 +136,7 @@
 }
 
 .rr-insight-card h2 {
-  color: rgba(232, 226, 214, 0.58);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.58);
 }
 
 .rr-insights-grid > :nth-child(1),
@@ -163,16 +163,16 @@
 
 .rr-pain-metric > span {
   border-radius: var(--rr-radius-pill);
-  background: rgba(46, 125, 91, 0.16);
+  background: rgb(var(--rr-accent-rgb) / 0.16);
   padding: 3px 9px;
-  color: #69ad8b;
+  color: var(--rr-accent-text);
   font-size: 12px;
   font-weight: 700;
 }
 
 .rr-pain-metric > span.is-rising {
-  background: rgba(201, 85, 46, 0.15);
-  color: #dd805e;
+  background: rgb(var(--rr-pain-rgb) / 0.15);
+  color: var(--rr-pain-rising);
 }
 
 .rr-pain-chart {
@@ -204,7 +204,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: 5px;
-  color: rgba(232, 226, 214, 0.58);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.58);
   font-size: 10.5px;
   font-weight: 600;
 }
@@ -233,7 +233,7 @@
   max-height: 76px;
   align-self: end;
   border-radius: 7px 7px 3px 3px;
-  background: rgba(46, 125, 91, 0.28);
+  background: rgb(var(--rr-accent-rgb) / 0.28);
   transition: height 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -242,7 +242,7 @@
 }
 
 .rr-load-bars small {
-  color: rgba(232, 226, 214, 0.6);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.6);
   font-size: 10px;
   font-weight: 600;
   text-align: center;
@@ -250,7 +250,7 @@
 
 .rr-insights-caption {
   margin-top: 12px;
-  color: rgba(232, 226, 214, 0.62);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.62);
   font-size: 11.5px;
   line-height: 1.45;
 }
@@ -270,12 +270,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  color: rgba(232, 226, 214, 0.65);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.65);
   font-size: 10.5px;
 }
 
 .rr-rebound-bars > div > p strong {
-  color: rgba(232, 226, 214, 0.72);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.72);
   font-family: var(--font-archivo), sans-serif;
   font-size: 12px;
   font-weight: 800;
@@ -302,11 +302,11 @@
 }
 
 .rr-rebound-bars i.is-mild {
-  background: rgba(46, 125, 91, 0.45);
+  background: rgb(var(--rr-accent-rgb) / 0.45);
 }
 
 .rr-rebound-bars i.is-strong {
-  background: rgba(201, 85, 46, 0.75);
+  background: rgb(var(--rr-pain-rgb) / 0.75);
 }
 
 .rr-insights-grid > :nth-child(4) {
@@ -319,7 +319,7 @@
   right: 18px;
   display: flex;
   gap: 10px;
-  color: rgba(232, 226, 214, 0.55);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.55);
   font-size: 11px;
   font-weight: 600;
 }
@@ -355,7 +355,7 @@
 
 .rr-exercise-frequency > div > span {
   overflow: hidden;
-  color: rgba(232, 226, 214, 0.7);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.7);
   font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -373,7 +373,7 @@
 }
 
 .rr-exercise-frequency b {
-  background: rgba(46, 125, 91, 0.35);
+  background: rgb(var(--rr-accent-rgb) / 0.35);
 }
 
 .rr-exercise-frequency b.is-leading {
@@ -381,7 +381,7 @@
 }
 
 .rr-exercise-frequency strong {
-  color: rgba(232, 226, 214, 0.65);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.65);
   font-family: var(--font-archivo), sans-serif;
   font-size: 12px;
   font-weight: 800;
@@ -393,7 +393,7 @@
   min-height: 84px;
   place-items: center;
   margin-top: 14px;
-  border: 1px dashed rgba(244, 239, 231, 0.12);
+  border: 1px dashed rgb(var(--rr-ink-rgb) / 0.12);
   border-radius: 14px;
   color: var(--rr-text-muted);
   font-size: 12px;

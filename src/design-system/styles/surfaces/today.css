@@ -33,7 +33,7 @@
   width: 38px;
   height: 38px;
   place-items: center;
-  border: 1px solid rgba(244, 239, 231, 0.12);
+  border: 1px solid rgb(var(--rr-ink-rgb) / 0.12);
   border-radius: 50%;
   background: var(--rr-wash);
   color: var(--rr-ink);
@@ -60,7 +60,7 @@
   display: grid;
   justify-items: center;
   gap: 6px;
-  color: rgba(232, 226, 214, 0.45);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.45);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.05em;
@@ -79,7 +79,7 @@
   place-items: center;
   border: 1px solid var(--rr-border);
   border-radius: 12px;
-  background: rgba(244, 239, 231, 0.04);
+  background: rgb(var(--rr-ink-rgb) / 0.04);
   color: var(--rr-text-faint);
   font-family: var(--font-archivo), sans-serif;
   font-size: 13px;
@@ -87,14 +87,14 @@
 }
 
 .rr-week-mark.is-complete {
-  border-color: rgba(46, 125, 91, 0.35);
+  border-color: rgb(var(--rr-accent-rgb) / 0.35);
   background: var(--rr-accent-tint);
   color: var(--rr-accent-light);
 }
 
 .rr-week-mark.is-today {
   border: 2px solid var(--rr-accent);
-  box-shadow: 0 8px 18px -6px rgba(46, 125, 91, 0.5);
+  box-shadow: 0 8px 18px -6px rgb(var(--rr-accent-rgb) / 0.5);
 }
 
 .rr-week-mark.is-today.is-complete {
@@ -153,7 +153,7 @@
 .rr-hero-heading > div > span {
   display: block;
   margin-top: 5px;
-  color: rgba(232, 226, 214, 0.6);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.6);
   font-size: 13px;
   line-height: 1.4;
 }
@@ -171,7 +171,7 @@
 }
 
 .rr-progress-ring circle:first-child {
-  stroke: rgba(244, 239, 231, 0.11);
+  stroke: rgb(var(--rr-ink-rgb) / 0.11);
 }
 
 .rr-progress-ring-value {
@@ -196,7 +196,7 @@
 }
 
 .rr-progress-ring small {
-  color: rgba(232, 226, 214, 0.5);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.5);
   font-size: 13px;
   font-weight: 700;
 }
@@ -224,7 +224,7 @@
   gap: 12px;
   border: 1px solid var(--rr-border-soft);
   border-radius: 15px;
-  background: rgba(20, 17, 14, 0.5);
+  background: rgb(var(--rr-surface-rgb) / 0.5);
   padding: 12px 14px;
 }
 
@@ -245,7 +245,7 @@
 }
 
 .rr-ritual-list article.is-pending .rr-ritual-dot {
-  border-color: rgba(244, 239, 231, 0.3);
+  border-color: rgb(var(--rr-ink-rgb) / 0.3);
   border-style: dashed;
 }
 
@@ -260,12 +260,12 @@
 }
 
 .rr-ritual-list article.is-complete > div strong {
-  color: rgba(232, 226, 214, 0.6);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.6);
 }
 
 .rr-ritual-list article > div small {
   margin-top: 2px;
-  color: rgba(232, 226, 214, 0.5);
+  color: rgb(var(--rr-ink-secondary-rgb) / 0.5);
   font-size: 11.5px;
 }
 
@@ -316,7 +316,7 @@
   height: 30px;
   place-items: center;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgb(var(--rr-white-rgb) / 0.18);
   font-size: 15px;
 }
 
@@ -331,7 +331,7 @@
 .rr-recent-card {
   border: 1px solid var(--rr-border);
   border-radius: 17px;
-  background: rgba(244, 239, 231, 0.04);
+  background: rgb(var(--rr-ink-rgb) / 0.04);
   padding: 15px 17px;
 }
 
@@ -355,7 +355,7 @@
   margin-top: 11px;
   overflow: hidden;
   border-radius: var(--rr-radius-pill);
-  background: rgba(244, 239, 231, 0.09);
+  background: rgb(var(--rr-ink-rgb) / 0.09);
 }
 
 .rr-milestone-card > span i {
@@ -414,7 +414,7 @@
   gap: 13px;
   border: 1px solid var(--rr-border);
   border-radius: 16px;
-  background: rgba(244, 239, 231, 0.03);
+  background: rgb(var(--rr-ink-rgb) / 0.03);
   padding: 13px 15px;
   transition: background-color 150ms ease;
 }

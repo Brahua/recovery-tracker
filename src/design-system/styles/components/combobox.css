@@ -23,7 +23,7 @@
   overflow-y: auto;
   border: 1px solid var(--rr-border-hero);
   border-radius: var(--rr-radius-control);
-  background: #1b1713;
+  background: var(--rr-popover-bg);
   padding: 4px;
   box-shadow: var(--rr-shadow-paper);
   list-style: none;

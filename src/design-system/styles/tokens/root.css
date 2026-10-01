@@ -1,0 +1,91 @@
+/* Design tokens (custom properties). Phase 2 splits them by kind. */
+
+:root {
+  /* Recovery Ritual design system: Claude Design is the visual source of truth. */
+  --rr-bg: #0e0c0a;
+  --rr-bg-night: #131217;
+  --rr-surface: #14110e;
+  --rr-ink: #f4efe7;
+  --rr-ink-secondary: #e8e2d6;
+  --rr-paper-ink: #1c1915;
+  --rr-accent: #2e7d5b;
+  --rr-accent-light: rgb(88, 152, 122);
+  /* Accent text on --rr-accent-tint backgrounds; --rr-accent-light falls below 4.5:1 there. */
+  --rr-accent-on-tint: #6aa98a;
+  --rr-pain: #c9552e;
+  --rr-amber: #b08a2e;
+  --rr-night: #7e90ba;
+  --rr-text-body: rgba(232, 226, 214, 0.65);
+  --rr-text-muted: rgba(232, 226, 214, 0.55);
+  --rr-text-dim: rgba(232, 226, 214, 0.45);
+  --rr-text-faint: rgba(232, 226, 214, 0.35);
+  --rr-card-bg: rgba(244, 239, 231, 0.045);
+  --rr-wash-soft: rgba(244, 239, 231, 0.06);
+  --rr-wash: rgba(244, 239, 231, 0.08);
+  --rr-border-soft: rgba(244, 239, 231, 0.07);
+  --rr-border: rgba(244, 239, 231, 0.08);
+  --rr-border-strong: rgba(244, 239, 231, 0.1);
+  --rr-border-hero: rgba(244, 239, 231, 0.13);
+  --rr-border-control: rgba(244, 239, 231, 0.14);
+  --rr-input-bg: rgba(20, 17, 14, 0.4);
+  --rr-accent-tint: rgba(46, 125, 91, 0.22);
+  --rr-accent-border: rgba(46, 125, 91, 0.6);
+  --rr-accent-gradient: linear-gradient(
+    180deg,
+    var(--rr-accent-light),
+    var(--rr-accent)
+  );
+  --rr-accent-card: linear-gradient(
+    150deg,
+    rgba(46, 125, 91, 0.14),
+    rgba(46, 125, 91, 0.04)
+  );
+  --rr-hero-card: linear-gradient(
+    165deg,
+    rgba(244, 239, 231, 0.11),
+    rgba(244, 239, 231, 0.04)
+  );
+  --rr-radius-control: 13px;
+  --rr-radius-button: 16px;
+  --rr-radius-card: 20px;
+  --rr-radius-hero: 22px;
+  --rr-radius-pill: 99px;
+  --rr-shadow-cta:
+    0 18px 36px -12px rgba(46, 125, 91, 0.5),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.22);
+  --rr-shadow-hero: 0 28px 56px -22px rgba(0, 0, 0, 0.55);
+  --rr-shadow-paper: 0 20px 40px -16px rgba(0, 0, 0, 0.6);
+  --rr-shadow-thumb:
+    0 4px 14px rgba(0, 0, 0, 0.45),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+  --rr-glow-night: 0 0 14px rgba(126, 144, 186, 0.25);
+  --rr-content-max: 1040px;
+  --rr-sidebar-width: 248px;
+  --rr-page-padding: 40px;
+  --rr-page-padding-mobile: 24px;
+  --rr-card-padding: 24px;
+  --rr-hit-target: 44px;
+  /* Space taken by the fixed mobile tab bar (7px + 50px + 7px + 1px border). */
+  --rr-bottom-nav-offset: calc(65px + env(safe-area-inset-bottom, 0px));
+
+  /* Legacy light-screen aliases stay in place until each screen is migrated. */
+  --background: #f5f3ea;
+  --background-strong: #fbfaf4;
+  --surface: rgba(255, 252, 245, 0.84);
+  --surface-strong: #fffdf8;
+  --surface-muted: #f2f4ec;
+  --border: rgba(88, 102, 76, 0.14);
+  --border-strong: rgba(64, 81, 54, 0.2);
+  --foreground: #18201a;
+  --muted: #5a6858;
+  --accent: #254131;
+  --accent-soft: #8cb46c;
+  --accent-warm: #caa46a;
+  --success-bg: #edf6e8;
+  --success-border: #c8ddbc;
+  --error-bg: #fff1ec;
+  --error-border: #e4c1b6;
+  --shadow-soft: 0 22px 60px rgba(43, 58, 34, 0.08);
+  --shadow-card: 0 18px 40px rgba(42, 57, 34, 0.06);
+}

@@ -1,0 +1,35 @@
+/* Base element styles: html, body, headings, display and kicker text. */
+
+html {
+  background: var(--rr-bg);
+}
+
+body {
+  font-family: var(--font-instrument-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-archivo), sans-serif;
+}
+
+.rr-theme {
+  background: var(--rr-bg);
+  color: var(--rr-ink);
+}
+
+.rr-display {
+  font-family: var(--font-archivo), sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.rr-kicker {
+  color: var(--rr-text-muted);
+  font-size: 0.71875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}

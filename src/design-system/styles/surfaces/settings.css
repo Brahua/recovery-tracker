@@ -351,6 +351,11 @@
   background: var(--rr-swatch-amber);
 }
 
+.rr-settings-signout {
+  padding: 0 18px;
+  font-size: 14px;
+}
+
 .rr-access {
   display: grid;
   gap: 16px;

@@ -34,6 +34,15 @@ test.describe("settings", () => {
     await expect(page.getByRole("heading", { name: `Hola, ${name}` })).toHaveCount(0);
   });
 
+  // On mobile the sidebar (with "Salir") is hidden, so Ajustes carries the sign-out. Not clicked:
+  // the E2E user's session is shared by every spec.
+  test("offers sign-out on mobile, in Ajustes → Cuenta", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/ajustes");
+    const account = page.getByRole("region", { name: "Cuenta" });
+    await expect(account.getByRole("button", { name: "Cerrar sesión" })).toBeVisible();
+  });
+
   test("is reachable from the profile area", async ({ page }) => {
     await page.goto("/");
     await page.getByRole("link", { name: "Ajustes" }).first().click();

@@ -1,0 +1,221 @@
+/* Bienvenida: first-run tour (swipeable cards) and quick setup (name, theme, accent, notice). */
+
+.rr-onboarding {
+  display: grid;
+  min-height: 100dvh;
+  align-content: start;
+  gap: 20px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 560px;
+  padding: calc(20px + env(safe-area-inset-top, 0px)) 24px
+    calc(28px + env(safe-area-inset-bottom, 0px));
+  background: var(--rr-bg);
+  color: var(--rr-ink-secondary);
+}
+
+.rr-onboarding-header {
+  display: flex;
+  min-height: var(--rr-hit-target);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.rr-onboarding-brand {
+  color: var(--rr-ink);
+  font-family: var(--rr-font-display);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.rr-onboarding-skip {
+  min-height: var(--rr-hit-target);
+  border-radius: var(--rr-radius-button);
+  padding: 0 14px;
+  color: var(--rr-text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rr-onboarding-skip:hover {
+  background: var(--rr-wash-soft);
+  color: var(--rr-ink);
+}
+
+.rr-onboarding-title {
+  color: var(--rr-ink);
+  font-family: var(--rr-font-display);
+  font-size: 30px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+.rr-onboarding-title:focus {
+  outline: none;
+}
+
+.rr-onboarding-tour {
+  display: grid;
+  gap: 18px;
+}
+
+.rr-onboarding-track {
+  display: grid;
+  grid-auto-columns: 100%;
+  grid-auto-flow: column;
+  gap: 16px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.rr-onboarding-track::-webkit-scrollbar {
+  display: none;
+}
+
+.rr-onboarding-card {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-height: 320px;
+  border: 1px solid var(--rr-border-hero);
+  border-radius: var(--rr-radius-hero);
+  background: var(--rr-hero-card);
+  box-shadow: var(--rr-shadow-hero);
+  padding: 26px 22px;
+  scroll-snap-align: start;
+}
+
+.rr-onboarding-card h2 {
+  color: var(--rr-ink);
+  font-size: 24px;
+  font-weight: 850;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.rr-onboarding-card > p:last-child {
+  color: var(--rr-text-body);
+  font-size: 15px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+.rr-onboarding-card .rr-kicker {
+  color: var(--rr-accent-text);
+}
+
+.rr-onboarding-glyph {
+  display: grid;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 10px;
+  place-items: center;
+  border: 1px solid var(--rr-accent-border);
+  border-radius: var(--rr-radius-card);
+  background: var(--rr-accent-tint);
+  color: var(--rr-accent-on-tint);
+}
+
+.rr-onboarding-glyph svg {
+  width: 28px;
+  height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.rr-onboarding-controls {
+  display: grid;
+  gap: 16px;
+}
+
+.rr-onboarding-dots {
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+}
+
+.rr-onboarding-dots i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgb(var(--rr-ink-rgb) / 0.2);
+  transition:
+    width 240ms var(--rr-ease-out),
+    background-color 240ms var(--rr-ease-out);
+}
+
+.rr-onboarding-dots i.is-current {
+  width: 22px;
+  border-radius: var(--rr-radius-pill);
+  background: var(--rr-accent);
+}
+
+.rr-onboarding-buttons {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: 10px;
+}
+
+.rr-onboarding-back:disabled {
+  opacity: 0.45;
+}
+
+.rr-onboarding-next,
+.rr-onboarding-start {
+  min-height: 54px;
+  font-size: 16px;
+}
+
+.rr-onboarding-setup {
+  display: grid;
+  gap: 18px;
+}
+
+.rr-onboarding-notice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  border: 1px solid var(--rr-border);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-card-bg);
+  padding: 14px;
+  color: var(--rr-text-body);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.rr-onboarding-notice input {
+  width: 22px;
+  height: 22px;
+  margin-top: 1px;
+  accent-color: var(--rr-accent);
+}
+
+.rr-onboarding-notice strong {
+  color: var(--rr-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rr-onboarding-dots i {
+    transition: none;
+  }
+}
+
+@media (min-width: 64rem) {
+  .rr-onboarding {
+    padding-top: 56px;
+  }
+
+  .rr-onboarding-title {
+    font-size: 36px;
+  }
+}

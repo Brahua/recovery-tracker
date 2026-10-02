@@ -66,6 +66,7 @@ export function buildSessionSuccessState(
 export function buildCloseoutSuccessState(
   hasSessionToday: boolean,
   summary?: string,
+  areaPhrase?: string,
 ): RitualSuccessConfig {
   return {
     eyebrow: "Cierre guardado",
@@ -73,7 +74,7 @@ export function buildCloseoutSuccessState(
     body:
       summary ??
       (hasSessionToday
-        ? "No queda nada pendiente. Hoy también cuidaste tu recuperación."
+        ? `No queda nada pendiente. Hoy también cuidaste ${areaPhrase ?? "tu recuperación"}.`
         : "El cierre nocturno quedo registrado. Falta la sesion para completar el dia."),
     primaryHref: hasSessionToday ? "/" : "/registrar?mode=session",
     primaryLabel: hasSessionToday ? "Hasta manana" : "Registrar sesion",

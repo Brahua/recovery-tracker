@@ -9,6 +9,8 @@ import {
 import type { LatestTherapistNotes, NightlyCloseout, RehabSession } from "@/types/recovery";
 import { getRecoveryDateKey, recoveryTimeZone } from "@/lib/recovery-date";
 import { formatTreatmentCount } from "@/lib/treatments";
+import { conditionAreaPhrase, conditionSummary } from "@/lib/condition";
+import { parseCondition } from "@/lib/validation/condition";
 import { getUserDisplayName, type DisplayNameUser } from "@/lib/user-display-name";
 
 const dateFormatter = new Intl.DateTimeFormat("es-PE", {
@@ -138,7 +140,13 @@ export function TodayOverview({
   const todayKey = getRecoveryDateKey(now);
   const hasSessionToday = recentSessions.some((session) => sessionDateKey(session) === todayKey);
   const hasCloseoutToday = recentCloseouts.some((closeout) => closeout.date === todayKey);
-  const state = getTodayRitualState(hasSessionToday, hasCloseoutToday);
+  const condition = parseCondition(user.user_metadata?.condition);
+  const state = getTodayRitualState(
+    hasSessionToday,
+    hasCloseoutToday,
+    conditionAreaPhrase(condition),
+  );
+  const conditionLine = conditionSummary(condition, todayKey);
   const week = buildRecentWeek(recentSessions, recentCloseouts, now);
   const streak = calculateLoggingStreak(recentSessions, recentCloseouts, now);
   const loggedDays = week.filter((day) => day.completed).length;
@@ -153,6 +161,7 @@ export function TodayOverview({
         <div>
           <p className="rr-kicker">{capitalize(dateFormatter.format(now))}</p>
           <h1 className="rr-page-title">Hola, {firstName}</h1>
+          {conditionLine ? <p className="rr-today-condition">{conditionLine}</p> : null}
         </div>
         <Link aria-label="Ajustes" className="rr-mobile-avatar" href="/ajustes">
           <span aria-hidden="true">{firstName.charAt(0)}</span>

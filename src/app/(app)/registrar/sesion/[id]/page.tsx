@@ -5,6 +5,7 @@ import { PostTherapyForm } from "@/features/check-in/post-therapy/form";
 import { loadExerciseLibrary } from "@/lib/exercise-library";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { parseCondition } from "@/lib/validation/condition";
 import { recordIdSchema } from "@/lib/validation/recovery";
 
 export default async function EditSessionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -41,6 +42,7 @@ export default async function EditSessionPage({ params }: { params: Promise<{ id
   return (
     <PostTherapyForm
       catalog={catalog}
+      condition={parseCondition(user.user_metadata?.condition)}
       defaultOccurredAt={new Date().toISOString()}
       editingSession={session}
       recentSessions={[]}

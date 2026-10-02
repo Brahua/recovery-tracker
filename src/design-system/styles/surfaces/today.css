@@ -617,3 +617,10 @@
     color: var(--rr-text-muted);
   }
 }
+
+.rr-today-condition {
+  margin-top: 4px;
+  color: var(--rr-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+}

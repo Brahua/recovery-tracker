@@ -18,6 +18,7 @@ import {
   CloseoutDateContext,
   formatCloseoutDateLabel,
 } from "@/features/check-in/nightly-closeout/date-context";
+import { conditionAreaPhrase, type Condition } from "@/lib/condition";
 import { getCloseoutFormProgress } from "@/lib/closeout-form-state";
 import { getHistoryHrefForDate } from "@/lib/history-view-model";
 import { getRecoveryDateKey, toRecoveryDateTimeLocal } from "@/lib/recovery-date";
@@ -134,6 +135,8 @@ interface NightlyCloseoutFormProps {
   selectedCloseout?: NightlyCloseout;
   selectedDate: string;
   selectedSession?: RehabSession;
+  /** The injury of the account, to word the questions. */
+  condition?: Condition | null;
 }
 
 export function NightlyCloseoutForm({
@@ -144,7 +147,9 @@ export function NightlyCloseoutForm({
   selectedCloseout,
   selectedDate,
   selectedSession,
+  condition,
 }: NightlyCloseoutFormProps) {
+  const areaPhrase = conditionAreaPhrase(condition);
   const router = useAppRouter();
   const [actionState, formAction] = useActionState(
     editingCloseout ? updateNightlyCloseoutAction : createNightlyCloseoutAction,
@@ -282,7 +287,8 @@ export function NightlyCloseoutForm({
         />
 
         <p className="rr-closeout-intro">
-          Un minuto para registrar cómo te fue {selectedDate === today ? "hoy" : "ese día"}.
+          Un minuto para registrar cómo {areaPhrase ? `quedó ${areaPhrase}` : "te fue"}{" "}
+          {selectedDate === today ? "hoy" : "ese día"}.
         </p>
 
         <section className="rr-closeout-recap">
@@ -349,7 +355,7 @@ export function NightlyCloseoutForm({
                 </div>
               </div>
               <div className="rr-closeout-field-group rr-rebound-field">
-                <h3>¿Se resintió la zona tratada después de la sesión?</h3>
+                <h3>¿Se resintió {areaPhrase ?? "la zona tratada"} después de la sesión?</h3>
                 <div
                   className="rr-closeout-choice-row rr-rebound-choice-row"
                   role="group"

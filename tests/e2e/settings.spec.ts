@@ -34,6 +34,38 @@ test.describe("settings", () => {
     await expect(page.getByRole("heading", { name: `Hola, ${name}` })).toHaveCount(0);
   });
 
+  // Ajustes → Mi recuperación: the injury words Hoy and the Reporte; removing it goes back to the
+  // neutral text. The E2E user is shared by every spec, so the test leaves no condition behind.
+  test("saves the injury, shows it in Hoy and Reporte, and removes it", async ({ page }) => {
+    await page.goto("/ajustes");
+    const card = page.getByRole("region", { name: "Mi recuperación" });
+    await card.getByLabel("¿Qué zona del cuerpo estás recuperando?").selectOption("SHOULDER");
+    await card.getByRole("radio", { name: "Izquierdo" }).check();
+    await card.getByRole("radio", { name: "Operación" }).check();
+    await card.getByRole("button", { name: "Guardar" }).click();
+    await expect(toast(page, "Recuperación guardada")).toBeVisible();
+
+    await page.goto("/");
+    await expect(page.getByText("Hombro izquierdo · operación")).toBeVisible();
+
+    await page.goto("/reporte");
+    await expect(page.getByText("Hombro izquierdo · operación")).toBeVisible();
+
+    await page.goto("/ajustes");
+    await card.getByRole("button", { name: "Quitar" }).click();
+    await expect(toast(page, "Quitamos tu lesión")).toBeVisible();
+    await page.goto("/");
+    await expect(page.getByText("Hombro izquierdo · operación")).toHaveCount(0);
+  });
+
+  test("asks for the zone before saving the injury", async ({ page }) => {
+    await page.goto("/ajustes");
+    const card = page.getByRole("region", { name: "Mi recuperación" });
+    await card.getByRole("radio", { name: "Lesión o golpe" }).check();
+    await card.getByRole("button", { name: "Guardar" }).click();
+    await expect(card.getByRole("alert")).toHaveText("Elige la zona del cuerpo.");
+  });
+
   // On mobile the sidebar (with "Salir") is hidden, so Ajustes carries the sign-out. Not clicked:
   // the E2E user's session is shared by every spec.
   test("offers sign-out on mobile, in Ajustes → Cuenta", async ({ page }) => {

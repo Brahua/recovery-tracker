@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-01 (PR 4 de 5: tema claro). Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
+> Última actualización: 2026-10-01 (acceso por invitación, apariencia y onboarding terminados).
 
 ## Cómo retomar
 
@@ -30,21 +30,19 @@
 - Token viejo de Supabase revocado; `SUPABASE_ACCESS_TOKEN` nuevo (token de proyecto, vence en ~1 año: renovarlo antes y actualizar el secret). Probado con un workflow temporal: API 200 y `link` + `db push --dry-run` OK.
 - PR #9 integrado y desplegado: cabeceras de seguridad (comprobadas en el dominio), guardia de la base de producción, axe en E2E y acciones de GitHub en `@v7`.
 
-### En curso: acceso por invitación, onboarding y apariencia
+### Acceso por invitación, apariencia y onboarding ✅ (2026-10-01)
 
-Spec aprobada: `docs/specs/access-onboarding-personalization-spec.md` · Plan: `tasks/plan-access-onboarding.md` · Tareas: `tasks/todo-access-onboarding.md`. Cinco PRs en orden: (1) acceso por invitación en la base, (2) sección "Acceso" en Ajustes para el admin, (3) color principal, (4) tema claro, (5) onboarding.
+Spec: `docs/specs/access-onboarding-personalization-spec.md` · Plan: `tasks/plan-access-onboarding.md` · Tareas: `tasks/todo-access-onboarding.md`.
 
-- **PR 1 en producción (#34, 2026-10-01):** migración `20261004000000_access_control.sql`, hook `before_user_created` **activo** en producción (Management API), modo `invite_only`, lista vacía, owner con `app_metadata.role = "admin"`. Probado por el owner: su cuenta entra; otra cuenta de Google ve "acceso por invitación" y no se crea. Para invitar a alguien antes del PR 2: SQL en `docs/deployment.md` → "Acceso por invitación".
-- **PR 2 en producción (#36):** Ajustes → Acceso (invitar, compartir, quitar, modo), migración `20261005000000_access_admin.sql`. El E2E promueve al usuario anónimo a admin con la `service_role` local (`tests/e2e/admin-helpers.ts`).
-- **PR 3 en producción (#37):** color principal en Ajustes → Apariencia (`src/lib/appearance.ts`, script inline en `src/app/layout.tsx`, `AppearanceSync`). Con terracota, el dolor pasa a frambuesa.
-- **PR 4, rama `feat/light-theme`:** tema claro y "Sistema" (bloques `[data-theme="light"]` y `prefers-color-scheme` en `tokens/colors.css`, idénticos por test). Texto translúcido con `--rr-text-alpha`.
-- **Colores:** Verde `#2E7D5B` (defecto), Terracota `#C9552E`, Ámbar `#B08A2E` (Claude Design, ajuste "Estilo" de Hoy). Ver spec → "Colores".
+- **Acceso (#34, #36):** hook `before_user_created` **activo** en producción, modo `invite_only`, el owner es admin (`app_metadata.role`). Ajustes → Acceso: invitar, compartir, quitar y abrir el acceso. Pasos y SQL en `docs/deployment.md` → "Acceso por invitación".
+- **Apariencia (#37, #39):** Ajustes → Apariencia con tema (Oscuro, Claro, Sistema) y color (Verde, Terracota, Ámbar, de Claude Design). Script inline en `src/app/layout.tsx` + cookie `rr-appearance` + `AppearanceSync`; la cuenta (`user_metadata.preferences`) manda. Tokens claros en `tokens/colors.css` (dos copias idénticas, verificadas por test); el texto translúcido usa `--rr-text-alpha`. La landing queda oscura (`.rr-theme-dark`).
+- **Onboarding (PR 5):** `/bienvenida` para cuentas nuevas (recorrido de 6 tarjetas + configuración rápida, o "Saltar"); se repite desde Ajustes → Cuenta. El owner lo verá una vez al entrar.
+- **Cerrar sesión en el celular (#38):** Ajustes → Cuenta.
+- MCP `claude_design` conectado en este equipo (configuración local); proyecto de diseño en `docs/design/claude-design-reference.md`.
 - En producción quedan 3 usuarios anónimos del 2026-09-16 sin datos (restos del staging); no se borran sin el OK del owner.
-- MCP `claude_design` conectado en este equipo (configuración local); el proyecto de diseño es el de `docs/design/claude-design-reference.md`.
+- **Falta que el owner lo pruebe en producción**, sobre todo el tema claro en el iPhone (la barra de estado de la app instalada sigue negra: iOS la fija al abrir).
 
-| Rama | Estado |
-|---|---|
-| `feat/light-theme` | PR 4 abierto, esperando CI |
+No hay ramas abiertas.
 
 ## ⏰ Vencimientos
 

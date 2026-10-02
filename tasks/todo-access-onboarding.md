@@ -90,13 +90,13 @@ Verificación en la PC: `npm run format && npm run lint && npm run design:check 
 
 ## PR 5: onboarding
 
-- [ ] E1. Decisión de redirigir a `/bienvenida` (función pura + layout)
+- [x] E1. Decisión de redirigir a `/bienvenida` (función pura + layout)
   - Files: `src/lib/onboarding.ts` (+ test), `src/app/(app)/layout.tsx`
-- [ ] E2. Recorrido (tarjetas con scroll-snap, Siguiente/Atrás/Saltar, accesible, reduce movimiento)
+- [x] E2. Recorrido (tarjetas con scroll-snap, Siguiente/Atrás/Saltar, accesible, reduce movimiento)
   - Files: `src/features/onboarding/tour.tsx`, `tour-steps.ts`, `src/design-system/styles/surfaces/onboarding.css`
-- [ ] E3. Configuración rápida + `completeOnboardingAction`
+- [x] E3. Configuración rápida + `completeOnboardingAction`
   - Files: `src/features/onboarding/setup-form.tsx`, `actions.ts`, ruta `/bienvenida`
-- [ ] E4. "Ver el recorrido otra vez" en Ajustes
+- [x] E4. "Ver el recorrido otra vez" en Ajustes
   - Files: `src/app/(app)/ajustes/page.tsx`
-- [ ] E5. E2E (completo, saltar, repetir; axe) y docs
+- [x] E5. E2E (completo, saltar, repetir; axe) y docs
   - Files: `tests/e2e/onboarding.spec.ts`, docs

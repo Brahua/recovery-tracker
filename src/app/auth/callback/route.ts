@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getProviderErrorReason } from "@/lib/auth-callback-error";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { getRequestOrigin } from "@/lib/supabase/urls";
 
@@ -44,6 +45,8 @@ export async function GET(request: Request) {
     );
   }
 
-  const reason = providerError ? "provider_rejected" : "missing_code";
+  const reason = providerError
+    ? getProviderErrorReason(providerError, searchParams.get("error_description"))
+    : "missing_code";
   return NextResponse.redirect(`${await getRequestOrigin()}/auth/auth-code-error?reason=${reason}`);
 }

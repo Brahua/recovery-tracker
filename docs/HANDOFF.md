@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-01 (edición de registros pasados). Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
+> Última actualización: 2026-10-01 (acceso por invitación, PR 1 de 5). Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
 
 ## Cómo retomar
 
@@ -30,7 +30,16 @@
 - Token viejo de Supabase revocado; `SUPABASE_ACCESS_TOKEN` nuevo (token de proyecto, vence en ~1 año: renovarlo antes y actualizar el secret). Probado con un workflow temporal: API 200 y `link` + `db push --dry-run` OK.
 - PR #9 integrado y desplegado: cabeceras de seguridad (comprobadas en el dominio), guardia de la base de producción, axe en E2E y acciones de GitHub en `@v7`.
 
-No hay ramas abiertas.
+### En curso: acceso por invitación, onboarding y apariencia
+
+Spec aprobada: `docs/specs/access-onboarding-personalization-spec.md` · Plan: `tasks/plan-access-onboarding.md` · Tareas: `tasks/todo-access-onboarding.md`. Cinco PRs en orden: (1) acceso por invitación en la base, (2) sección "Acceso" en Ajustes para el admin, (3) color principal, (4) tema claro, (5) onboarding.
+
+- **PR 1, rama `feat/invite-only-access`:** migración `20261004000000_access_control.sql` (hook `before_user_created`, lista y modo), pgTAP en CI, pantalla "no invitado", ADR-005. **Después del deploy:** activar el hook en producción por la Management API y marcar al owner como admin (`docs/deployment.md` → "Acceso por invitación"). No activarlo antes: sin la función, todo registro nuevo falla.
+- **PR 3 y 4 esperan los colores** del archivo `Recovery Tracker Design System.dc.html` de Claude Design. El owner va a conectar el MCP `claude_design` (`claude mcp add --transport http claude_design https://api.anthropic.com/v1/design/mcp`, reiniciar y `/design-login`).
+
+| Rama | Estado |
+|---|---|
+| `feat/invite-only-access` | PR 1 abierto, esperando CI |
 
 ## ⏰ Vencimientos
 

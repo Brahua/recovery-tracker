@@ -97,5 +97,14 @@ test.describe.serial("accessibility (axe)", () => {
       await expect(page.getByRole("heading", { name: "Vuelve mas fuerte." })).toBeVisible();
       await expectNoAxeViolations(page);
     });
+
+    test("invite-only rejection page has no WCAG A/AA violations", async ({ page }) => {
+      await page.goto("/auth/auth-code-error?reason=not_invited");
+      await expect(
+        page.getByRole("heading", { name: "Recovery Ritual está en acceso por invitación." }),
+      ).toBeVisible();
+      await expect(page.getByRole("button", { name: "Intentar con otra cuenta" })).toBeVisible();
+      await expectNoAxeViolations(page);
+    });
   });
 });

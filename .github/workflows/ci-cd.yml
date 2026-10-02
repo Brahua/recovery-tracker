@@ -59,6 +59,10 @@ jobs:
       - name: Start local Supabase (applies migrations + seed)
         run: npx supabase start
 
+      # pgTAP tests in supabase/tests/ (auth hook, privileges) against the same throwaway database.
+      - name: Database tests (pgTAP)
+        run: npx supabase test db
+
       - name: Point app env at local Supabase
         run: npm run supabase:env:local
 

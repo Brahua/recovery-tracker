@@ -54,7 +54,7 @@ test.describe.serial("edit past closeouts", () => {
     await expectNoAxeViolations(page);
 
     await page.getByRole("slider", { name: "Dolor" }).fill("6");
-    await page.getByRole("textbox", { name: "Fecha del cierre" }).fill(newDate);
+    await page.getByLabel("Fecha y hora del cierre").fill(`${newDate}T21:45`);
     await expect(page).toHaveURL(new RegExp(`date=${newDate}`));
     await page.getByRole("button", { name: "Guardar cambios" }).click();
 
@@ -62,6 +62,8 @@ test.describe.serial("edit past closeouts", () => {
     await expect(page).toHaveURL(new RegExp(`/historial\\?before=${newDate}`));
     const card = page.locator(`[data-closeout-id="${closeoutId}"]`);
     await expect(card.getByText("Dolor final 6/10")).toBeVisible();
+    // The hour chosen in the picker is the one Historial shows.
+    await expect(card.locator("time")).toHaveText(/9:45/);
   });
 
   test("does not move a closeout onto a day that already has one", async ({ page }) => {
@@ -71,7 +73,7 @@ test.describe.serial("edit past closeouts", () => {
     const closeoutId = await createCloseout(page, movingDate, "4");
 
     await openCloseoutEditor(page, movingDate, closeoutId);
-    await page.getByRole("textbox", { name: "Fecha del cierre" }).fill(takenDate);
+    await page.getByLabel("Fecha y hora del cierre").fill(`${takenDate}T22:00`);
 
     await expect(
       page.getByText("Ese día ya tiene un cierre registrado. Elige otra fecha."),

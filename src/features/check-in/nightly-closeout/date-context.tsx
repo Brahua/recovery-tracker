@@ -1,7 +1,7 @@
 "use client";
 
 import { DateField } from "@/components/date-field";
-import { duplicateCloseoutDateMessage } from "@/lib/closeout-date";
+import { duplicateCloseoutDateMessage, splitCloseoutDateTime } from "@/lib/closeout-date";
 import { addRecoveryDays, recoveryTimeZone } from "@/lib/recovery-date";
 
 export function formatCloseoutDateLabel(value: string, today: string) {
@@ -18,36 +18,45 @@ export function formatCloseoutDateLabel(value: string, today: string) {
 }
 
 interface CloseoutDateContextProps {
+  /** "HH:MM" in Lima time. */
+  closedTime: string;
   dateLabel: string;
   hasCloseout: boolean;
   isPending: boolean;
   onChange: (date: string) => void;
+  onTimeChange: (time: string) => void;
   selectedDate: string;
   today: string;
 }
 
+// One picker for the day being closed and the hour it was closed ("Hoy · 22:30"). The form posts
+// it as closedAt; the server splits it into date and closed_time.
 export function CloseoutDateContext({
+  closedTime,
   dateLabel,
   hasCloseout,
   isPending,
   onChange,
+  onTimeChange,
   selectedDate,
   today,
 }: CloseoutDateContextProps) {
   return (
     <section aria-label="Fecha del cierre" className="rr-closeout-date-context">
       <DateField
-        defaultValue={selectedDate}
-        display={dateLabel}
+        defaultValue={`${selectedDate}T${closedTime}`}
+        display={`${dateLabel} · ${closedTime}`}
         key={selectedDate}
-        label="Fecha del cierre"
-        max={today}
-        name="date"
+        label="Fecha y hora del cierre"
+        max={`${today}T23:59`}
+        name="closedAt"
         onChange={(event) => {
-          if (event.target.value) onChange(event.target.value);
+          const { date, closedTime: time } = splitCloseoutDateTime(event.target.value);
+          if (time) onTimeChange(time);
+          if (date && date !== selectedDate) onChange(date);
         }}
         required
-        type="date"
+        type="datetime-local"
       />
       {isPending ? <p role="status">Buscando registros de ese día…</p> : null}
       {hasCloseout ? (

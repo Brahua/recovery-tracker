@@ -206,6 +206,10 @@ export const createNightlyCloseoutInputSchema = z.object({
   sleepQuality: rating1To5Schema,
   reboundPainLevel: reboundLevelSchema,
   notes: optionalTextSchema,
+  closedTime: z
+    .string()
+    .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Elige una hora válida.")
+    .optional(),
 });
 
 // Ids of saved sessions and closeouts that arrive from the client.

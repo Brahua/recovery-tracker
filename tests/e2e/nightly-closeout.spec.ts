@@ -15,9 +15,9 @@ test.describe("nightly closeout", () => {
   test("saves a closeout and keeps it visible after reload", async ({ page }) => {
     await ensureAuthenticated(page);
     const yesterday = addRecoveryDays(getRecoveryDateKey(), -1);
-    const dateInput = page.getByRole("textbox", { name: "Fecha del cierre" });
-    await expect(dateInput).toHaveAttribute("max", getRecoveryDateKey());
-    await dateInput.fill(yesterday);
+    const dateInput = page.getByLabel("Fecha y hora del cierre");
+    await expect(dateInput).toHaveAttribute("max", `${getRecoveryDateKey()}T23:59`);
+    await dateInput.fill(`${yesterday}T22:30`);
     await page.getByRole("slider", { name: "Dolor" }).fill("3");
     await page.getByText("Alta", { exact: true }).click();
     await page.getByText("Leve", { exact: true }).click();
@@ -45,7 +45,7 @@ test.describe("nightly closeout", () => {
   test("blocks a second closeout for a date that is already closed", async ({ page }) => {
     await ensureAuthenticated(page);
     const closedDate = addRecoveryDays(getRecoveryDateKey(), -2);
-    await page.getByRole("textbox", { name: "Fecha del cierre" }).fill(closedDate);
+    await page.getByLabel("Fecha y hora del cierre").fill(`${closedDate}T22:00`);
     await page.getByRole("slider", { name: "Dolor" }).fill("2");
     await page.getByText("Media", { exact: true }).click();
     await page.getByText("Nada", { exact: true }).click();
@@ -56,7 +56,7 @@ test.describe("nightly closeout", () => {
     ).toBeVisible();
 
     await ensureAuthenticated(page);
-    await page.getByRole("textbox", { name: "Fecha del cierre" }).fill(closedDate);
+    await page.getByLabel("Fecha y hora del cierre").fill(`${closedDate}T22:00`);
 
     await expect(
       page.getByText("Ese día ya tiene un cierre registrado. Elige otra fecha."),
@@ -87,11 +87,11 @@ test.describe("nightly closeout", () => {
     const note = page.getByPlaceholder("Lo que quieras dejar escrito antes de dormir...");
     await note.fill("Conservar el cierre si la fecha es rechazada.");
     // The picker's max blocks this in the browser; drop it to prove the server rejects it too.
-    await page.locator('input[name="date"]').evaluate((input, value) => {
+    await page.locator('input[name="closedAt"]').evaluate((input, value) => {
       const dateInput = input as HTMLInputElement;
       dateInput.removeAttribute("max");
       dateInput.value = value;
-    }, futureDate);
+    }, `${futureDate}T22:00`);
     await page.getByRole("button", { name: "Cerrar el dia" }).click();
 
     await expect(page.locator(".rr-session-error")).toContainText(

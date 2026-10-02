@@ -158,6 +158,8 @@ export interface NightlyCloseout {
   sleepQuality: Rating1To5;
   reboundPainLevel: ReboundLevel;
   notes?: string;
+  /** Hour the day was closed, "HH:MM" in Lima time; older closeouts may not have it. */
+  closedTime?: string;
   createdAt: ISODateTimeString;
   updatedAt: ISODateTimeString;
 }

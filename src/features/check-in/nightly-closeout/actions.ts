@@ -13,6 +13,7 @@ import {
   futureCloseoutDateMessage,
   getCloseoutDateError,
   invalidCloseoutDateMessage,
+  splitCloseoutDateTime,
 } from "@/lib/closeout-date";
 import { getHistoryHrefForDate } from "@/lib/history-view-model";
 import { AuthenticationRequiredError } from "@/lib/supabase/authenticated";
@@ -77,8 +78,10 @@ export interface NightlyCloseoutActionState {
 }
 
 function readCloseoutForm(formData: FormData): CreateNightlyCloseoutInput {
+  const { date, closedTime } = splitCloseoutDateTime(getSingleValue(formData, "closedAt"));
   return {
-    date: getSingleValue(formData, "date"),
+    date,
+    closedTime,
     endOfDayPain: parsePainScore(getSingleValue(formData, "endOfDayPain")),
     energy: parseRating1To5(getSingleValue(formData, "energy")),
     sleepHours: Number(getSingleValue(formData, "sleepHours")),

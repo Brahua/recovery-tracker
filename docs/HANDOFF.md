@@ -67,6 +67,7 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 ### Datos
 
 - Varias sesiones por día; **un cierre por usuario y fecha** (también en la base). No hay cierres con fecha futura.
+- La hora del cierre es `closed_time` (hora del día en Lima), aparte de `date`: un cierre a las 00:30 de la noche del 1 sigue siendo del día 1. El formulario la envía junto con la fecha como `closedAt` (`splitCloseoutDateTime`).
 - El "día" se calcula en `America/Lima`; los timestamps se guardan en UTC.
 - Historial solo muestra datos (y lleva a editarlos); las interpretaciones van en Insights y Reporte.
 - Editar una sesión la reemplaza entera en una transacción (`update_rehab_session`, que comparte `insert_rehab_session_children` con `create_rehab_session`): un cambio en cómo se guardan los hijos va en esa función.

@@ -1,5 +1,6 @@
 "use client";
 
+import { treatmentZoneSuggestionsFor, type Condition } from "@/lib/condition";
 import { createDraftId } from "@/lib/draft-id";
 import {
   countValidTreatments,
@@ -14,7 +15,6 @@ import {
   treatmentCatalog,
   treatmentLabel,
   treatmentTakesMinutes,
-  treatmentZoneSuggestions,
   type TreatmentDraft,
 } from "@/lib/treatments";
 import type { TreatmentCategory, TreatmentModality } from "@/types/recovery";
@@ -22,6 +22,7 @@ import type { TreatmentCategory, TreatmentModality } from "@/types/recovery";
 const zoneListId = "rr-treatment-zones";
 
 interface TreatmentsCardProps {
+  condition?: Condition | null;
   drafts: TreatmentDraft[];
   onChange: (drafts: TreatmentDraft[]) => void;
   therapistNotes: string;
@@ -29,6 +30,7 @@ interface TreatmentsCardProps {
 }
 
 export function TreatmentsCard({
+  condition,
   drafts,
   onChange,
   therapistNotes,
@@ -201,7 +203,7 @@ export function TreatmentsCard({
       ) : null}
 
       <datalist id={zoneListId}>
-        {treatmentZoneSuggestions.map((zone) => (
+        {treatmentZoneSuggestionsFor(condition).map((zone) => (
           <option key={zone} value={zone} />
         ))}
       </datalist>

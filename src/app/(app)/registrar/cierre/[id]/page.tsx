@@ -1,6 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 
 import { createRecoveryLogRepository } from "@/data/recovery-log-repository";
+import { parseCondition } from "@/lib/validation/condition";
 import { NightlyCloseoutForm } from "@/features/check-in/nightly-closeout/form";
 import { getCloseoutDateError } from "@/lib/closeout-date";
 import { getRecoveryDateKey } from "@/lib/recovery-date";
@@ -65,6 +66,7 @@ export default async function EditCloseoutPage({
 
   return (
     <NightlyCloseoutForm
+      condition={parseCondition(user.user_metadata?.condition)}
       defaultOccurredAt={new Date().toISOString()}
       editingCloseout={closeout}
       recentCloseouts={[]}

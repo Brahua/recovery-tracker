@@ -30,13 +30,16 @@ export interface TodayRitualState {
 export function getTodayRitualState(
   hasSessionToday: boolean,
   hasCloseoutToday: boolean,
+  areaPhrase?: string,
 ): TodayRitualState {
   if (!hasSessionToday) {
     return {
       progress: 0,
       eyebrow: "Siguiente paso",
       title: "Te toca la sesion de hoy",
-      body: "Un paso más cerca de tu recuperación.",
+      body: areaPhrase
+        ? `Un paso más para ${areaPhrase}.`
+        : "Un paso más cerca de tu recuperación.",
       primaryHref: "/registrar?mode=session",
       primaryLabel: "Empezar sesion de hoy",
       primaryMeta: "20 min",

@@ -91,3 +91,14 @@ describe("buildCloseoutSuccessState", () => {
     expect(state.secondaryHref).toBe("/insights");
   });
 });
+
+describe("buildCloseoutSuccessState with a condition", () => {
+  it("names the area of the injury once the day is closed", () => {
+    expect(buildCloseoutSuccessState(true, undefined, "tu rodilla derecha").body).toBe(
+      "No queda nada pendiente. Hoy también cuidaste tu rodilla derecha.",
+    );
+    expect(buildCloseoutSuccessState(true).body).toBe(
+      "No queda nada pendiente. Hoy también cuidaste tu recuperación.",
+    );
+  });
+});

@@ -2,8 +2,10 @@ import Link from "@/components/app-link";
 
 import { ReportActions } from "@/components/report-actions";
 import { ReportQuestions } from "@/components/report-questions";
+import { conditionSummary, type Condition } from "@/lib/condition";
 import { buildPainTrendInsight } from "@/lib/recovery-insights";
 import { createReportViewModel } from "@/lib/report-view-model";
+import { getRecoveryDateKey } from "@/lib/recovery-date";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
 const shortDateFormatter = new Intl.DateTimeFormat("es-PE", {
@@ -70,6 +72,8 @@ interface MedicalReportProps {
   recentSessions: RehabSession[];
   recentCloseouts: NightlyCloseout[];
   windowDays: 7 | 14 | 30;
+  /** The injury of the account; shown under the title. */
+  condition?: Condition | null;
 }
 
 export function MedicalReport({
@@ -77,10 +81,12 @@ export function MedicalReport({
   recentSessions,
   recentCloseouts,
   windowDays,
+  condition,
 }: MedicalReportProps) {
   const report = createReportViewModel(recentSessions, recentCloseouts, windowDays, now);
   const { summary } = report;
   const line = painPolyline(summary.painTrend.points);
+  const conditionLine = conditionSummary(condition, getRecoveryDateKey(now));
   const hasData = report.recordCount > 0 || report.sessionCount > 0;
   const ranges = [
     { days: 30, href: "/reporte", label: "30 dias" },
@@ -97,6 +103,7 @@ export function MedicalReport({
             {formatDate(summary.dateRange.to, "long")}
           </p>
           <h1 className="rr-page-title">Reporte</h1>
+          {conditionLine ? <p className="rr-report-condition">{conditionLine}</p> : null}
         </div>
         <span className={`rr-report-status ${hasData ? "" : "is-empty"}`}>
           {hasData ? "Listo" : "Sin datos"}

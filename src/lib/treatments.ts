@@ -65,18 +65,6 @@ export const treatmentCatalog: TreatmentCategoryGroup[] = [
   },
 ];
 
-export const treatmentZoneSuggestions = [
-  "Rodilla anterior",
-  "Tendón rotuliano",
-  "Rodilla medial",
-  "Rodilla lateral",
-  "Hueco poplíteo",
-  "Cuádriceps",
-  "Isquiotibiales",
-  "Cintilla iliotibial",
-  "Gemelos",
-] as const;
-
 const optionByModality = new Map<
   CatalogModality,
   TreatmentOption & { category: TreatmentCategory }

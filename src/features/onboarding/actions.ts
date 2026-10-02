@@ -27,6 +27,7 @@ export async function completeOnboardingAction(input: unknown): Promise<Onboardi
       ? {
           display_name: parsed.data.name,
           preferences: parsed.data.appearance,
+          ...(parsed.data.condition ? { condition: parsed.data.condition } : {}),
           medical_notice_accepted_at: now,
           onboarding_completed_at: now,
         }

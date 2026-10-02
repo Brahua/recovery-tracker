@@ -6,8 +6,14 @@ import { useEffect, useId, useRef, useState } from "react";
 import { applyAppearance } from "@/components/appearance/apply-appearance";
 import { useActionFeedback } from "@/components/feedback/use-action-feedback";
 import { completeOnboardingAction } from "@/features/onboarding/actions";
+import { ConditionFields } from "@/features/settings/condition-fields";
 import { tourSteps, type TourIcon } from "@/features/onboarding/tour-steps";
 import { accentOptions, accents, themeOptions, themes, type Appearance } from "@/lib/appearance";
+import {
+  conditionInputFromDraft,
+  emptyConditionDraft,
+  isConditionDraftEmpty,
+} from "@/lib/condition-draft";
 import { DISPLAY_NAME_MAX_LENGTH } from "@/lib/validation/profile";
 
 interface OnboardingProps {
@@ -62,6 +68,7 @@ export function Onboarding({ appearance, chosenName, fallbackName, mode }: Onboa
   const [stage, setStage] = useState<"tour" | "setup">("tour");
   const [name, setName] = useState(chosenName ?? "");
   const [current, setCurrent] = useState(appearance);
+  const [conditionDraft, setConditionDraft] = useState({ ...emptyConditionDraft });
   const [acceptedNotice, setAcceptedNotice] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const nameId = useId();
@@ -136,7 +143,16 @@ export function Onboarding({ appearance, chosenName, fallbackName, mode }: Onboa
 
   function submitSetup(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    complete({ kind: "setup", name, appearance: current, acceptedNotice });
+    complete({
+      kind: "setup",
+      name,
+      appearance: current,
+      // Optional: untouched means "I'll set it later in Ajustes".
+      condition: isConditionDraftEmpty(conditionDraft)
+        ? null
+        : conditionInputFromDraft(conditionDraft),
+      acceptedNotice,
+    });
   }
 
   return (
@@ -234,6 +250,18 @@ export function Onboarding({ appearance, chosenName, fallbackName, mode }: Onboa
               value={name}
             />
           </div>
+
+          <section aria-labelledby="onboarding-condition" className="rr-onboarding-condition">
+            <h2 id="onboarding-condition">Tu recuperación</h2>
+            <p className="rr-settings-hint">
+              Opcional: así la app te habla de tu zona. Puedes dejarlo para después.
+            </p>
+            <ConditionFields
+              disabled={pending}
+              draft={conditionDraft}
+              onChange={setConditionDraft}
+            />
+          </section>
 
           <fieldset className="rr-appearance-group">
             <legend>Tema</legend>

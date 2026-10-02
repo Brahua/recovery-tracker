@@ -37,6 +37,15 @@ function closeoutOn(date: string): NightlyCloseout {
   };
 }
 
+describe("getTodayRitualState with a condition", () => {
+  it("words the body with the area of the injury", () => {
+    expect(getTodayRitualState(false, false, "tu hombro izquierdo").body).toBe(
+      "Un paso más para tu hombro izquierdo.",
+    );
+    expect(getTodayRitualState(false, false).body).toBe("Un paso más cerca de tu recuperación.");
+  });
+});
+
 describe("getTodayRitualState", () => {
   it("starts with the session and zero percent when nothing is logged", () => {
     const state = getTodayRitualState(false, false);

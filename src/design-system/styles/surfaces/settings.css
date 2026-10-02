@@ -64,6 +64,29 @@
   outline: none;
 }
 
+.rr-settings-form select {
+  width: 100%;
+  min-width: 0;
+  min-height: var(--rr-hit-target);
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  padding: 10px 12px;
+  color: var(--rr-ink);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.rr-settings-form select:focus {
+  border-color: var(--rr-accent-light);
+}
+
+.rr-settings-form label span {
+  color: var(--rr-text-muted);
+  font-weight: 400;
+}
+
 .rr-settings-form input::placeholder {
   color: var(--rr-text-muted);
 }
@@ -474,4 +497,20 @@
   .rr-settings-card {
     padding: 24px;
   }
+}
+
+/* Mi recuperación: the injury form (zone, side, what happened, since when). */
+.rr-condition-form {
+  display: grid;
+  gap: 16px;
+}
+
+.rr-condition-kinds {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.rr-condition-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }

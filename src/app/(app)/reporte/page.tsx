@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { MedicalReport } from "@/features/reports/medical-report";
+import { parseCondition } from "@/lib/validation/condition";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -23,6 +24,7 @@ export default async function ReportePage({
 
   return (
     <MedicalReport
+      condition={parseCondition(user.user_metadata?.condition)}
       now={new Date().toISOString()}
       recentCloseouts={recentCloseouts}
       recentSessions={recentSessions}

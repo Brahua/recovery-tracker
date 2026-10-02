@@ -18,6 +18,7 @@ import {
 } from "@/features/check-in/post-therapy/actions";
 import { TreatmentsCard } from "@/features/check-in/post-therapy/treatments-card";
 import { RoutinePicker } from "@/features/routines/routine-picker";
+import { conditionAreaPhrase, type Condition } from "@/lib/condition";
 import { createDraftId } from "@/lib/draft-id";
 import {
   findRepeatedEntryIds,
@@ -174,6 +175,8 @@ interface PostTherapyFormProps {
   defaultOccurredAt: string;
   errorMessage?: string;
   recentSessions: RehabSession[];
+  /** The injury of the account, to word the questions and suggest treatment zones. */
+  condition?: Condition | null;
 }
 
 export function PostTherapyForm({
@@ -183,6 +186,7 @@ export function PostTherapyForm({
   defaultOccurredAt,
   errorMessage,
   recentSessions,
+  condition,
 }: PostTherapyFormProps) {
   const router = useAppRouter();
   const [actionState, formAction] = useActionState(
@@ -397,7 +401,11 @@ export function PostTherapyForm({
 
           <section className="rr-form-card rr-final-state-card">
             <SectionHeader complete={finalState !== null} title="Estado al terminar" />
-            <p className="rr-field-question">¿Cómo quedaste justo al terminar?</p>
+            <p className="rr-field-question">
+              {condition && conditionAreaPhrase(condition)
+                ? `¿Cómo quedó ${conditionAreaPhrase(condition)} justo al terminar?`
+                : "¿Cómo quedaste justo al terminar?"}
+            </p>
             <div
               className="rr-choice-row rr-final-state-row"
               role="group"
@@ -459,6 +467,7 @@ export function PostTherapyForm({
           {isPhysiotherapy ? (
             <>
               <TreatmentsCard
+                condition={condition}
                 drafts={treatmentDrafts}
                 onChange={setTreatmentDrafts}
                 onTherapistNotesChange={setTherapistNotes}

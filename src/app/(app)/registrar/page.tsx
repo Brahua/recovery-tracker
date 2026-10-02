@@ -6,6 +6,8 @@ import { DayClosedState } from "@/components/day-closed-state";
 import { SessionSavedState } from "@/components/session-saved-state";
 import { NightlyCloseoutForm } from "@/features/check-in/nightly-closeout/form";
 import { PostTherapyForm } from "@/features/check-in/post-therapy/form";
+import { parseCondition } from "@/lib/validation/condition";
+import { conditionAreaPhrase } from "@/lib/condition";
 import { loadExerciseLibrary } from "@/lib/exercise-library";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 import { getCloseoutDateError } from "@/lib/closeout-date";
@@ -40,6 +42,7 @@ export default async function RegistrarPage({
     redirect("/");
   }
 
+  const condition = parseCondition(user.user_metadata?.condition);
   const today = getRecoveryDateKey();
   const requestedCloseoutDate = getSingleSearchParam(resolvedSearchParams, "date");
   const selectedCloseoutDate =
@@ -91,7 +94,11 @@ export default async function RegistrarPage({
   const successState = showSessionSuccess
     ? buildSessionSuccessState(hasCloseoutToday, sessionSuccessMessage)
     : showNightlySuccess
-      ? buildCloseoutSuccessState(Boolean(closeoutSession), nightlySuccessMessage)
+      ? buildCloseoutSuccessState(
+          Boolean(closeoutSession),
+          nightlySuccessMessage,
+          conditionAreaPhrase(condition),
+        )
       : null;
 
   return (
@@ -125,6 +132,7 @@ export default async function RegistrarPage({
           {mode === "session" ? (
             <PostTherapyForm
               catalog={catalog}
+              condition={condition}
               routines={routines}
               defaultOccurredAt={new Date().toISOString()}
               errorMessage={sessionErrorMessage}
@@ -132,6 +140,7 @@ export default async function RegistrarPage({
             />
           ) : (
             <NightlyCloseoutForm
+              condition={condition}
               defaultOccurredAt={new Date().toISOString()}
               errorMessage={nightlyErrorMessage}
               recentCloseouts={recentCloseouts}

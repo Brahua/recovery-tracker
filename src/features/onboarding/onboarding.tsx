@@ -57,7 +57,7 @@ function TourGlyph({ icon }: { icon: TourIcon }) {
 export function Onboarding({ appearance, chosenName, fallbackName, mode }: OnboardingProps) {
   const router = useRouter();
   const { pending, run } = useActionFeedback();
-  const trackRef = useRef<HTMLOListElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [stage, setStage] = useState<"tour" | "setup">("tour");
   const [name, setName] = useState(chosenName ?? "");
@@ -159,9 +159,15 @@ export function Onboarding({ appearance, chosenName, fallbackName, mode }: Onboa
           <h1 className="rr-onboarding-title" id="onboarding-title">
             {mode === "replay" ? "Cómo funciona la app" : "Te damos la bienvenida a tu ritual"}
           </h1>
-          <ol className="rr-onboarding-track" ref={trackRef}>
+          <div
+            aria-label="Tarjetas del recorrido"
+            className="rr-onboarding-track"
+            ref={trackRef}
+            role="region"
+            tabIndex={0}
+          >
             {tourSteps.map((step, stepIndex) => (
-              <li
+              <div
                 aria-hidden={stepIndex !== index}
                 aria-label={`${stepIndex + 1} de ${tourSteps.length}`}
                 aria-roledescription="diapositiva"
@@ -175,9 +181,9 @@ export function Onboarding({ appearance, chosenName, fallbackName, mode }: Onboa
                 <p className="rr-kicker">{step.kicker}</p>
                 <h2>{step.title}</h2>
                 <p>{step.body}</p>
-              </li>
+              </div>
             ))}
-          </ol>
+          </div>
 
           <div className="rr-onboarding-controls">
             <p aria-live="polite" className="rr-onboarding-progress">

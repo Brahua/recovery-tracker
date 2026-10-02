@@ -72,6 +72,12 @@
   scrollbar-width: none;
 }
 
+.rr-onboarding-track:focus-visible {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 4px;
+  border-radius: var(--rr-radius-hero);
+}
+
 .rr-onboarding-track::-webkit-scrollbar {
   display: none;
 }

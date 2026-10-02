@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-01 (PR 2 de 5: Acceso en Ajustes). Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
+> Última actualización: 2026-10-01 (PR 3 de 5: color principal). Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
 
 ## Cómo retomar
 
@@ -35,14 +35,15 @@
 Spec aprobada: `docs/specs/access-onboarding-personalization-spec.md` · Plan: `tasks/plan-access-onboarding.md` · Tareas: `tasks/todo-access-onboarding.md`. Cinco PRs en orden: (1) acceso por invitación en la base, (2) sección "Acceso" en Ajustes para el admin, (3) color principal, (4) tema claro, (5) onboarding.
 
 - **PR 1 en producción (#34, 2026-10-01):** migración `20261004000000_access_control.sql`, hook `before_user_created` **activo** en producción (Management API), modo `invite_only`, lista vacía, owner con `app_metadata.role = "admin"`. Probado por el owner: su cuenta entra; otra cuenta de Google ve "acceso por invitación" y no se crea. Para invitar a alguien antes del PR 2: SQL en `docs/deployment.md` → "Acceso por invitación".
-- **PR 2, rama `feat/access-admin-settings`:** Ajustes → Acceso (invitar, compartir, quitar, modo), migración `20261005000000_access_admin.sql`, pgTAP y E2E. El E2E promueve al usuario anónimo a admin con la `service_role` local (`tests/e2e/admin-helpers.ts`).
+- **PR 2 en producción (#36):** Ajustes → Acceso (invitar, compartir, quitar, modo), migración `20261005000000_access_admin.sql`. El E2E promueve al usuario anónimo a admin con la `service_role` local (`tests/e2e/admin-helpers.ts`).
+- **PR 3, rama `feat/accent-color`:** color principal en Ajustes → Apariencia (`src/lib/appearance.ts`, script inline en `src/app/layout.tsx`, `AppearanceSync`). Con terracota, el dolor pasa a frambuesa.
 - **Colores:** Verde `#2E7D5B` (defecto), Terracota `#C9552E`, Ámbar `#B08A2E` (Claude Design, ajuste "Estilo" de Hoy). Ver spec → "Colores".
 - En producción quedan 3 usuarios anónimos del 2026-09-16 sin datos (restos del staging); no se borran sin el OK del owner.
 - MCP `claude_design` conectado en este equipo (configuración local); el proyecto de diseño es el de `docs/design/claude-design-reference.md`.
 
 | Rama | Estado |
 |---|---|
-| `feat/access-admin-settings` | PR 2 abierto, esperando CI |
+| `feat/accent-color` | PR 3 abierto, esperando CI |
 
 ## ⏰ Vencimientos
 

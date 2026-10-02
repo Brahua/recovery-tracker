@@ -6,6 +6,7 @@ import {
   AuthenticationRequiredError,
   requireAuthenticatedSupabase,
 } from "@/lib/supabase/authenticated";
+import { appearanceSchema } from "@/lib/validation/appearance";
 import { displayNameSchema } from "@/lib/validation/profile";
 
 export interface ProfileActionResult {
@@ -40,5 +41,31 @@ export async function saveDisplayNameAction(input: unknown): Promise<ProfileActi
 
   // The greeting (Hoy) and the sidebar name live in the (app) layout tree.
   revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+// Saves the theme and accent in user_metadata.preferences, so every device follows the account.
+// The browser already applied the change and wrote the cookie (applyAppearance).
+export async function saveAppearanceAction(input: unknown): Promise<ProfileActionResult> {
+  const parsed = appearanceSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Apariencia no válida." };
+  }
+
+  try {
+    const { supabase } = await requireAuthenticatedSupabase();
+    const { error } = await supabase.auth.updateUser({ data: { preferences: parsed.data } });
+    if (error) throw error;
+  } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return {
+        ok: false,
+        error: "Tu sesión expiró. Recarga la página e inicia sesión nuevamente.",
+      };
+    }
+    console.error("Failed to save appearance.", error);
+    return { ok: false, error: "No se pudo guardar la apariencia. Intenta otra vez." };
+  }
+
   return { ok: true };
 }

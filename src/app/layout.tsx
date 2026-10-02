@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Archivo, Instrument_Sans } from "next/font/google";
 import { FeedbackProviders } from "@/components/feedback/feedback-providers";
 import { ServiceWorkerRegistrar } from "@/components/pwa/service-worker-registrar";
+import { appearanceInlineScript, defaultAppearance } from "@/lib/appearance";
 
 import { APP_BACKGROUND } from "./manifest";
 
@@ -40,7 +41,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="es" className={`${archivo.variable} ${instrumentSans.variable} h-full antialiased`}>
+    // The inline script sets data-theme/data-accent from the appearance cookie before the first
+    // paint, so <html> may differ from the server render (suppressHydrationWarning).
+    <html
+      className={`${archivo.variable} ${instrumentSans.variable} h-full antialiased`}
+      data-accent={defaultAppearance.accent}
+      data-theme={defaultAppearance.theme}
+      lang="es"
+      suppressHydrationWarning
+    >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: appearanceInlineScript }} />
+      </head>
       <body className="min-h-full flex flex-col">
         <FeedbackProviders>{children}</FeedbackProviders>
         <ServiceWorkerRegistrar />

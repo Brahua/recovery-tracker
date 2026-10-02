@@ -54,7 +54,7 @@ Queremos tres cosas:
 19. `/ajustes` → nueva sección "Apariencia": **Tema** (Oscuro, Claro, Sistema) y **Color principal** (3 opciones con muestra y nombre). Cambiar se ve al instante y se guarda solo, con toast de confirmación.
 20. Por defecto: tema Oscuro y el verde actual. Nadie ve un cambio si no toca nada.
 21. Se guarda en `user_metadata.preferences = { theme, accent }` (como `display_name`, sin migración) y se valida con zod en el servidor (valores fuera de la lista se rechazan).
-22. **Sin parpadeo:** el servidor pinta `<html data-theme data-accent>` desde una cookie espejo (`rr-appearance`); la cookie se reescribe al guardar y al iniciar sesión (callback). Con "Sistema", el CSS decide con `prefers-color-scheme`, sin JavaScript.
+22. **Sin parpadeo:** un script inline mínimo en `<head>` (patrón de la guía de Next 16, `preventing-flash-before-hydration.md`) lee la cookie espejo `rr-appearance` y pone `<html data-theme data-accent>` antes de pintar; así las páginas estáticas (`/offline`) siguen estáticas. La cookie la escribe el navegador al elegir y `AppearanceSync` (layout de la app) la alinea con la cuenta tras iniciar sesión o cambiar en otro dispositivo. Con "Sistema", el CSS decide con `prefers-color-scheme`.
 23. Tema claro completo en todas las pantallas autenticadas, con contraste WCAG AA en los dos temas y con los 3 colores (axe en E2E para cada combinación de tema; colores revisados con un chequeo de contraste por token).
 24. La barra de estado del iPhone y `theme-color` siguen el tema (`viewport.themeColor` con variantes por `prefers-color-scheme` / tema guardado).
 25. La landing (sin sesión) sigue oscura: su foto y diseño son oscuros y todavía no hay preferencias.
@@ -195,7 +195,8 @@ npm run -s css:compare -- compare <baseline> --resolve   # paso de tokens sin ca
 Fuente: proyecto de Claude Design `74a9f44b-…` (`docs/design/claude-design-reference.md`).
 
 - **Color principal:** las opciones del ajuste "Estilo → accentColor" de `Recovery Tracker Hoy.dc.html`: **Verde recuperación `#2E7D5B`** (por defecto), **Terracota `#C9552E`** y **Ámbar `#B08A2E`**. El diseño deriva de cada uno: claro = mezcla del 18% hacia blanco, brillo 18%, sombra 50%, tinte 22%, borde 35%.
-- **Terracota:** en el design system también codifica el dolor (slider, "peor"). Con terracota como principal hay que separar el dolor para que siga leyéndose (decisión en el PR 3, con vista previa).
+- **Terracota:** en el design system también codifica el dolor (slider, "peor"). Decisión (2026-10-01, delegada al agente): con terracota como principal, los tokens de dolor pasan a frambuesa (`#d4426e` y su familia, misma luminancia, mismo contraste).
+- **Texto sobre el acento:** tokens `--rr-on-accent`, `--rr-on-accent-bright` y `--rr-on-accent-mark` (fijos, no dependen del tema). El ámbar es claro: lleva texto carbón.
 - **Tema claro:** base "Papel" del design system: fondo hueso `#F4EFE7` con tinta carbón `#1C1915`; la paleta clara completa la propone el agente (PR 4) y el owner la aprueba.
 
 ## Decisiones tomadas (2026-10-01)

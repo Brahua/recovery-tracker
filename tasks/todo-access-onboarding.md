@@ -50,28 +50,28 @@ Verificación en la PC: `npm run format && npm run lint && npm run design:check 
   - Acceptance: E2E (usuario anónimo promovido a admin solo en local): invitar, ver "Pendiente", quitar; sin rol no ve la sección; axe; en `e2e:critical`; `CHANGELOG`, `HANDOFF`.
   - Files: `tests/e2e/access.spec.ts`, `package.json`, docs
 
-## PR 3: apariencia en tema oscuro (espera los 3 colores)
+## PR 3: apariencia en tema oscuro
 
-- [ ] C1. Tokens de acento derivados de `--rr-accent-rgb`
+- [x] C1. Tokens de acento derivados de `--rr-accent-rgb`
   - Acceptance: `--rr-accent-tint`, `-border`, `-card`, `--rr-selection` y similares usan `rgb(var(--rr-accent-rgb) / …)`.
   - Verify: `npm run -s css:compare -- compare <baseline> --resolve` sin cambios.
   - Files: `src/design-system/styles/tokens/colors.css`
 
-- [ ] C2. Lógica de apariencia
+- [x] C2. Lógica de apariencia
   - Acceptance: tipos, defaults, validación zod, parseo de cookie y de `user_metadata.preferences`; `saveAppearanceAction` (updateUser + cookie); el callback de login reescribe la cookie.
   - Verify: tests unitarios.
   - Files: `src/lib/appearance.ts` (+ test), `src/lib/validation/appearance.ts` (+ test), `src/features/settings/actions.ts`, `src/app/auth/callback/route.ts`
 
-- [ ] C3. Atributos en `<html>` y los 3 acentos
+- [x] C3. Atributos en `<html>` y los 3 acentos
   - Acceptance: el servidor pinta `data-theme`/`data-accent`; bloques `[data-accent="…"]` con la familia completa de tokens de cada color; contraste AA verificado.
   - Verify: typecheck; chequeo de contraste; revisión visual con `npm run dev` si el owner lo pide.
   - Files: `src/app/layout.tsx` o `src/app/(app)/layout.tsx`, `src/design-system/styles/tokens/colors.css`
 
-- [ ] C4. Sección "Apariencia"
+- [x] C4. Sección "Apariencia"
   - Acceptance: tema (solo Oscuro habilitado hasta el PR 4) y 3 muestras de color; vista previa al instante y guardado con toast.
   - Files: `src/features/settings/appearance-settings.tsx`, `src/app/(app)/ajustes/page.tsx`, `src/design-system/styles/surfaces/settings.css`
 
-- [ ] C5. E2E y docs
+- [x] C5. E2E y docs
   - Acceptance: cambiar color persiste tras recargar; axe con cada color; docs.
   - Files: `tests/e2e/appearance.spec.ts`, docs
 

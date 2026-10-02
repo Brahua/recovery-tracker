@@ -6,9 +6,11 @@ import {
   getTodayRitualState,
   type RecentWeekDay,
 } from "@/lib/today-view-model";
+import type { RecoveryGoal } from "@/types/goals";
 import type { LatestTherapistNotes, NightlyCloseout, RehabSession } from "@/types/recovery";
 import { getRecoveryDateKey, recoveryTimeZone } from "@/lib/recovery-date";
 import { formatTreatmentCount } from "@/lib/treatments";
+import { GoalsCard } from "@/features/goals/goals-card";
 import { conditionAreaPhrase, conditionSummary } from "@/lib/condition";
 import { parseCondition } from "@/lib/validation/condition";
 import { getUserDisplayName, type DisplayNameUser } from "@/lib/user-display-name";
@@ -127,6 +129,7 @@ interface TodayOverviewProps {
   recentCloseouts: NightlyCloseout[];
   /** Notes from the latest physio session; shown until the next one. */
   therapistNotes: LatestTherapistNotes | null;
+  goals: RecoveryGoal[];
   user: DisplayNameUser;
 }
 
@@ -134,6 +137,7 @@ export function TodayOverview({
   recentSessions,
   recentCloseouts,
   therapistNotes,
+  goals,
   user,
 }: TodayOverviewProps) {
   const now = new Date();
@@ -227,6 +231,8 @@ export function TodayOverview({
 
         <aside className="rr-today-rail">
           {therapistNotes ? <TherapistNotesCard notes={therapistNotes} /> : null}
+
+          <GoalsCard goals={goals} />
 
           <section className="rr-milestone-card">
             <div>

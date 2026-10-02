@@ -5,7 +5,9 @@ import { ReportQuestions } from "@/components/report-questions";
 import { conditionSummary, type Condition } from "@/lib/condition";
 import { buildPainTrendInsight } from "@/lib/recovery-insights";
 import { createReportViewModel } from "@/lib/report-view-model";
+import { splitGoals } from "@/lib/goals";
 import { getRecoveryDateKey } from "@/lib/recovery-date";
+import type { RecoveryGoal } from "@/types/goals";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
 const shortDateFormatter = new Intl.DateTimeFormat("es-PE", {
@@ -74,6 +76,8 @@ interface MedicalReportProps {
   windowDays: 7 | 14 | 30;
   /** The injury of the account; shown under the title. */
   condition?: Condition | null;
+  /** The patient's goals; the card only shows when there are some. */
+  goals?: RecoveryGoal[];
 }
 
 export function MedicalReport({
@@ -82,11 +86,13 @@ export function MedicalReport({
   recentCloseouts,
   windowDays,
   condition,
+  goals = [],
 }: MedicalReportProps) {
   const report = createReportViewModel(recentSessions, recentCloseouts, windowDays, now);
   const { summary } = report;
   const line = painPolyline(summary.painTrend.points);
   const conditionLine = conditionSummary(condition, getRecoveryDateKey(now));
+  const { pending: pendingGoals, achieved: achievedGoals } = splitGoals(goals);
   const hasData = report.recordCount > 0 || report.sessionCount > 0;
   const ranges = [
     { days: 30, href: "/reporte", label: "30 dias" },
@@ -267,6 +273,21 @@ export function MedicalReport({
           <ReportCard number="06" title="Preguntas para tu cita">
             <ReportQuestions questions={summary.appointmentQuestions} />
           </ReportCard>
+
+          {goals.length > 0 ? (
+            <ReportCard number="07" title="Mis metas">
+              <p className="rr-report-copy">
+                {pendingGoals.length === 0
+                  ? "Todas las metas están logradas."
+                  : `Pendientes: ${pendingGoals.map((goal) => goal.title).join(" · ")}.`}
+              </p>
+              {achievedGoals.length > 0 ? (
+                <p className="rr-report-copy">
+                  Logradas: {achievedGoals.map((goal) => goal.title).join(" · ")}.
+                </p>
+              ) : null}
+            </ReportCard>
+          ) : null}
         </section>
       </div>
       <ReportActions />

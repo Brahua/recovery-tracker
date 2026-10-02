@@ -624,3 +624,134 @@
   font-size: 13px;
   font-weight: 600;
 }
+
+/* Mis metas: the patient's own goals, ticked off when achieved. */
+.rr-goals-card {
+  display: grid;
+  gap: 12px;
+  border: 1px solid var(--rr-border);
+  border-radius: 17px;
+  background: rgb(var(--rr-ink-rgb) / 0.04);
+  padding: 15px 17px;
+}
+
+.rr-goals-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rr-goals-heading h2 {
+  color: var(--rr-ink);
+  font-family: var(--rr-font-display);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.rr-goals-heading span {
+  color: var(--rr-accent-text);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rr-goals-list {
+  display: grid;
+  gap: 2px;
+  list-style: none;
+}
+
+.rr-goals-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px;
+  color: var(--rr-text-body);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.rr-goals-list li.is-achieved {
+  color: var(--rr-text-muted);
+}
+
+.rr-goal-check,
+.rr-goal-remove {
+  display: grid;
+  width: var(--rr-hit-target);
+  height: var(--rr-hit-target);
+  place-items: center;
+  border: 0;
+  background: transparent;
+  color: var(--rr-text-muted);
+  cursor: pointer;
+}
+
+.rr-goal-check::before {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--rr-border-control);
+  border-radius: 50%;
+  content: "";
+}
+
+.rr-goal-check:hover::before,
+.rr-goal-check:focus-visible::before {
+  border-color: var(--rr-accent-light);
+}
+
+.rr-goal-remove {
+  font-size: 20px;
+}
+
+.rr-goal-done {
+  display: grid;
+  width: var(--rr-hit-target);
+  place-items: center;
+  color: var(--rr-accent-text);
+  font-weight: 800;
+}
+
+.rr-goals-empty {
+  color: var(--rr-text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+.rr-goals-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.rr-goals-form input {
+  min-width: 0;
+  min-height: var(--rr-hit-target);
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  padding: 8px 12px;
+  color: var(--rr-ink);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.rr-goals-form input:focus {
+  border-color: var(--rr-accent-light);
+}
+
+.rr-goals-error {
+  color: var(--rr-pain-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rr-goals-achieved summary {
+  min-height: var(--rr-hit-target);
+  color: var(--rr-text-muted);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+}

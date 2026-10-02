@@ -56,6 +56,8 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 
 ## Protecciones automáticas
 
+- `main` tiene el ruleset "Protect main": solo entra por PR con "Lint · Typecheck · Unit" y "E2E (Supabase local + Playwright)" en verde, sin force-push ni bypass. Detalle en `docs/deployment.md` → "Protección de `main`". El repo es público desde el 2026-10-02.
+
 - `npm run supabase:push` y `supabase:push:linked` pasan por `scripts/check-db-target.mjs`: se niegan a escribir en un proyecto enlazado sin `ALLOW_PROD_DB=1`. Solo el job `deploy` de CI lo define. `supabase:push:dry` no cambia (solo lee).
 - `playwright.config.ts` no arranca si `NEXT_PUBLIC_SUPABASE_URL` no es el Supabase local, y solo reutiliza un servidor ya levantado con `E2E_REUSE_SERVER=1`.
 - `npm run design:check` (en CI) falla si una hoja de estilos fuera de `src/design-system/styles/tokens/` usa un color, curva o fuente literal.

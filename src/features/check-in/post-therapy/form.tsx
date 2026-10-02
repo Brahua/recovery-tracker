@@ -266,16 +266,11 @@ export function PostTherapyForm({
               <Link aria-label="Volver a Historial" href={historyHref}>
                 <span aria-hidden="true">‹</span>
               </Link>
-            ) : (
-              <Link aria-label="Volver a Hoy" href="/">
-                <span aria-hidden="true">‹</span>
-              </Link>
-            )}
+            ) : null}
             <div>
               <p className="rr-kicker">{contextDate}</p>
               <h1 className="rr-page-title">{editingSession ? "Editar sesión" : "Registrar"}</h1>
             </div>
-            <span>{contextDate}</span>
           </div>
 
           <div className="rr-registrar-controls">

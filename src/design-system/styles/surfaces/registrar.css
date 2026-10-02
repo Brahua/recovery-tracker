@@ -21,9 +21,14 @@
 
 .rr-registrar-title {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: 10px;
+}
+
+/* Editing a saved record is a sub-screen: a back link to Historial sits before the title. */
+.rr-registrar-title:has(> a) {
+  grid-template-columns: 34px minmax(0, 1fr);
 }
 
 .rr-registrar-title > a {
@@ -40,13 +45,7 @@
 }
 
 .rr-registrar-title p {
-  display: none;
-}
-
-.rr-registrar-title > span {
-  color: var(--rr-text-muted);
-  font-size: 11.5px;
-  font-weight: 600;
+  margin-bottom: 3px;
 }
 
 .rr-registrar-controls {

@@ -390,14 +390,8 @@
     display: block;
   }
 
-  .rr-registrar-title > a,
-  .rr-registrar-title > span {
+  .rr-registrar-title > a {
     display: none;
-  }
-
-  .rr-registrar-title p {
-    display: block;
-    margin-bottom: 3px;
   }
 
   .rr-registrar-controls {

@@ -91,9 +91,6 @@ export function MedicalReport({
   return (
     <div className="rr-report">
       <header className="rr-report-header">
-        <Link aria-label="Volver a Hoy" className="rr-report-back" href="/">
-          ‹
-        </Link>
         <div>
           <p className="rr-kicker">
             {formatDate(summary.dateRange.from, "long")} al{" "}

@@ -64,6 +64,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Aligned the responsive Historial with its mobile and desktop Claude Design references, including the date rail, single-open session accordion, two-column exercise details, separate closeout cards, and viewport-specific navigation.
 
 ### Fixed
+- Module headers share one layout: kicker above the title and no back arrow on the screens reached from the tab bar (Registrar, Insights, Reporte now match Hoy, Historial, Ejercicios and Ajustes). The back link stays only on sub-screens (editing a session or closeout, the routine editor). Insights and Reporte no longer put the title above the kicker on mobile.
 - Nightly closeout picks the hour too: one date-and-time picker ("Hoy · 22:30"). The hour is stored as a Lima time of day in `nightly_closeouts.closed_time` (migration `20261006000000_closeout_time.sql`, existing rows backfilled from `created_at`), separate from `date`, so closing the night of Oct 1 at 00:30 keeps Oct 1. Historial shows it.
 - Bottom tab bar looks the same on every screen: Historial no longer turns it into a floating pill. Module titles share one style (`.rr-page-title`, 28px / 32px desktop, with the gray `.rr-kicker`) on Hoy, Registrar, Historial, Ejercicios, Insights, Reporte, Ajustes and the routine editor.
 - Sign out on mobile: Ajustes → Cuenta shows the signed-in email and "Cerrar sesión" (the sidebar with "Salir" is desktop-only).

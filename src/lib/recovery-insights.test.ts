@@ -5,6 +5,7 @@ import {
   buildReboundAssociationReport,
   buildSessionResponseReport,
   buildSleepEnergyReport,
+  buildStiffnessReport,
   createMedicalReportSummary,
 } from "@/lib/recovery-insights";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
@@ -88,6 +89,25 @@ describe("medical report insights", () => {
 
     expect(text).toContain("sueno promedio");
     expect(text).toContain("energia promedio");
+  });
+
+  it("summarizes stiffness only from closeouts that recorded it", () => {
+    expect(buildStiffnessReport(closeouts, 7, "2026-07-10T12:00:00.000Z")).toBeUndefined();
+
+    const withStiffness: NightlyCloseout[] = [
+      { ...closeouts[0]!, stiffnessLevel: "STRONG" },
+      { ...closeouts[1]!, stiffnessLevel: "MILD" },
+    ];
+    expect(buildStiffnessReport(withStiffness, 7, "2026-07-10T12:00:00.000Z")).toBe(
+      "La rigidez fue bastante o mucha en 1 de 2 cierres con rigidez registrada.",
+    );
+    expect(
+      buildStiffnessReport(
+        [{ ...closeouts[1]!, stiffnessLevel: "NONE" }],
+        7,
+        "2026-07-10T12:00:00.000Z",
+      ),
+    ).toBe("No hubo rigidez marcada (bastante o mucha) en 1 cierre con rigidez registrada.");
   });
 
   it("creates a medical report summary with questions and notes", () => {

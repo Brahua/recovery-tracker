@@ -1,5 +1,5 @@
 import { recoveryTimeZone } from "@/lib/recovery-date";
-import type { FinalState, ReboundLevel, SessionType } from "@/types/recovery";
+import type { FinalState, ReboundLevel, SessionType, StiffnessLevel } from "@/types/recovery";
 
 export const sessionTypeLabels: Record<SessionType, string> = {
   HOME: "En casa",
@@ -8,6 +8,9 @@ export const sessionTypeLabels: Record<SessionType, string> = {
   GYM: "Gimnasio",
   WALK: "Caminata",
   OTHER: "Otra",
+  MOBILITY: "Movilidad",
+  BALANCE: "Equilibrio",
+  BREATHING: "Respiración",
 };
 
 export const sessionTypeGlyphs: Record<SessionType, string> = {
@@ -17,6 +20,9 @@ export const sessionTypeGlyphs: Record<SessionType, string> = {
   GYM: "GM",
   WALK: "CM",
   OTHER: "OT",
+  MOBILITY: "MV",
+  BALANCE: "EQ",
+  BREATHING: "RS",
 };
 
 export const finalStateLabels: Record<FinalState, string> = {
@@ -30,6 +36,13 @@ export const reboundLabels: Record<ReboundLevel, string> = {
   MILD: "Leve",
   MODERATE: "Moderado",
   STRONG: "Fuerte",
+};
+
+export const stiffnessLabels: Record<StiffnessLevel, string> = {
+  NONE: "ninguna",
+  MILD: "un poco",
+  MODERATE: "bastante",
+  STRONG: "mucha",
 };
 
 const dayFormatter = new Intl.DateTimeFormat("es-PE", {

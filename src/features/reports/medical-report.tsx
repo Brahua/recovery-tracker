@@ -242,6 +242,9 @@ export function MedicalReport({
               </div>
             </div>
             <p className="rr-report-copy">{summary.sleepEnergyText}</p>
+            {summary.stiffnessText ? (
+              <p className="rr-report-copy">{summary.stiffnessText}</p>
+            ) : null}
           </ReportCard>
 
           <ReportCard number="05" title="Notas destacadas">

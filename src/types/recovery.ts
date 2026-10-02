@@ -8,11 +8,17 @@ export const sessionTypes = [
   "GYM",
   "WALK",
   "OTHER",
+  "MOBILITY",
+  "BALANCE",
+  "BREATHING",
 ] as const;
 
 export const finalStates = ["BETTER", "SAME", "WORSE"] as const;
 
 export const reboundLevels = ["NONE", "MILD", "MODERATE", "STRONG"] as const;
+
+// How stiff the body felt during the day; same four steps as the rebound.
+export const stiffnessLevels = ["NONE", "MILD", "MODERATE", "STRONG"] as const;
 
 export const treatmentCategories = [
   "PHYSICAL_AGENT",
@@ -49,6 +55,7 @@ export type Rating1To5 = (typeof rating1To5Values)[number];
 export type SessionType = (typeof sessionTypes)[number];
 export type FinalState = (typeof finalStates)[number];
 export type ReboundLevel = (typeof reboundLevels)[number];
+export type StiffnessLevel = (typeof stiffnessLevels)[number];
 export type TreatmentCategory = (typeof treatmentCategories)[number];
 export type TreatmentModality = (typeof treatmentModalities)[number];
 
@@ -157,6 +164,8 @@ export interface NightlyCloseout {
   sleepHours: number;
   sleepQuality: Rating1To5;
   reboundPainLevel: ReboundLevel;
+  /** Optional: closeouts saved before it existed do not have it. */
+  stiffnessLevel?: StiffnessLevel;
   notes?: string;
   /** Hour the day was closed, "HH:MM" in Lima time; older closeouts may not have it. */
   closedTime?: string;

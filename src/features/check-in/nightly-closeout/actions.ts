@@ -23,6 +23,7 @@ import type {
   PainScore,
   Rating1To5,
   ReboundLevel,
+  StiffnessLevel,
 } from "@/types/recovery";
 
 const expiredSessionMessage = "Tu sesión expiró. Recarga la página e inicia sesión nuevamente.";
@@ -47,6 +48,11 @@ function parseRating1To5(value: string) {
 
 function parseReboundLevel(value: string) {
   return value as ReboundLevel;
+}
+
+// Stiffness is optional: nothing chosen stays unset.
+function parseStiffnessLevel(value: string) {
+  return value ? (value as StiffnessLevel) : undefined;
 }
 
 function buildCloseoutSummary(
@@ -87,6 +93,7 @@ function readCloseoutForm(formData: FormData): CreateNightlyCloseoutInput {
     sleepHours: Number(getSingleValue(formData, "sleepHours")),
     sleepQuality: parseRating1To5(getSingleValue(formData, "sleepQuality")),
     reboundPainLevel: parseReboundLevel(getSingleValue(formData, "reboundPainLevel")),
+    stiffnessLevel: parseStiffnessLevel(getSingleValue(formData, "stiffnessLevel")),
     notes: getSingleValue(formData, "notes") || undefined,
   };
 }

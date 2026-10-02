@@ -36,6 +36,8 @@ export interface MedicalReportSummary {
   sessionResponseText: string;
   reboundAssociationText: string;
   sleepEnergyText: string;
+  /** Undefined when no closeout in the window recorded stiffness. */
+  stiffnessText?: string;
   noteHighlights: string[];
   appointmentQuestions: string[];
 }
@@ -188,6 +190,32 @@ export function buildSleepEnergyReport(
   return `En ${formatWindowLabel(windowDays)}, el sueno promedio fue ${averageSleep ?? "--"} h y la energia promedio ${averageEnergy ?? "--"}/5.`;
 }
 
+export function buildStiffnessReport(
+  closeouts: NightlyCloseout[],
+  windowDays: number,
+  referenceDate?: Date | string,
+) {
+  const range = getDateRangeForLastDays(windowDays, referenceDate);
+  const recorded = filterCloseoutsByRange(closeouts, range).filter(
+    (closeout) => closeout.stiffnessLevel !== undefined,
+  );
+
+  if (recorded.length === 0) {
+    return undefined;
+  }
+
+  const marked = recorded.filter(
+    (closeout) => closeout.stiffnessLevel === "MODERATE" || closeout.stiffnessLevel === "STRONG",
+  ).length;
+  const total = `${recorded.length} cierre${recorded.length === 1 ? "" : "s"}`;
+
+  if (marked === 0) {
+    return `No hubo rigidez marcada (bastante o mucha) en ${total} con rigidez registrada.`;
+  }
+
+  return `La rigidez fue bastante o mucha en ${marked} de ${total} con rigidez registrada.`;
+}
+
 export function buildAppointmentQuestions(summary: MedicalReportSummary) {
   const questions: string[] = [];
 
@@ -264,6 +292,7 @@ export function createMedicalReportSummary(
       referenceDate,
     ),
     sleepEnergyText: buildSleepEnergyReport(closeouts, windowDays, referenceDate),
+    stiffnessText: buildStiffnessReport(closeouts, windowDays, referenceDate),
     noteHighlights,
     appointmentQuestions: [],
   };

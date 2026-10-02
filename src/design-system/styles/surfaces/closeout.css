@@ -721,3 +721,8 @@
     color: var(--rr-night);
   }
 }
+
+.rr-closeout-field-group h3 span {
+  color: var(--rr-text-muted);
+  font-weight: 400;
+}

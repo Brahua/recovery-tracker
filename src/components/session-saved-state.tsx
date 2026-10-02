@@ -13,6 +13,9 @@ const sessionTypeLabels: Record<SessionType, string> = {
   GYM: "Gimnasio",
   WALK: "Caminata",
   OTHER: "Otra",
+  MOBILITY: "Movilidad",
+  BALANCE: "Equilibrio",
+  BREATHING: "Respiración",
 };
 
 function formatSessionContext(value?: string) {

@@ -42,6 +42,25 @@ test.describe("nightly closeout", () => {
     await expect(page.getByText("dolor 3")).toBeVisible();
   });
 
+  test("stiffness is optional and shows in Historial", async ({ page }) => {
+    await ensureAuthenticated(page);
+    // -29 stays clear of the other specs' dates (accessibility uses -3…-28) and inside Historial's 30 days.
+    const closedDate = addRecoveryDays(getRecoveryDateKey(), -29);
+    await page.getByLabel("Fecha y hora del cierre").fill(`${closedDate}T22:15`);
+    await page.getByRole("slider", { name: "Dolor" }).fill("2");
+    await page.getByText("Media", { exact: true }).click();
+    await page.getByText("Nada", { exact: true }).click();
+    await page.getByText("Regular", { exact: true }).click();
+    await page.getByText("Bastante", { exact: true }).click();
+    await page.getByRole("button", { name: "Cerrar el dia" }).click();
+    await expect(
+      page.getByRole("heading", { name: /^(Dia cerrado|Cierre guardado)\.$/ }),
+    ).toBeVisible();
+
+    await page.goto("/historial");
+    await expect(page.getByText("Rigidez bastante").first()).toBeVisible();
+  });
+
   test("blocks a second closeout for a date that is already closed", async ({ page }) => {
     await ensureAuthenticated(page);
     const closedDate = addRecoveryDays(getRecoveryDateKey(), -2);

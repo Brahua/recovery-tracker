@@ -109,6 +109,9 @@ const sessionTypeNames: Record<SessionType, string> = {
   GYM: "Gimnasio",
   WALK: "Caminata",
   OTHER: "Otra",
+  MOBILITY: "Movilidad",
+  BALANCE: "Equilibrio",
+  BREATHING: "Respiración",
 };
 
 const monthNames = [

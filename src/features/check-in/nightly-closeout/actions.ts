@@ -13,6 +13,7 @@ import {
   futureCloseoutDateMessage,
   getCloseoutDateError,
   invalidCloseoutDateMessage,
+  splitCloseoutDateTime,
 } from "@/lib/closeout-date";
 import { getHistoryHrefForDate } from "@/lib/history-view-model";
 import { AuthenticationRequiredError } from "@/lib/supabase/authenticated";
@@ -77,8 +78,10 @@ export interface NightlyCloseoutActionState {
 }
 
 function readCloseoutForm(formData: FormData): CreateNightlyCloseoutInput {
+  const { date, closedTime } = splitCloseoutDateTime(getSingleValue(formData, "closedAt"));
   return {
-    date: getSingleValue(formData, "date"),
+    date,
+    closedTime,
     endOfDayPain: parsePainScore(getSingleValue(formData, "endOfDayPain")),
     energy: parseRating1To5(getSingleValue(formData, "energy")),
     sleepHours: Number(getSingleValue(formData, "sleepHours")),
@@ -133,7 +136,8 @@ export async function createNightlyCloseoutAction(
   let savedCloseoutDate = "";
 
   try {
-    const date = getSingleValue(formData, "date");
+    const input = readCloseoutForm(formData);
+    const { date } = input;
     const dateError = getCloseoutDateError(date);
 
     if (dateError) {
@@ -149,7 +153,6 @@ export async function createNightlyCloseoutAction(
       throw new Error(duplicateCloseoutDateMessage);
     }
 
-    const input = readCloseoutForm(formData);
     const savedCloseout = await repository.createNightlyCloseout(input);
 
     savedCloseoutId = savedCloseout.id;
@@ -184,7 +187,8 @@ export async function updateNightlyCloseoutAction(
 
   try {
     const repository = await createRecoveryLogRepository();
-    const date = getSingleValue(formData, "date");
+    const input = readCloseoutForm(formData);
+    const { date } = input;
     const dateError = getCloseoutDateError(date);
 
     if (dateError) {
@@ -197,7 +201,7 @@ export async function updateNightlyCloseoutAction(
       throw new DuplicateCloseoutDateError();
     }
 
-    const saved = await repository.updateNightlyCloseout(id, readCloseoutForm(formData));
+    const saved = await repository.updateNightlyCloseout(id, input);
     const href = getHistoryHrefForDate(saved.date);
     const toastKey = encodeURIComponent(`${saved.id}:${saved.updatedAt}`);
     historyHref = `${href}${href.includes("?") ? "&" : "?"}updated=closeout&key=${toastKey}`;

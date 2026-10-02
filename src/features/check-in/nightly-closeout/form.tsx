@@ -20,7 +20,7 @@ import {
 } from "@/features/check-in/nightly-closeout/date-context";
 import { getCloseoutFormProgress } from "@/lib/closeout-form-state";
 import { getHistoryHrefForDate } from "@/lib/history-view-model";
-import { getRecoveryDateKey } from "@/lib/recovery-date";
+import { getRecoveryDateKey, toRecoveryDateTimeLocal } from "@/lib/recovery-date";
 import type {
   NightlyCloseout,
   PainScore,
@@ -51,20 +51,6 @@ const reboundOptions: Array<{ value: ReboundLevel; label: string }> = [
   { value: "MODERATE", label: "Moderado" },
   { value: "STRONG", label: "Fuerte" },
 ];
-
-function formatHeaderContext(value: string) {
-  const date = new Date(value);
-  const day = new Intl.DateTimeFormat("es-PE", {
-    day: "numeric",
-    month: "long",
-    weekday: "long",
-  }).format(date);
-  const time = new Intl.DateTimeFormat("es-PE", {
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-  return `${day} · ${time}`;
-}
 
 function formatRecentDay(value: string) {
   const date = new Date(`${value}T00:00:00`);
@@ -176,6 +162,10 @@ export function NightlyCloseoutForm({
   const [sleepQuality, setSleepQuality] = useState<Rating1To5 | null>(
     editingCloseout?.sleepQuality ?? null,
   );
+  // The hour the day was closed: kept here so changing the date (a URL change) does not reset it.
+  const [closedTime, setClosedTime] = useState(
+    editingCloseout?.closedTime ?? toRecoveryDateTimeLocal(defaultOccurredAt).slice(11, 16),
+  );
   const [showNote, setShowNote] = useState(Boolean(editingCloseout?.notes));
   const [note, setNote] = useState(editingCloseout?.notes ?? "");
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -228,9 +218,7 @@ export function NightlyCloseoutForm({
     });
   }
 
-  const headerContext = editingCloseout
-    ? dateLabel
-    : `${dateLabel} · ${formatHeaderContext(defaultOccurredAt).split(" · ")[1]}`;
+  const headerContext = `${dateLabel} · ${closedTime}`;
 
   return (
     <>
@@ -288,10 +276,12 @@ export function NightlyCloseoutForm({
         ) : null}
 
         <CloseoutDateContext
+          closedTime={closedTime}
           dateLabel={dateLabel}
           hasCloseout={dateHasCloseout}
           isPending={isDatePending}
           onChange={changeDate}
+          onTimeChange={setClosedTime}
           selectedDate={selectedDate}
           today={today}
         />

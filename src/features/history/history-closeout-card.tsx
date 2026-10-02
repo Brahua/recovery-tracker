@@ -3,15 +3,18 @@ import { historyTimeFormatter, reboundLabels } from "@/features/history/history-
 import type { NightlyCloseout } from "@/types/recovery";
 
 export function HistoryCloseoutCard({ closeout }: { closeout: NightlyCloseout }) {
+  // The hour chosen in the form (Lima, fixed UTC-5); older closeouts fall back to when they were saved.
+  const closedAt = closeout.closedTime
+    ? `${closeout.date}T${closeout.closedTime}:00-05:00`
+    : closeout.createdAt;
+
   return (
     <section className="rr-history-closeout" data-closeout-id={closeout.id}>
       <header>
         <span aria-hidden="true">☾</span>
         <div>
           <strong>Cierre del día</strong>
-          <time dateTime={closeout.createdAt}>
-            {historyTimeFormatter.format(new Date(closeout.createdAt))}
-          </time>
+          <time dateTime={closedAt}>{historyTimeFormatter.format(new Date(closedAt))}</time>
         </div>
       </header>
       <div className="rr-history-closeout-chips">

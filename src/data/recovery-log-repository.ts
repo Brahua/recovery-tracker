@@ -52,6 +52,7 @@ type NightlyCloseoutRow = {
   sleep_quality: NightlyCloseout["sleepQuality"];
   rebound_pain_level: NightlyCloseout["reboundPainLevel"];
   notes: string | null;
+  closed_time: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -145,13 +146,15 @@ function mapNightlyCloseoutRow(row: NightlyCloseoutRow): NightlyCloseout {
     sleepQuality: row.sleep_quality,
     reboundPainLevel: row.rebound_pain_level,
     notes: row.notes ?? undefined,
+    // Postgres returns "HH:MM:SS".
+    closedTime: row.closed_time ? row.closed_time.slice(0, 5) : undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 }
 
 const nightlyCloseoutColumns =
-  "id, user_id, date, end_of_day_pain, energy, sleep_hours, sleep_quality, rebound_pain_level, notes, created_at, updated_at";
+  "id, user_id, date, end_of_day_pain, energy, sleep_hours, sleep_quality, rebound_pain_level, notes, closed_time, created_at, updated_at";
 
 const rehabSessionColumns =
   "id, user_id, occurred_at, session_type, pain_before, pain_during, pain_after, perceived_load, final_state, notes, therapist_notes, created_at, updated_at";
@@ -165,6 +168,7 @@ function toNightlyCloseoutRow(input: CreateNightlyCloseoutInput) {
     sleep_quality: input.sleepQuality,
     rebound_pain_level: input.reboundPainLevel,
     notes: input.notes ?? null,
+    closed_time: input.closedTime ?? null,
   };
 }
 

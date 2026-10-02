@@ -29,7 +29,9 @@ Lo que el backlog original tenía como pendiente o diferido y hoy existe.
 | Sliders táctiles de dolor | Slider propio para dolor antes/durante/después | `src/components/ritual-pain-slider.tsx` |
 | Momento de cierre animado | Estados de éxito tras sesión y cierre, con animación que respeta movimiento reducido | `src/components/session-saved-state.tsx`, `src/components/day-closed-state.tsx` |
 | Diseño mobile-first con escritorio | Rediseño con Claude Design (8 pantallas), revisado en móvil, tablet y escritorio | `docs/specs/recovery-ritual-ux-redesign-spec.md` |
-| Modo oscuro | La app es oscura por diseño; el tema claro legado se retiró el 2026-10-01 | `src/design-system/styles/tokens/colors.css` |
+| Apariencia | Tema Oscuro (por defecto), Claro o Sistema y color principal Verde, Terracota o Ámbar, guardados en la cuenta | Ajustes → Apariencia, `src/lib/appearance.ts`, `docs/specs/access-onboarding-personalization-spec.md` |
+| Acceso por invitación | Solo entran correos invitados (hook de Supabase); el admin invita, comparte y abre el acceso desde Ajustes | Ajustes → Acceso, ADR-005 |
+| Onboarding | Recorrido de bienvenida y configuración rápida para cuentas nuevas, repetible desde Ajustes | `/bienvenida` |
 | Design system CSS | Tokens por tipo, componentes y un archivo por pantalla; `design:check` impide valores sueltos | `src/design-system/` |
 | Historial | Solo lectura, ventanas de 30 días, varias sesiones por día, series individuales | `/historial` |
 | Registros con fecha anterior | Sesiones y cierres de días pasados, sin fechas futuras ni cierres duplicados | Registrar |
@@ -57,7 +59,8 @@ Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justific
 | Baja | Exportar a CSV | Análisis propio en una hoja de cálculo | Hagas análisis a mano seguido |
 | Baja | Apple Health / wearables (sueño, pasos) | Datos sin cargarlos a mano | El registro manual de sueño sea poco fiable |
 | Baja | Sugerencias de progresión de carga | Guiar el entrenamiento | El fisio quiera usar los datos contigo (tema médico sensible) |
-| Baja | Varias lesiones / multiusuario | Producto más general | Otras personas quieran usarla |
+| Baja | Varias lesiones por cuenta | Seguir más de una lesión | Alguien quiera registrar dos lesiones a la vez (varias cuentas ya funcionan: acceso por invitación) |
+| Baja | Invitación por correo desde la app | Hoy la invitación se comparte con el menú del celular | Se invite a mucha gente o desde escritorio (necesita un servicio de email) |
 
 ## Pendiente: diseño
 

@@ -2,6 +2,8 @@
 
 Spec: `docs/specs/access-onboarding-personalization-spec.md` · Plan: `tasks/plan-access-onboarding.md`
 
+Estado: **terminado y probado por el owner en producción (2026-10-02)**. PRs #34–#40.
+
 Verificación en la PC: `npm run format && npm run lint && npm run design:check && npm run typecheck && npm test`. Build, E2E y Supabase local en CI.
 
 ## PR 1: acceso por invitación (base)

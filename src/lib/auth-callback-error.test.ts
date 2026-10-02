@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { getAuthCallbackErrorCopy, normalizeAuthCallbackReason } from "@/lib/auth-callback-error";
+import {
+  getAuthCallbackErrorCopy,
+  getProviderErrorReason,
+  normalizeAuthCallbackReason,
+} from "@/lib/auth-callback-error";
 import { selectRequestOrigin } from "@/lib/supabase/urls";
 
 describe("auth callback errors", () => {
@@ -20,6 +24,20 @@ describe("auth callback errors", () => {
 
   it("provides provider-specific copy when Google rejects the request", () => {
     expect(getAuthCallbackErrorCopy("provider_rejected").description).toContain("Google");
+  });
+
+  it("recognizes the invite-only rejection from the before_user_created hook", () => {
+    expect(getProviderErrorReason("access_denied", "not_invited")).toBe("not_invited");
+    expect(normalizeAuthCallbackReason("not_invited")).toBe("not_invited");
+    expect(getAuthCallbackErrorCopy("not_invited").title).toContain("invitación");
+  });
+
+  it("treats any other provider error as a Google rejection", () => {
+    expect(getProviderErrorReason("access_denied", "Signups not allowed for this instance")).toBe(
+      "provider_rejected",
+    );
+    expect(getProviderErrorReason("server_error", "not_invited")).toBe("provider_rejected");
+    expect(getProviderErrorReason("access_denied", null)).toBe("provider_rejected");
   });
 
   it("keeps the active loopback origin so the PKCE cookie stays available", () => {

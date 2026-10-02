@@ -2,6 +2,7 @@ export const authCallbackReasons = [
   "exchange_failed",
   "initiation_failed",
   "missing_code",
+  "not_invited",
   "provider_rejected",
   "unknown",
 ] as const;
@@ -24,6 +25,11 @@ const authCallbackCopy: Record<AuthCallbackReason, { title: string; description:
     description:
       "No recibimos una respuesta valida del proveedor. Vuelve al inicio e intenta nuevamente.",
   },
+  not_invited: {
+    title: "Recovery Ritual está en acceso por invitación.",
+    description:
+      "Tu cuenta de Google no está en la lista de invitados. Si alguien te invitó, entra con el correo que le diste; si no, pídele una invitación a quien te compartió la app.",
+  },
   provider_rejected: {
     title: "Google rechazo el acceso.",
     description:
@@ -44,4 +50,15 @@ export function normalizeAuthCallbackReason(reason: string | undefined): AuthCal
 
 export function getAuthCallbackErrorCopy(reason: AuthCallbackReason) {
   return authCallbackCopy[reason];
+}
+
+// Supabase Auth redirects to /auth/callback with ?error=…&error_description=… when sign-in fails.
+// The before_user_created hook rejects uninvited emails with a 403 and the message "not_invited"
+// (supabase/migrations/20261004000000_access_control.sql), which arrives as access_denied.
+export function getProviderErrorReason(
+  error: string | null,
+  description: string | null,
+): AuthCallbackReason {
+  if (error === "access_denied" && description === "not_invited") return "not_invited";
+  return "provider_rejected";
 }

@@ -5,7 +5,7 @@
 
 ## 1. Qué es
 
-App en español, pensada primero para el celular, para llevar el control de la rehabilitación después de una cirugía de rodilla. Tiene cuatro flujos principales:
+App en español, pensada primero para el celular, para llevar el control de una rehabilitación (de cualquier zona del cuerpo; empezó con una cirugía de rodilla). Una cuenta sigue una lesión activa. Tiene cuatro flujos principales:
 
 - **Registrar sesión:** lo que se anota al salir de terapia; en Fisio guiada, también los tratamientos del centro (agentes físicos, terapia manual, punción, vendaje) y las indicaciones del fisio.
 - **Cierre del día:** el registro de cada noche.

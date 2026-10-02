@@ -8,8 +8,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/",
     name: "Recovery Tracker",
     short_name: "Recovery",
-    description:
-      "Tu ritual diario de recuperacion de rodilla: sesiones, cierres, insights y reporte.",
+    description: "Tu ritual diario de rehabilitación: sesiones, cierres, insights y reporte.",
     lang: "es",
     start_url: "/",
     scope: "/",

@@ -114,7 +114,7 @@ export function SignedOutLanding({ errorMessage, showDemo, supabaseEnv }: Signed
 
       <section className="rr-landing-body" id="inicio">
         <div className="rr-landing-copy">
-          <p className="rr-landing-eyebrow">Rehabilitacion de rodilla</p>
+          <p className="rr-landing-eyebrow">Rehabilitación y recuperación</p>
           <h1>
             Vuelve
             <span>mas fuerte.</span>

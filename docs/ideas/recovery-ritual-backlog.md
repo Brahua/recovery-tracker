@@ -42,6 +42,10 @@ Lo que el backlog original tenía como pendiente o diferido y hoy existe.
 | Editar o corregir registros pasados | Sesiones y cierres se editan (fecha incluida) o se eliminan con confirmación, desde Historial o "Corregir" tras guardar | `docs/specs/edit-past-records-spec.md` |
 | Tratamientos del centro (parte de la línea de tiempo de tratamiento) | En Fisio guiada: agentes físicos, terapia manual, invasivas, vendaje e indicaciones del fisio; se ven en Historial, Insights y Reporte | `docs/specs/physio-treatments-spec.md` |
 
+## Dirección: app de rehabilitación en general
+
+Decidido el 2026-10-02: la app deja de ser solo de rodilla. Sigue pensada para el paciente, con registro fácil y datos que se entienden: **sin mediciones clínicas** (ROM, escalas, perímetros) ni alertas médicas, y **una sola lesión activa** por cuenta. Fases: 0 texto neutro, 1 entidad `condition` y zonas del cuerpo, 2 rigidez y tipos de sesión más amplios, 3 metas simples y reporte con la lesión.
+
 ## Pendiente: producto
 
 Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justificaría empezarla.
@@ -59,7 +63,10 @@ Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justific
 | Baja | Exportar a CSV | Análisis propio en una hoja de cálculo | Hagas análisis a mano seguido |
 | Baja | Apple Health / wearables (sueño, pasos) | Datos sin cargarlos a mano | El registro manual de sueño sea poco fiable |
 | Baja | Sugerencias de progresión de carga | Guiar el entrenamiento | El fisio quiera usar los datos contigo (tema médico sensible) |
-| Baja | Varias lesiones por cuenta | Seguir más de una lesión | Alguien quiera registrar dos lesiones a la vez (varias cuentas ya funcionan: acceso por invitación) |
+| Media | **Etapa de la recuperación** (opcional, elegida por el paciente: "Primeras semanas", "Recuperando movilidad", "Fortaleciendo", "Volviendo a mi actividad") | Da estructura al proceso sin términos técnicos | Se quiera ver en qué punto del proceso estás (idea del 2026-10-02, para más adelante) |
+| Media | **Módulo de documentos médicos** (exámenes, recetas, resonancias; Storage privado con RLS y URL firmadas, PDF/JPG/PNG/HEIC, subida desde el celular) | Tener a mano los documentos de la recuperación | Se retome (2026-10-02: se deja para más adelante; compartirlos y el límite de almacenamiento quedaron descartados por ahora) |
+| Media | **Portal para fisios** (crear ejercicios y rutinas y asignarlos a un paciente por correo; el paciente acepta o rechaza) | Que el fisio prescriba y el paciente lo reciba en la app | Hay un fisio dispuesto a usarlo. Idea del 2026-10-02, requiere spec propia (reemplaza la idea de documentos como siguiente gran feature). Decisiones: el fisio es una cuenta invitada por el admin; el paciente recibe una copia propia que puede editar sin afectar al fisio; el fisio no ve nada del paciente por ahora; se puede asignar a un correo sin cuenta y le aparece al entrar; las indicaciones van en las notas que ya existen |
+| Baja | Varias lesiones por cuenta (decidido el 2026-10-02: por ahora una sola lesión activa) | Seguir más de una lesión | Alguien quiera registrar dos lesiones a la vez (varias cuentas ya funcionan: acceso por invitación) |
 | Baja | Invitación por correo desde la app | Hoy la invitación se comparte con el menú del celular | Se invite a mucha gente o desde escritorio (necesita un servicio de email) |
 
 ## Pendiente: diseño
@@ -89,7 +96,7 @@ Antes de construir cualquiera de estos: los cuatro son features nuevas, no ajust
 - **Competir por dolor o puntos por sesiones más duras:** puede empujar a conductas inseguras.
 - **Comunidad o capa social:** no aporta al caso de uso personal.
 - **Marketplace de rutinas o planes de rehabilitación:** lejos del problema actual.
-- **Portal para médicos:** solo tendría sentido con varios profesionales usando la app.
+- **Portal para médicos:** reabierto solo como portal para fisios (ver Pendiente: producto). Un portal de lectura para médicos sigue descartado.
 
 ## Direcciones de producto consideradas al inicio
 

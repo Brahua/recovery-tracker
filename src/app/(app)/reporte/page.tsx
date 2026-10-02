@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { createGoalsRepository } from "@/data/goals-repository";
 import { MedicalReport } from "@/features/reports/medical-report";
 import { parseCondition } from "@/lib/validation/condition";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
@@ -22,8 +23,11 @@ export default async function ReportePage({
     redirect("/");
   }
 
+  const goals = await (await createGoalsRepository()).listGoals();
+
   return (
     <MedicalReport
+      goals={goals}
       condition={parseCondition(user.user_metadata?.condition)}
       now={new Date().toISOString()}
       recentCloseouts={recentCloseouts}

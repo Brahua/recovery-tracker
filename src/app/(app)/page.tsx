@@ -1,4 +1,5 @@
 import { SignedOutLanding } from "@/components/signed-out-landing";
+import { createGoalsRepository } from "@/data/goals-repository";
 import { createRecoveryLogRepository } from "@/data/recovery-log-repository";
 import { TodayOverview } from "@/features/today/overview";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
@@ -21,10 +22,14 @@ export default async function Home({
     );
   }
 
-  const therapistNotes = await (await createRecoveryLogRepository()).getLatestTherapistNotes();
+  const [therapistNotes, goals] = await Promise.all([
+    (await createRecoveryLogRepository()).getLatestTherapistNotes(),
+    (await createGoalsRepository()).listGoals(),
+  ]);
 
   return (
     <TodayOverview
+      goals={goals}
       recentCloseouts={recentCloseouts}
       recentSessions={recentSessions}
       therapistNotes={therapistNotes}

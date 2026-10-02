@@ -9,7 +9,7 @@
 
 - MVP terminado y validado con uso real (la semana de validación de julio se cerró el 2026-10-01).
 - El uso real produjo el catálogo de ejercicios, las rutinas, los arreglos de móvil, el nombre de la cuenta y el feedback global de carga; todo está en producción.
-- No hay una feature en curso ni elegida. La última entregada fue editar o corregir registros pasados (2026-10-01).
+- No hay una feature en curso ni elegida. La última entregada fue la app de rehabilitación en general (2026-10-02).
 
 ## Ya hecho
 
@@ -40,11 +40,12 @@ Lo que el backlog original tenía como pendiente o diferido y hoy existe.
 | Nombre en el saludo | Se elige en `/ajustes` y se mantiene entre inicios de sesión con Google | `src/features/settings/` |
 | Feedback de carga | Barra de progreso global, toasts en cada escritura, pantalla de error | `docs/specs/global-loading-and-feedback-spec.md` |
 | Editar o corregir registros pasados | Sesiones y cierres se editan (fecha incluida) o se eliminan con confirmación, desde Historial o "Corregir" tras guardar | `docs/specs/edit-past-records-spec.md` |
+| App de rehabilitación en general (2026-10-02) | Textos neutros, lesión activa por cuenta (zona, lado, tipo y fecha) que adapta los textos, rigidez en el cierre, tipos de sesión Movilidad, Equilibrio y Respiración, y metas simples | `docs/specs/general-rehab-spec.md`, Ajustes → Mi recuperación, Hoy → Mis metas |
 | Tratamientos del centro (parte de la línea de tiempo de tratamiento) | En Fisio guiada: agentes físicos, terapia manual, invasivas, vendaje e indicaciones del fisio; se ven en Historial, Insights y Reporte | `docs/specs/physio-treatments-spec.md` |
 
 ## Dirección: app de rehabilitación en general
 
-Decidido el 2026-10-02: la app deja de ser solo de rodilla. Sigue pensada para el paciente, con registro fácil y datos que se entienden: **sin mediciones clínicas** (ROM, escalas, perímetros) ni alertas médicas, y **una sola lesión activa** por cuenta. Fases: 0 texto neutro, 1 entidad `condition` y zonas del cuerpo, 2 rigidez y tipos de sesión más amplios, 3 metas simples y reporte con la lesión.
+Decidido el 2026-10-02: la app deja de ser solo de rodilla. Sigue pensada para el paciente, con registro fácil y datos que se entienden: **sin mediciones clínicas** (ROM, escalas, perímetros) ni alertas médicas, y **una sola lesión activa** por cuenta. Fases 0 a 3 entregadas el 2026-10-02 (texto neutro, lesión activa, rigidez y tipos de sesión, metas simples).
 
 ## Pendiente: producto
 
@@ -59,7 +60,6 @@ Ordenado por prioridad. "Se reabre cuando" es la señal de uso real que justific
 | Media | PDF real del reporte (archivo generado, no impresión del navegador) | Enviar el reporte por correo o WhatsApp | El fisio o el médico pida un archivo |
 | Media | Zonas de dolor / mapa de la rodilla | La ubicación del dolor en las citas | La ubicación del dolor sea tema en las citas |
 | Media | Resumen semanal y preguntas para la cita con IA | Mejores resúmenes que las reglas actuales | Los textos por reglas se queden cortos (con límites médicos claros) |
-| Baja | Registrar rigidez en el cierre nocturno | Hoy el cierre registra dolor, energía, sueño y rebote; la rigidez solo cabe en la nota | La rigidez sea un dato que el fisio pida seguir |
 | Baja | Exportar a CSV | Análisis propio en una hoja de cálculo | Hagas análisis a mano seguido |
 | Baja | Apple Health / wearables (sueño, pasos) | Datos sin cargarlos a mano | El registro manual de sueño sea poco fiable |
 | Baja | Sugerencias de progresión de carga | Guiar el entrenamiento | El fisio quiera usar los datos contigo (tema médico sensible) |

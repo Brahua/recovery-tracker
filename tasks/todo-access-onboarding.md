@@ -11,7 +11,7 @@ Verificación en la PC: `npm run format && npm run lint && npm run design:check 
   - Verify: CI aplica la migración; `npm run supabase:push:dry` lista solo esta migración.
   - Files: `supabase/migrations/20261004000000_access_control.sql`, `supabase/config.toml`
 
-- [x] A2. Pruebas SQL del hook (OK del owner el 2026-10-01; falta verlas verdes en CI)
+- [x] A2. Pruebas SQL del hook (OK del owner el 2026-10-01; verdes en CI, 10 casos)
   - Acceptance: pgTAP cubre permitir/rechazar por modo y lista, mayúsculas, anónimos, y que `authenticated` no lee las tablas; paso `npx supabase test db` en CI.
   - Verify: CI verde.
   - Files: `supabase/tests/access_control.test.sql`, `.github/workflows/ci-cd.yml`
@@ -25,7 +25,7 @@ Verificación en la PC: `npm run format && npm run lint && npm run design:check 
   - Acceptance: ADR de acceso por invitación (hook en la base, modo `open`, admin en `app_metadata`); `docs/deployment.md` con cómo activar/apagar el hook y cómo hacer "Ban user"; `CHANGELOG`, `HANDOFF`.
   - Files: `docs/decisions/ADR-005-invite-only-access.md`, `docs/deployment.md`, `CHANGELOG.md`, `docs/HANDOFF.md`
 
-- [ ] A5. Producción (tras el deploy)
+- [x] A5. Producción (tras el deploy)
   - Acceptance: función presente en producción; hook activado por Management API; `app_metadata.role = "admin"` en la cuenta del owner.
   - Verify: un correo no invitado ve el mensaje y no aparece en `auth.users`; el owner entra.
 

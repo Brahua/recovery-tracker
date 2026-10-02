@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-01 (acceso por invitación, PR 1 de 5). Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
+> Última actualización: 2026-10-01 (acceso por invitación en producción, PR 1 de 5). Handoffs anteriores (con fecha) en `docs/archive/handoffs/`.
 
 ## Cómo retomar
 
@@ -18,7 +18,7 @@
 ## Estado
 
 - **Producción:** https://recovery-tracker.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
-- **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01).
+- **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01). Acceso por invitación activo desde el 2026-10-01 (ADR-005).
 - **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo, feedback global de carga, tratamientos del centro en Fisio guiada y edición de sesiones y cierres. Detalle en `CHANGELOG.md`.
 - **Fase:** prueba de uso real. Tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`) en producción desde el 2026-10-01: fase 1 (PR #23, migración `20261002000000_session_treatments.sql`) y fase 2, Insights y Reporte (PR #24). Probado por el owner en producción el 2026-10-01.
 - **Editar o corregir registros pasados** (`docs/specs/edit-past-records-spec.md`): en producción desde el 2026-10-01. Cierres (PR #27), sesiones con la migración `20261003000000_edit_past_records.sql` (PR #28) y "Corregir" en las pantallas de éxito (PR 3). Incluye el arreglo de la hora de la sesión (el servidor la leía en UTC). **Falta que el owner lo pruebe en producción.** No hay una próxima feature elegida.
@@ -34,12 +34,14 @@
 
 Spec aprobada: `docs/specs/access-onboarding-personalization-spec.md` · Plan: `tasks/plan-access-onboarding.md` · Tareas: `tasks/todo-access-onboarding.md`. Cinco PRs en orden: (1) acceso por invitación en la base, (2) sección "Acceso" en Ajustes para el admin, (3) color principal, (4) tema claro, (5) onboarding.
 
-- **PR 1, rama `feat/invite-only-access`:** migración `20261004000000_access_control.sql` (hook `before_user_created`, lista y modo), pgTAP en CI, pantalla "no invitado", ADR-005. **Después del deploy:** activar el hook en producción por la Management API y marcar al owner como admin (`docs/deployment.md` → "Acceso por invitación"). No activarlo antes: sin la función, todo registro nuevo falla.
+- **PR 1 en producción (#34, 2026-10-01):** migración `20261004000000_access_control.sql`, hook `before_user_created` **activo** en producción (Management API), modo `invite_only`, lista vacía, owner con `app_metadata.role = "admin"`. Probado por el owner: su cuenta entra; otra cuenta de Google ve "acceso por invitación" y no se crea. Para invitar a alguien antes del PR 2: SQL en `docs/deployment.md` → "Acceso por invitación".
+- **Siguiente: PR 2**, sección "Acceso" en Ajustes (tareas B1–B4).
+- En producción quedan 3 usuarios anónimos del 2026-09-16 sin datos (restos del staging); no se borran sin el OK del owner.
 - **PR 3 y 4 esperan los colores** del archivo `Recovery Tracker Design System.dc.html` de Claude Design. El owner va a conectar el MCP `claude_design` (`claude mcp add --transport http claude_design https://api.anthropic.com/v1/design/mcp`, reiniciar y `/design-login`).
 
 | Rama | Estado |
 |---|---|
-| `feat/invite-only-access` | PR 1 abierto, esperando CI |
+| — | Sin ramas abiertas; PR 2 por empezar |
 
 ## ⏰ Vencimientos
 

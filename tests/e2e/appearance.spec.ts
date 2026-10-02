@@ -87,18 +87,28 @@ test.describe.serial("appearance", () => {
     });
   }
 
-  test("Sistema follows the device: light when the phone is in light mode", async ({ page }) => {
+  test("Sistema follows the device's light or dark mode", async ({ browser, page }) => {
     await choose(page, "Verde");
     await choose(page, "Sistema");
-    await page.emulateMedia({ colorScheme: "light" });
-    await page.goto("/");
-    await expect(page.locator("html")).toHaveAttribute("data-theme", "system");
-    const htmlBackground = () =>
-      page.evaluate(() => getComputedStyle(document.documentElement).backgroundColor);
-    expect(await htmlBackground()).toBe("rgb(246, 242, 235)");
 
-    await page.emulateMedia({ colorScheme: "dark" });
-    expect(await htmlBackground()).toBe("rgb(14, 12, 10)");
+    for (const [colorScheme, background] of [
+      ["light", "rgb(246, 242, 235)"],
+      ["dark", "rgb(14, 12, 10)"],
+    ] as const) {
+      const context = await browser.newContext({
+        storageState: await page.context().storageState(),
+        colorScheme,
+      });
+      const phone = await context.newPage();
+      await phone.goto("/");
+      await expect(phone.locator("html")).toHaveAttribute("data-theme", "system");
+      await expect
+        .poll(() =>
+          phone.evaluate(() => getComputedStyle(document.documentElement).backgroundColor),
+        )
+        .toBe(background);
+      await context.close();
+    }
   });
 
   test("the signed-out landing stays dark in the light theme", async ({ browser, baseURL }) => {

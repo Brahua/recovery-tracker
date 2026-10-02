@@ -1,6 +1,6 @@
 # Spec: acceso con Google, onboarding y personalización
 
-Estado: **borrador v2 (2026-10-01)**: incorpora las respuestas del owner (paleta clara propuesta por el agente, anónimos permitidos por el hook, el owner ve el onboarding, administración de accesos en Ajustes). Falta: los hex de los 3 colores.
+Estado: **borrador v2 (2026-10-01)**: incorpora las respuestas del owner (paleta clara propuesta por el agente, anónimos permitidos por el hook, el owner ve el onboarding, administración de accesos en Ajustes). Colores confirmados desde Claude Design (2026-10-01).
 
 ## Objetivo
 
@@ -30,12 +30,13 @@ Queremos tres cosas:
 
 **Administración de accesos (solo admin)**
 
-10. El rol de admin vive en `app_metadata.role = "admin"` (el usuario no puede cambiarlo; solo el servidor de Supabase). Fase 1: solo la cuenta del owner, asignado por SQL una vez.
+10. El rol de admin vive en `app_metadata.role = "admin"` (el usuario no puede cambiarlo; solo el servidor de Supabase). Fase 1: solo la cuenta del owner, asignado por SQL una vez. La base lo lee de `auth.users` (no del JWT), así que darlo o quitarlo aplica en la siguiente acción, sin volver a iniciar sesión.
 11. `/ajustes` → sección **"Acceso"**, visible solo para admin:
-    - **Invitar:** campo de correo + botón "Invitar". Agrega el correo a la lista (validado, sin duplicados) y abre el menú de compartir del celular (Web Share API; si no existe, "Copiar invitación") con un mensaje listo: "Te invité a Recovery Ritual. Entra con tu cuenta de Google (correo …) en https://recovery-tracker.brahua.com".
+    - **Invitar:** campo de correo + botón "Invitar". Agrega el correo a la lista (validado, sin duplicados).
+    - **Compartir:** cada invitado pendiente tiene "Compartir", que abre el menú de compartir del celular (Web Share API; si no existe, copia el texto) con un mensaje listo: "Te invité a Recovery Ritual… Entra con tu cuenta de Google (correo) en <URL de la app>". Es un botón aparte porque el menú de compartir necesita un toque directo.
     - **Lista de invitados:** correo, fecha y estado ("Pendiente" / "Ya entró", según exista la cuenta), con "Quitar" (con confirmación en la app, no `confirm()`).
-    - **Modo de acceso:** interruptor "Solo por invitación" / "Abierto a cualquier cuenta de Google", con confirmación que explica la consecuencia.
-12. Toda acción de admin se verifica en la base (funciones `security definer` que revisan `auth.jwt() -> 'app_metadata' ->> 'role'`), no solo ocultando la sección. Un no admin que llama a la acción recibe un error.
+    - **Modo de acceso:** estado actual ("Solo por invitación" / "Abierto") y un botón para cambiarlo ("Abrir a cualquier cuenta de Google" / "Volver a solo por invitación"), con confirmación que explica la consecuencia.
+12. Toda acción de admin se verifica en la base (funciones `security definer` que revisan el rol en `auth.users`), no solo ocultando la sección. Un no admin que llama a la acción recibe un error.
 13. Quitar un correo impide que se cree la cuenta si aún no entró; si ya entró, su cuenta sigue activa (ver Fuera de alcance).
 
 **Onboarding**
@@ -84,10 +85,10 @@ Google ──► Supabase Auth ──► hook before_user_created (Postgres)
 - `public.app_access_settings` (una sola fila, `mode text check (mode in ('invite_only','open'))`).
 - `public.access_allowlist` (`email text primary key`, guardado recortado y en minúsculas por un `check`; `note text`, `created_at`). Sin `citext` para no sumar extensiones.
 - Función `public.before_user_created_hook(event jsonb)` con `security definer`, `grant execute` solo a `supabase_auth_admin`; RLS activado en ambas tablas, sin políticas para usuarios. Deja pasar `is_anonymous`.
-- Funciones de admin (`security definer`, `grant execute` a `authenticated`, cada una verifica el rol): `admin_list_access()` (lista + modo + si el correo ya tiene cuenta), `admin_invite_email(email)`, `admin_remove_email(email)`, `admin_set_access_mode(mode)`. Server Actions en `src/features/access/actions.ts` las llaman con el cliente del usuario (sin `service_role`).
+- Funciones de admin (`security definer`, `grant execute` a `authenticated`, cada una llama a `require_app_admin()`, que lee el rol de `auth.users`): `admin_list_access()` (lista + modo + si el correo ya tiene cuenta), `admin_invite_email(email)`, `admin_remove_email(email)`, `admin_set_access_mode(mode)`. Server Actions en `src/features/access/actions.ts` las llaman con el cliente del usuario (sin `service_role`).
 - La página de Ajustes decide si muestra "Acceso" con `user.app_metadata.role`; la base vuelve a verificarlo en cada acción.
 - Local: `[auth.hook.before_user_created]` en `supabase/config.toml`. Producción: activar el hook en el proyecto `pevrupenrzueyzidfeah` con la Management API (lo hace el agente con comandos que no imprimen secretos, ver memoria del proyecto) **después** de que CI aplique la migración, y sembrar el correo del owner en la lista.
-- Los E2E usan un usuario anónimo, que el hook deja pasar. Para probar "Acceso", un test SQL/E2E promueve al anónimo a admin solo en la base local.
+- Los E2E usan un usuario anónimo, que el hook deja pasar. Para probar "Acceso", `tests/e2e/admin-helpers.ts` lo promueve a admin con la `service_role` del Supabase local (leída de `supabase status`, nunca de un archivo de entorno) y lo vuelve a quitar al final.
 
 ### Onboarding
 
@@ -189,9 +190,13 @@ npm run -s css:compare -- compare <baseline> --resolve   # paso de tokens sin ca
 - Tema y color se ven igual tras recargar y en otro dispositivo, sin parpadeo.
 - axe sin violaciones en tema claro y oscuro; CI verde en cada fase.
 
-## Preguntas abiertas
+## Colores (Claude Design, 2026-10-01)
 
-1. **Los 3 colores principales de Claude Design:** el owner pasa los hex. ¿Uno de ellos es el verde actual `#2e7d5b`?
+Fuente: proyecto de Claude Design `74a9f44b-…` (`docs/design/claude-design-reference.md`).
+
+- **Color principal:** las opciones del ajuste "Estilo → accentColor" de `Recovery Tracker Hoy.dc.html`: **Verde recuperación `#2E7D5B`** (por defecto), **Terracota `#C9552E`** y **Ámbar `#B08A2E`**. El diseño deriva de cada uno: claro = mezcla del 18% hacia blanco, brillo 18%, sombra 50%, tinte 22%, borde 35%.
+- **Terracota:** en el design system también codifica el dolor (slider, "peor"). Con terracota como principal hay que separar el dolor para que siga leyéndose (decisión en el PR 3, con vista previa).
+- **Tema claro:** base "Papel" del design system: fondo hueso `#F4EFE7` con tinta carbón `#1C1915`; la paleta clara completa la propone el agente (PR 4) y el owner la aprueba.
 
 ## Decisiones tomadas (2026-10-01)
 

@@ -177,11 +177,11 @@ La app además oculta la entrada de demo si no está `ENABLE_DEMO_MODE`, que nun
 
 Solo se crean cuentas de correos invitados (ADR-005). Lo aplica el hook `before_user_created` (`public.before_user_created_hook`, migración `20261004000000_access_control.sql`).
 
-- **Modo:** `select mode from public.app_access_settings;` → `invite_only` (por defecto) u `open`. Abrir a cualquier cuenta de Google: `update public.app_access_settings set mode = 'open';` (desde el PR 2, también desde Ajustes → Acceso).
-- **Invitar por SQL:** `insert into public.access_allowlist (email) values (lower('persona@gmail.com'));` (desde el PR 2, desde Ajustes → Acceso).
+- **Modo:** `select mode from public.app_access_settings;` → `invite_only` (por defecto) u `open`. Abrir a cualquier cuenta de Google: `update public.app_access_settings set mode = 'open';` (o desde Ajustes → Acceso).
+- **Invitar:** Ajustes → Acceso (solo la cuenta admin). Por SQL: `insert into public.access_allowlist (email) values (lower('persona@gmail.com'));`.
 - **Quitar el acceso a alguien que ya entró:** quitarlo de la lista no basta; Dashboard → Authentication → Users → "Ban user".
 - **Activar o apagar el hook en producción** (Management API, sin imprimir el token): `PATCH https://api.supabase.com/v1/projects/pevrupenrzueyzidfeah/config/auth` con `hook_before_user_created_enabled` (`true`/`false`) y `hook_before_user_created_uri` = `pg-functions://postgres/public/before_user_created_hook`. También en Dashboard → Authentication → Hooks. **Activarlo solo cuando la función ya existe en producción**; si no, falla todo registro nuevo. Las cuentas existentes no pasan por el hook.
-- **Admin:** la cuenta del owner tiene `app_metadata.role = "admin"` (`update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role": "admin"}' where email = …;`). Tras asignarlo, cerrar sesión y volver a entrar para renovar el token.
+- **Admin:** la cuenta del owner tiene `app_metadata.role = "admin"` (`update auth.users set raw_app_meta_data = raw_app_meta_data || '{"role": "admin"}' where email = …;`). Las funciones de admin (`20261005000000_access_admin.sql`) lo leen de `auth.users`, así que aplica sin volver a iniciar sesión.
 - **Probar:** entrar con un correo no invitado muestra "Recovery Ritual está en acceso por invitación" y no aparece en `auth.users`.
 
 ## Cabeceras de seguridad

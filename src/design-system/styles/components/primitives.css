@@ -30,7 +30,7 @@
 .rr-button--primary {
   min-height: 58px;
   background: var(--rr-accent-gradient);
-  color: var(--rr-ink);
+  color: var(--rr-on-accent);
   box-shadow: var(--rr-shadow-cta);
 }
 

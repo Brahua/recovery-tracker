@@ -250,7 +250,7 @@
   background: var(--rr-accent-gradient);
   box-shadow: var(--rr-shadow-cta);
   padding-inline: 20px;
-  color: var(--rr-ink);
+  color: var(--rr-on-accent);
   font-size: 16.5px;
   transition:
     filter 150ms ease,
@@ -545,7 +545,7 @@
   place-items: center;
   border-radius: 50%;
   background: var(--rr-accent);
-  color: var(--rr-surface);
+  color: var(--rr-on-accent-mark);
   font-size: 12px;
   font-weight: 800;
 }

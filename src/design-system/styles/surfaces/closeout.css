@@ -438,7 +438,7 @@
 .rr-closeout-save.is-ready {
   background: var(--rr-accent-gradient);
   box-shadow: var(--rr-shadow-cta);
-  color: var(--rr-ink);
+  color: var(--rr-on-accent);
 }
 
 .rr-closeout-save.is-ready b {

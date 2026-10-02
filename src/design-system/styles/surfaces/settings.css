@@ -1,5 +1,5 @@
 /* Ajustes: profile (display name), install guide, reminders (device state, switches, times) and
-   access (admin only: mode, invite form, invite list). */
+   appearance (theme, accent swatches) and access (admin only: mode, invite form, invite list). */
 
 .rr-settings {
   display: grid;
@@ -256,6 +256,101 @@
   opacity: 0.6;
 }
 
+.rr-appearance {
+  display: grid;
+  gap: 18px;
+}
+
+.rr-appearance-group {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  border: 0;
+  padding: 0;
+}
+
+.rr-appearance-group legend {
+  margin-bottom: 10px;
+  color: var(--rr-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rr-appearance-themes,
+.rr-appearance-accents {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rr-appearance-theme,
+.rr-appearance-accent {
+  position: relative;
+  display: flex;
+  min-height: var(--rr-hit-target);
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-input-bg);
+  padding: 8px 10px;
+  color: var(--rr-text-body);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  transition:
+    border-color 180ms var(--rr-ease-out),
+    background-color 180ms var(--rr-ease-out);
+}
+
+.rr-appearance-theme input,
+.rr-appearance-accent input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.rr-appearance-theme:has(input:checked),
+.rr-appearance-accent:has(input:checked) {
+  border-color: var(--rr-accent-border);
+  background: var(--rr-accent-tint);
+  color: var(--rr-ink);
+}
+
+.rr-appearance-theme:has(input:focus-visible),
+.rr-appearance-accent:has(input:focus-visible) {
+  outline: 2px solid var(--rr-accent-light);
+  outline-offset: 2px;
+}
+
+.rr-appearance-group:disabled .rr-appearance-theme,
+.rr-appearance-group:disabled .rr-appearance-accent {
+  cursor: progress;
+}
+
+.rr-appearance-swatch {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border: 1px solid var(--rr-border-hero);
+  border-radius: 50%;
+}
+
+.rr-appearance-swatch.is-green {
+  background: var(--rr-swatch-green);
+}
+
+.rr-appearance-swatch.is-terracotta {
+  background: var(--rr-swatch-terracotta);
+}
+
+.rr-appearance-swatch.is-amber {
+  background: var(--rr-swatch-amber);
+}
+
 .rr-access {
   display: grid;
   gap: 16px;
@@ -355,6 +450,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .rr-appearance-theme,
+  .rr-appearance-accent,
   .rr-switch,
   .rr-switch::after {
     transition: none;

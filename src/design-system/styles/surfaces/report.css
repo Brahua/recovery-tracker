@@ -474,7 +474,7 @@
   flex: 1;
   background: var(--rr-accent-gradient);
   box-shadow: var(--rr-shadow-cta);
-  color: var(--rr-ink);
+  color: var(--rr-on-accent);
   font-size: 15.5px;
 }
 

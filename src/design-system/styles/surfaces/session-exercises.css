@@ -352,7 +352,7 @@
 .rr-session-save.is-ready {
   background: var(--rr-accent-gradient);
   box-shadow: var(--rr-shadow-cta);
-  color: var(--rr-ink);
+  color: var(--rr-on-accent);
 }
 
 .rr-session-save.is-ready b {

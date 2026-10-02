@@ -101,7 +101,7 @@
 .rr-week-mark.is-today.is-complete {
   border: 0;
   background: var(--rr-accent);
-  color: var(--rr-surface);
+  color: var(--rr-on-accent-mark);
 }
 
 .rr-mobile-momentum > p {

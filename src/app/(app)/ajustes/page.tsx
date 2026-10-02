@@ -3,10 +3,12 @@ import { redirect } from "next/navigation";
 import { createAccessRepository } from "@/data/access-repository";
 import { createRemindersRepository } from "@/data/reminders-repository";
 import { AccessSettings } from "@/features/access/access-settings";
+import { AppearanceSettings } from "@/features/appearance/appearance-settings";
 import { RemindersSettings } from "@/features/reminders/reminders-settings";
 import { InstallGuide } from "@/features/settings/install-guide";
 import { ProfileForm } from "@/features/settings/profile-form";
 import { isAppAdmin } from "@/lib/access";
+import { appearanceFromMetadata } from "@/lib/appearance";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 import { getChosenDisplayName, getUserDisplayName } from "@/lib/user-display-name";
 
@@ -35,12 +37,17 @@ export default async function AjustesPage() {
       <header className="rr-settings-header">
         <p className="rr-kicker">Tu cuenta</p>
         <h1 className="rr-display">Ajustes</h1>
-        <p>Cómo te llama la app, cómo tenerla en tu celular y cuándo avisarte.</p>
+        <p>Cómo te llama la app, cómo se ve, cómo tenerla en tu celular y cuándo avisarte.</p>
       </header>
 
       <section aria-labelledby="ajustes-perfil" className="rr-settings-card">
         <h2 id="ajustes-perfil">Perfil</h2>
         <ProfileForm chosenName={getChosenDisplayName(identity)} fallbackName={fallbackName} />
+      </section>
+
+      <section aria-labelledby="ajustes-apariencia" className="rr-settings-card">
+        <h2 id="ajustes-apariencia">Apariencia</h2>
+        <AppearanceSettings appearance={appearanceFromMetadata(user.user_metadata)} />
       </section>
 
       <section aria-labelledby="ajustes-instalar" className="rr-settings-card">

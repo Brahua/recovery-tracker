@@ -67,7 +67,7 @@ export function RoutineEditor({ catalog, routine }: RoutineEditorProps) {
         <Link href={routinesHref}>
           <span aria-hidden="true">‹</span> Rutinas
         </Link>
-        <h1 className="rr-display">{routine ? "Editar rutina" : "Nueva rutina"}</h1>
+        <h1 className="rr-page-title">{routine ? "Editar rutina" : "Nueva rutina"}</h1>
       </header>
 
       {error ? (

@@ -252,8 +252,8 @@ export function NightlyCloseoutForm({
               </Link>
             )}
             <div>
-              <p>{headerContext}</p>
-              <h1>{editingCloseout ? "Editar cierre" : "Registrar"}</h1>
+              <p className="rr-kicker">{headerContext}</p>
+              <h1 className="rr-page-title">{editingCloseout ? "Editar cierre" : "Registrar"}</h1>
             </div>
             <span>☾ {headerContext}</span>
           </div>

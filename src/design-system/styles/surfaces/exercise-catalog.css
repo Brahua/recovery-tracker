@@ -43,12 +43,6 @@
   gap: 4px;
 }
 
-.rr-exercise-catalog-header h1 {
-  color: var(--rr-ink);
-  font-size: 28px;
-  line-height: 1.1;
-}
-
 .rr-exercise-catalog-header > div > p:last-child {
   color: var(--rr-text-muted);
   font-size: 13px;

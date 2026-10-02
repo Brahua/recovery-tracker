@@ -20,17 +20,11 @@
 .rr-history-header .rr-kicker {
   grid-column: 1 / -1;
   grid-row: 1;
-  color: var(--rr-accent-light);
-  font-size: 11px;
 }
 
 .rr-history-header h1 {
   grid-column: 1;
   grid-row: 2;
-  color: var(--rr-ink);
-  font-size: 28px;
-  font-weight: 850;
-  line-height: 1.1;
 }
 
 .rr-history-range {
@@ -513,33 +507,6 @@
   outline-offset: 2px;
 }
 
-.rr-app-shell.is-history .rr-mobile-nav {
-  right: auto;
-  bottom: 8px;
-  left: 50%;
-  width: calc(100% - 28px);
-  max-width: 402px;
-  gap: 2px;
-  border: 1px solid rgb(var(--rr-ink-rgb) / 0.09);
-  border-radius: 18px;
-  background: rgb(var(--rr-bg-rgb) / 0.92);
-  padding: 6px;
-  box-shadow: 0 -8px 28px rgb(var(--rr-black-rgb) / 0.35);
-  transform: translateX(-50%);
-}
-
-.rr-app-shell.is-history .rr-mobile-nav a {
-  min-height: 46px;
-  border-radius: 13px;
-  font-size: 9px;
-  letter-spacing: 0.04em;
-}
-
-.rr-app-shell.is-history .rr-mobile-nav a:hover,
-.rr-app-shell.is-history .rr-mobile-nav a.is-active {
-  background: rgb(var(--rr-ink-rgb) / 0.08);
-}
-
 @keyframes rr-rise {
   from {
     opacity: 0;
@@ -587,17 +554,6 @@
     display: flex;
     flex-direction: column;
     gap: 3px;
-  }
-
-  .rr-history-header .rr-kicker {
-    color: var(--rr-accent-text);
-    font-size: 11.5px;
-  }
-
-  .rr-history-header h1 {
-    font-size: 30px;
-    font-weight: 800;
-    letter-spacing: -0.025em;
   }
 
   .rr-history-heading > p:last-child {

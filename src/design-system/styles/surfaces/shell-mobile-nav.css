@@ -8,8 +8,7 @@
 }
 
 @media (max-width: 360px) {
-  .rr-mobile-nav a,
-  .rr-app-shell.is-history .rr-mobile-nav a {
+  .rr-mobile-nav a {
     font-size: 8.5px;
     letter-spacing: 0;
   }

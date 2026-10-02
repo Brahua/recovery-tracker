@@ -332,8 +332,10 @@ export function RecoveryDashboard({
           ‹
         </Link>
         <div>
-          <p>{range === "all" ? "Historial completo" : "Ultimas 4 semanas"}</p>
-          <h1>Insights</h1>
+          <p className="rr-kicker">
+            {range === "all" ? "Historial completo" : "Ultimas 4 semanas"}
+          </p>
+          <h1 className="rr-page-title">Insights</h1>
         </div>
         <nav aria-label="Rango de Insights" className="rr-insights-range">
           <Link

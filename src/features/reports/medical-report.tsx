@@ -95,11 +95,11 @@ export function MedicalReport({
           ‹
         </Link>
         <div>
-          <p>
+          <p className="rr-kicker">
             {formatDate(summary.dateRange.from, "long")} al{" "}
             {formatDate(summary.dateRange.to, "long")}
           </p>
-          <h1>Reporte</h1>
+          <h1 className="rr-page-title">Reporte</h1>
         </div>
         <span className={`rr-report-status ${hasData ? "" : "is-empty"}`}>
           {hasData ? "Listo" : "Sin datos"}

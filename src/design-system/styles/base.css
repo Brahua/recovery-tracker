@@ -1,4 +1,4 @@
-/* Base element styles: html, body, headings, display and kicker text. */
+/* Base element styles: html, body, headings, display, kicker and module title text. */
 
 html {
   background: var(--rr-bg);
@@ -36,4 +36,22 @@ h3 {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+/* Module title (h1): the same on every screen (Hoy, Registrar, Historial, Ejercicios, Insights,
+   Reporte, Ajustes), above an optional .rr-kicker. */
+.rr-page-title {
+  color: var(--rr-ink);
+  font-family: var(--rr-font-display);
+  font-size: 28px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  text-wrap: balance;
+}
+
+@media (min-width: 64rem) {
+  .rr-page-title {
+    font-size: 32px;
+  }
 }

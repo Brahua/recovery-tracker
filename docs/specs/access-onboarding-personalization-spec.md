@@ -1,6 +1,6 @@
 # Spec: acceso con Google, onboarding y personalización
 
-Estado: **borrador v2 (2026-10-01)**: incorpora las respuestas del owner (paleta clara propuesta por el agente, anónimos permitidos por el hook, el owner ve el onboarding, administración de accesos en Ajustes). Colores confirmados desde Claude Design (2026-10-01).
+Estado: **implementada (2026-10-01)** en 5 PRs: acceso por invitación (#34), Acceso en Ajustes (#36), color principal (#37), tema claro (#39) y onboarding (PR 5). Arreglo relacionado: cerrar sesión en el celular (#38).
 
 ## Objetivo
 
@@ -45,8 +45,8 @@ Queremos tres cosas:
 15. `/bienvenida` tiene dos partes:
     - **Recorrido** (5–6 tarjetas que se deslizan, con indicador de paso, "Siguiente", "Atrás" y "Saltar"): Hoy y la racha, Registrar sesión (rutinas, ejercicios, series, tratamientos), Cierre nocturno, Historial y cómo corregir, Insights y Reporte para la consulta, Instalar y recordatorios. Cada tarjeta usa una ilustración o captura estilizada de la pantalla real.
     - **Configuración rápida:** nombre ("¿Cómo quieres que te llamemos?"), tema y color principal (con vista previa al instante) y aceptar el aviso "No sustituye consejo médico".
-16. Al terminar (o al saltar) se guarda `onboarding_completed_at` y va a Hoy. Saltar no exige el aviso médico, que queda visible en el pie de Ajustes.
-17. En Ajustes, "Ver el recorrido otra vez" abre el recorrido sin repetir la configuración.
+16. Al terminar (o al saltar) se guarda `onboarding_completed_at` y va a Hoy. "Empezar" exige marcar el aviso médico ("no sustituye el consejo médico") y guarda `medical_notice_accepted_at`; "Saltar" solo marca el onboarding como hecho.
+17. En Ajustes → Cuenta, "Ver el recorrido de la app otra vez" abre el recorrido (`/bienvenida?recorrido=1`) sin repetir la configuración; "Cerrar" o "Terminar" vuelven a Ajustes.
 18. Funciona con teclado y lector de pantalla (axe sin violaciones) y respeta "reducir movimiento".
 
 **Apariencia**
@@ -92,8 +92,9 @@ Google ──► Supabase Auth ──► hook before_user_created (Postgres)
 
 ### Onboarding
 
-- `src/app/(app)/layout.tsx` ya carga el usuario: si falta `onboarding_completed_at`, redirige a `/bienvenida` (excepto si ya está ahí).
-- `/bienvenida` vive fuera del shell (sin barra de pestañas), como la landing.
+- `src/app/(app)/layout.tsx` ya carga el usuario: si falta `onboarding_completed_at`, redirige a `/bienvenida`.
+- `/bienvenida` (`src/app/bienvenida/page.tsx`) vive fuera del grupo `(app)`, sin barra de pestañas ni barra lateral.
+- Los E2E: `auth.setup.ts` salta el recorrido para el usuario compartido; `onboarding.spec.ts` usa usuarios anónimos nuevos.
 - Server Actions en `src/features/onboarding/actions.ts`: `completeOnboardingAction` (nombre, apariencia, aviso → `updateUser` + cookie + `revalidatePath("/", "layout")`).
 - El recorrido es un componente cliente con scroll-snap (deslizar en móvil) y botones; sin dependencias nuevas.
 

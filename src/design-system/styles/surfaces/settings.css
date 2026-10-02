@@ -350,6 +350,15 @@
   background: var(--rr-swatch-amber);
 }
 
+.rr-settings-link {
+  justify-self: start;
+  color: var(--rr-accent-text);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 .rr-settings-signout {
   padding: 0 18px;
   font-size: 14px;

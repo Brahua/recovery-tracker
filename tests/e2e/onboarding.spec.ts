@@ -61,7 +61,8 @@ test.describe("onboarding", () => {
     await page.getByRole("button", { name: "Saltar" }).click();
     await expect(page.getByRole("heading", { name: /^Hola,/ })).toBeVisible();
 
-    await page.goto("/bienvenida?recorrido=1");
+    await page.goto("/ajustes");
+    await page.getByRole("link", { name: "Ver el recorrido de la app otra vez" }).click();
     await expect(page.getByRole("heading", { name: "Cómo funciona la app" })).toBeVisible();
     await page.getByRole("button", { name: "Cerrar" }).click();
     await expect(page).toHaveURL(/\/ajustes$/);

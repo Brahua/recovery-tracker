@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 
 import { signOutAction } from "@/app/auth/actions";
+import Link from "@/components/app-link";
 import { FormPendingReporter } from "@/components/feedback/form-pending-reporter";
-
 import { createAccessRepository } from "@/data/access-repository";
 import { createRemindersRepository } from "@/data/reminders-repository";
 import { AccessSettings } from "@/features/access/access-settings";
@@ -12,6 +12,7 @@ import { InstallGuide } from "@/features/settings/install-guide";
 import { ProfileForm } from "@/features/settings/profile-form";
 import { isAppAdmin } from "@/lib/access";
 import { appearanceFromMetadata } from "@/lib/appearance";
+import { ONBOARDING_REPLAY_PATH } from "@/lib/onboarding";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 import { getChosenDisplayName, getUserDisplayName } from "@/lib/user-display-name";
 
@@ -68,6 +69,9 @@ export default async function AjustesPage() {
 
       <section aria-labelledby="ajustes-cuenta" className="rr-settings-card">
         <h2 id="ajustes-cuenta">Cuenta</h2>
+        <Link className="rr-settings-link" href={ONBOARDING_REPLAY_PATH}>
+          Ver el recorrido de la app otra vez
+        </Link>
         {user.email ? (
           <p className="rr-settings-hint">
             Entraste con <strong>{user.email}</strong>.

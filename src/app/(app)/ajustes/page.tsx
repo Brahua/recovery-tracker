@@ -1,5 +1,8 @@
 import { redirect } from "next/navigation";
 
+import { signOutAction } from "@/app/auth/actions";
+import { FormPendingReporter } from "@/components/feedback/form-pending-reporter";
+
 import { createAccessRepository } from "@/data/access-repository";
 import { createRemindersRepository } from "@/data/reminders-repository";
 import { AccessSettings } from "@/features/access/access-settings";
@@ -61,6 +64,21 @@ export default async function AjustesPage() {
       <section aria-labelledby="ajustes-recordatorios" className="rr-settings-card">
         <h2 id="ajustes-recordatorios">Recordatorios</h2>
         <RemindersSettings settings={reminderSettings} vapidPublicKey={vapidPublicKey} />
+      </section>
+
+      <section aria-labelledby="ajustes-cuenta" className="rr-settings-card">
+        <h2 id="ajustes-cuenta">Cuenta</h2>
+        {user.email ? (
+          <p className="rr-settings-hint">
+            Entraste con <strong>{user.email}</strong>.
+          </p>
+        ) : null}
+        <form action={signOutAction}>
+          <FormPendingReporter />
+          <button className="rr-button rr-button--secondary rr-settings-signout" type="submit">
+            Cerrar sesión
+          </button>
+        </form>
       </section>
 
       {accessOverview ? (

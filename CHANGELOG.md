@@ -62,6 +62,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Aligned the responsive Historial with its mobile and desktop Claude Design references, including the date rail, single-open session accordion, two-column exercise details, separate closeout cards, and viewport-specific navigation.
 
 ### Fixed
+- Sign out on mobile: Ajustes → Cuenta shows the signed-in email and "Cerrar sesión" (the sidebar with "Salir" is desktop-only).
 - Session times are read as Lima time on the server: it runs in UTC and parsed the form's `datetime-local` value as UTC, five hours off. Future session dates are rejected.
 - Toasts on iOS: the popover viewport could stretch over the whole screen, turning the toast into a full-height dark card that hid the page. Its position now uses longhands with a content height, toasts never stretch, and the viewport ignores taps.
 - Remaining small text using `--rr-text-dim` (date in Hoy, streak card, progress ring label, pending ritual, history range, set actions, form hints) now uses `--rr-text-muted` to reach 4.5:1; decorative glyphs keep the dim color.

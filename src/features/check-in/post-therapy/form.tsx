@@ -57,6 +57,9 @@ const sessionTypeOptions: Array<{ value: SessionType; label: string }> = [
   { value: "GYM", label: "Gimnasio" },
   { value: "HYDROTHERAPY", label: "Hidroterapia" },
   { value: "WALK", label: "Caminata" },
+  { value: "MOBILITY", label: "Movilidad" },
+  { value: "BALANCE", label: "Equilibrio" },
+  { value: "BREATHING", label: "Respiración" },
   { value: "OTHER", label: "Otro" },
 ];
 

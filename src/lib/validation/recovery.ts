@@ -14,6 +14,7 @@ import {
   rating1To5Values,
   reboundLevels,
   sessionTypes,
+  stiffnessLevels,
   treatmentCategories,
   treatmentModalities,
   type PainScore,
@@ -205,6 +206,7 @@ export const createNightlyCloseoutInputSchema = z.object({
   sleepHours: z.number().min(0).max(24),
   sleepQuality: rating1To5Schema,
   reboundPainLevel: reboundLevelSchema,
+  stiffnessLevel: z.enum(stiffnessLevels).optional(),
   notes: optionalTextSchema,
   closedTime: z
     .string()

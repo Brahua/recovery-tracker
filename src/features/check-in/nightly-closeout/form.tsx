@@ -28,6 +28,7 @@ import type {
   Rating1To5,
   RehabSession,
   ReboundLevel,
+  StiffnessLevel,
 } from "@/types/recovery";
 
 const energyOptions: Array<{ value: Rating1To5; label: string }> = [
@@ -51,6 +52,13 @@ const reboundOptions: Array<{ value: ReboundLevel; label: string }> = [
   { value: "MILD", label: "Leve" },
   { value: "MODERATE", label: "Moderado" },
   { value: "STRONG", label: "Fuerte" },
+];
+
+const stiffnessOptions: Array<{ value: StiffnessLevel; label: string }> = [
+  { value: "NONE", label: "Ninguna" },
+  { value: "MILD", label: "Un poco" },
+  { value: "MODERATE", label: "Bastante" },
+  { value: "STRONG", label: "Mucha" },
 ];
 
 function formatRecentDay(value: string) {
@@ -160,6 +168,9 @@ export function NightlyCloseoutForm({
     editingCloseout?.endOfDayPain ?? null,
   );
   const [energy, setEnergy] = useState<Rating1To5 | null>(editingCloseout?.energy ?? null);
+  const [stiffnessLevel, setStiffnessLevel] = useState<StiffnessLevel | null>(
+    editingCloseout?.stiffnessLevel ?? null,
+  );
   const [reboundPainLevel, setReboundPainLevel] = useState<ReboundLevel | null>(
     editingCloseout?.reboundPainLevel ?? null,
   );
@@ -370,6 +381,32 @@ export function NightlyCloseoutForm({
                         checked={reboundPainLevel === option.value}
                         name="reboundPainLevel"
                         onChange={() => setReboundPainLevel(option.value)}
+                        type="radio"
+                        value={option.value}
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="rr-closeout-field-group rr-rebound-field">
+                <h3>
+                  ¿Cuánta rigidez sentiste hoy? <span>(opcional)</span>
+                </h3>
+                <div
+                  className="rr-closeout-choice-row rr-rebound-choice-row"
+                  role="group"
+                  aria-label="Nivel de rigidez"
+                >
+                  {stiffnessOptions.map((option) => (
+                    <label
+                      className={stiffnessLevel === option.value ? "is-selected" : ""}
+                      key={option.value}
+                    >
+                      <input
+                        checked={stiffnessLevel === option.value}
+                        name="stiffnessLevel"
+                        onChange={() => setStiffnessLevel(option.value)}
                         type="radio"
                         value={option.value}
                       />

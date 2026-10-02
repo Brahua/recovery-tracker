@@ -104,6 +104,22 @@ describe("session treatments", () => {
   });
 });
 
+describe("session types for any rehab", () => {
+  it.each(["MOBILITY", "BALANCE", "BREATHING"])("accepts %s sessions", (sessionType) => {
+    const result = createRehabSessionInputSchema.safeParse({
+      occurredAt: "2026-07-09T18:30:00.000Z",
+      sessionType,
+      painBefore: 2,
+      painAfter: 2,
+      perceivedLoad: 2,
+      exercises: [{ name: "Respiración diafragmática", durationMinutes: 10, sets: [] }],
+      finalState: "BETTER",
+    });
+
+    expect(result.success).toBe(true);
+  });
+});
+
 describe("createRehabSessionInputSchema", () => {
   it("accepts a valid rehab session payload", () => {
     const result = createRehabSessionInputSchema.safeParse({
@@ -267,6 +283,25 @@ describe("createNightlyCloseoutInputSchema", () => {
     });
 
     expect(result.success).toBe(true);
+  });
+
+  it("accepts an optional stiffness level and rejects an unknown one", () => {
+    const base = {
+      date: "2026-07-09",
+      endOfDayPain: 4,
+      energy: 3,
+      sleepHours: 7.5,
+      sleepQuality: 4,
+      reboundPainLevel: "MILD",
+    };
+
+    expect(createNightlyCloseoutInputSchema.safeParse(base).success).toBe(true);
+    expect(
+      createNightlyCloseoutInputSchema.safeParse({ ...base, stiffnessLevel: "MODERATE" }).success,
+    ).toBe(true);
+    expect(
+      createNightlyCloseoutInputSchema.safeParse({ ...base, stiffnessLevel: "HUGE" }).success,
+    ).toBe(false);
   });
 
   it("rejects invalid sleep hour values", () => {

@@ -77,12 +77,6 @@
   font-weight: 700;
 }
 
-.rr-routine-editor-header h1 {
-  color: var(--rr-ink);
-  font-size: 28px;
-  line-height: 1.1;
-}
-
 .rr-routine-name {
   display: grid;
   gap: 5px;

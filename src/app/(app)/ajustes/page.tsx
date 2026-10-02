@@ -40,7 +40,7 @@ export default async function AjustesPage() {
     <section className="rr-settings">
       <header className="rr-settings-header">
         <p className="rr-kicker">Tu cuenta</p>
-        <h1 className="rr-display">Ajustes</h1>
+        <h1 className="rr-page-title">Ajustes</h1>
         <p>Cómo te llama la app, cómo se ve, cómo tenerla en tu celular y cuándo avisarte.</p>
       </header>
 

@@ -122,7 +122,7 @@ export function ExerciseCatalog({ exercises, routines, section }: ExerciseCatalo
       <header className="rr-exercise-catalog-header">
         <div>
           <p className="rr-kicker">Tu catálogo</p>
-          <h1 className="rr-display">Ejercicios</h1>
+          <h1 className="rr-page-title">Ejercicios</h1>
           <p>
             {section === "rutinas"
               ? "Agrupa ejercicios con su plan para registrar sesiones repetidas en un toque."

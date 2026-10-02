@@ -151,8 +151,8 @@ export function TodayOverview({
     <div className="rr-today">
       <header className="rr-today-header">
         <div>
-          <p>{capitalize(dateFormatter.format(now))}</p>
-          <h1>Hola, {firstName}</h1>
+          <p className="rr-kicker">{capitalize(dateFormatter.format(now))}</p>
+          <h1 className="rr-page-title">Hola, {firstName}</h1>
         </div>
         <Link aria-label="Ajustes" className="rr-mobile-avatar" href="/ajustes">
           <span aria-hidden="true">{firstName.charAt(0)}</span>

@@ -26,18 +26,11 @@
 
 .rr-insights-header h1 {
   order: -1;
-  color: var(--rr-ink);
-  font-size: 21px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
 }
 
 .rr-insights-header p {
   overflow: hidden;
   margin-top: 2px;
-  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.6 * var(--rr-text-alpha)));
-  font-size: 12.5px;
-  font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
@@ -493,14 +486,10 @@
 
   .rr-insights-header h1 {
     margin-top: 2px;
-    font-size: 30px;
   }
 
   .rr-insights-header p {
     margin-top: 0;
-    font-size: 12.5px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
   }
 
   .rr-insights-back {

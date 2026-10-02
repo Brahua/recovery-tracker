@@ -33,7 +33,7 @@ export function HistoryList({
       <header className="rr-history-header">
         <div className="rr-history-heading">
           <p className="rr-kicker">Registro personal</p>
-          <h1 className="rr-display">Historial</h1>
+          <h1 className="rr-page-title">Historial</h1>
           <p>Todo lo que registraste, día a día.</p>
         </div>
         <span className="rr-history-range">{formatHistoryRange(from, to)}</span>

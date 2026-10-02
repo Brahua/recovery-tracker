@@ -64,6 +64,7 @@ The format is based on Keep a Changelog and this project currently follows Seman
 - Aligned the responsive Historial with its mobile and desktop Claude Design references, including the date rail, single-open session accordion, two-column exercise details, separate closeout cards, and viewport-specific navigation.
 
 ### Fixed
+- Bottom tab bar looks the same on every screen: Historial no longer turns it into a floating pill. Module titles share one style (`.rr-page-title`, 28px / 32px desktop, with the gray `.rr-kicker`) on Hoy, Registrar, Historial, Ejercicios, Insights, Reporte, Ajustes and the routine editor.
 - Sign out on mobile: Ajustes → Cuenta shows the signed-in email and "Cerrar sesión" (the sidebar with "Salir" is desktop-only).
 - Session times are read as Lima time on the server: it runs in UTC and parsed the form's `datetime-local` value as UTC, five hours off. Future session dates are rejected.
 - Toasts on iOS: the popover viewport could stretch over the whole screen, turning the toast into a full-height dark card that hid the page. Its position now uses longhands with a content height, toasts never stretch, and the viewport ignores taps.

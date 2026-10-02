@@ -272,8 +272,8 @@ export function PostTherapyForm({
               </Link>
             )}
             <div>
-              <p>{contextDate}</p>
-              <h1>{editingSession ? "Editar sesión" : "Registrar"}</h1>
+              <p className="rr-kicker">{contextDate}</p>
+              <h1 className="rr-page-title">{editingSession ? "Editar sesión" : "Registrar"}</h1>
             </div>
             <span>{contextDate}</span>
           </div>

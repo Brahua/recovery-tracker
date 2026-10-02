@@ -282,8 +282,7 @@ export function NightlyCloseoutForm({
         />
 
         <p className="rr-closeout-intro">
-          Un minuto para registrar cómo quedó la rodilla{" "}
-          {selectedDate === today ? "hoy" : "ese día"}.
+          Un minuto para registrar cómo te fue {selectedDate === today ? "hoy" : "ese día"}.
         </p>
 
         <section className="rr-closeout-recap">
@@ -303,7 +302,7 @@ export function NightlyCloseoutForm({
             <section className="rr-closeout-question rr-closeout-pain-question">
               <CloseoutSectionHeader
                 complete={endOfDayPain !== null}
-                desktopTitle="¿Como queda la rodilla?"
+                desktopTitle="¿Cómo terminas el día?"
                 hint="dolor · 0 a 10"
                 title="Dolor al final del dia"
               />
@@ -350,7 +349,7 @@ export function NightlyCloseoutForm({
                 </div>
               </div>
               <div className="rr-closeout-field-group rr-rebound-field">
-                <h3>¿Se resintio la rodilla despues de la sesion?</h3>
+                <h3>¿Se resintió la zona tratada después de la sesión?</h3>
                 <div
                   className="rr-closeout-choice-row rr-rebound-choice-row"
                   role="group"

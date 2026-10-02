@@ -63,7 +63,7 @@ function buildCloseoutSummary(
   }
 
   if (endOfDayPain <= 3 && energy >= 4) {
-    return "Cierre guardado; la rodilla terminó bastante estable y con buena energía.";
+    return "Cierre guardado; el día terminó bastante estable y con buena energía.";
   }
 
   if (reboundPainLevel === "NONE") {

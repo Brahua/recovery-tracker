@@ -25,7 +25,7 @@ export const tourSteps: TourStep[] = [
     icon: "closeout",
     kicker: "Cierre nocturno",
     title: "Cierra el día antes de dormir.",
-    body: "Dolor, rigidez, ánimo y sueño en un minuto. Así ves cómo responde tu rodilla a lo que hiciste.",
+    body: "Dolor, rigidez, ánimo y sueño en un minuto. Así ves cómo responde tu cuerpo a lo que hiciste.",
   },
   {
     icon: "history",

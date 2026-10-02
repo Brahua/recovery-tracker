@@ -397,11 +397,11 @@ export function PostTherapyForm({
 
           <section className="rr-form-card rr-final-state-card">
             <SectionHeader complete={finalState !== null} title="Estado al terminar" />
-            <p className="rr-field-question">¿Como quedo la rodilla justo al terminar?</p>
+            <p className="rr-field-question">¿Cómo quedaste justo al terminar?</p>
             <div
               className="rr-choice-row rr-final-state-row"
               role="group"
-              aria-label="Estado de la rodilla al terminar"
+              aria-label="Estado al terminar"
             >
               {finalStateOptions.map((option) => (
                 <label

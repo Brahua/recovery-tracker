@@ -6,6 +6,9 @@ The format is based on Keep a Changelog and this project currently follows Seman
 
 ## [Unreleased]
 
+### Changed
+- The app is no longer worded for knee rehab only: landing, manifest, invite message, onboarding, check-in and closeout questions, Today and success messages now use neutral wording ("your recovery", "the treated area").
+
 ### Added
 - First-run onboarding (`/bienvenida`): a new account sees a six-card swipeable tour of the app (Hoy, Registrar, Cierre, Historial, Insights y Reporte, Ajustes) and a quick setup (name, theme, accent with live preview, and the "no sustituye consejo médico" notice), or can skip it. `user_metadata.onboarding_completed_at` stops the redirect; Ajustes → Cuenta replays the tour. E2E covers the full flow, skipping and replaying with fresh anonymous users.
 - Light theme and "Sistema" in Ajustes → Apariencia ("Papel": hueso paper, carbón ink), with every accent. Accent text, pain and night colors are darkened for paper; translucent ink text scales its alpha with `--rr-text-alpha` (1 dark, 1.45 light). The signed-out landing stays dark (`.rr-theme-dark`). E2E runs axe on 9 screens in the light theme with each accent and checks "Sistema" against the device mode.

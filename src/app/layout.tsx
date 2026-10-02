@@ -20,7 +20,7 @@ const instrumentSans = Instrument_Sans({
 
 export const metadata: Metadata = {
   title: "Recovery Tracker",
-  description: "Registro visual y motivante para recuperacion de rodilla.",
+  description: "Registro visual y motivante para tu rehabilitación.",
   // Installed on the iPhone home screen: full screen, dark status bar, short title under the icon.
   appleWebApp: {
     capable: true,

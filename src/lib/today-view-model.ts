@@ -36,7 +36,7 @@ export function getTodayRitualState(
       progress: 0,
       eyebrow: "Siguiente paso",
       title: "Te toca la sesion de hoy",
-      body: "Un paso mas cerca de tu rodilla de antes.",
+      body: "Un paso más cerca de tu recuperación.",
       primaryHref: "/registrar?mode=session",
       primaryLabel: "Empezar sesion de hoy",
       primaryMeta: "20 min",

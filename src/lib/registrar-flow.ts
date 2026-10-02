@@ -73,7 +73,7 @@ export function buildCloseoutSuccessState(
     body:
       summary ??
       (hasSessionToday
-        ? "No queda nada pendiente. Hoy tambien cuidaste tu rodilla."
+        ? "No queda nada pendiente. Hoy también cuidaste tu recuperación."
         : "El cierre nocturno quedo registrado. Falta la sesion para completar el dia."),
     primaryHref: hasSessionToday ? "/" : "/registrar?mode=session",
     primaryLabel: hasSessionToday ? "Hasta manana" : "Registrar sesion",

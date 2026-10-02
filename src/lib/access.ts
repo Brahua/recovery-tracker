@@ -46,5 +46,5 @@ export function isAppAdmin(user: { app_metadata?: Record<string, unknown> | null
 
 // What the admin shares (WhatsApp, Messages…) after inviting someone.
 export function buildInviteMessage(email: string, siteUrl: string) {
-  return `Te invité a Recovery Ritual, la app para seguir tu recuperación de rodilla. Entra con tu cuenta de Google (${email}) en ${siteUrl}`;
+  return `Te invité a Recovery Ritual, la app para seguir tu rehabilitación. Entra con tu cuenta de Google (${email}) en ${siteUrl}`;
 }

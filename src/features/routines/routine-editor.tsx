@@ -83,7 +83,7 @@ export function RoutineEditor({ catalog, routine }: RoutineEditorProps) {
           id={nameId}
           maxLength={60}
           onChange={(event) => setName(event.target.value)}
-          placeholder="Ej. Core rodilla"
+          placeholder="Ej. Movilidad de la mañana"
           type="text"
           value={name}
         />

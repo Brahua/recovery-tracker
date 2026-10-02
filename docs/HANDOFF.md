@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-02 (cierre de sesión: acceso, apariencia y onboarding probados en producción).
+> Última actualización: 2026-10-02 (cierre de sesión: acceso, apariencia, onboarding, arreglos de UI, hora del cierre, repo público con `main` protegida).
 
 ## Cómo retomar
 
@@ -42,7 +42,13 @@ Spec: `docs/specs/access-onboarding-personalization-spec.md` · Plan: `tasks/pla
 - Los 3 usuarios anónimos del 2026-09-16 (sin datos en ninguna tabla) se borraron el 2026-10-02 con el OK del owner. En producción solo queda la cuenta del owner.
 - **Probado por el owner en producción (2026-10-02).** En la app instalada en iPhone, la barra de estado sigue negra con el tema claro: iOS la fija al abrir (`apple-mobile-web-app-status-bar-style`).
 
-No hay ramas abiertas.
+### Arreglos posteriores (2026-10-02) ✅
+
+- Barra inferior igual en todos los módulos (#42) y un solo encabezado: `.rr-page-title` con `.rr-kicker`, sin flecha en los módulos de la barra; la flecha solo en sub-pantallas (#42, #44).
+- Cierre del día con fecha y hora: `nightly_closeouts.closed_time` (#43).
+- Repo público (revisado sin secretos en el historial) y `main` protegida con el ruleset "Protect main" (#45).
+
+No hay ramas abiertas ni PRs pendientes.
 
 ## ⏰ Vencimientos
 

@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-02 (cierre de sesión: acceso, apariencia, onboarding, arreglos de UI, hora del cierre, repo público con `main` protegida).
+> Última actualización: 2026-10-02 (app de rehabilitación en general: texto neutro, lesión activa, rigidez, tipos de sesión y metas).
 
 ## Cómo retomar
 
@@ -41,6 +41,17 @@ Spec: `docs/specs/access-onboarding-personalization-spec.md` · Plan: `tasks/pla
 - MCP `claude_design` conectado en este equipo (configuración local); proyecto de diseño en `docs/design/claude-design-reference.md`.
 - Los 3 usuarios anónimos del 2026-09-16 (sin datos en ninguna tabla) se borraron el 2026-10-02 con el OK del owner. En producción solo queda la cuenta del owner.
 - **Probado por el owner en producción (2026-10-02).** En la app instalada en iPhone, la barra de estado sigue negra con el tema claro: iOS la fija al abrir (`apple-mobile-web-app-status-bar-style`).
+
+### App de rehabilitación en general ✅ (2026-10-02)
+
+Spec: `docs/specs/general-rehab-spec.md`. La app ya no es solo de rodilla; sigue pensada para el paciente (sin mediciones clínicas) y con **una lesión activa** por cuenta.
+
+- **Fase 0 (#47):** textos neutros en landing, manifest, invitación, onboarding, registro, cierre y Hoy.
+- **Fase 1 (#48):** `user_metadata.condition` (zona, lado, tipo, fecha), sin migración. Ajustes → Mi recuperación y paso opcional en el onboarding; Hoy y Reporte la muestran y los textos nombran la zona. Se valida al guardar y al leer (`parseCondition`). El owner debe elegir su lesión en Ajustes (no se asumió ninguna para la cuenta existente).
+- **Fase 2:** `nightly_closeouts.stiffness_level` (opcional) y tipos de sesión Movilidad, Equilibrio y Respiración (migración `20261007000000`).
+- **Fase 3:** `recovery_goals` ("Mis metas" en Hoy, hasta 10 pendientes, listadas en el Reporte; migración `20261008000000`).
+- **Backlog:** etapa de la recuperación, módulo de documentos médicos y portal para fisios (spec propia, con las decisiones ya tomadas) están en `docs/ideas/recovery-ritual-backlog.md`.
+- **`gh` en esta máquina:** la función `gh` del shell elige la cuenta por carpeta, pero en el Bash de Claude devolvía `jbrahua`; funciona `GH_TOKEN="$(env -u GH_TOKEN command gh auth token --user Brahua)" command gh …`.
 
 ### Arreglos posteriores (2026-10-02) ✅
 

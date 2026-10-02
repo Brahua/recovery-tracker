@@ -1,6 +1,6 @@
 # Spec: rehabilitación en general
 
-> Estado: en construcción (2026-10-02). Decisiones del owner en `docs/ideas/recovery-ritual-backlog.md` → "Dirección: app de rehabilitación en general".
+> Estado: entregada en producción (2026-10-02): fases 0 a 3. Decisiones del owner en `docs/ideas/recovery-ritual-backlog.md` → "Dirección: app de rehabilitación en general".
 
 ## Objetivo
 
@@ -12,7 +12,7 @@ Que la app sirva para la rehabilitación de cualquier zona del cuerpo, no solo l
 - Varias lesiones por cuenta: hay **una lesión activa**.
 - Etapa de la recuperación, documentos médicos y portal de fisios (están en el backlog; el portal tendrá su propia spec).
 
-## Fase 0: texto neutro (hecha, PR #47)
+## Fase 0: texto neutro (PR #47)
 
 Landing, manifest, invitación, onboarding, preguntas del registro y del cierre y mensajes de éxito ya no dicen "rodilla".
 

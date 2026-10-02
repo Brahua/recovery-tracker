@@ -68,7 +68,6 @@
   padding: 0;
   opacity: 0;
   appearance: none;
-  color-scheme: dark;
   cursor: pointer;
   /* 16px or more keeps iOS from zooming in on focus. */
   font-size: 16px;

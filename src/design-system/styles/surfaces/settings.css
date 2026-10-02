@@ -245,7 +245,6 @@
   background: var(--rr-input-bg);
   padding: 8px 12px;
   color: var(--rr-ink);
-  color-scheme: dark;
   font: inherit;
   font-size: 16px;
   font-variant-numeric: tabular-nums;

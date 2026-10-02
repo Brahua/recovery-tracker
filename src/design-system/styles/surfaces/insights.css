@@ -35,7 +35,7 @@
 .rr-insights-header p {
   overflow: hidden;
   margin-top: 2px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.6);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.6 * var(--rr-text-alpha)));
   font-size: 12.5px;
   font-weight: 600;
   text-overflow: ellipsis;
@@ -60,7 +60,7 @@
 
 .rr-insights-back:hover {
   background: rgb(var(--rr-ink-rgb) / 0.09);
-  color: var(--rr-white);
+  color: var(--rr-ink);
 }
 
 .rr-insights-range {
@@ -77,7 +77,7 @@
   place-items: center;
   border-radius: 8px;
   padding-inline: 11px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.55);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.55 * var(--rr-text-alpha)));
   font-size: 12px;
   font-weight: 650;
 }
@@ -121,7 +121,7 @@
 .rr-insights-summary > strong {
   display: block;
   margin-top: 7px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.78);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.78 * var(--rr-text-alpha)));
   font-size: 14.5px;
   font-weight: 500;
   line-height: 1.55;
@@ -142,7 +142,7 @@
 }
 
 .rr-insight-card h2 {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.58);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.58 * var(--rr-text-alpha)));
 }
 
 .rr-insights-grid > :nth-child(1),
@@ -210,7 +210,7 @@
   display: flex;
   justify-content: space-between;
   margin-top: 5px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.58);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.58 * var(--rr-text-alpha)));
   font-size: 10.5px;
   font-weight: 600;
 }
@@ -248,7 +248,7 @@
 }
 
 .rr-load-bars small {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.6);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.6 * var(--rr-text-alpha)));
   font-size: 10px;
   font-weight: 600;
   text-align: center;
@@ -256,7 +256,7 @@
 
 .rr-insights-caption {
   margin-top: 12px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.62);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.62 * var(--rr-text-alpha)));
   font-size: 11.5px;
   line-height: 1.45;
 }
@@ -276,12 +276,12 @@
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.65);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.65 * var(--rr-text-alpha)));
   font-size: 10.5px;
 }
 
 .rr-rebound-bars > div > p strong {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.72);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.72 * var(--rr-text-alpha)));
   font-family: var(--rr-font-display);
   font-size: 12px;
   font-weight: 800;
@@ -325,7 +325,7 @@
   right: 18px;
   display: flex;
   gap: 10px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.55);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.55 * var(--rr-text-alpha)));
   font-size: 11px;
   font-weight: 600;
 }
@@ -361,7 +361,7 @@
 
 .rr-exercise-frequency > div > span {
   overflow: hidden;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.7);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.7 * var(--rr-text-alpha)));
   font-size: 12px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -387,7 +387,7 @@
 }
 
 .rr-exercise-frequency strong {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.65);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.65 * var(--rr-text-alpha)));
   font-family: var(--rr-font-display);
   font-size: 12px;
   font-weight: 800;
@@ -450,7 +450,7 @@
 
 .rr-treatment-response dd {
   margin-top: 3px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.75);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.75 * var(--rr-text-alpha)));
   font-size: 12px;
   font-variant-numeric: tabular-nums;
 }

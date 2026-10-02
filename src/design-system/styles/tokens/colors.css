@@ -1,6 +1,12 @@
-/* Color tokens: brand, text, surfaces, washes, borders, named colors and RGB channels. Claude Design is the visual source of truth. */
+/* Color tokens: brand, text, surfaces, washes, borders, named colors and RGB channels. Claude Design is the visual source of truth.
+   Dark is the default theme. .rr-theme-dark pins it on a subtree (the signed-out landing). */
 
-:root {
+:root,
+.rr-theme-dark {
+  color-scheme: dark;
+  /* Multiplies the alpha of translucent ink text (rgb(var(--rr-ink-rgb) / calc(a * …))): the light
+     theme raises it, since the same alpha reads weaker on a light background. */
+  --rr-text-alpha: 1;
   --rr-bg: #0e0c0a;
   --rr-surface: #14110e;
   --rr-ink: #f4efe7;
@@ -118,4 +124,156 @@
   --rr-accent-text: #c0a158;
   --rr-on-accent: #14110e;
   --rr-on-accent-bright: #14110e;
+}
+
+/* Light theme ("Papel" in Claude Design: hueso paper, carbón ink), chosen in Ajustes → Apariencia
+   (<html data-theme="light">, or "system" while the device is in light mode). Text keeps WCAG AA:
+   accent, pain and night colors are darkened for paper. The two copies below must stay identical
+   (src/lib/appearance-css.test.ts checks it). */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --rr-text-alpha: 1.45;
+  --rr-bg: #f6f2eb;
+  --rr-surface: #fdfbf7;
+  --rr-ink: #1c1915;
+  --rr-ink-secondary: #2b2620;
+  --rr-text-body: rgb(28 25 21 / 0.82);
+  --rr-text-muted: rgb(28 25 21 / 0.7);
+  --rr-text-dim: rgb(28 25 21 / 0.6);
+  --rr-text-faint: rgb(28 25 21 / 0.5);
+  --rr-card-bg: rgb(255 255 255 / 0.6);
+  --rr-wash-soft: rgb(28 25 21 / 0.04);
+  --rr-wash: rgb(28 25 21 / 0.06);
+  --rr-border-soft: rgb(28 25 21 / 0.08);
+  --rr-border: rgb(28 25 21 / 0.1);
+  --rr-border-strong: rgb(28 25 21 / 0.13);
+  --rr-border-hero: rgb(28 25 21 / 0.12);
+  --rr-border-control: rgb(28 25 21 / 0.2);
+  --rr-input-bg: rgb(255 255 255 / 0.75);
+  --rr-hero-card: linear-gradient(165deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.6));
+  /* Accent as text must be darker on paper; fills keep the brand color. */
+  --rr-accent-light: #205d43;
+  --rr-accent-on-tint: #205d43;
+  --rr-accent-text: #205d43;
+  --rr-accent-gradient: linear-gradient(180deg, rgb(var(--rr-accent-light-rgb)), var(--rr-accent));
+  --rr-accent-tint: rgb(var(--rr-accent-rgb) / 0.14);
+  --rr-accent-card: linear-gradient(
+    150deg,
+    rgb(var(--rr-accent-rgb) / 0.12),
+    rgb(var(--rr-accent-rgb) / 0.04)
+  );
+  --rr-selection: rgb(var(--rr-accent-rgb) / 0.25);
+  --rr-night: #4b6091;
+  --rr-night-light: #3c5ea7;
+  --rr-surface-deep: #f4f0e8;
+  --rr-popover-bg: #fffdf9;
+  --rr-photo-placeholder: #e3dccf;
+  --rr-night-surface: #e9ebf4;
+  --rr-night-surface-mid: #f1eff2;
+  --rr-gold: #765c2a;
+  --rr-pain-soft: #a2421f;
+  --rr-pain-worse: #9a3c1b;
+  --rr-pain-rising: #a8451f;
+  --rr-pain-high: #a44121;
+  --rr-ink-rgb: 28 25 21;
+  --rr-ink-secondary-rgb: 28 25 21;
+  --rr-bg-rgb: 246 242 235;
+  --rr-surface-rgb: 253 251 247;
+  --rr-surface-deep-rgb: 244 240 232;
+  --rr-shadow-hero: 0 24px 48px -24px rgb(28 25 21 / 0.18);
+  --rr-shadow-paper: 0 16px 32px -16px rgb(28 25 21 / 0.2);
+  --rr-shadow-thumb:
+    0 2px 8px rgb(0 0 0 / 0.2),
+    inset 0 -2px 0 rgb(0 0 0 / 0.08);
+}
+
+:root[data-theme="light"][data-accent="terracotta"] {
+  --rr-accent-light: #8d391d;
+  --rr-accent-on-tint: #8d391d;
+  --rr-accent-text: #8d391d;
+  --rr-pain-soft: #b72450;
+  --rr-pain-worse: #b9214e;
+  --rr-pain-rising: #b7234f;
+  --rr-pain-high: #b42550;
+}
+
+:root[data-theme="light"][data-accent="amber"] {
+  --rr-accent-light: #6d551a;
+  --rr-accent-on-tint: #6d551a;
+  --rr-accent-text: #6d551a;
+}
+
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] {
+    color-scheme: light;
+    --rr-text-alpha: 1.45;
+    --rr-bg: #f6f2eb;
+    --rr-surface: #fdfbf7;
+    --rr-ink: #1c1915;
+    --rr-ink-secondary: #2b2620;
+    --rr-text-body: rgb(28 25 21 / 0.82);
+    --rr-text-muted: rgb(28 25 21 / 0.7);
+    --rr-text-dim: rgb(28 25 21 / 0.6);
+    --rr-text-faint: rgb(28 25 21 / 0.5);
+    --rr-card-bg: rgb(255 255 255 / 0.6);
+    --rr-wash-soft: rgb(28 25 21 / 0.04);
+    --rr-wash: rgb(28 25 21 / 0.06);
+    --rr-border-soft: rgb(28 25 21 / 0.08);
+    --rr-border: rgb(28 25 21 / 0.1);
+    --rr-border-strong: rgb(28 25 21 / 0.13);
+    --rr-border-hero: rgb(28 25 21 / 0.12);
+    --rr-border-control: rgb(28 25 21 / 0.2);
+    --rr-input-bg: rgb(255 255 255 / 0.75);
+    --rr-hero-card: linear-gradient(165deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.6));
+    /* Accent as text must be darker on paper; fills keep the brand color. */
+    --rr-accent-light: #205d43;
+    --rr-accent-on-tint: #205d43;
+    --rr-accent-text: #205d43;
+    --rr-accent-gradient: linear-gradient(180deg, rgb(var(--rr-accent-light-rgb)), var(--rr-accent));
+    --rr-accent-tint: rgb(var(--rr-accent-rgb) / 0.14);
+    --rr-accent-card: linear-gradient(
+      150deg,
+      rgb(var(--rr-accent-rgb) / 0.12),
+      rgb(var(--rr-accent-rgb) / 0.04)
+    );
+    --rr-selection: rgb(var(--rr-accent-rgb) / 0.25);
+    --rr-night: #4b6091;
+    --rr-night-light: #3c5ea7;
+    --rr-surface-deep: #f4f0e8;
+    --rr-popover-bg: #fffdf9;
+    --rr-photo-placeholder: #e3dccf;
+    --rr-night-surface: #e9ebf4;
+    --rr-night-surface-mid: #f1eff2;
+    --rr-gold: #765c2a;
+    --rr-pain-soft: #a2421f;
+    --rr-pain-worse: #9a3c1b;
+    --rr-pain-rising: #a8451f;
+    --rr-pain-high: #a44121;
+    --rr-ink-rgb: 28 25 21;
+    --rr-ink-secondary-rgb: 28 25 21;
+    --rr-bg-rgb: 246 242 235;
+    --rr-surface-rgb: 253 251 247;
+    --rr-surface-deep-rgb: 244 240 232;
+    --rr-shadow-hero: 0 24px 48px -24px rgb(28 25 21 / 0.18);
+    --rr-shadow-paper: 0 16px 32px -16px rgb(28 25 21 / 0.2);
+    --rr-shadow-thumb:
+      0 2px 8px rgb(0 0 0 / 0.2),
+      inset 0 -2px 0 rgb(0 0 0 / 0.08);
+  }
+
+  :root[data-theme="system"][data-accent="terracotta"] {
+    --rr-accent-light: #8d391d;
+    --rr-accent-on-tint: #8d391d;
+    --rr-accent-text: #8d391d;
+    --rr-pain-soft: #b72450;
+    --rr-pain-worse: #b9214e;
+    --rr-pain-rising: #b7234f;
+    --rr-pain-high: #b42550;
+  }
+
+  :root[data-theme="system"][data-accent="amber"] {
+    --rr-accent-light: #6d551a;
+    --rr-accent-on-tint: #6d551a;
+    --rr-accent-text: #6d551a;
+  }
 }

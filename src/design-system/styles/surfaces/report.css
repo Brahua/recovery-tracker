@@ -35,7 +35,7 @@
 .rr-report-header p {
   overflow: hidden;
   margin-top: 2px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.6);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.6 * var(--rr-text-alpha)));
   font-size: 12px;
   font-weight: 600;
   text-overflow: ellipsis;
@@ -88,7 +88,7 @@
   border: 1px solid rgb(var(--rr-ink-rgb) / 0.14);
   border-radius: var(--rr-radius-pill);
   padding-inline: 15px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.62);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.62 * var(--rr-text-alpha)));
   font-size: 12.5px;
   font-weight: 700;
 }
@@ -123,7 +123,7 @@
 .rr-report-summary span {
   display: block;
   overflow: hidden;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.58);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.58 * var(--rr-text-alpha)));
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -209,7 +209,7 @@
 
 .rr-report-copy {
   margin-top: 14px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.68);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.68 * var(--rr-text-alpha)));
   font-size: 13px;
   line-height: 1.55;
 }
@@ -221,7 +221,7 @@
 }
 
 .rr-high-pain-days h3 {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.58);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.58 * var(--rr-text-alpha)));
   font-family: var(--rr-font-body);
   font-size: 11px;
   font-weight: 700;
@@ -256,7 +256,7 @@
 
 .rr-high-pain-days > div small,
 .rr-high-pain-days > p {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.6);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.6 * var(--rr-text-alpha)));
   font-size: 11.5px;
 }
 
@@ -267,7 +267,7 @@
 }
 
 .rr-report-treatments h3 {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.58);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.58 * var(--rr-text-alpha)));
   font-family: var(--rr-font-body);
   font-size: 11px;
   font-weight: 700;
@@ -308,7 +308,7 @@
 
 .rr-report-treatments li small,
 .rr-report-treatments > p {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.6);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.6 * var(--rr-text-alpha)));
   font-size: 11.5px;
 }
 
@@ -345,7 +345,7 @@
 
 .rr-report-stats span {
   margin-top: 3px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.62);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.62 * var(--rr-text-alpha)));
   font-size: 11px;
   line-height: 1.35;
 }
@@ -362,7 +362,7 @@
 }
 
 .rr-report-notes blockquote p {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.78);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.78 * var(--rr-text-alpha)));
   font-size: 13px;
   font-style: italic;
   line-height: 1.5;
@@ -371,7 +371,7 @@
 .rr-report-notes cite {
   display: block;
   margin-top: 5px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.58);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.58 * var(--rr-text-alpha)));
   font-size: 11px;
   font-style: normal;
   font-weight: 600;
@@ -409,7 +409,7 @@
   place-items: center;
   border: 1.5px solid rgb(var(--rr-ink-rgb) / 0.4);
   border-radius: 7px;
-  color: var(--rr-surface);
+  color: var(--rr-on-accent-mark);
   font-size: 11px;
   font-weight: 800;
   transition:
@@ -423,7 +423,7 @@
 }
 
 .rr-report-questions button strong {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.72);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.72 * var(--rr-text-alpha)));
   font-size: 13.5px;
   font-weight: 500;
   line-height: 1.5;
@@ -435,13 +435,13 @@
 
 .rr-report-questions > p {
   margin-top: 8px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.58);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.58 * var(--rr-text-alpha)));
   font-size: 11.5px;
 }
 
 .rr-report-empty {
   margin-top: 14px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.62);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.62 * var(--rr-text-alpha)));
   font-size: 12px;
   line-height: 1.5;
 }

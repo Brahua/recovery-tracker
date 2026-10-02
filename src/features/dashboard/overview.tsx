@@ -328,9 +328,6 @@ export function RecoveryDashboard({
   return (
     <div className="rr-insights">
       <header className="rr-insights-header">
-        <Link aria-label="Volver a Hoy" className="rr-insights-back" href="/">
-          ‹
-        </Link>
         <div>
           <p className="rr-kicker">
             {range === "all" ? "Historial completo" : "Ultimas 4 semanas"}

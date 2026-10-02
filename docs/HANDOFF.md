@@ -92,7 +92,7 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 
 ## Trampas técnicas
 
-- Título de cada módulo: `<h1 className="rr-page-title">` con `<p className="rr-kicker">` encima; las pantallas no le ponen tamaño, peso ni color propios al título. La barra inferior tiene un solo estilo (`surfaces/shell.css`).
+- Título de cada módulo: `<h1 className="rr-page-title">` con `<p className="rr-kicker">` encima; las pantallas no le ponen tamaño, peso ni color propios al título. Los módulos de la barra inferior no llevan flecha de volver; solo las sub-pantallas (editar sesión o cierre, editor de rutinas). La barra inferior tiene un solo estilo (`surfaces/shell.css`).
 
 - Al mergear un PR con varios commits, `gh pr merge --squash` usa el título del PR (en español) como commit: pasar `--subject "feat: … (#N)"` en inglés (pasó en #39).
 - Apariencia: `<html data-theme data-accent>` lo pone un script inline antes de pintar (cookie `rr-appearance`); un color nuevo en una superficie debe usar tokens que existan en los dos temas, y el texto translúcido `calc(alpha * var(--rr-text-alpha))`. axe corre en claro y en oscuro (`tests/e2e/appearance.spec.ts`).

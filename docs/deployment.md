@@ -212,6 +212,18 @@ Si el token de Supabase vence, el job `deploy` falla en "Apply migrations to pro
 5. Revocar el token viejo en la misma página de Supabase.
 6. Actualizar la fecha de vencimiento en esta tabla y en `docs/HANDOFF.md`.
 
+## Protección de `main` (ruleset de GitHub)
+
+Desde el 2026-10-02 el repo es público y `main` tiene el ruleset **"Protect main"** (Settings → Rules → Rulesets), igual al de `brahua-os`:
+
+- No se puede borrar la rama ni hacer force-push.
+- Todo cambio entra por PR (sin aprobaciones obligatorias; cualquier método de merge).
+- Para mergear deben pasar los checks **"Lint · Typecheck · Unit"** y **"E2E (Supabase local + Playwright)"**. "Deploy to production" no se exige porque en los PRs se omite.
+- Nadie puede saltarse las reglas (sin bypass), tampoco el owner: no se puede hacer push directo a `main`.
+- La rama del PR se borra sola al mergear.
+
+Si se renombra un job de CI, hay que actualizar el ruleset con el nombre nuevo, o los PRs quedan esperando un check que nunca llega: `gh api repos/Brahua/recovery-tracker/rulesets` para ver el id y `gh api -X PUT repos/Brahua/recovery-tracker/rulesets/<id> --input <json>` para cambiarlo.
+
 ## Protección del deploy
 
 Vercel Authentication está desactivada para que la URL sea pública. La seguridad la dan el login de Google y el RLS de Supabase.

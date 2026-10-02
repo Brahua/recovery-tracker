@@ -77,15 +77,15 @@ Verificación en la PC: `npm run format && npm run lint && npm run design:check 
 
 ## PR 4: tema claro
 
-- [ ] D1. Propuesta de paleta clara + chequeo de contraste (el owner la aprueba antes de seguir)
+- [x] D1. Propuesta de paleta clara + chequeo de contraste (aprobación delegada al agente por el owner, 2026-10-01)
   - Files: `scripts/design-system/check-contrast.mjs` (o test), vista previa para el owner
-- [ ] D2. Tokens claros y "Sistema" (`[data-theme="light"]` y `prefers-color-scheme` para `system`)
+- [x] D2. Tokens claros y "Sistema" (`[data-theme="light"]` y `prefers-color-scheme` para `system`)
   - Files: `src/design-system/styles/tokens/colors.css`
-- [ ] D3. Revisión de superficies con fondos fijos (noche, éxito, insights, reporte)
+- [x] D3. Revisión de superficies con fondos fijos (noche, éxito, insights, reporte)
   - Files: `src/design-system/styles/surfaces/*.css`, tokens
-- [ ] D4. `themeColor` por tema y barra de estado
+- [x] D4. `themeColor` por tema y barra de estado
   - Files: `src/app/layout.tsx`, `src/lib/appearance.ts`
-- [ ] D5. Axe en los dos temas, habilitar Claro/Sistema en Ajustes, docs
+- [x] D5. Axe en los dos temas, habilitar Claro/Sistema en Ajustes, docs
   - Files: `tests/e2e/accessibility.spec.ts`, `tests/e2e/appearance.spec.ts`, docs
 
 ## PR 5: onboarding

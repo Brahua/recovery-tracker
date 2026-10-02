@@ -1,6 +1,7 @@
-/* Shadows and glows. */
+/* Shadows and glows. Light theme values live with its colors (colors.css). */
 
-:root {
+:root,
+.rr-theme-dark {
   --rr-shadow-cta:
     0 18px 36px -12px rgb(var(--rr-accent-rgb) / 0.5),
     inset 0 1.5px 0 rgba(255, 255, 255, 0.28),

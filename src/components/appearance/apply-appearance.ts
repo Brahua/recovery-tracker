@@ -8,10 +8,13 @@ export function applyAppearance(appearance: Appearance) {
   root.setAttribute("data-accent", appearance.accent);
   document.cookie = appearanceCookieString(appearance, window.location.protocol === "https:");
 
+  const resolved =
+    appearance.theme === "system"
+      ? window.matchMedia("(prefers-color-scheme: light)").matches
+        ? "light"
+        : "dark"
+      : appearance.theme;
   for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
-    // "Sistema" keeps each tag's own media query (light or dark); a fixed theme overrides both.
-    const forLight = meta.media.includes("light");
-    const theme = appearance.theme === "system" ? (forLight ? "light" : "dark") : appearance.theme;
-    meta.content = themeColors[theme];
+    meta.content = themeColors[resolved];
   }
 }

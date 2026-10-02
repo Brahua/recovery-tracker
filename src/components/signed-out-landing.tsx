@@ -93,7 +93,8 @@ type SignedOutLandingProps = {
 
 export function SignedOutLanding({ errorMessage, showDemo, supabaseEnv }: SignedOutLandingProps) {
   return (
-    <main className="rr-landing-shell">
+    // The landing is dark by design (photo and copy), whatever theme the browser last used.
+    <main className="rr-landing-shell rr-theme-dark">
       <div className="rr-landing-photo" aria-hidden="true">
         <Image
           alt=""

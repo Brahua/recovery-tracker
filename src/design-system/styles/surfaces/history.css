@@ -329,7 +329,7 @@
 }
 
 .rr-history-sets li span {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.75);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.75 * var(--rr-text-alpha)));
   font-size: 12.5px;
   font-variant-numeric: tabular-nums;
 }
@@ -376,7 +376,7 @@
 }
 
 .rr-history-treatments li {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.75);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.75 * var(--rr-text-alpha)));
   font-size: 12.5px;
 }
 
@@ -391,7 +391,7 @@
 }
 
 .rr-history-session-note span {
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.7);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.7 * var(--rr-text-alpha)));
   font-size: 12.5px;
   line-height: 1.5;
 }
@@ -460,7 +460,7 @@
   border-radius: var(--rr-radius-pill);
   background: rgb(var(--rr-night-rgb) / 0.1);
   padding: 5px 11px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.75);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.75 * var(--rr-text-alpha)));
   font-size: 11.5px;
   font-weight: 600;
   white-space: nowrap;
@@ -498,7 +498,7 @@
   place-items: center;
   border: 1px solid var(--rr-border-control);
   border-radius: 14px;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.7);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.7 * var(--rr-text-alpha)));
   font-size: 13.5px;
   font-weight: 600;
 }
@@ -590,7 +590,7 @@
   }
 
   .rr-history-header .rr-kicker {
-    color: var(--rr-accent);
+    color: var(--rr-accent-text);
     font-size: 11.5px;
   }
 

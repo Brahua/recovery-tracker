@@ -67,7 +67,7 @@
   border: 1px solid rgb(var(--rr-ink-rgb) / 0.23);
   border-radius: var(--rr-radius-pill);
   background: rgb(var(--rr-bg-rgb) / 0.25);
-  color: rgb(var(--rr-ink-rgb) / 0.76);
+  color: rgb(var(--rr-ink-rgb) / calc(0.76 * var(--rr-text-alpha)));
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -93,7 +93,7 @@
 
 .rr-landing-eyebrow {
   margin: 0 0 12px;
-  color: rgb(var(--rr-ink-rgb) / 0.72);
+  color: rgb(var(--rr-ink-rgb) / calc(0.72 * var(--rr-text-alpha)));
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -117,7 +117,7 @@
 .rr-landing-subhead {
   max-width: 390px;
   margin: 18px 0 0;
-  color: rgb(var(--rr-ink-rgb) / 0.78);
+  color: rgb(var(--rr-ink-rgb) / calc(0.78 * var(--rr-text-alpha)));
   font-size: 1rem;
   line-height: 1.5;
 }
@@ -166,7 +166,7 @@
 .rr-landing-demo {
   border: 1px solid transparent;
   background: transparent;
-  color: rgb(var(--rr-ink-rgb) / 0.72);
+  color: rgb(var(--rr-ink-rgb) / calc(0.72 * var(--rr-text-alpha)));
 }
 
 .rr-landing-demo span {
@@ -210,7 +210,7 @@
   border: 1px solid rgb(var(--rr-amber-rgb) / 0.35);
   border-radius: 10px;
   background: rgb(var(--rr-amber-rgb) / 0.08);
-  color: rgb(var(--rr-ink-rgb) / 0.78);
+  color: rgb(var(--rr-ink-rgb) / calc(0.78 * var(--rr-text-alpha)));
   font-size: 0.75rem;
   line-height: 1.45;
 }
@@ -275,7 +275,7 @@
 }
 
 .rr-landing-peek-copy span {
-  color: rgb(var(--rr-ink-rgb) / 0.54);
+  color: rgb(var(--rr-ink-rgb) / calc(0.54 * var(--rr-text-alpha)));
   font-size: 0.625rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -293,7 +293,7 @@
   grid-column: 1 / -1;
   padding-top: 10px;
   border-top: 1px solid var(--rr-border);
-  color: rgb(var(--rr-ink-rgb) / 0.57);
+  color: rgb(var(--rr-ink-rgb) / calc(0.57 * var(--rr-text-alpha)));
   font-size: 0.6875rem;
   font-weight: 600;
 }
@@ -344,7 +344,7 @@
 
 .rr-landing-benefits h2 {
   margin: 0;
-  color: rgb(var(--rr-ink-rgb) / 0.9);
+  color: rgb(var(--rr-ink-rgb) / calc(0.9 * var(--rr-text-alpha)));
   font-family: var(--rr-font-body);
   font-size: 0.8125rem;
   font-weight: 700;
@@ -354,7 +354,7 @@
 
 .rr-landing-benefits p {
   margin: 5px 0 0;
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.53);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.53 * var(--rr-text-alpha)));
   font-size: 0.71875rem;
   line-height: 1.45;
 }
@@ -365,7 +365,7 @@
   margin: 0 24px;
   padding: 18px 0 calc(22px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--rr-border-soft);
-  color: rgb(var(--rr-ink-secondary-rgb) / 0.56);
+  color: rgb(var(--rr-ink-secondary-rgb) / calc(0.56 * var(--rr-text-alpha)));
   font-size: 0.625rem;
   line-height: 1.5;
   text-align: center;
@@ -421,7 +421,7 @@
 
   .rr-landing-eyebrow {
     margin-bottom: 18px;
-    color: rgb(var(--rr-ink-rgb) / 0.48);
+    color: rgb(var(--rr-ink-rgb) / calc(0.48 * var(--rr-text-alpha)));
   }
 
   .rr-landing-copy h1 {
@@ -432,7 +432,7 @@
   .rr-landing-subhead {
     max-width: 470px;
     margin-top: 24px;
-    color: rgb(var(--rr-ink-rgb) / 0.62);
+    color: rgb(var(--rr-ink-rgb) / calc(0.62 * var(--rr-text-alpha)));
     font-size: 1.0625rem;
   }
 

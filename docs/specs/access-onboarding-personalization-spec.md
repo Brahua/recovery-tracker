@@ -56,7 +56,7 @@ Queremos tres cosas:
 21. Se guarda en `user_metadata.preferences = { theme, accent }` (como `display_name`, sin migración) y se valida con zod en el servidor (valores fuera de la lista se rechazan).
 22. **Sin parpadeo:** un script inline mínimo en `<head>` (patrón de la guía de Next 16, `preventing-flash-before-hydration.md`) lee la cookie espejo `rr-appearance` y pone `<html data-theme data-accent>` antes de pintar; así las páginas estáticas (`/offline`) siguen estáticas. La cookie la escribe el navegador al elegir y `AppearanceSync` (layout de la app) la alinea con la cuenta tras iniciar sesión o cambiar en otro dispositivo. Con "Sistema", el CSS decide con `prefers-color-scheme`.
 23. Tema claro completo en todas las pantallas autenticadas, con contraste WCAG AA en los dos temas y con los 3 colores (axe en E2E para cada combinación de tema; colores revisados con un chequeo de contraste por token).
-24. La barra de estado del iPhone y `theme-color` siguen el tema (`viewport.themeColor` con variantes por `prefers-color-scheme` / tema guardado).
+24. El color de la barra del navegador (`theme-color`) sigue el tema elegido (`applyAppearance`). La barra de estado de la app instalada en iPhone sigue negra: iOS la fija al abrir la app (`apple-mobile-web-app-status-bar-style`).
 25. La landing (sin sesión) sigue oscura: su foto y diseño son oscuros y todavía no hay preferencias.
 
 ### Fuera de alcance
@@ -197,7 +197,7 @@ Fuente: proyecto de Claude Design `74a9f44b-…` (`docs/design/claude-design-ref
 - **Color principal:** las opciones del ajuste "Estilo → accentColor" de `Recovery Tracker Hoy.dc.html`: **Verde recuperación `#2E7D5B`** (por defecto), **Terracota `#C9552E`** y **Ámbar `#B08A2E`**. El diseño deriva de cada uno: claro = mezcla del 18% hacia blanco, brillo 18%, sombra 50%, tinte 22%, borde 35%.
 - **Terracota:** en el design system también codifica el dolor (slider, "peor"). Decisión (2026-10-01, delegada al agente): con terracota como principal, los tokens de dolor pasan a frambuesa (`#d4426e` y su familia, misma luminancia, mismo contraste).
 - **Texto sobre el acento:** tokens `--rr-on-accent`, `--rr-on-accent-bright` y `--rr-on-accent-mark` (fijos, no dependen del tema). El ámbar es claro: lleva texto carbón.
-- **Tema claro:** base "Papel" del design system: fondo hueso `#F4EFE7` con tinta carbón `#1C1915`; la paleta clara completa la propone el agente (PR 4) y el owner la aprueba.
+- **Tema claro (PR 4, propuesto por el agente con aprobación delegada por el owner):** base "Papel": fondo `#f6f2eb`, superficie `#fdfbf7`, tinta carbón `#1c1915`. El acento como texto, el dolor y la noche se oscurecen para papel (≥ 4,8:1). El texto con transparencia usa `calc(alpha * var(--rr-text-alpha))`: 1 en oscuro y 1,45 en claro, porque la misma opacidad contrasta menos sobre fondo claro. La landing queda oscura con `.rr-theme-dark`.
 
 ## Decisiones tomadas (2026-10-01)
 

@@ -50,7 +50,7 @@ export default async function AjustesPage() {
 
       <section aria-labelledby="ajustes-apariencia" className="rr-settings-card">
         <h2 id="ajustes-apariencia">Apariencia</h2>
-        <AppearanceSettings appearance={appearanceFromMetadata(user.user_metadata)} />
+        <AppearanceSettings appearance={appearanceFromMetadata(user.user_metadata)} showTheme />
       </section>
 
       <section aria-labelledby="ajustes-instalar" className="rr-settings-card">

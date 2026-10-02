@@ -222,7 +222,7 @@
   .rr-streak-card small {
     display: block;
     margin-top: 4px;
-    color: rgb(var(--rr-ink-secondary-rgb) / 0.5);
+    color: rgb(var(--rr-ink-secondary-rgb) / calc(0.5 * var(--rr-text-alpha)));
     font-size: 11.5px;
   }
 

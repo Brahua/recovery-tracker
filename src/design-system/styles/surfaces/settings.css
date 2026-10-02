@@ -1,4 +1,5 @@
-/* Ajustes: profile (display name), install guide and reminders (device state, switches, times). */
+/* Ajustes: profile (display name), install guide, reminders (device state, switches, times) and
+   access (admin only: mode, invite form, invite list). */
 
 .rr-settings {
   display: grid;
@@ -253,6 +254,104 @@
 .rr-reminder-time:disabled {
   color: var(--rr-text-muted);
   opacity: 0.6;
+}
+
+.rr-access {
+  display: grid;
+  gap: 16px;
+}
+
+.rr-access-mode {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+
+.rr-access-badge {
+  border: 1px solid var(--rr-border-control);
+  border-radius: var(--rr-radius-pill);
+  padding: 4px 12px;
+  color: var(--rr-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.rr-access-badge.is-open {
+  border-color: var(--rr-accent-border);
+  background: var(--rr-accent-tint);
+  color: var(--rr-accent-on-tint);
+}
+
+.rr-access-mode-toggle {
+  padding: 0 16px;
+  font-size: 14px;
+}
+
+.rr-access-invite {
+  border-top: 1px solid var(--rr-border);
+  padding-top: 16px;
+}
+
+.rr-access-list {
+  display: grid;
+  gap: 10px;
+  border-top: 1px solid var(--rr-border);
+  padding-top: 16px;
+}
+
+.rr-access-list h3 {
+  color: var(--rr-ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.rr-access-list ul {
+  display: grid;
+  gap: 8px;
+}
+
+.rr-access-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  border: 1px solid var(--rr-border);
+  border-radius: var(--rr-radius-control);
+  background: var(--rr-wash-soft);
+  padding: 10px 12px 10px 14px;
+}
+
+.rr-access-row-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.rr-access-row-copy strong {
+  overflow-wrap: anywhere;
+  color: var(--rr-ink);
+  font-size: 14px;
+}
+
+.rr-access-state {
+  color: var(--rr-text-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.rr-access-state.is-joined {
+  color: var(--rr-accent-text);
+}
+
+.rr-access-row-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.rr-access-row-actions .rr-modal-secondary {
+  min-height: var(--rr-hit-target);
+  padding: 0 12px;
 }
 
 @media (prefers-reduced-motion: reduce) {

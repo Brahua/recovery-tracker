@@ -1,9 +1,12 @@
 import { redirect } from "next/navigation";
 
+import { createAccessRepository } from "@/data/access-repository";
 import { createRemindersRepository } from "@/data/reminders-repository";
+import { AccessSettings } from "@/features/access/access-settings";
 import { RemindersSettings } from "@/features/reminders/reminders-settings";
 import { InstallGuide } from "@/features/settings/install-guide";
 import { ProfileForm } from "@/features/settings/profile-form";
+import { isAppAdmin } from "@/lib/access";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 import { getChosenDisplayName, getUserDisplayName } from "@/lib/user-display-name";
 
@@ -15,6 +18,10 @@ export default async function AjustesPage() {
   }
 
   const reminderSettings = await (await createRemindersRepository()).getSettings();
+  // The database checks the admin role again on every access call.
+  const accessOverview = isAppAdmin(user)
+    ? await (await createAccessRepository()).getOverview()
+    : null;
   const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY?.trim() || null;
   const identity = { email: user.email, user_metadata: user.user_metadata };
   // The placeholder shows what the app would use if the chosen name is cleared.
@@ -48,6 +55,13 @@ export default async function AjustesPage() {
         <h2 id="ajustes-recordatorios">Recordatorios</h2>
         <RemindersSettings settings={reminderSettings} vapidPublicKey={vapidPublicKey} />
       </section>
+
+      {accessOverview ? (
+        <section aria-labelledby="ajustes-acceso" className="rr-settings-card">
+          <h2 id="ajustes-acceso">Acceso</h2>
+          <AccessSettings overview={accessOverview} />
+        </section>
+      ) : null}
     </section>
   );
 }

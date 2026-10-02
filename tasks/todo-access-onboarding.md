@@ -31,22 +31,22 @@ Verificación en la PC: `npm run format && npm run lint && npm run design:check 
 
 ## PR 2: acceso en Ajustes (admin)
 
-- [ ] B1. Funciones de admin
+- [x] B1. Funciones de admin
   - Acceptance: `admin_list_access`, `admin_invite_email`, `admin_remove_email`, `admin_set_access_mode`, cada una verifica el rol admin del JWT; `grant execute` a `authenticated`. Aditiva.
   - Verify: pgTAP (admin sí, no admin error); CI.
   - Files: `supabase/migrations/20261005000000_access_admin.sql`, `supabase/tests/access_admin.test.sql`, `src/types/database.generated.ts`
 
-- [ ] B2. Validación y Server Actions
+- [x] B2. Validación y Server Actions
   - Acceptance: zod para email (recorta, minúsculas, formato) y modo; actions que devuelven `{ ok, error? }`, mensajes en español, `revalidatePath("/ajustes")`.
   - Verify: tests de validación.
   - Files: `src/lib/validation/access.ts` (+ test), `src/features/access/actions.ts`
 
-- [ ] B3. Sección "Acceso" en Ajustes
+- [x] B3. Sección "Acceso" en Ajustes
   - Acceptance: visible solo con `app_metadata.role === "admin"`; invitar + compartir (Web Share / copiar); lista con "Pendiente"/"Ya entró" y "Quitar" con confirmación en la app; interruptor de modo con confirmación; estilos con tokens.
   - Verify: `design:check`; E2E en B4.
   - Files: `src/features/access/access-settings.tsx`, `src/app/(app)/ajustes/page.tsx`, `src/design-system/styles/surfaces/settings.css`
 
-- [ ] B4. E2E y docs
+- [x] B4. E2E y docs
   - Acceptance: E2E (usuario anónimo promovido a admin solo en local): invitar, ver "Pendiente", quitar; sin rol no ve la sección; axe; en `e2e:critical`; `CHANGELOG`, `HANDOFF`.
   - Files: `tests/e2e/access.spec.ts`, `package.json`, docs
 

@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-01 (acceso por invitación, apariencia y onboarding terminados).
+> Última actualización: 2026-10-02 (cierre de sesión: acceso, apariencia y onboarding probados en producción).
 
 ## Cómo retomar
 
@@ -18,7 +18,7 @@
 ## Estado
 
 - **Producción:** https://recovery-tracker.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
-- **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01). Acceso por invitación activo desde el 2026-10-01 (ADR-005).
+- **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01). Acceso por invitación activo desde el 2026-10-01 (ADR-005); para invitar: Ajustes → Acceso (solo el admin).
 - **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo, feedback global de carga, tratamientos del centro en Fisio guiada y edición de sesiones y cierres. Detalle en `CHANGELOG.md`.
 - **Fase:** prueba de uso real. Tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`) en producción desde el 2026-10-01: fase 1 (PR #23, migración `20261002000000_session_treatments.sql`) y fase 2, Insights y Reporte (PR #24). Probado por el owner en producción el 2026-10-01.
 - **Editar o corregir registros pasados** (`docs/specs/edit-past-records-spec.md`): en producción desde el 2026-10-01. Cierres (PR #27), sesiones con la migración `20261003000000_edit_past_records.sql` (PR #28) y "Corregir" en las pantallas de éxito (PR 3). Incluye el arreglo de la hora de la sesión (el servidor la leía en UTC). **Falta que el owner lo pruebe en producción.** No hay una próxima feature elegida.
@@ -36,11 +36,11 @@ Spec: `docs/specs/access-onboarding-personalization-spec.md` · Plan: `tasks/pla
 
 - **Acceso (#34, #36):** hook `before_user_created` **activo** en producción, modo `invite_only`, el owner es admin (`app_metadata.role`). Ajustes → Acceso: invitar, compartir, quitar y abrir el acceso. Pasos y SQL en `docs/deployment.md` → "Acceso por invitación".
 - **Apariencia (#37, #39):** Ajustes → Apariencia con tema (Oscuro, Claro, Sistema) y color (Verde, Terracota, Ámbar, de Claude Design). Script inline en `src/app/layout.tsx` + cookie `rr-appearance` + `AppearanceSync`; la cuenta (`user_metadata.preferences`) manda. Tokens claros en `tokens/colors.css` (dos copias idénticas, verificadas por test); el texto translúcido usa `--rr-text-alpha`. La landing queda oscura (`.rr-theme-dark`).
-- **Onboarding (PR 5):** `/bienvenida` para cuentas nuevas (recorrido de 6 tarjetas + configuración rápida, o "Saltar"); se repite desde Ajustes → Cuenta. El owner lo verá una vez al entrar.
+- **Onboarding (#40):** `/bienvenida` para cuentas nuevas (recorrido de 6 tarjetas + configuración rápida, o "Saltar"); se repite desde Ajustes → Cuenta. El owner lo verá una vez al entrar.
 - **Cerrar sesión en el celular (#38):** Ajustes → Cuenta.
 - MCP `claude_design` conectado en este equipo (configuración local); proyecto de diseño en `docs/design/claude-design-reference.md`.
-- En producción quedan 3 usuarios anónimos del 2026-09-16 sin datos (restos del staging); no se borran sin el OK del owner.
-- **Falta que el owner lo pruebe en producción**, sobre todo el tema claro en el iPhone (la barra de estado de la app instalada sigue negra: iOS la fija al abrir).
+- Los 3 usuarios anónimos del 2026-09-16 (sin datos en ninguna tabla) se borraron el 2026-10-02 con el OK del owner. En producción solo queda la cuenta del owner.
+- **Probado por el owner en producción (2026-10-02).** En la app instalada en iPhone, la barra de estado sigue negra con el tema claro: iOS la fija al abrir (`apple-mobile-web-app-status-bar-style`).
 
 No hay ramas abiertas.
 
@@ -91,6 +91,10 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 
 ## Trampas técnicas
 
+- Al mergear un PR con varios commits, `gh pr merge --squash` usa el título del PR (en español) como commit: pasar `--subject "feat: … (#N)"` en inglés (pasó en #39).
+- Apariencia: `<html data-theme data-accent>` lo pone un script inline antes de pintar (cookie `rr-appearance`); un color nuevo en una superficie debe usar tokens que existan en los dos temas, y el texto translúcido `calc(alpha * var(--rr-text-alpha))`. axe corre en claro y en oscuro (`tests/e2e/appearance.spec.ts`).
+- Una cuenta nueva va a `/bienvenida` hasta tener `onboarding_completed_at`; el usuario compartido de E2E lo salta en `auth.setup.ts`.
+
 - Next 16: `params` y `searchParams` son `Promise`; leer `node_modules/next/dist/docs/` antes de tocar rutas o Server Actions.
 - Dos GET idénticos de Supabase en el mismo render devuelven la respuesta memorizada: escribir antes de la única lectura.
 - Los E2E comparten un usuario anónimo por corrida; usar nombres únicos (`uniqueName`) y, con la máquina cargada, `--workers=1`.
@@ -98,6 +102,7 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 
 ## Próximos pasos
 
-- **PWA y recordatorios: terminado y verificado en el iPhone (2026-10-01).** Spec: `docs/specs/pwa-and-reminders-spec.md`. Diagnóstico del cron y secretos: `docs/deployment.md` → "Envío programado de recordatorios". No hay feature en curso.
+- **No hay feature en curso.** La siguiente se elige del backlog (`docs/ideas/recovery-ritual-backlog.md`).
+- Para abrir la app a cualquier cuenta de Google: Ajustes → Acceso → "Abrir a cualquier cuenta de Google" (sin desplegar).
+- PWA y recordatorios: diagnóstico del cron y secretos en `docs/deployment.md` → "Envío programado de recordatorios".
 - Ícono de la app: editar `src/design-system/brand/app-icon.svg` y regenerar con `node scripts/pwa/render-icons.mjs`. El service worker es `public/sw.js` (subir `CACHE_VERSION` si cambia `offline.html`).
-- El resto de lo pendiente está en **`docs/ideas/recovery-ritual-backlog.md`**.

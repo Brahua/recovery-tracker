@@ -738,8 +738,18 @@
   outline: none;
 }
 
+.rr-goals-form input::placeholder {
+  font-size: 14px;
+}
+
 .rr-goals-form input:focus {
   border-color: var(--rr-accent-light);
+}
+
+.rr-goals-form .rr-button {
+  padding-inline: 16px;
+  font-size: 14px;
+  white-space: nowrap;
 }
 
 .rr-goals-error {

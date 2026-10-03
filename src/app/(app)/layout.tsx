@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { AppearanceSync } from "@/components/appearance/appearance-sync";
 import { AppShell } from "@/components/app-shell";
 import { appearanceFromMetadata } from "@/lib/appearance";
+import { demoProfiles, getDemoProfileId } from "@/lib/demo/profiles";
 import { hasCompletedOnboarding, ONBOARDING_PATH } from "@/lib/onboarding";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 import { calculateLoggingStreak } from "@/lib/today-view-model";
@@ -20,9 +21,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!hasCompletedOnboarding(user.user_metadata)) redirect(ONBOARDING_PATH);
 
   const appearance = appearanceFromMetadata(user.user_metadata);
+  const demoProfileId = getDemoProfileId(user.app_metadata);
 
   return (
     <AppShell
+      demoTitle={demoProfileId ? demoProfiles[demoProfileId].title : undefined}
       streak={calculateLoggingStreak(recentSessions, recentCloseouts)}
       user={{ email: user.email, user_metadata: user.user_metadata }}
     >

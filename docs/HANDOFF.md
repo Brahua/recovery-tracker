@@ -53,6 +53,15 @@ Spec: `docs/specs/general-rehab-spec.md`. La app ya no es solo de rodilla; sigue
 - **Backlog:** etapa de la recuperación, módulo de documentos médicos y portal para fisios (spec propia, con las decisiones ya tomadas) están en `docs/ideas/recovery-ritual-backlog.md`.
 - **`gh` en esta máquina:** la función `gh` del shell elige la cuenta por carpeta, pero en el Bash de Claude devolvía `jbrahua`; funciona `GH_TOKEN="$(env -u GH_TOKEN command gh auth token --user Brahua)" command gh …`.
 
+### Modo demo ✅ (2026-10-03)
+
+Spec: `docs/specs/demo-mode-spec.md`. Botón **Modo demo** en la landing → modal con tres pacientes (rodilla post artroscopia, esguince grado III de tobillo, manguito rotador) que entra a una cuenta demo compartida con meses de datos de ejemplo.
+
+- **Cuentas:** tres usuarios reales en producción (`demo-*@demo.recovery-tracker.brahua.com`, sin contraseña ni acceso por Google), creados y cargados el 2026-10-03 con `npm run demo:reset`. La marca es `app_metadata.demo_profile`.
+- **Reiniciar:** `npm run demo:reset` (`--only knee|ankle|shoulder`, `--dry-run`); necesita `SUPABASE_SERVICE_ROLE_KEY`. Pasos para sacarla del CLI sin imprimirla en la spec.
+- **Probado:** datos con test contra las restricciones de la base; creación, reinicio y el flujo `generateLink` + `verifyOtp` contra producción (sesión y RLS: 41 sesiones visibles para Camila).
+- **Falta:** verlo en pantalla (la landing, el modal y el aviso no se revisaron en un navegador porque no se levantó `npm run dev`) y programar el reinicio si se quiere automático.
+
 ### Arreglos posteriores (2026-10-02) ✅
 
 - Barra inferior igual en todos los módulos (#42) y un solo encabezado: `.rr-page-title` con `.rr-kicker`, sin flecha en los módulos de la barra; la flecha solo en sub-pantallas (#42, #44).

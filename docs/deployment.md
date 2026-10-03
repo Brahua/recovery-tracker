@@ -171,7 +171,11 @@ Solo **Google** está activo (verificado el 2026-10-01). Dashboard → Authentic
 | Email | ❌ apagado | La app no lo usa; con la publishable key (pública) cualquiera podría registrarse por la API |
 | Anonymous Sign-Ins | ❌ apagado | Solo servía para E2E; ahora usan Supabase local, donde `supabase/config.toml` lo habilita. Activo, cualquiera podría crear usuarios basura con la publishable key |
 
-La app además oculta la entrada de demo si no está `ENABLE_DEMO_MODE`, que nunca se define en Vercel.
+La sesión anónima de prueba ("Sesión de prueba anónima" en la landing) solo aparece en desarrollo o con `ENABLE_DEMO_MODE`, que nunca se define en Vercel. No tiene relación con el **Modo demo** público, que no usa ninguno de estos proveedores: entra a tres cuentas fijas con la `service_role` (ver "Modo demo" abajo).
+
+## Modo demo
+
+El botón "Modo demo" de la landing inicia sesión en una de tres cuentas demo (`docs/specs/demo-mode-spec.md`). Necesita `SUPABASE_SERVICE_ROLE_KEY` en Vercel Production (la misma de los recordatorios) y que las cuentas existan: las crea y las carga `npm run demo:reset`. Ese mismo comando, corrido cuando se quiera, borra lo que los visitantes hayan agregado y deja los datos originales. No hay migración ni cambio en los proveedores de Auth.
 
 ## Acceso por invitación
 

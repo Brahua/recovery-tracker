@@ -2,6 +2,7 @@ import Image from "next/image";
 
 import { signInWithGoogleAction } from "@/app/auth/actions";
 import { signInAnonymouslyForTestingAction } from "@/features/check-in/test-auth/actions";
+import { DemoPicker } from "@/features/demo/demo-picker";
 
 const benefits = [
   {
@@ -87,11 +88,15 @@ function BenefitIcon({ name }: { name: BenefitIcon }) {
 
 type SignedOutLandingProps = {
   errorMessage?: string;
-  showDemo: boolean;
+  showTestAuth: boolean;
   supabaseEnv: boolean;
 };
 
-export function SignedOutLanding({ errorMessage, showDemo, supabaseEnv }: SignedOutLandingProps) {
+export function SignedOutLanding({
+  errorMessage,
+  showTestAuth,
+  supabaseEnv,
+}: SignedOutLandingProps) {
   return (
     // The landing is dark by design (photo and copy), whatever theme the browser last used.
     <main className="rr-landing-shell rr-theme-dark">
@@ -131,10 +136,11 @@ export function SignedOutLanding({ errorMessage, showDemo, supabaseEnv }: Signed
               Continuar con Google
             </button>
           </form>
-          {showDemo ? (
+          <DemoPicker disabled={!supabaseEnv} />
+          {showTestAuth ? (
             <form action={signInAnonymouslyForTestingAction}>
               <button className="rr-landing-demo" disabled={!supabaseEnv} type="submit">
-                Explorar en modo demo <span aria-hidden="true">→</span>
+                Sesión de prueba anónima (solo desarrollo) <span aria-hidden="true">→</span>
               </button>
             </form>
           ) : null}

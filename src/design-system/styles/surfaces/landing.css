@@ -132,7 +132,7 @@
   margin: 0;
 }
 
-.rr-landing-actions button {
+:is(.rr-landing-actions > button, .rr-landing-actions > form > button) {
   width: 100%;
   min-height: 54px;
   border-radius: 14px;
@@ -175,7 +175,7 @@
   transition: transform 180ms ease;
 }
 
-.rr-landing-actions button:hover:not(:disabled) {
+:is(.rr-landing-actions > button, .rr-landing-actions > form > button):hover:not(:disabled) {
   transform: translateY(-2px);
 }
 
@@ -193,13 +193,13 @@
   transform: translateX(3px);
 }
 
-.rr-landing-actions button:focus-visible,
+:is(.rr-landing-actions > button, .rr-landing-actions > form > button):focus-visible,
 .rr-landing-brand:focus-visible {
   outline: 2px solid var(--rr-gold);
   outline-offset: 3px;
 }
 
-.rr-landing-actions button:disabled {
+:is(.rr-landing-actions > button, .rr-landing-actions > form > button):disabled {
   cursor: not-allowed;
   opacity: 0.48;
 }

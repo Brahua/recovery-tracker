@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-02 (app de rehabilitación en general: texto neutro, lesión activa, rigidez, tipos de sesión y metas).
+> Última actualización: 2026-10-03 (arreglos visuales, sesión que se perdía tras cada despliegue y revisión del historial).
 
 ## Cómo retomar
 
@@ -58,6 +58,14 @@ Spec: `docs/specs/general-rehab-spec.md`. La app ya no es solo de rodilla; sigue
 - Barra inferior igual en todos los módulos (#42) y un solo encabezado: `.rr-page-title` con `.rr-kicker`, sin flecha en los módulos de la barra; la flecha solo en sub-pantallas (#42, #44).
 - Cierre del día con fecha y hora: `nightly_closeouts.closed_time` (#43).
 - Repo público (revisado sin secretos en el historial) y `main` protegida con el ruleset "Protect main" (#45).
+
+### Ajustes tras el uso real (2026-10-03) ✅
+
+- **Visual (#52):** botón «Agregar» y placeholder de «Mis metas» más pequeños (14px; el texto escrito sigue en 16px por el zoom de iOS) y avatar del sidebar en desktop centrado (una regla `.rr-user-row span` lo pisaba).
+- **Sesión que se perdía (#53):** `proxy.ts` creaba la respuesta antes de renovar el token, así que la pantalla del mismo request volvía a renovar con un refresh token ya rotado; con la rotación activada, reutilizarlo fuera de los 10 s puede revocar la sesión entera. Ahora el `proxy` recrea la respuesta en `setAll` (patrón oficial de Supabase) y aplica los headers anti-caché; `src/lib/supabase/proxy.test.ts` falla con el código anterior.
+  - **Falta comprobarlo en producción:** el owner nota la pérdida de sesión en la app instalada (iPhone), normalmente tras un despliegue. Si tras el siguiente despliegue sigue entrando sin volver a iniciar sesión, queda resuelto. Si no, mirar `auth.sessions` de producción (solo lectura) y sospechar de iOS y sus cookies.
+  - Descartado: la configuración de Auth de producción no limita la sesión (`sessions_timebox` e `sessions_inactivity_timeout` en 0, JWT de 1 h, cookies de 400 días); ningún workflow, migración ni script borra sesiones. El 2026-10-03 solo existían 3 sesiones, todas de ese día.
+- **Historial (sin cambios):** la ventana de «Ver 30 días anteriores» es de 30 días corridos (`getHistoryWindow`), no por mes; la duda del owner era de fechas, no un bug.
 
 No hay ramas abiertas ni PRs pendientes.
 
@@ -117,6 +125,7 @@ Si el token de Supabase vence, el deploy falla con HTTP 401 al migrar y no publi
 - Apariencia: `<html data-theme data-accent>` lo pone un script inline antes de pintar (cookie `rr-appearance`); un color nuevo en una superficie debe usar tokens que existan en los dos temas, y el texto translúcido `calc(alpha * var(--rr-text-alpha))`. axe corre en claro y en oscuro (`tests/e2e/appearance.spec.ts`).
 - Una cuenta nueva va a `/bienvenida` hasta tener `onboarding_completed_at`; el usuario compartido de E2E lo salta en `auth.setup.ts`.
 
+- Sesión de Supabase: en `proxy.ts` (`updateSession`) la respuesta debe recrearse dentro de `setAll` con `NextResponse.next({ request })`, copiando las cookies y los headers que entrega la librería. Si se crea una sola vez antes de renovar, la pantalla del mismo request usa un refresh token ya rotado y la sesión puede revocarse. Lo protege `src/lib/supabase/proxy.test.ts`.
 - Next 16: `params` y `searchParams` son `Promise`; leer `node_modules/next/dist/docs/` antes de tocar rutas o Server Actions.
 - Dos GET idénticos de Supabase en el mismo render devuelven la respuesta memorizada: escribir antes de la única lectura.
 - Los E2E comparten un usuario anónimo por corrida; usar nombres únicos (`uniqueName`) y, con la máquina cargada, `--workers=1`.

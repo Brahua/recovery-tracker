@@ -16,7 +16,7 @@ export default async function Home({
     return (
       <SignedOutLanding
         errorMessage={error}
-        showDemo={process.env.NODE_ENV !== "production" || process.env.ENABLE_DEMO_MODE === "1"}
+        showTestAuth={process.env.NODE_ENV !== "production" || process.env.ENABLE_DEMO_MODE === "1"}
         supabaseEnv={Boolean(supabaseEnv)}
       />
     );

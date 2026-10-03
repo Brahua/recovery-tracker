@@ -30,6 +30,7 @@
     "test:recovery": "vitest run src/lib/recovery-calculations.test.ts src/lib/recovery-insights.test.ts",
     "test:validation": "vitest run src/lib/validation/recovery.test.ts",
     "typecheck": "tsc --noEmit",
+    "demo:reset": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/demo/reset-demo.mjs",
     "css:compare": "node scripts/design-system/compare-css.mjs",
     "design:check": "node scripts/design-system/check-tokens.mjs"
   },

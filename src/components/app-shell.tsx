@@ -58,6 +58,8 @@ function getUserIdentity(user: DisplayNameUser) {
 }
 
 interface AppShellProps {
+  /** Set when the account is one of the demo patients (docs/specs/demo-mode-spec.md). */
+  demoTitle?: string;
   user: DisplayNameUser;
   streak: number;
   children: React.ReactNode;
@@ -65,7 +67,7 @@ interface AppShellProps {
 
 // Rendered once by the (app) layout so navigation never remounts the shell.
 // Pages that need a distraction-free view render <ImmersiveMarker />.
-export function AppShell({ user, streak, children }: AppShellProps) {
+export function AppShell({ demoTitle, user, streak, children }: AppShellProps) {
   const pathname = usePathname();
   const identity = getUserIdentity(user);
 
@@ -129,6 +131,17 @@ export function AppShell({ user, streak, children }: AppShellProps) {
       </aside>
 
       <section className="rr-mobile-frame">
+        {demoTitle ? (
+          <aside aria-label="Modo demo" className="rr-demo-banner">
+            <span>
+              <strong>Modo demo</strong> · {demoTitle}. Datos de ejemplo: puedes probar todo.
+            </span>
+            <form action={signOutAction}>
+              <FormPendingReporter />
+              <button type="submit">Salir de la demo</button>
+            </form>
+          </aside>
+        ) : null}
         <div className="rr-main-glow" />
         <div className="rr-main-content">{children}</div>
       </section>

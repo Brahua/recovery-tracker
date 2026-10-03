@@ -10,7 +10,7 @@ async function newUser(browser: Browser) {
   });
   const page = await context.newPage();
   await page.goto("/");
-  await page.getByRole("button", { name: "Explorar en modo demo" }).click();
+  await page.getByRole("button", { name: "Sesión de prueba anónima" }).click();
   await expect(page).toHaveURL(/\/bienvenida$/);
   return { context, page };
 }

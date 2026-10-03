@@ -234,7 +234,7 @@
     padding-inline: 4px;
   }
 
-  .rr-avatar {
+  .rr-user-row .rr-avatar {
     display: grid;
     width: 34px;
     height: 34px;

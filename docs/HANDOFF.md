@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-03 (arreglos visuales, sesión que se perdía tras cada despliegue y revisión del historial).
+> Última actualización: 2026-10-06 (modo demo en producción, PR #55).
 
 ## Cómo retomar
 
@@ -53,14 +53,17 @@ Spec: `docs/specs/general-rehab-spec.md`. La app ya no es solo de rodilla; sigue
 - **Backlog:** etapa de la recuperación, módulo de documentos médicos y portal para fisios (spec propia, con las decisiones ya tomadas) están en `docs/ideas/recovery-ritual-backlog.md`.
 - **`gh` en esta máquina:** la función `gh` del shell elige la cuenta por carpeta, pero en el Bash de Claude devolvía `jbrahua`; funciona `GH_TOKEN="$(env -u GH_TOKEN command gh auth token --user Brahua)" command gh …`.
 
-### Modo demo ✅ (2026-10-03)
+### Modo demo ✅ (2026-10-03, PR #55, en producción)
 
 Spec: `docs/specs/demo-mode-spec.md`. Botón **Modo demo** en la landing → modal con tres pacientes (rodilla post artroscopia, esguince grado III de tobillo, manguito rotador) que entra a una cuenta demo compartida con meses de datos de ejemplo.
 
 - **Cuentas:** tres usuarios reales en producción (`demo-*@demo.recovery-tracker.brahua.com`, sin contraseña ni acceso por Google), creados y cargados el 2026-10-03 con `npm run demo:reset`. La marca es `app_metadata.demo_profile`.
-- **Reiniciar:** `npm run demo:reset` (`--only knee|ankle|shoulder`, `--dry-run`); necesita `SUPABASE_SERVICE_ROLE_KEY`. Pasos para sacarla del CLI sin imprimirla en la spec.
+- **Reiniciar:** `npm run demo:reset` (`--only knee|ankle|shoulder`, `--dry-run`); necesita `SUPABASE_SERVICE_ROLE_KEY`. Cómo sacarla del CLI sin imprimirla: en `docs/specs/demo-mode-spec.md`.
 - **Probado:** datos con test contra las restricciones de la base; creación, reinicio y el flujo `generateLink` + `verifyOtp` contra producción (sesión y RLS: 41 sesiones visibles para Camila).
-- **Falta:** verlo en pantalla (la landing, el modal y el aviso no se revisaron en un navegador porque no se levantó `npm run dev`) y programar el reinicio si se quiere automático.
+- **Revisado en local el 2026-10-03** (`npm run dev`, móvil y escritorio, con la service key en la variable de entorno): modal, entrada, aviso, Ajustes y "Salir de la demo". CI (incluido E2E del modal) y despliegue en verde.
+- **Para saber:** la racha de la demo parte en 0 porque la racha exige haber registrado hoy y hoy queda libre a propósito. El reinicio es manual; programarlo (GitHub Actions con `schedule` y el secret `SUPABASE_SERVICE_ROLE_KEY`) queda como mejora opcional. Si hay abuso de la demo: firewall de Vercel.
+- **Falta:** que el owner la pruebe en el dominio de producción. Tras probarla, correr `npm run demo:reset` para dejarla limpia.
+- **Puertos:** el 3000 y el 3100 estaban ocupados por otros proyectos; `next dev -p 3200` funcionó.
 
 ### Arreglos posteriores (2026-10-02) ✅
 

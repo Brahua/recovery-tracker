@@ -28,7 +28,7 @@ export function InstallGuide() {
     return (
       <ol className="rr-settings-steps">
         <li>
-          Abre <strong>recovery-tracker.brahua.com</strong> en <strong>Safari</strong>.
+          Abre <strong>recovery.brahua.com</strong> en <strong>Safari</strong>.
         </li>
         <li>
           Toca <strong>Compartir</strong> (el cuadrado con la flecha hacia arriba).

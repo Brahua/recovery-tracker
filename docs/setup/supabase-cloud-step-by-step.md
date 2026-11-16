@@ -27,8 +27,8 @@ In Google Cloud Console, the OAuth client's authorized redirect URI is the Supab
 
 Dashboard → Authentication → URL Configuration:
 
-- Site URL: `https://recovery-tracker.brahua.com`
-- Redirect URLs: `https://recovery-tracker.brahua.com/**`, `https://recovery-tracker-brahua-lab.vercel.app/**` and, only if you log in locally against production, `http://localhost:3000/**`.
+- Site URL: `https://recovery.brahua.com`
+- Redirect URLs: `https://recovery.brahua.com/**`, `https://recovery-tracker-brahua-lab.vercel.app/**` and, only if you log in locally against production, `http://localhost:3000/**`.
 
 ## 5. Other Providers
 
@@ -46,13 +46,13 @@ Production values live only in Vercel (see `docs/deployment.md`):
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://pevrupenrzueyzidfeah.supabase.co
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=sb_publishable_…
-NEXT_PUBLIC_SITE_URL=https://recovery-tracker.brahua.com
+NEXT_PUBLIC_SITE_URL=https://recovery.brahua.com
 ```
 
 ## 7. Smoke Test
 
 After a deploy:
 
-1. Open https://recovery-tracker.brahua.com and sign in with Google.
+1. Open https://recovery.brahua.com and sign in with Google.
 2. The callback returns to `/auth/callback` on the same domain and lands on `/`.
 3. No auth redirect errors appear.

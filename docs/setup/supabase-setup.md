@@ -5,7 +5,7 @@ Two Supabase targets exist for this project:
 | Target | Used for |
 |---|---|
 | **Local** (Supabase CLI in Docker) | Playwright E2E in CI; locally only on a machine that can run Docker (not the owner's PC unless asked) |
-| **Production** (hosted, ref `pevrupenrzueyzidfeah`, formerly `staging`) | The live app at https://recovery-tracker.brahua.com; real data |
+| **Production** (hosted, ref `pevrupenrzueyzidfeah`, formerly `staging`) | The live app at https://recovery.brahua.com; real data |
 
 There is no separate staging project anymore (see `docs/decisions/ADR-004-promote-staging-to-production.md`).
 Migrations reach production only through the `deploy` job in `.github/workflows/ci-cd.yml` (see `docs/deployment.md`).

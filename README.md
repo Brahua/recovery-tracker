@@ -19,7 +19,7 @@ npm run e2e
 
 There is a single hosted environment: **production**.
 
-- App: https://recovery-tracker.brahua.com (Vercel project `brahua-lab/recovery-tracker`)
+- App: https://recovery.brahua.com (Vercel project `brahua-lab/recovery-tracker`)
 - Supabase: `pevrupenrzueyzidfeah` (formerly `recovery-tracker-staging`; promoted to production on 2026-09-30, see `docs/decisions/ADR-004-promote-staging-to-production.md`)
 - Google OAuth is the only sign-in provider in production (email and anonymous sign-ins are off). Anonymous sign-in is only enabled in local Supabase for Playwright.
 - Security headers on every route (`next.config.ts`); scripts and Playwright refuse to write to the production database (`scripts/check-db-target.mjs`).
@@ -158,7 +158,7 @@ Latest redesign verification also included:
 
 ## Current Milestone
 
-The MVP, UX redesign, individual-series capture, read-only history, robust session validation, and backdated closeouts are implemented and browser-reviewed. Since then the exercise catalog, routines and global loading/feedback have shipped. Regression coverage is green. The former staging project is now production at https://recovery-tracker.brahua.com and holds the single real user's data. The real-use trial is closed; there is no next feature chosen yet (see the backlog).
+The MVP, UX redesign, individual-series capture, read-only history, robust session validation, and backdated closeouts are implemented and browser-reviewed. Since then the exercise catalog, routines and global loading/feedback have shipped. Regression coverage is green. The former staging project is now production at https://recovery.brahua.com and holds the single real user's data. The real-use trial is closed; there is no next feature chosen yet (see the backlog).
 
 ## Documentation Practice
 

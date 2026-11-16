@@ -67,7 +67,7 @@ iPhone (PWA instalada)
 Supabase (producción)
   pg_cron cada 5 min ──► public.dispatch_reminders()
                           lee de Vault: URL del endpoint + secreto (si faltan, no hace nada)
-                          └─ pg_net POST ──► https://recovery-tracker.brahua.com/api/reminders/dispatch
+                          └─ pg_net POST ──► https://recovery.brahua.com/api/reminders/dispatch
 
 Next (Vercel) POST /api/reminders/dispatch
   1. valida el secreto
@@ -106,7 +106,7 @@ Además: extensiones `pg_cron` y `pg_net`, función `public.dispatch_reminders()
 | `VAPID_SUBJECT` | Vercel Production | `mailto:` del owner |
 | `SUPABASE_SERVICE_ROLE_KEY` | Vercel Production | sensitive |
 | `REMINDERS_DISPATCH_SECRET` | Vercel Production + Supabase Vault (`reminders_dispatch_secret`) | sensitive |
-| `reminders_dispatch_url` | Supabase Vault | `https://recovery-tracker.brahua.com/api/reminders/dispatch` |
+| `reminders_dispatch_url` | Supabase Vault | `https://recovery.brahua.com/api/reminders/dispatch` |
 
 ## Estructura
 

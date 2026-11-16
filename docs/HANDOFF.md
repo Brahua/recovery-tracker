@@ -17,7 +17,7 @@
 
 ## Estado
 
-- **Producción:** https://recovery-tracker.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
+- **Producción:** https://recovery.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
 - **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01). Acceso por invitación activo desde el 2026-10-01 (ADR-005); para invitar: Ajustes → Acceso (solo el admin).
 - **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo, feedback global de carga, tratamientos del centro en Fisio guiada, edición de sesiones y cierres, y la app de rehabilitación en general (lesión activa, rigidez, tipos de sesión y metas). Detalle en `CHANGELOG.md`.
 - **Fase:** prueba de uso real; la app de rehabilitación en general se entregó el 2026-10-02 (sección de abajo) y **falta que el owner la pruebe en producción** (empezando por elegir su lesión en Ajustes → Mi recuperación). Antes: Tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`) en producción desde el 2026-10-01: fase 1 (PR #23, migración `20261002000000_session_treatments.sql`) y fase 2, Insights y Reporte (PR #24). Probado por el owner en producción el 2026-10-01.
@@ -57,7 +57,7 @@ Spec: `docs/specs/general-rehab-spec.md`. La app ya no es solo de rodilla; sigue
 
 Spec: `docs/specs/demo-mode-spec.md`. Botón **Modo demo** en la landing → modal con tres pacientes (rodilla post artroscopia, esguince grado III de tobillo, manguito rotador) que entra a una cuenta demo compartida con meses de datos de ejemplo.
 
-- **Cuentas:** tres usuarios reales en producción (`demo-*@demo.recovery-tracker.brahua.com`, sin contraseña ni acceso por Google), creados y cargados el 2026-10-03 con `npm run demo:reset`. La marca es `app_metadata.demo_profile`.
+- **Cuentas:** tres usuarios reales en producción (`demo-*@demo.recovery.brahua.com`, sin contraseña ni acceso por Google), creados y cargados el 2026-10-03 con `npm run demo:reset`. La marca es `app_metadata.demo_profile`.
 - **Reiniciar:** `npm run demo:reset` (`--only knee|ankle|shoulder`, `--dry-run`); necesita `SUPABASE_SERVICE_ROLE_KEY`. Cómo sacarla del CLI sin imprimirla: en `docs/specs/demo-mode-spec.md`.
 - **Probado:** datos con test contra las restricciones de la base; creación, reinicio y el flujo `generateLink` + `verifyOtp` contra producción (sesión y RLS: 41 sesiones visibles para Camila).
 - **Revisado en local el 2026-10-03** (`npm run dev`, móvil y escritorio, con la service key en la variable de entorno): modal, entrada, aviso, Ajustes y "Salir de la demo". CI (incluido E2E del modal) y despliegue en verde.

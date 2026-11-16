@@ -16,7 +16,7 @@
     "supabase:login": "npx supabase login",
     "supabase:reset": "npx supabase db reset",
     "supabase:push": "node scripts/check-db-target.mjs && npx supabase db push",
-    "supabase:push:linked": "node scripts/check-db-target.mjs && npx supabase db push --linked",
+    "supabase:push:linked": "node scripts/check-db-target.mjs && npx supabase db push --linked --yes",
     "supabase:push:dry": "npx supabase db push --linked --dry-run",
     "supabase:link": "npx supabase link",
     "supabase:types": "npx supabase gen types typescript --local > src/types/database.generated.ts",

@@ -40,29 +40,29 @@ export interface TodayRitualState {
 interface TodayRitualInput {
   day: DayProgress;
   week: WeekProgress;
-  hasCloseoutToday: boolean;
+  hasCheckinToday: boolean;
   areaPhrase?: string;
 }
 
 const sessionHref = "/registrar?mode=session";
-const closeoutHref = "/registrar?mode=closeout";
+const morningHref = "/registrar?mode=morning";
 
 function sessionsWord(count: number) {
   return count === 1 ? "sesión" : "sesiones";
 }
 
 // Today's card follows the session goal (docs/specs/morning-checkin-and-daily-goal-spec.md): the
-// day is done with goal.perDay sessions; the nightly closeout is optional.
+// day is done with goal.perDay sessions; "¿Cómo amaneciste?" is optional and offered all day.
 export function getTodayRitualState({
   day,
   week,
-  hasCloseoutToday,
+  hasCheckinToday,
   areaPhrase,
 }: TodayRitualInput): TodayRitualState {
   const progress = Math.min(100, Math.round((day.count / day.perDay) * 100));
-  const optionalCloseout = hasCloseoutToday
+  const optionalMorning = hasCheckinToday
     ? null
-    : { secondaryHref: closeoutHref, secondaryLabel: "Hacer cierre (opcional)" };
+    : { secondaryHref: morningHref, secondaryLabel: "¿Cómo amaneciste?" };
 
   if (day.met) {
     return {
@@ -78,7 +78,7 @@ export function getTodayRitualState({
       primaryHref: "/insights",
       primaryLabel: "Ver insights",
       primaryMeta: "Ahora",
-      ...(optionalCloseout ?? {
+      ...(optionalMorning ?? {
         secondaryHref: sessionHref,
         secondaryLabel: "Registrar otra sesión",
       }),
@@ -95,7 +95,7 @@ export function getTodayRitualState({
       primaryHref: sessionHref,
       primaryLabel: "Registrar otra sesión",
       primaryMeta: "20 min",
-      ...(optionalCloseout ?? { secondaryHref: "/insights", secondaryLabel: "Ver insights" }),
+      ...(optionalMorning ?? { secondaryHref: "/insights", secondaryLabel: "Ver insights" }),
     };
   }
 
@@ -108,7 +108,7 @@ export function getTodayRitualState({
       primaryHref: sessionHref,
       primaryLabel: "Registrar una sesión",
       primaryMeta: "20 min",
-      ...(optionalCloseout ?? { secondaryHref: "/insights", secondaryLabel: "Ver insights" }),
+      ...(optionalMorning ?? { secondaryHref: "/insights", secondaryLabel: "Ver insights" }),
     };
   }
 
@@ -120,7 +120,7 @@ export function getTodayRitualState({
     primaryHref: sessionHref,
     primaryLabel: "Empezar sesión de hoy",
     primaryMeta: "20 min",
-    ...(optionalCloseout ?? { secondaryHref: "/insights", secondaryLabel: "Ver insights" }),
+    ...(optionalMorning ?? { secondaryHref: "/insights", secondaryLabel: "Ver insights" }),
   };
 }
 

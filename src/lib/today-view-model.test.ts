@@ -59,11 +59,11 @@ describe("getTodayRitualState with a condition", () => {
       getTodayRitualState({
         day: day(0),
         week: week(0),
-        hasCloseoutToday: false,
+        hasCheckinToday: false,
         areaPhrase: "tu hombro izquierdo",
       }).body,
     ).toBe("Un paso más para tu hombro izquierdo.");
-    expect(getTodayRitualState({ day: day(0), week: week(0), hasCloseoutToday: false }).body).toBe(
+    expect(getTodayRitualState({ day: day(0), week: week(0), hasCheckinToday: false }).body).toBe(
       "Un paso más cerca de tu recuperación.",
     );
   });
@@ -71,16 +71,17 @@ describe("getTodayRitualState with a condition", () => {
 
 describe("getTodayRitualState", () => {
   it("starts with the session and zero percent when nothing is logged", () => {
-    const state = getTodayRitualState({ day: day(0), week: week(0), hasCloseoutToday: false });
+    const state = getTodayRitualState({ day: day(0), week: week(0), hasCheckinToday: false });
 
     expect(state.progress).toBe(0);
     expect(state.primaryHref).toBe("/registrar?mode=session");
     expect(state.primaryLabel).toBe("Empezar sesión de hoy");
-    expect(state.secondaryLabel).toBe("Hacer cierre (opcional)");
+    expect(state.secondaryLabel).toBe("¿Cómo amaneciste?");
+    expect(state.secondaryHref).toBe("/registrar?mode=morning");
   });
 
   it("completes the day with one session when the goal is 1, without a closeout", () => {
-    const state = getTodayRitualState({ day: day(1), week: week(1), hasCloseoutToday: false });
+    const state = getTodayRitualState({ day: day(1), week: week(1), hasCheckinToday: false });
 
     expect(state.progress).toBe(100);
     expect(state.eyebrow).toBe("Día completo");
@@ -90,7 +91,7 @@ describe("getTodayRitualState", () => {
   });
 
   it("shows k of N and the share when the goal is 2", () => {
-    const state = getTodayRitualState({ day: day(1, 2), week: week(0, 5), hasCloseoutToday: true });
+    const state = getTodayRitualState({ day: day(1, 2), week: week(0, 5), hasCheckinToday: true });
 
     expect(state.progress).toBe(50);
     expect(state.title).toBe("Llevas 1 de 2 sesiones.");
@@ -100,7 +101,7 @@ describe("getTodayRitualState", () => {
   });
 
   it("completes the day at the second session of a 2-session goal", () => {
-    const state = getTodayRitualState({ day: day(2, 2), week: week(5, 5), hasCloseoutToday: true });
+    const state = getTodayRitualState({ day: day(2, 2), week: week(5, 5), hasCheckinToday: true });
 
     expect(state.progress).toBe(100);
     expect(state.title).toBe("2 sesiones. Día completo.");
@@ -109,7 +110,7 @@ describe("getTodayRitualState", () => {
   });
 
   it("offers rest once the week is met and today has no sessions", () => {
-    const state = getTodayRitualState({ day: day(0), week: week(3, 3), hasCloseoutToday: true });
+    const state = getTodayRitualState({ day: day(0), week: week(3, 3), hasCheckinToday: true });
 
     expect(state.eyebrow).toBe("Semana cumplida");
     expect(state.title).toBe("Hoy puedes descansar o sumar una sesión.");

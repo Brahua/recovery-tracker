@@ -66,7 +66,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `supabase/migrations/20261117000000_morning_checkins.sql`, `src/types/recovery.ts`, `src/lib/validation/recovery.ts` (+ test), `src/data/recovery-log-repository.ts`, `src/data/recovery-log-mappers.ts` (+ test)
   - Deps: Checkpoint A
 
-- [ ] **M2: Formulario "¿Cómo amaneciste?"** (M)
+- [x] **M2: Formulario "¿Cómo amaneciste?"** (M)
   - Acceptance:
     - `/registrar?mode=morning` reemplaza la pestaña "Cierre"; edición en `/registrar/manana/[id]`
     - fecha por defecto hoy, pasadas permitidas, futuras no; una por día
@@ -77,7 +77,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/features/check-in/morning-checkin/{form.tsx,actions.ts}`, `src/lib/morning-checkin-form-state.ts` (+ test), `src/app/(app)/registrar/page.tsx`, `src/app/(app)/registrar/manana/[id]/page.tsx`, `src/design-system/styles/surfaces/closeout.css`
   - Deps: M1
 
-- [ ] **M3: Hoy con el registro de la mañana** (S)
+- [x] **M3: Hoy con el registro de la mañana** (S)
   - Acceptance:
     - tarjeta secundaria "¿Cómo amaneciste? · 1 min" todo el día mientras no exista el de hoy
     - Hoy ya no ofrece el cierre nocturno
@@ -89,7 +89,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
 ### Checkpoint B1
 - [ ] PR 3 con CI en verde: el registro de la mañana se guarda y Hoy lo muestra
 
-- [ ] **M4: Historial** (S)
+- [x] **M4: Historial** (S)
   - Acceptance: registros de la mañana como "Cómo amaneciste" en su día, con editar y eliminar; cierres viejos sin cambios.
   - Verify: unitarios de `history-view-model`; e2e en M8.
   - Files: `src/lib/history-view-model.ts` (+ test), `src/features/history/history-morning-card.tsx`, `src/features/history/history-list.tsx`, `src/design-system/styles/surfaces/history.css`

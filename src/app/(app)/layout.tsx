@@ -9,7 +9,7 @@ import { loadRecoveryPageData } from "@/lib/recovery-page-data";
 import { calculateLoggingStreak } from "@/lib/today-view-model";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const { user, recentSessions, recentCloseouts } = await loadRecoveryPageData({
+  const { user, recentSessions, recentCloseouts, rangeCheckins } = await loadRecoveryPageData({
     limit: null,
   });
 
@@ -26,7 +26,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <AppShell
       demoTitle={demoProfileId ? demoProfiles[demoProfileId].title : undefined}
-      streak={calculateLoggingStreak(recentSessions, recentCloseouts)}
+      streak={calculateLoggingStreak(recentSessions, recentCloseouts, new Date(), rangeCheckins)}
       user={{ email: user.email, user_metadata: user.user_metadata }}
     >
       <AppearanceSync accent={appearance.accent} theme={appearance.theme} />

@@ -36,7 +36,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/lib/today-view-model.ts` (+ test), `src/lib/registrar-flow.ts` (+ test), `src/features/today/overview.tsx`, `src/lib/recovery-page-data.ts`, `tests/e2e/settings.spec.ts`
   - Deps: G2
 
-- [ ] **G4: Recordatorio de sesión según la meta** (M)
+- [x] **G4: Recordatorio de sesión según la meta** (M)
   - Acceptance:
     - se envía solo si las sesiones de hoy < `perDay` y la semana no está cumplida
     - el dispatcher lee las sesiones de la semana y la meta de cada usuario con recordatorio pendiente
@@ -44,7 +44,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/lib/reminders/due-reminders.ts` (+ test), `src/lib/reminders/dispatch.ts` (+ test), `src/data/reminders-dispatch-store.ts`
   - Deps: G2
 
-- [ ] **G5: Adherencia en el Reporte** (S)
+- [x] **G5: Adherencia en el Reporte** (S)
   - Acceptance: línea "Meta: … · cumplida X de Y semanas" con semanas completas del periodo; sin semanas completas, no aparece.
   - Verify: unitarios de `report-view-model`.
   - Files: `src/lib/report-view-model.ts` (+ test), `src/features/reports/medical-report.tsx`

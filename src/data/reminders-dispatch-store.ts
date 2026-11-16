@@ -8,7 +8,8 @@ import {
   type PushSubscriptionRow,
   type ReminderSettingsRow,
 } from "@/data/reminders-mappers";
-import { getRecoveryUtcRange } from "@/lib/recovery-date";
+import { getRecoveryUtcRange, getRecoveryWeekKeys } from "@/lib/recovery-date";
+import { sessionGoalFromMetadata, type SessionGoal } from "@/lib/session-goal";
 import type { DispatchStore } from "@/lib/reminders/dispatch";
 import type { ReminderKind, StoredPushSubscription } from "@/types/reminders";
 
@@ -34,18 +35,39 @@ export function createDispatchStore(client: SupabaseClient): DispatchStore {
       }));
     },
 
-    async usersWithSessionOn(userIds, localDate) {
-      const { fromInclusive, toExclusive } = getRecoveryUtcRange(localDate, localDate);
+    async sessionsInWeekOf(userIds, localDate) {
+      const week = getRecoveryWeekKeys(localDate);
+      const { fromInclusive, toExclusive } = getRecoveryUtcRange(week[0], week[6]);
       const rows = check(
         await client
           .from("rehab_sessions")
-          .select("user_id")
+          .select("user_id, occurred_at")
           .in("user_id", userIds)
           .gte("occurred_at", fromInclusive)
           .lt("occurred_at", toExclusive)
-          .returns<Array<{ user_id: string }>>(),
+          .returns<Array<{ user_id: string; occurred_at: string }>>(),
       );
-      return new Set((rows ?? []).map((row) => row.user_id));
+      const byUser = new Map<string, Array<{ occurredAt: string }>>();
+      for (const row of rows ?? []) {
+        byUser.set(row.user_id, [
+          ...(byUser.get(row.user_id) ?? []),
+          { occurredAt: row.occurred_at },
+        ]);
+      }
+      return byUser;
+    },
+
+    async sessionGoalsFor(userIds) {
+      // One admin read per user: only users with a device and an open session window get here.
+      const goals = new Map<string, SessionGoal>();
+      await Promise.all(
+        userIds.map(async (userId) => {
+          const { data, error } = await client.auth.admin.getUserById(userId);
+          if (error) throw new Error(error.message);
+          goals.set(userId, sessionGoalFromMetadata(data.user?.user_metadata));
+        }),
+      );
+      return goals;
     },
 
     async usersWithCloseoutOn(userIds, localDate) {

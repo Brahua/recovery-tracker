@@ -5,6 +5,7 @@ import { ReportQuestions } from "@/components/report-questions";
 import { conditionSummary, type Condition } from "@/lib/condition";
 import { buildPainTrendInsight } from "@/lib/recovery-insights";
 import { createReportViewModel } from "@/lib/report-view-model";
+import type { SessionGoal } from "@/lib/session-goal";
 import { splitGoals } from "@/lib/goals";
 import { getRecoveryDateKey } from "@/lib/recovery-date";
 import type { RecoveryGoal } from "@/types/goals";
@@ -78,6 +79,8 @@ interface MedicalReportProps {
   condition?: Condition | null;
   /** The patient's goals; the card only shows when there are some. */
   goals?: RecoveryGoal[];
+  /** Sessions per day and days per week; adds the weekly adherence line. */
+  sessionGoal?: SessionGoal;
 }
 
 export function MedicalReport({
@@ -87,8 +90,15 @@ export function MedicalReport({
   windowDays,
   condition,
   goals = [],
+  sessionGoal,
 }: MedicalReportProps) {
-  const report = createReportViewModel(recentSessions, recentCloseouts, windowDays, now);
+  const report = createReportViewModel(
+    recentSessions,
+    recentCloseouts,
+    windowDays,
+    now,
+    sessionGoal,
+  );
   const { summary } = report;
   const line = painPolyline(summary.painTrend.points);
   const conditionLine = conditionSummary(condition, getRecoveryDateKey(now));
@@ -207,6 +217,13 @@ export function MedicalReport({
               </div>
             </div>
             <p className="rr-report-copy">{summary.sessionResponseText}</p>
+            {report.adherence ? (
+              <p className="rr-report-copy">
+                Meta: {report.adherence.goalText} · cumplida {report.adherence.metWeeks} de{" "}
+                {report.adherence.weeks} semana{report.adherence.weeks === 1 ? "" : "s"} completa
+                {report.adherence.weeks === 1 ? "" : "s"}.
+              </p>
+            ) : null}
             {report.physioSessionCount > 0 ? (
               <div className="rr-report-treatments">
                 <h3>

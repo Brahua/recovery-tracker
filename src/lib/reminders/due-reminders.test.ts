@@ -19,7 +19,7 @@ const settings: ReminderSettings = {
 /** Lima is UTC-5 all year. */
 const lima = (date: string, time: string) => new Date(`${date}T${time}:00-05:00`);
 
-const pending = { hasSessionToday: false, hasCloseoutToday: false, deliveredToday: [] as const };
+const pending = { sessionGoalPending: true, hasCloseoutToday: false, deliveredToday: [] as const };
 
 describe("dueReminders", () => {
   it("sends nothing before the chosen time", () => {
@@ -56,7 +56,7 @@ describe("dueReminders", () => {
       "closeout",
     ]);
     expect(
-      dueReminders({ now, settings: closeoutAt, ...pending, hasSessionToday: true }).kinds,
+      dueReminders({ now, settings: closeoutAt, ...pending, sessionGoalPending: false }).kinds,
     ).toEqual(["closeout"]);
     expect(
       dueReminders({ now, settings: closeoutAt, ...pending, hasCloseoutToday: true }).kinds,

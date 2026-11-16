@@ -1,5 +1,5 @@
 import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
-import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import type { MorningCheckin, NightlyCloseout, RehabSession } from "@/types/recovery";
 
 export interface HistoryWindow {
   from: string;
@@ -10,6 +10,8 @@ export interface HistoryWindow {
 export interface HistoryDay {
   date: string;
   sessions: RehabSession[];
+  morningCheckin?: MorningCheckin;
+  // Legacy nightly closeout: replaced by the morning check-in but still shown.
   closeout?: NightlyCloseout;
 }
 
@@ -20,7 +22,17 @@ export function getHistoryDaySummary(day: HistoryDay) {
     0,
   );
 
-  return `${sessionCount} ${sessionCount === 1 ? "sesión" : "sesiones"} · ${exerciseCount} ejercicio${exerciseCount === 1 ? "" : "s"} · ${day.closeout ? "cierre listo" : "sin cierre"}`;
+  const parts =
+    sessionCount === 0
+      ? ["Sin sesiones"]
+      : [
+          `${sessionCount} ${sessionCount === 1 ? "sesión" : "sesiones"}`,
+          `${exerciseCount} ejercicio${exerciseCount === 1 ? "" : "s"}`,
+        ];
+  if (day.morningCheckin) parts.push("mañana registrada");
+  if (day.closeout) parts.push("cierre");
+
+  return parts.join(" · ");
 }
 
 function isDateKey(value: string) {
@@ -53,6 +65,7 @@ export function getHistoryHrefForDate(date: string, today: string = getRecoveryD
 export function buildHistoryDays(
   sessions: RehabSession[],
   closeouts: NightlyCloseout[],
+  checkins: MorningCheckin[] = [],
 ): HistoryDay[] {
   const days = new Map<string, HistoryDay>();
 
@@ -67,6 +80,12 @@ export function buildHistoryDays(
     const day = days.get(closeout.date) ?? { date: closeout.date, sessions: [] };
     day.closeout = closeout;
     days.set(closeout.date, day);
+  }
+
+  for (const checkin of checkins) {
+    const day = days.get(checkin.date) ?? { date: checkin.date, sessions: [] };
+    day.morningCheckin = checkin;
+    days.set(checkin.date, day);
   }
 
   return Array.from(days.values())

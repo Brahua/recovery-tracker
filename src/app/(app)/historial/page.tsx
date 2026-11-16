@@ -10,6 +10,7 @@ type SearchParams = Record<string, string | string[] | undefined>;
 // Set by the edit actions when they redirect back here.
 const updatedToastMessages = new Map([
   ["closeout", "Cierre actualizado"],
+  ["morning", "Registro de la mañana actualizado"],
   ["session", "Sesión actualizada"],
 ]);
 
@@ -22,11 +23,12 @@ export default async function HistorialPage({
   const requestedEnd =
     typeof resolvedSearchParams.before === "string" ? resolvedSearchParams.before : undefined;
   const window = getHistoryWindow(requestedEnd);
-  const { supabaseEnv, user, recentSessions, recentCloseouts } = await loadRecoveryPageData({
-    from: window.from,
-    to: window.to,
-    limit: null,
-  });
+  const { supabaseEnv, user, recentSessions, recentCloseouts, rangeCheckins } =
+    await loadRecoveryPageData({
+      from: window.from,
+      to: window.to,
+      limit: null,
+    });
 
   if (!supabaseEnv || !user) {
     redirect("/");
@@ -43,7 +45,7 @@ export default async function HistorialPage({
         <ToastOnMount message={updatedToast} onceKey={`updated:${updatedKey}`} />
       ) : null}
       <HistoryList
-        days={buildHistoryDays(recentSessions, recentCloseouts)}
+        days={buildHistoryDays(recentSessions, recentCloseouts, rangeCheckins)}
         expandedSessionId={typeof focusedSession === "string" ? focusedSession : undefined}
         from={window.from}
         key={`${window.to}:${typeof updatedKey === "string" ? updatedKey : ""}`}

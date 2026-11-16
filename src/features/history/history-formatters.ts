@@ -1,5 +1,11 @@
 import { recoveryTimeZone } from "@/lib/recovery-date";
-import type { FinalState, ReboundLevel, SessionType, StiffnessLevel } from "@/types/recovery";
+import type {
+  FinalState,
+  Rating1To5,
+  ReboundLevel,
+  SessionType,
+  StiffnessLevel,
+} from "@/types/recovery";
 
 export const sessionTypeLabels: Record<SessionType, string> = {
   HOME: "En casa",
@@ -36,6 +42,14 @@ export const reboundLabels: Record<ReboundLevel, string> = {
   MILD: "Leve",
   MODERATE: "Moderado",
   STRONG: "Fuerte",
+};
+
+export const sleepQualityLabels: Record<Rating1To5, string> = {
+  1: "muy mala",
+  2: "mala",
+  3: "regular",
+  4: "buena",
+  5: "muy buena",
 };
 
 export const stiffnessLabels: Record<StiffnessLevel, string> = {

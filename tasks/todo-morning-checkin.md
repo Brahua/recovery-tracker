@@ -51,9 +51,9 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Deps: G2
 
 ### Checkpoint A
-- [ ] format, lint, design:check, typecheck y unitarios en verde en la PC
-- [ ] PRs 1 y 2 con CI en verde y desplegados
-- [ ] El owner prueba en producción: meta 1×7 y 2×5
+- [x] format, lint, design:check, typecheck y unitarios en verde en la PC
+- [x] PRs 1 y 2 con CI en verde y desplegados (#58, #59)
+- [x] Probado en producción con una cuenta demo (meta 1×7 y 2×5); falta que el owner lo pruebe con su cuenta
 
 ## Fase 2: registro de la mañana
 
@@ -87,7 +87,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Deps: M1
 
 ### Checkpoint B1
-- [ ] PR 3 con CI en verde: el registro de la mañana se guarda y Hoy lo muestra
+- [x] Desvío: M1–M8 fueron en un solo PR (#60), porque quitar la creación de cierres rompía los E2E que los creaban
 
 - [x] **M4: Historial** (S)
   - Acceptance: registros de la mañana como "Cómo amaneciste" en su día, con editar y eliminar; cierres viejos sin cambios.
@@ -130,12 +130,13 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Deps: M2–M6
 
 ### Checkpoint B
-- [ ] PRs 3–5 con CI en verde y desplegados
-- [ ] El owner prueba en producción: registro de la mañana, Historial con cierres viejos, Insights y Reporte
+- [x] PR #60 (+ #61, `--yes` en el push de migraciones) con CI en verde y desplegado; migración aplicada
+- [x] Probado en producción con una cuenta demo: mañana, Hoy, Historial, Insights y Reporte; falta que el owner lo pruebe con su cuenta
+- [ ] `npm run demo:reset` con los datos nuevos (necesita la clave `service_role`)
 
 ## Fase 3: documentación
 
-- [ ] **D1: Docs** (S)
+- [x] **D1: Docs** (S)
   - Acceptance: spec marcada como entregada; `docs/HANDOFF.md`, `RECAP.md`, `CHANGELOG.md` y `README.md` actualizados.
   - Files: esos cuatro + la spec
   - Deps: Checkpoint B

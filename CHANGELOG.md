@@ -7,9 +7,13 @@ The format is based on Keep a Changelog and this project currently follows Seman
 ## [Unreleased]
 
 ### Changed
+- The nightly closeout is replaced by an optional morning check-in, "¿Cómo amaneciste?": last night's sleep (hours and quality), pain and stiffness on waking, and the rebound from the day before (asked only when that day had sessions). New table `morning_checkins` (migration `20261117000000_morning_checkins.sql`, additive); older closeouts stay readable and editable. Hoy offers it all day, Historial shows and edits it, the reminder asks for it (08:00 by default) and Insights and the Reporte read both sources through `lib/daily-signals`, tying each rebound to the day of the sessions it answers to. Spec: `docs/specs/morning-checkin-and-daily-goal-spec.md`.
+- Production moved to https://recovery.brahua.com.
+- CI confirms the production migration push (`supabase db push --linked --yes`): Supabase CLI 3.x asks first and applies nothing without a terminal.
 - The app is no longer worded for knee rehab only: landing, manifest, invite message, onboarding, check-in and closeout questions, Today and success messages now use neutral wording ("your recovery", "the treated area").
 
 ### Added
+- Session goal: N sessions a day (1–5) on D days a week (1–7), in Ajustes and the onboarding (`user_metadata.session_goal`). Hoy measures the day and the Monday–Sunday week against it (full, partial and empty days), the session reminder stops once the day or the week is met, and the Reporte shows how many full weeks met it.
 - Demo mode: the landing's "Modo demo" opens a modal with three patients (left knee after arthroscopy, grade III ankle sprain, rotator cuff injury) and signs the visitor into a shared demo account with weeks of mock but coherent records (sessions, physio treatments, closeouts, catalog, routines, goals). A banner marks the demo and Ajustes hides reminders. `npm run demo:reset` (`--only`, `--dry-run`) restores the original data. No migration. Spec: `docs/specs/demo-mode-spec.md`.
 - "Mis metas" in Hoy: simple goals in the patient's own words, ticked off when achieved (up to 10 pending), listed in the Reporte. New table `recovery_goals` with RLS per owner and a pending-goals limit trigger (migration `20261008000000_recovery_goals.sql`, additive).
 - Stiffness in the nightly closeout (optional: Ninguna, Un poco, Bastante, Mucha; `nightly_closeouts.stiffness_level`), shown in Historial and summarized in the Reporte, and three more session types: Movilidad, Equilibrio and Respiración (`rehab_sessions.session_type` check widened). Migration `20261007000000_stiffness_and_session_types.sql` is additive.

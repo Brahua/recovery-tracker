@@ -1,6 +1,6 @@
 # Spec: registro de la mañana y meta de sesiones
 
-> Estado: **aprobada por el owner** (2026-11-16). Plan: `tasks/plan-morning-checkin.md` · Tareas: `tasks/todo-morning-checkin.md`.
+> Estado: **entregada en producción** (2026-11-16, PRs #58–#61). Aprobada por el owner el mismo día. Plan: `tasks/plan-morning-checkin.md` · Tareas: `tasks/todo-morning-checkin.md`.
 
 ## Problema
 

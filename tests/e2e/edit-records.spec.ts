@@ -3,6 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { getHistoryHrefForDate } from "@/lib/history-view-model";
 import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 
+import { insertLegacyCloseout } from "./admin-helpers";
 import { expectNoAxeViolations } from "./axe-helpers";
 import {
   addExerciseFromCatalog,
@@ -21,17 +22,12 @@ import {
 const dayAt = (step: number) =>
   addRecoveryDays(getRecoveryDateKey(), -(40 + test.info().workerIndex * 10 + step));
 
+// The app no longer creates closeouts (the morning check-in replaced them): seed the older one.
 async function createCloseout(page: Page, date: string, pain: string) {
-  await page.goto(`/registrar?mode=closeout&date=${date}`);
-  await page.getByRole("slider", { name: "Dolor" }).fill(pain);
-  await page.getByText("Alta", { exact: true }).click();
-  await page.getByText("Leve", { exact: true }).click();
-  await page.getByText("Buena", { exact: true }).click();
-  await page.getByRole("button", { name: "Cerrar el dia" }).click();
-  await expect(toast(page, "Cierre guardado")).toBeVisible();
-  const closeoutId = new URL(page.url()).searchParams.get("closeoutId");
-  expect(closeoutId).toBeTruthy();
-  return closeoutId as string;
+  return insertLegacyCloseout(page.context(), date, {
+    endOfDayPain: Number(pain),
+    closedTime: "21:00",
+  });
 }
 
 async function openCloseoutEditor(page: Page, date: string, closeoutId: string) {

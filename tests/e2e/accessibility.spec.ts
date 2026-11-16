@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 
+import { insertLegacyCloseout } from "./admin-helpers";
 import { expectNoAxeViolations } from "./axe-helpers";
 import {
   addExerciseFromCatalog,
@@ -17,7 +18,7 @@ import {
 const SIGNED_IN_SCREENS = [
   { name: "Hoy", path: "/", ready: /^Hola,/ },
   { name: "Registrar sesion", path: "/registrar?mode=session", ready: null },
-  { name: "Cierre del dia", path: "/registrar?mode=closeout", ready: null },
+  { name: "Cómo amaneciste", path: "/registrar?mode=morning", ready: null },
   { name: "Historial", path: "/historial", ready: null },
   { name: "Insights", path: "/insights", ready: null },
   { name: "Reporte", path: "/reporte", ready: null },
@@ -27,7 +28,8 @@ const SIGNED_IN_SCREENS = [
 ] as const;
 
 // Populated screens render far more than empty states (history rows, metrics, sets),
-// so the suite logs its own session and closeout instead of relying on other specs.
+// so the suite logs its own session, an older closeout and a morning instead of relying on other
+// specs.
 async function seedRecoveryData(page: Page) {
   await openSessionForm(page);
   await fillSessionBasics(page);
@@ -44,23 +46,27 @@ async function seedRecoveryData(page: Page) {
   await closeExerciseDialog(page);
   await saveSession(page);
 
-  // Inside Historial's 30-day window, on a day no other spec closes (they use -1 and -2).
-  // Random so a CI retry of this serial block does not hit the one-closeout-per-day rule.
-  const closeoutDate = addRecoveryDays(getRecoveryDateKey(), -(3 + Math.floor(Math.random() * 26)));
-  await page.goto(`/registrar?mode=closeout&date=${closeoutDate}`);
-  await page.getByRole("slider", { name: "Dolor" }).fill("4");
-  await page.getByText("Alta", { exact: true }).click();
-  await page.getByText("Leve", { exact: true }).click();
-  await page.getByText("Buena", { exact: true }).click();
-  await page.getByRole("button", { name: "Cerrar el dia" }).click();
-  await expect(page.getByRole("status").filter({ hasText: "Cierre guardado" })).toBeVisible();
+  // Inside Historial's 30-day window. Random so a CI retry of this serial block does not hit the
+  // one-per-day rule; the closeout and the morning never share a day (even vs odd offsets).
+  const offset = 3 + 2 * Math.floor(Math.random() * 13);
+  await insertLegacyCloseout(page.context(), addRecoveryDays(getRecoveryDateKey(), -offset));
+  await page.goto(
+    `/registrar?mode=morning&date=${addRecoveryDays(getRecoveryDateKey(), -(offset + 1))}`,
+  );
+  await page.getByText("Bien", { exact: true }).click();
+  await page.getByRole("slider", { name: "Dolor al despertar" }).fill("4");
+  await page.getByText("Un poco", { exact: true }).click();
+  const rebound = page.getByRole("group", { name: "Rebote de la sesión anterior" });
+  if (await rebound.isVisible()) await rebound.getByText("Leve", { exact: true }).click();
+  await page.getByRole("button", { name: /Guardar mañana/ }).click();
+  await expect(page.getByRole("heading", { name: "Que tengas buen día." })).toBeVisible();
 }
 
 test.describe.serial("accessibility (axe)", () => {
   // Entrance animations fade content in; axe would measure contrast mid-fade.
   test.use({ contextOptions: { reducedMotion: "reduce" } });
 
-  test("seed a session and a closeout", async ({ page }) => {
+  test("seed a session, an older closeout and a morning", async ({ page }) => {
     await seedRecoveryData(page);
   });
 

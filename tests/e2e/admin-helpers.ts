@@ -54,3 +54,53 @@ export async function setCurrentUserAdmin(context: BrowserContext, admin: boolea
   });
   if (error) throw error;
 }
+
+// The app no longer creates nightly closeouts (the morning check-in replaced them), but users keep
+// the ones they saved: this writes one straight into the local database, as history.
+export async function insertLegacyCloseout(
+  context: BrowserContext,
+  date: string,
+  values: { endOfDayPain?: number; closedTime?: string; stiffnessLevel?: string } = {},
+) {
+  const client = localAdminClient();
+  const userId = await currentUserId(context);
+  const { data, error } = await client
+    .from("nightly_closeouts")
+    .insert({
+      user_id: userId,
+      date,
+      end_of_day_pain: values.endOfDayPain ?? 3,
+      energy: 4,
+      sleep_hours: 7.5,
+      sleep_quality: 4,
+      rebound_pain_level: "MILD",
+      stiffness_level: values.stiffnessLevel ?? null,
+      closed_time: values.closedTime ?? "22:00",
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return data.id as string;
+}
+
+// A session on a given Lima day (10:00), without exercises: enough for "the day before had
+// sessions" without going through the session form.
+export async function insertSessionOn(context: BrowserContext, date: string) {
+  const client = localAdminClient();
+  const userId = await currentUserId(context);
+  const { data, error } = await client
+    .from("rehab_sessions")
+    .insert({
+      user_id: userId,
+      occurred_at: `${date}T15:00:00.000Z`,
+      session_type: "HOME",
+      pain_before: 3,
+      pain_after: 2,
+      perceived_load: 3,
+      final_state: "BETTER",
+    })
+    .select("id")
+    .single();
+  if (error) throw error;
+  return data.id as string;
+}

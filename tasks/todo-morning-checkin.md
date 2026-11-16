@@ -120,7 +120,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/features/onboarding/{onboarding.tsx,tour-steps.ts}`, `src/components/signed-out-landing.tsx`, `src/app/manifest.ts`, `scripts/demo/seed-data.mjs` (+ test)
   - Deps: M2
 
-- [ ] **M8: E2E** (M)
+- [x] **M8: E2E** (M)
   - Acceptance:
     - `morning-checkin.spec.ts`: guardar, rebote condicional, duplicado de fecha, editar
     - `nightly-closeout.spec.ts` pasa a cubrir solo ver y editar un cierre viejo

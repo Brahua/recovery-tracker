@@ -29,10 +29,10 @@ test.describe("mobile fixed action bars", () => {
     await expectAboveTabBar(page, page.getByRole("button", { name: /Guardar sesion/ }));
   });
 
-  test("closeout save button sits above the tab bar", async ({ page }) => {
+  test("morning save button sits above the tab bar", async ({ page }) => {
     const pastDate = addRecoveryDays(getRecoveryDateKey(), -400);
-    await page.goto(`/registrar?mode=closeout&date=${pastDate}`);
-    await expectAboveTabBar(page, page.getByRole("button", { name: /Cerrar el dia/ }));
+    await page.goto(`/registrar?mode=morning&date=${pastDate}`);
+    await expectAboveTabBar(page, page.getByRole("button", { name: /Guardar mañana/ }));
   });
 
   test("report actions sit above the tab bar", async ({ page }) => {

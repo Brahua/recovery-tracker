@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { toDailySignals } from "@/lib/daily-signals";
 
 import { calculateTreatmentFrequency, calculateTreatmentResponse } from "@/lib/treatment-insights";
 import type { NightlyCloseout, PainScore, RehabSession, SessionTreatment } from "@/types/recovery";
@@ -86,7 +87,10 @@ describe("calculateTreatmentResponse", () => {
       closeout(5, "NONE"),
     ];
 
-    const [laserResponse, tecarResponse] = calculateTreatmentResponse(sessions, closeouts);
+    const [laserResponse, tecarResponse] = calculateTreatmentResponse(
+      sessions,
+      toDailySignals(closeouts),
+    );
 
     expect(laserResponse).toEqual({
       key: "LASER",

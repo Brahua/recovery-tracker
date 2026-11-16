@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { toDailySignals } from "@/lib/daily-signals";
 
 import {
   calculatePainTrend,
   calculateRecentExerciseFrequency,
   calculateReboundSummary,
   calculateSleepPainComparison,
-  filterCloseoutsByRange,
+  filterSignalsByRange,
   filterSessionsByRange,
   calculateWeeklyLoad,
   getDateRangeForLastDays,
@@ -130,10 +131,15 @@ describe("recovery calculations", () => {
       "session-1",
       "session-2",
     ]);
-    expect(filterCloseoutsByRange(nightlyCloseouts, range).map((closeout) => closeout.id)).toEqual([
-      "closeout-2",
-      "closeout-3",
-    ]);
+    expect(
+      filterSignalsByRange(toDailySignals(nightlyCloseouts), range).map((signal) => signal.date),
+    ).toEqual(
+      nightlyCloseouts
+        .slice(1, 3)
+        .map((closeout) => closeout.date)
+        .sort()
+        .reverse(),
+    );
   });
 
   it("returns no-data trend for empty closeouts", () => {
@@ -145,7 +151,11 @@ describe("recovery calculations", () => {
   });
 
   it("detects a downward pain trend from closeouts", () => {
-    const result = calculatePainTrend(nightlyCloseouts, 7, "2026-07-10T12:00:00.000Z");
+    const result = calculatePainTrend(
+      toDailySignals(nightlyCloseouts),
+      7,
+      "2026-07-10T12:00:00.000Z",
+    );
 
     expect(result.direction).toBe("DOWN");
     expect(result.sampleCount).toBe(4);
@@ -167,7 +177,7 @@ describe("recovery calculations", () => {
   it("counts rebound and strong rebound separately", () => {
     const result = calculateReboundSummary(
       rehabSessions,
-      nightlyCloseouts,
+      toDailySignals(nightlyCloseouts),
       7,
       "2026-07-10T12:00:00.000Z",
     );
@@ -181,7 +191,9 @@ describe("recovery calculations", () => {
   it("uses the latest closeout date for latest rebound level even if input is unsorted", () => {
     const result = calculateReboundSummary(
       rehabSessions,
-      [nightlyCloseouts[1]!, nightlyCloseouts[3]!, nightlyCloseouts[2]!, nightlyCloseouts[0]!],
+      [nightlyCloseouts[1]!, nightlyCloseouts[3]!, nightlyCloseouts[2]!, nightlyCloseouts[0]!].map(
+        (closeout) => toDailySignals([closeout])[0]!,
+      ),
       7,
       "2026-07-10T12:00:00.000Z",
     );
@@ -190,7 +202,11 @@ describe("recovery calculations", () => {
   });
 
   it("compares low sleep against adequate sleep", () => {
-    const result = calculateSleepPainComparison(nightlyCloseouts, 14, "2026-07-10T12:00:00.000Z");
+    const result = calculateSleepPainComparison(
+      toDailySignals(nightlyCloseouts),
+      14,
+      "2026-07-10T12:00:00.000Z",
+    );
 
     expect(result.relationship).toBe("HIGHER_AFTER_LOW_SLEEP");
     expect(result.lowSleepCount).toBe(2);
@@ -244,14 +260,18 @@ describe("exercise frequency with the catalog", () => {
 
 describe("recovery insights", () => {
   it("keeps pain trend insight observational in Spanish", () => {
-    const trend = calculatePainTrend(nightlyCloseouts, 7, "2026-07-10T12:00:00.000Z");
+    const trend = calculatePainTrend(
+      toDailySignals(nightlyCloseouts),
+      7,
+      "2026-07-10T12:00:00.000Z",
+    );
 
     expect(buildPainTrendInsight(trend)).toContain("va bajando");
   });
 
   it("handles insufficient data without inventing advice", () => {
     const summary = calculateSleepPainComparison(
-      [nightlyCloseouts[0]!],
+      toDailySignals([nightlyCloseouts[0]!]),
       14,
       "2026-07-10T12:00:00.000Z",
     );
@@ -260,16 +280,20 @@ describe("recovery insights", () => {
   });
 
   it("builds a combined weekly story from the pure summaries", () => {
-    const painTrend = calculatePainTrend(nightlyCloseouts, 7, "2026-07-10T12:00:00.000Z");
+    const painTrend = calculatePainTrend(
+      toDailySignals(nightlyCloseouts),
+      7,
+      "2026-07-10T12:00:00.000Z",
+    );
     const weeklyLoad = calculateWeeklyLoad(rehabSessions, 7, "2026-07-10T12:00:00.000Z");
     const rebound = calculateReboundSummary(
       rehabSessions,
-      nightlyCloseouts,
+      toDailySignals(nightlyCloseouts),
       7,
       "2026-07-10T12:00:00.000Z",
     );
     const sleepPain = calculateSleepPainComparison(
-      nightlyCloseouts,
+      toDailySignals(nightlyCloseouts),
       14,
       "2026-07-10T12:00:00.000Z",
     );
@@ -281,7 +305,7 @@ describe("recovery insights", () => {
       sleepPain,
     });
 
-    expect(story).toContain("El dolor promedio de cierre va bajando");
+    expect(story).toContain("El dolor promedio registrado va bajando");
     expect(story).toContain("El rebote aparecio en 3 de las ultimas 3 sesiones");
     expect(story).toContain("menos de 6 horas");
     expect(story).toContain("carga total de 9 puntos");

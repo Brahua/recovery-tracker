@@ -1,18 +1,19 @@
+import type { DailySignal } from "@/lib/daily-signals";
 import {
-  filterCloseoutsByRange,
   filterSessionsByRange,
+  filterSignalsByRange,
   getDateRangeForLastDays,
 } from "@/lib/recovery-calculations";
 import { createMedicalReportSummary, type MedicalReportSummary } from "@/lib/recovery-insights";
 import { calculateTreatmentFrequency, type TreatmentFrequencyItem } from "@/lib/treatment-insights";
-import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import type { RehabSession } from "@/types/recovery";
 import { getRecoveryDateKey } from "@/lib/recovery-date";
 import { formatSessionGoal, type SessionGoal } from "@/lib/session-goal";
 import { getWeeklyAdherence } from "@/lib/session-goal-progress";
 
 export interface ReportNote {
   date: string;
-  source: "Cierre nocturno" | "Sesion" | "Indicaciones del fisio";
+  source: "Cierre nocturno" | "Registro de la mañana" | "Sesion" | "Indicaciones del fisio";
   text: string;
 }
 
@@ -38,7 +39,7 @@ function average(values: number[]) {
 
 export function createReportViewModel(
   sessions: RehabSession[],
-  closeouts: NightlyCloseout[],
+  signals: DailySignal[],
   windowDays: number,
   referenceDate?: Date | string,
   sessionGoal?: SessionGoal,
@@ -54,11 +55,20 @@ export function createReportViewModel(
       )
     : null;
   const filteredSessions = filterSessionsByRange(sessions, range);
-  const filteredCloseouts = filterCloseoutsByRange(closeouts, range);
+  const filteredSignals = filterSignalsByRange(signals, range);
   const notes: ReportNote[] = [
-    ...filteredCloseouts.flatMap((closeout) =>
-      closeout.notes?.trim()
-        ? [{ date: closeout.date, source: "Cierre nocturno" as const, text: closeout.notes }]
+    ...filteredSignals.flatMap((signal) =>
+      signal.notes?.trim()
+        ? [
+            {
+              date: signal.date,
+              source:
+                signal.source === "morning"
+                  ? ("Registro de la mañana" as const)
+                  : ("Cierre nocturno" as const),
+              text: signal.notes,
+            },
+          ]
         : [],
     ),
     ...filteredSessions.flatMap((session) =>
@@ -88,16 +98,19 @@ export function createReportViewModel(
     .slice(0, 4);
 
   return {
-    summary: createMedicalReportSummary(sessions, closeouts, windowDays, referenceDate),
-    recordCount: filteredCloseouts.length,
+    summary: createMedicalReportSummary(sessions, signals, windowDays, referenceDate),
+    recordCount: filteredSignals.length,
     sessionCount: filteredSessions.length,
     improvedSessionCount: filteredSessions.filter((session) => session.finalState === "BETTER")
       .length,
     averageSessionPainDelta: average(
       filteredSessions.map((session) => session.painAfter - session.painBefore),
     ),
-    averageSleepHours: average(filteredCloseouts.map((closeout) => closeout.sleepHours)),
-    averageEnergy: average(filteredCloseouts.map((closeout) => closeout.energy)),
+    averageSleepHours: average(filteredSignals.map((signal) => signal.sleepHours)),
+    // Energy only exists in older nightly closeouts.
+    averageEnergy: average(
+      filteredSignals.flatMap((signal) => (signal.energy === undefined ? [] : [signal.energy])),
+    ),
     physioSessionCount: filteredSessions.filter(
       (session) => session.sessionType === "PHYSIOTHERAPY",
     ).length,

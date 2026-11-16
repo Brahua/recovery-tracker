@@ -95,7 +95,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/lib/history-view-model.ts` (+ test), `src/features/history/history-morning-card.tsx`, `src/features/history/history-list.tsx`, `src/design-system/styles/surfaces/history.css`
   - Deps: M1
 
-- [ ] **M5: Insights, dashboard y Reporte con ambas fuentes** (L → dividir si pasa de 5 archivos de lógica)
+- [x] **M5: Insights, dashboard y Reporte con ambas fuentes** (L → dividir si pasa de 5 archivos de lógica)
   - Acceptance:
     - `toDailySignals(closeouts, checkins)` alinea rebote (D-1), sueño (D-1→D), dolor y rigidez según la tabla de la spec
     - Insights, gráfico sueño vs. dolor y Reporte consumen `DailySignal`; textos "al despertar" / "al final del día" según el origen

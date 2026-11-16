@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { toDailySignals } from "@/lib/daily-signals";
 
 import { createReportViewModel } from "@/lib/report-view-model";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
@@ -61,7 +62,12 @@ const closeouts: NightlyCloseout[] = [
 
 describe("createReportViewModel", () => {
   it("derives report metrics only from records inside the selected window", () => {
-    const report = createReportViewModel(sessions, closeouts, 14, "2026-07-16T12:00:00.000Z");
+    const report = createReportViewModel(
+      sessions,
+      toDailySignals(closeouts),
+      14,
+      "2026-07-16T12:00:00.000Z",
+    );
 
     expect(report.recordCount).toBe(1);
     expect(report.sessionCount).toBe(1);
@@ -107,7 +113,7 @@ describe("createReportViewModel", () => {
     };
     const report = createReportViewModel(
       [...sessions, physio],
-      closeouts,
+      toDailySignals(closeouts),
       14,
       "2026-07-16T12:00:00.000Z",
     );

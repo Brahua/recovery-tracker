@@ -1,4 +1,5 @@
-import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import type { DailySignal } from "@/lib/daily-signals";
+import type { RehabSession } from "@/types/recovery";
 
 export interface WeeklySessionCount {
   label: string;
@@ -37,16 +38,17 @@ export function buildFourWeekSessionCounts(
   return buckets.map((count, index) => ({ label: `S${index + 1}`, count }));
 }
 
-export function buildReboundDistribution(closeouts: NightlyCloseout[]): ReboundDistributionItem[] {
+/** Only signals that answered the rebound question (mornings after a rest day did not). */
+export function buildReboundDistribution(signals: DailySignal[]): ReboundDistributionItem[] {
+  const answered = signals.filter((item) => item.rebound !== undefined);
   const counts = {
-    none: closeouts.filter((item) => item.reboundPainLevel === "NONE").length,
-    mild: closeouts.filter((item) => item.reboundPainLevel === "MILD").length,
-    strong: closeouts.filter(
-      (item) => item.reboundPainLevel === "MODERATE" || item.reboundPainLevel === "STRONG",
-    ).length,
+    none: answered.filter((item) => item.rebound === "NONE").length,
+    mild: answered.filter((item) => item.rebound === "MILD").length,
+    strong: answered.filter((item) => item.rebound === "MODERATE" || item.rebound === "STRONG")
+      .length,
   };
   const percentage = (count: number) =>
-    closeouts.length === 0 ? 0 : Math.round((count / closeouts.length) * 100);
+    answered.length === 0 ? 0 : Math.round((count / answered.length) * 100);
 
   return [
     {

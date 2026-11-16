@@ -112,7 +112,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/lib/reminders/{settings,due-reminders,messages}.ts` (+ tests), `src/data/reminders-dispatch-store.ts`, `src/features/reminders/reminders-settings.tsx`
   - Deps: M1, G4
 
-- [ ] **M7: Textos, onboarding y demo** (S)
+- [x] **M7: Textos, onboarding y demo** (S)
   - Acceptance:
     - onboarding, tour, landing y manifest explican el registro de la mañana y la meta; no se habla de "cerrar el día"
     - `seed-data.mjs` genera registros de la mañana y metas 1×7, 2×5 y 1×3

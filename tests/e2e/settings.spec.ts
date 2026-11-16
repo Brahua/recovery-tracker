@@ -58,6 +58,31 @@ test.describe("settings", () => {
     await expect(page.getByText("Hombro izquierdo · operación")).toHaveCount(0);
   });
 
+  // Ajustes → Meta de sesiones: Hoy measures the day and the week against it. The E2E user is shared
+  // by every spec, so the test puts the default goal (1 session, every day) back.
+  test("saves the session goal and shows it in Hoy", async ({ page }) => {
+    await page.goto("/ajustes");
+    const card = page.getByRole("region", { name: "Meta de sesiones" });
+    await card.getByLabel("¿Cuántas sesiones al día?").selectOption("3");
+    await card.getByLabel("¿Cuántos días a la semana?").selectOption("2");
+    await card.getByRole("button", { name: "Guardar meta" }).click();
+    await expect(toast(page, "Meta guardada")).toBeVisible();
+
+    await page.goto("/");
+    await expect(page.getByText("Meta: 3 sesiones al día, 2 días a la semana")).toBeVisible();
+    await expect(page.getByText(/de 2 días esta semana|Semana cumplida/).first()).toBeVisible();
+
+    await page.goto("/ajustes");
+    await expect(card.getByLabel("¿Cuántas sesiones al día?")).toHaveValue("3");
+    await card.getByLabel("¿Cuántas sesiones al día?").selectOption("1");
+    await card.getByLabel("¿Cuántos días a la semana?").selectOption("7");
+    await card.getByRole("button", { name: "Guardar meta" }).click();
+    await expect(toast(page, "Meta guardada")).toBeVisible();
+
+    await page.goto("/");
+    await expect(page.getByText("Meta: 1 sesión al día, todos los días")).toBeVisible();
+  });
+
   test("asks for the zone before saving the injury", async ({ page }) => {
     await page.goto("/ajustes");
     const card = page.getByRole("region", { name: "Mi recuperación" });

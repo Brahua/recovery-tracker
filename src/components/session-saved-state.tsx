@@ -4,6 +4,7 @@ import { SaveSessionAsRoutine } from "@/features/routines/save-session-as-routin
 import type { RitualSuccessConfig } from "@/lib/registrar-flow";
 import { recoveryTimeZone } from "@/lib/recovery-date";
 import { suggestRoutineName } from "@/lib/routine-state";
+import type { DayProgress } from "@/lib/session-goal-progress";
 import type { RehabSession, SessionType } from "@/types/recovery";
 
 const sessionTypeLabels: Record<SessionType, string> = {
@@ -33,14 +34,15 @@ function formatSessionContext(value?: string) {
 }
 
 interface SessionSavedStateProps extends RitualSuccessConfig {
-  hasCloseoutToday: boolean;
+  /** Today's sessions against the goal, the saved one included. */
+  dayProgress: DayProgress;
   session?: RehabSession;
   streak: number;
 }
 
 export function SessionSavedState({
   body,
-  hasCloseoutToday,
+  dayProgress,
   primaryHref,
   primaryLabel,
   secondaryHref,
@@ -48,8 +50,9 @@ export function SessionSavedState({
   session,
   streak,
 }: SessionSavedStateProps) {
-  const dayProgress = hasCloseoutToday ? 2 : 1;
-  const ringOffset = hasCloseoutToday ? 0 : 188.5;
+  const ringShare = Math.min(1, dayProgress.count / dayProgress.perDay);
+  // 377 ≈ 2π·60, the ring's circumference.
+  const ringOffset = Math.round(377 * (1 - ringShare) * 10) / 10;
   const visibleStreak = Math.max(1, streak);
   const filledDots = Math.min(7, visibleStreak);
 
@@ -62,7 +65,7 @@ export function SessionSavedState({
         <div
           className="rr-success-ring"
           role="img"
-          aria-label={`${dayProgress} de 2 rituales completados`}
+          aria-label={`${dayProgress.count} de ${dayProgress.perDay} sesiones de hoy`}
         >
           <svg aria-hidden="true" viewBox="0 0 136 136">
             <circle className="rr-success-ring-track" cx="68" cy="68" r="60" />
@@ -76,7 +79,9 @@ export function SessionSavedState({
           </svg>
           <div>
             <strong aria-hidden="true">✓</strong>
-            <span>{dayProgress} de 2</span>
+            <span>
+              {dayProgress.count} de {dayProgress.perDay}
+            </span>
           </div>
         </div>
 
@@ -134,14 +139,18 @@ export function SessionSavedState({
               ☾
             </span>
             <span>
-              {hasCloseoutToday ? (
+              {dayProgress.met ? (
                 <>
-                  Tu dia ya esta completo. <strong>Los dos rituales quedaron registrados.</strong>
+                  Tu día ya está completo. <strong>Llegaste a tu meta de sesiones.</strong>
                 </>
               ) : (
                 <>
-                  Queda el cierre del dia — <strong>1 minuto, esta noche.</strong> Puedes hacerlo
-                  cuando termine tu dia.
+                  Llevas {dayProgress.count} de {dayProgress.perDay} sesiones —{" "}
+                  <strong>
+                    {dayProgress.perDay - dayProgress.count === 1
+                      ? "la siguiente completa el día."
+                      : `te faltan ${dayProgress.perDay - dayProgress.count} para completar el día.`}
+                  </strong>
                 </>
               )}
             </span>

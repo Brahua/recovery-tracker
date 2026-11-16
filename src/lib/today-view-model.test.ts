@@ -5,6 +5,7 @@ import {
   calculateLoggingStreak,
   getTodayRitualState,
 } from "@/lib/today-view-model";
+import { getWeekProgress, type DayProgress, type WeekProgress } from "@/lib/session-goal-progress";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
 function sessionOn(date: string): RehabSession {
@@ -37,52 +38,96 @@ function closeoutOn(date: string): NightlyCloseout {
   };
 }
 
+const day = (count: number, perDay = 1): DayProgress => ({
+  date: "2026-07-16",
+  count,
+  perDay,
+  met: count >= perDay,
+  status: count >= perDay ? "full" : count > 0 ? "partial" : "empty",
+});
+
+const week = (metDays: number, daysPerWeek = 7): WeekProgress => ({
+  days: [],
+  metDays,
+  daysPerWeek,
+  weekMet: metDays >= daysPerWeek,
+});
+
 describe("getTodayRitualState with a condition", () => {
   it("words the body with the area of the injury", () => {
-    expect(getTodayRitualState(false, false, "tu hombro izquierdo").body).toBe(
-      "Un paso más para tu hombro izquierdo.",
+    expect(
+      getTodayRitualState({
+        day: day(0),
+        week: week(0),
+        hasCloseoutToday: false,
+        areaPhrase: "tu hombro izquierdo",
+      }).body,
+    ).toBe("Un paso más para tu hombro izquierdo.");
+    expect(getTodayRitualState({ day: day(0), week: week(0), hasCloseoutToday: false }).body).toBe(
+      "Un paso más cerca de tu recuperación.",
     );
-    expect(getTodayRitualState(false, false).body).toBe("Un paso más cerca de tu recuperación.");
   });
 });
 
 describe("getTodayRitualState", () => {
   it("starts with the session and zero percent when nothing is logged", () => {
-    const state = getTodayRitualState(false, false);
+    const state = getTodayRitualState({ day: day(0), week: week(0), hasCloseoutToday: false });
 
     expect(state.progress).toBe(0);
     expect(state.primaryHref).toBe("/registrar?mode=session");
-    expect(state.primaryLabel).toBe("Empezar sesion de hoy");
+    expect(state.primaryLabel).toBe("Empezar sesión de hoy");
+    expect(state.secondaryLabel).toBe("Hacer cierre (opcional)");
   });
 
-  it("moves to closeout and fifty percent after the session", () => {
-    const state = getTodayRitualState(true, false);
-
-    expect(state.progress).toBe(50);
-    expect(state.primaryHref).toBe("/registrar?mode=closeout");
-    expect(state.primaryLabel).toBe("Hacer cierre nocturno");
-  });
-
-  it("marks the day complete when both rituals are logged", () => {
-    const state = getTodayRitualState(true, true);
+  it("completes the day with one session when the goal is 1, without a closeout", () => {
+    const state = getTodayRitualState({ day: day(1), week: week(1), hasCloseoutToday: false });
 
     expect(state.progress).toBe(100);
+    expect(state.eyebrow).toBe("Día completo");
+    expect(state.title).toBe("Sesión hecha. Día completo.");
+    expect(state.body).toBe("Llevas 1 de 7 días esta semana.");
     expect(state.primaryHref).toBe("/insights");
-    expect(state.primaryLabel).toBe("Ver insights");
+  });
+
+  it("shows k of N and the share when the goal is 2", () => {
+    const state = getTodayRitualState({ day: day(1, 2), week: week(0, 5), hasCloseoutToday: true });
+
+    expect(state.progress).toBe(50);
+    expect(state.title).toBe("Llevas 1 de 2 sesiones.");
+    expect(state.body).toBe("Te falta 1 sesión para completar el día.");
+    expect(state.primaryLabel).toBe("Registrar otra sesión");
+    expect(state.secondaryHref).toBe("/insights");
+  });
+
+  it("completes the day at the second session of a 2-session goal", () => {
+    const state = getTodayRitualState({ day: day(2, 2), week: week(5, 5), hasCloseoutToday: true });
+
+    expect(state.progress).toBe(100);
+    expect(state.title).toBe("2 sesiones. Día completo.");
+    expect(state.body).toBe("Semana cumplida. Ya hiciste lo importante.");
+    expect(state.secondaryLabel).toBe("Registrar otra sesión");
+  });
+
+  it("offers rest once the week is met and today has no sessions", () => {
+    const state = getTodayRitualState({ day: day(0), week: week(3, 3), hasCloseoutToday: true });
+
+    expect(state.eyebrow).toBe("Semana cumplida");
+    expect(state.title).toBe("Hoy puedes descansar o sumar una sesión.");
+    expect(state.progress).toBe(0);
   });
 });
 
 describe("buildRecentWeek", () => {
-  it("builds the current week from Monday through Sunday and marks today", () => {
+  it("labels Monday through Sunday, keeps each day's status and marks today", () => {
     const now = new Date("2026-07-16T12:00:00.000Z");
-    const days = buildRecentWeek(
-      [sessionOn("2026-07-14"), sessionOn("2026-07-16")],
-      [closeoutOn("2026-07-15")],
+    const progress = getWeekProgress(
+      [sessionOn("2026-07-14"), sessionOn("2026-07-16"), sessionOn("2026-07-16")],
+      { perDay: 2, daysPerWeek: 5 },
       now,
     );
+    const days = buildRecentWeek(progress, now);
 
-    expect(days).toHaveLength(7);
-    expect(days.map((day) => day.key)).toEqual([
+    expect(days.map((item) => item.key)).toEqual([
       "2026-07-13",
       "2026-07-14",
       "2026-07-15",
@@ -91,17 +136,17 @@ describe("buildRecentWeek", () => {
       "2026-07-18",
       "2026-07-19",
     ]);
-    expect(days.map((day) => day.label)).toEqual(["L", "M", "X", "J", "V", "S", "D"]);
-    expect(days.map((day) => day.completed)).toEqual([
-      false,
-      true,
-      true,
-      true,
-      false,
-      false,
-      false,
+    expect(days.map((item) => item.label)).toEqual(["L", "M", "X", "J", "V", "S", "D"]);
+    expect(days.map((item) => item.status)).toEqual([
+      "empty",
+      "partial",
+      "empty",
+      "full",
+      "empty",
+      "empty",
+      "empty",
     ]);
-    expect(days.findIndex((day) => day.isToday)).toBe(3);
+    expect(days.findIndex((item) => item.isToday)).toBe(3);
   });
 });
 

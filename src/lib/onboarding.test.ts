@@ -28,8 +28,29 @@ describe("onboarding", () => {
       kind: "setup",
       name: "Ana María",
       appearance: { theme: "light", accent: "amber" },
+      sessionGoal: { perDay: 1, daysPerWeek: 7 },
       acceptedNotice: true,
     });
+  });
+
+  it("saves the session goal chosen in the setup", () => {
+    const parsed = completeOnboardingSchema.parse({
+      kind: "setup",
+      name: "Ana",
+      appearance: { theme: "light", accent: "amber" },
+      sessionGoal: { perDay: 2, daysPerWeek: 5 },
+      acceptedNotice: true,
+    });
+    expect(parsed.kind === "setup" && parsed.sessionGoal).toEqual({ perDay: 2, daysPerWeek: 5 });
+    expect(
+      completeOnboardingSchema.safeParse({
+        kind: "setup",
+        name: "Ana",
+        appearance: { theme: "light", accent: "amber" },
+        sessionGoal: { perDay: 9, daysPerWeek: 5 },
+        acceptedNotice: true,
+      }).success,
+    ).toBe(false);
   });
 
   it("keeps the Google name when the name is left empty", () => {

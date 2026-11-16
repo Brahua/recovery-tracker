@@ -20,6 +20,8 @@ import {
 } from "@/lib/registrar-flow";
 import { calculateLoggingStreak } from "@/lib/today-view-model";
 import { getRecoveryDateKey } from "@/lib/recovery-date";
+import { sessionGoalFromMetadata } from "@/lib/session-goal";
+import { getDayProgress } from "@/lib/session-goal-progress";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -35,8 +37,7 @@ export default async function RegistrarPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const pageData = await loadRecoveryPageData({ limit: null });
-  const { supabaseEnv, user, recentSessions, recentCloseouts, hasSessionToday, hasCloseoutToday } =
-    pageData;
+  const { supabaseEnv, user, recentSessions, recentCloseouts, hasCloseoutToday } = pageData;
 
   if (!supabaseEnv || !user) {
     redirect("/");
@@ -44,6 +45,11 @@ export default async function RegistrarPage({
 
   const condition = parseCondition(user.user_metadata?.condition);
   const today = getRecoveryDateKey();
+  const todayProgress = getDayProgress(
+    recentSessions,
+    today,
+    sessionGoalFromMetadata(user.user_metadata),
+  );
   const requestedCloseoutDate = getSingleSearchParam(resolvedSearchParams, "date");
   const selectedCloseoutDate =
     requestedCloseoutDate && !getCloseoutDateError(requestedCloseoutDate, today)
@@ -65,7 +71,7 @@ export default async function RegistrarPage({
   );
 
   const requestedMode = getSingleSearchParam(resolvedSearchParams, "mode");
-  const mode = resolveRegistrarMode(requestedMode, hasSessionToday, hasCloseoutToday);
+  const mode = resolveRegistrarMode(requestedMode, todayProgress.met, hasCloseoutToday);
   const sessionSuccessMessage = getSingleSearchParam(resolvedSearchParams, "sessionSummary");
   const sessionSaved = getSingleSearchParam(resolvedSearchParams, "sessionSaved") === "1";
   const savedSessionId = getSingleSearchParam(resolvedSearchParams, "sessionId");
@@ -92,10 +98,18 @@ export default async function RegistrarPage({
     ? await loadExerciseLibrary()
     : { catalog: [], routines: [] };
   const successState = showSessionSuccess
-    ? buildSessionSuccessState(hasCloseoutToday, sessionSuccessMessage)
+    ? buildSessionSuccessState(todayProgress, sessionSuccessMessage)
     : showNightlySuccess
       ? buildCloseoutSuccessState(
-          Boolean(closeoutSession),
+          savedCloseout
+            ? getDayProgress(
+                savedCloseout.date === selectedCloseoutDate
+                  ? selectedDayData.recentSessions
+                  : recentSessions,
+                savedCloseout.date,
+                sessionGoalFromMetadata(user.user_metadata),
+              ).met
+            : false,
           nightlySuccessMessage,
           conditionAreaPhrase(condition),
         )
@@ -116,7 +130,7 @@ export default async function RegistrarPage({
       {showSessionSuccess && successState ? (
         <SessionSavedState
           {...successState}
-          hasCloseoutToday={hasCloseoutToday}
+          dayProgress={todayProgress}
           session={savedSession}
           streak={streak}
         />

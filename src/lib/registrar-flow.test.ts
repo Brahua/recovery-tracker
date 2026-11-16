@@ -7,6 +7,7 @@ import {
   resolveSavedSession,
   resolveRegistrarMode,
 } from "@/lib/registrar-flow";
+import type { DayProgress } from "@/lib/session-goal-progress";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
 const sessions = [{ id: "latest" }, { id: "saved" }] as RehabSession[];
@@ -18,11 +19,11 @@ describe("resolveRegistrarMode", () => {
     expect(resolveRegistrarMode("closeout", true, false)).toBe("closeout");
   });
 
-  it("defaults to session when today's session is missing", () => {
+  it("defaults to session while today's session goal is not met", () => {
     expect(resolveRegistrarMode(undefined, false, false)).toBe("session");
   });
 
-  it("defaults to closeout when session exists but closeout is missing", () => {
+  it("defaults to the optional closeout once the goal is met", () => {
     expect(resolveRegistrarMode(undefined, true, false)).toBe("closeout");
   });
 
@@ -51,21 +52,31 @@ describe("resolveSavedCloseout", () => {
   });
 });
 
-describe("buildSessionSuccessState", () => {
-  it("returns to today and keeps closeout as the secondary action", () => {
-    const state = buildSessionSuccessState(false);
+const progress = (count: number, perDay: number): DayProgress => ({
+  date: "2026-07-16",
+  count,
+  perDay,
+  met: count >= perDay,
+  status: count >= perDay ? "full" : count > 0 ? "partial" : "empty",
+});
 
+describe("buildSessionSuccessState", () => {
+  it("asks for another session while the day goal is not met", () => {
+    const state = buildSessionSuccessState(progress(1, 2));
+
+    expect(state.title).toBe("Llevas 1 de 2 sesiones hoy.");
+    expect(state.body).toBe("Te falta 1 sesión para completar el día.");
     expect(state.primaryHref).toBe("/");
     expect(state.primaryLabel).toBe("Volver a Hoy");
-    expect(state.secondaryHref).toBe("/registrar?mode=closeout");
-    expect(state.secondaryLabel).toBe("Hacer el cierre ahora");
+    expect(state.secondaryHref).toBe("/registrar?mode=session");
+    expect(state.secondaryLabel).toBe("Registrar otra sesión");
   });
 
-  it("offers insights when both rituals are done", () => {
-    const state = buildSessionSuccessState(true, "Resumen");
+  it("completes the day without a closeout and offers insights", () => {
+    const state = buildSessionSuccessState(progress(1, 1), "Resumen");
 
+    expect(state.title).toBe("Día completo.");
     expect(state.body).toBe("Resumen");
-    expect(state.primaryHref).toBe("/");
     expect(state.secondaryHref).toBe("/insights");
   });
 });

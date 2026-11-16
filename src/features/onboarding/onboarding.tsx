@@ -7,6 +7,7 @@ import { applyAppearance } from "@/components/appearance/apply-appearance";
 import { useActionFeedback } from "@/components/feedback/use-action-feedback";
 import { completeOnboardingAction } from "@/features/onboarding/actions";
 import { ConditionFields } from "@/features/settings/condition-fields";
+import { SessionGoalFields } from "@/features/settings/session-goal-fields";
 import { tourSteps, type TourIcon } from "@/features/onboarding/tour-steps";
 import { accentOptions, accents, themeOptions, themes, type Appearance } from "@/lib/appearance";
 import {
@@ -14,6 +15,7 @@ import {
   emptyConditionDraft,
   isConditionDraftEmpty,
 } from "@/lib/condition-draft";
+import { defaultSessionGoal } from "@/lib/session-goal";
 import { DISPLAY_NAME_MAX_LENGTH } from "@/lib/validation/profile";
 
 interface OnboardingProps {
@@ -69,6 +71,7 @@ export function Onboarding({ appearance, chosenName, fallbackName, mode }: Onboa
   const [name, setName] = useState(chosenName ?? "");
   const [current, setCurrent] = useState(appearance);
   const [conditionDraft, setConditionDraft] = useState({ ...emptyConditionDraft });
+  const [sessionGoal, setSessionGoal] = useState({ ...defaultSessionGoal });
   const [acceptedNotice, setAcceptedNotice] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const nameId = useId();
@@ -151,6 +154,7 @@ export function Onboarding({ appearance, chosenName, fallbackName, mode }: Onboa
       condition: isConditionDraftEmpty(conditionDraft)
         ? null
         : conditionInputFromDraft(conditionDraft),
+      sessionGoal,
       acceptedNotice,
     });
   }
@@ -261,6 +265,14 @@ export function Onboarding({ appearance, chosenName, fallbackName, mode }: Onboa
               draft={conditionDraft}
               onChange={setConditionDraft}
             />
+          </section>
+
+          <section aria-labelledby="onboarding-goal" className="rr-onboarding-condition">
+            <h2 id="onboarding-goal">Tu meta de sesiones</h2>
+            <p className="rr-settings-hint">
+              Lo que te indicó tu fisio. Si no sabes, déjalo así y cámbialo después en Ajustes.
+            </p>
+            <SessionGoalFields disabled={pending} goal={sessionGoal} onChange={setSessionGoal} />
           </section>
 
           <fieldset className="rr-appearance-group">

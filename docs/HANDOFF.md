@@ -1,7 +1,7 @@
 # Traspaso entre sesiones
 
 > Punto de entrada para retomar el trabajo. Se actualiza al cerrar cada tarea o sesión, en vez de crear un archivo nuevo.
-> Última actualización: 2026-10-06 (modo demo en producción, PR #55).
+> Última actualización: 2026-11-16 (dominio `recovery.brahua.com`, registro de la mañana y meta de sesiones, PRs #57–#61).
 
 ## Cómo retomar
 
@@ -19,9 +19,26 @@
 
 - **Producción:** https://recovery.brahua.com. El antiguo staging (Supabase `pevrupenrzueyzidfeah`) es producción desde el 2026-09-30 (ADR-004). Tiene los datos reales de una cuenta.
 - **Auth en producción:** solo Google. Email y login anónimo apagados (verificado el 2026-10-01). Acceso por invitación activo desde el 2026-10-01 (ADR-005); para invitar: Ajustes → Acceso (solo el admin).
-- **Funcionalidad:** MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo, feedback global de carga, tratamientos del centro en Fisio guiada, edición de sesiones y cierres, y la app de rehabilitación en general (lesión activa, rigidez, tipos de sesión y metas). Detalle en `CHANGELOG.md`.
+- **Funcionalidad:** meta de sesiones y registro de la mañana (sección de abajo), MVP, rediseño, historial, series individuales, cierres con fecha anterior, catálogo de ejercicios, rutinas, nombre en el saludo, feedback global de carga, tratamientos del centro en Fisio guiada, edición de sesiones y cierres, y la app de rehabilitación en general (lesión activa, rigidez, tipos de sesión y metas). Detalle en `CHANGELOG.md`.
 - **Fase:** prueba de uso real; la app de rehabilitación en general se entregó el 2026-10-02 (sección de abajo) y **falta que el owner la pruebe en producción** (empezando por elegir su lesión en Ajustes → Mi recuperación). Antes: Tratamientos del centro para Fisio guiada (`docs/specs/physio-treatments-spec.md`) en producción desde el 2026-10-01: fase 1 (PR #23, migración `20261002000000_session_treatments.sql`) y fase 2, Insights y Reporte (PR #24). Probado por el owner en producción el 2026-10-01.
 - **Editar o corregir registros pasados** (`docs/specs/edit-past-records-spec.md`): en producción desde el 2026-10-01. Cierres (PR #27), sesiones con la migración `20261003000000_edit_past_records.sql` (PR #28) y "Corregir" en las pantallas de éxito (PR 3). Incluye el arreglo de la hora de la sesión (el servidor la leía en UTC). **Falta que el owner lo pruebe en producción.** No hay una próxima feature elegida.
+
+### Registro de la mañana y meta de sesiones ✅ (2026-11-16, PRs #58–#61, en producción)
+
+Spec: `docs/specs/morning-checkin-and-daily-goal-spec.md` · Plan: `tasks/plan-morning-checkin.md` · Tareas: `tasks/todo-morning-checkin.md`.
+
+- **Meta (#58, #59):** `user_metadata.session_goal = { perDay 1–5, daysPerWeek 1–7 }` (por defecto 1 × 7), en Ajustes → Meta de sesiones y en el onboarding. Hoy mide el día (k de N) y la semana lunes–domingo (días llenos / a medias / vacíos, "k de D días"). El recordatorio de sesión no sale con la meta del día o de la semana cumplida; el Reporte muestra las semanas completas que la cumplieron. Clave propia y no dentro de `preferences`, porque guardar la apariencia reemplaza `preferences` entero.
+- **Registro de la mañana (#60):** tabla `morning_checkins` (migración `20261117000000`, aditiva). Reemplaza al cierre nocturno en Registrar (`?mode=morning`; los enlaces `?mode=closeout` llevan ahí), Hoy (tarjeta todo el día), Historial (editar en `/registrar/manana/[id]`; eliminar solo desde ahí) y el recordatorio (`closeout` en la base, 08:00 por defecto; una hora guardada después del mediodía se lee como 08:00). Los cierres viejos se conservan, se ven y se editan.
+- **Insights y Reporte:** `src/lib/daily-signals.ts` une cierres viejos y mañanas; el rebote de una mañana se cuenta en el día de las sesiones a las que responde (D-1).
+- **Validado en producción (2026-11-16, cuenta demo de tobillo):** meta 2 × 5 guardada en Ajustes; "¿Cómo amaneciste?" guardado (sin pregunta de rebote: el día anterior no tenía sesiones); Hoy con 50 %, "Llevas 1 de 2 sesiones", día a medias en la semana, mañana "Hecho" y "Última mañana"; Historial con la tarjeta; Insights (todo) mezclando cierres viejos y la mañana; Reporte con "Sueño" y la línea de adherencia; cron de recordatorios sin errores. Esa cuenta demo quedó con una sesión y una mañana de hoy y meta 2 × 5.
+- **Demo pendiente:** `npm run demo:reset` (cierres viejos hasta hace 15 días, mañanas de los últimos 14, metas 1×5, 2×5 y 1×3) **no se pudo correr**: el CLI de Supabase no tiene sesión en esta máquina (`npx supabase login`) y Vercel guarda `SUPABASE_SERVICE_ROLE_KEY` como sensible (`env pull` no la entrega). Correrlo con la clave de la spec del modo demo.
+- **CI (#61):** `supabase:push:linked` lleva `--yes`. `npx supabase` resuelve el CLI 3.x, que pide confirmación antes de `db push` y sin terminal no aplicaba nada. En CI, Supabase local falló dos veces por un puerto ocupado; volver a correr el job lo resolvió.
+- **Falta que el owner lo pruebe** con su cuenta: elegir la meta en Ajustes, reinstalar la PWA en `recovery.brahua.com` y revisar la hora del recordatorio de la mañana.
+
+### Dominio `recovery.brahua.com` ✅ (2026-11-16, PR #57)
+
+- CNAME `recovery` en Hostinger hacia Vercel; `NEXT_PUBLIC_SITE_URL`, Site URL y Redirect URLs de Supabase Auth y `reminders_dispatch_url` en Vault actualizados (el cron ya llama al dominio nuevo).
+- `recovery-tracker.brahua.com` ya no resuelve (el registro se renombró); el dominio sigue agregado al proyecto de Vercel por si se quiere redirigir. Los emails demo siguen en `demo.recovery-tracker.brahua.com` (las cuentas existen con esos emails).
 
 ### Paso a producción (2026-09-30) ✅
 
@@ -57,7 +74,7 @@ Spec: `docs/specs/general-rehab-spec.md`. La app ya no es solo de rodilla; sigue
 
 Spec: `docs/specs/demo-mode-spec.md`. Botón **Modo demo** en la landing → modal con tres pacientes (rodilla post artroscopia, esguince grado III de tobillo, manguito rotador) que entra a una cuenta demo compartida con meses de datos de ejemplo.
 
-- **Cuentas:** tres usuarios reales en producción (`demo-*@demo.recovery.brahua.com`, sin contraseña ni acceso por Google), creados y cargados el 2026-10-03 con `npm run demo:reset`. La marca es `app_metadata.demo_profile`.
+- **Cuentas:** tres usuarios reales en producción (`demo-*@demo.recovery-tracker.brahua.com`, sin contraseña ni acceso por Google), creados y cargados el 2026-10-03 con `npm run demo:reset`. La marca es `app_metadata.demo_profile`.
 - **Reiniciar:** `npm run demo:reset` (`--only knee|ankle|shoulder`, `--dry-run`); necesita `SUPABASE_SERVICE_ROLE_KEY`. Cómo sacarla del CLI sin imprimirla: en `docs/specs/demo-mode-spec.md`.
 - **Probado:** datos con test contra las restricciones de la base; creación, reinicio y el flujo `generateLink` + `verifyOtp` contra producción (sesión y RLS: 41 sesiones visibles para Camila).
 - **Revisado en local el 2026-10-03** (`npm run dev`, móvil y escritorio, con la service key en la variable de entorno): modal, entrada, aviso, Ajustes y "Salir de la demo". CI (incluido E2E del modal) y despliegue en verde.

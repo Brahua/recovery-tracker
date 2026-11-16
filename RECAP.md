@@ -1,15 +1,15 @@
 # Recap — Recovery Ritual (`recovery-tracker`)
 
 > Resumen rápido del proyecto: de qué va, cómo está construido, en qué fase está y cómo empezar a desarrollar.
-> Última actualización: 2026-10-01. Para el detalle, seguir los enlaces a `README.md`, `docs/` y `tasks/`.
+> Última actualización: 2026-11-16. Para el detalle, seguir los enlaces a `README.md`, `docs/` y `tasks/`.
 
 ## 1. Qué es
 
 App en español, pensada primero para el celular, para llevar el control de una rehabilitación (de cualquier zona del cuerpo; empezó con una cirugía de rodilla). Una cuenta sigue una lesión activa. Tiene cuatro flujos principales:
 
-- **Registrar sesión:** lo que se anota al salir de terapia; en Fisio guiada, también los tratamientos del centro (agentes físicos, terapia manual, punción, vendaje) y las indicaciones del fisio.
-- **Cierre del día:** el registro de cada noche.
-- **Historial:** todo lo registrado, día a día; desde ahí se corrige o elimina una sesión o un cierre.
+- **Registrar sesión:** lo que se anota al salir de terapia; en Fisio guiada, también los tratamientos del centro (agentes físicos, terapia manual, punción, vendaje) y las indicaciones del fisio. El día se completa con la **meta de sesiones** de la cuenta (N al día, D días por semana).
+- **¿Cómo amaneciste?:** registro opcional al despertar (sueño de anoche, dolor, rigidez y rebote de la sesión de ayer). Reemplazó al cierre nocturno el 2026-11-16; los cierres viejos se conservan.
+- **Historial:** todo lo registrado, día a día; desde ahí se corrige o elimina una sesión, una mañana o un cierre viejo.
 - **Insights:** tendencias de dolor, carga, sueño y ejercicios.
 - **Reporte:** un resumen para llevar a la cita con el médico o el fisio.
 
@@ -53,8 +53,9 @@ proxy.ts          Refresca la sesión de Supabase en cada request
 
 Vienen de `docs/archive/handoffs/session-handoff-2026-07-17.md`:
 
-- Se permiten varias sesiones por día. Solo puede haber **un cierre por usuario y fecha**, y la base de datos también lo impide.
-- No se aceptan cierres con fecha futura.
+- Se permiten varias sesiones por día. Solo puede haber **un registro de la mañana (y un cierre viejo) por usuario y fecha**, y la base de datos también lo impide.
+- No se aceptan mañanas ni cierres con fecha futura.
+- El rebote de una mañana responde a las sesiones del día anterior: Insights y Reporte leen cierres y mañanas con `src/lib/daily-signals.ts`, nunca por separado.
 - El "día" se calcula en `America/Lima`, pero los timestamps se guardan en UTC.
 - Historial solo muestra datos (y lleva a editarlos). Las interpretaciones van en Insights y Reporte.
 - Editar una sesión la reemplaza entera en una transacción (`update_rehab_session`); un ejercicio que no se toca conserva su nombre histórico.
@@ -66,7 +67,7 @@ Vienen de `docs/archive/handoffs/session-handoff-2026-07-17.md`:
 
 - **Terminado:** el MVP, el rediseño con Claude Design (8 pantallas), el historial, las series individuales, los registros con fecha anterior, el CI/CD, el catálogo de ejercicios (`/ejercicios`), las rutinas, el feedback global de carga, el design system CSS (`src/design-system/`), la app instalable (PWA con pantalla offline), `/ajustes` (nombre, instalación y recordatorios) los recordatorios push programados con `pg_cron` los tratamientos del centro en Fisio guiada (registro, Historial, Hoy, Insights y Reporte; `docs/specs/physio-treatments-spec.md`) y la edición o eliminación de sesiones y cierres pasados (`docs/specs/edit-past-records-spec.md`).
 - **Última verificación documentada (2026-10-02):** CI en verde en `main` (lint, typecheck, unitarios, E2E críticos con axe) y deploy a producción correcto.
-- **Fase actual:** la validación de uso real se cerró (2026-10-01) y de ella salieron las features ya entregadas. La app de rehabilitación en general (lesión activa, rigidez, tipos de sesión y metas) se entregó el 2026-10-02. El modo demo público (botón en la landing, tres pacientes de ejemplo; `docs/specs/demo-mode-spec.md`) se entregó el 2026-10-03. **No hay una próxima feature elegida**; el portal para fisios tendrá su propia spec.
+- **Fase actual:** la validación de uso real se cerró (2026-10-01) y de ella salieron las features ya entregadas. La app de rehabilitación en general (lesión activa, rigidez, tipos de sesión y metas) se entregó el 2026-10-02. El modo demo público (botón en la landing, tres pacientes de ejemplo; `docs/specs/demo-mode-spec.md`) se entregó el 2026-10-03. El registro de la mañana y la meta de sesiones (`docs/specs/morning-checkin-and-daily-goal-spec.md`) se entregaron el 2026-11-16. **No hay una próxima feature elegida**; el portal para fisios tendrá su propia spec.
 - **Backlog:** todo lo pendiente (producto, diseño y técnico), con lo ya hecho verificado contra el código, está en `docs/ideas/recovery-ritual-backlog.md`.
 - **Entornos:** desde el 2026-09-30 el antiguo staging **es producción** (ADR-004). Hay un solo entorno hospedado: Supabase `pevrupenrzueyzidfeah` y https://recovery.brahua.com (la URL `recovery-tracker-brahua-lab.vercel.app` sigue funcionando). Tiene los datos reales. Para desarrollar y probar se usa Supabase local.
 

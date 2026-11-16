@@ -1,3 +1,4 @@
+import type { DayProgress } from "@/lib/session-goal-progress";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 
 export type RegistrarMode = "session" | "closeout";
@@ -24,14 +25,14 @@ export function resolveSavedCloseout(closeouts: NightlyCloseout[], savedCloseout
 
 export function resolveRegistrarMode(
   requestedMode: string | undefined,
-  hasSessionToday: boolean,
+  dayGoalMet: boolean,
   hasCloseoutToday: boolean,
 ): RegistrarMode {
   if (requestedMode === "session" || requestedMode === "closeout") {
     return requestedMode;
   }
 
-  if (!hasSessionToday) {
+  if (!dayGoalMet) {
     return "session";
   }
 
@@ -42,42 +43,40 @@ export function resolveRegistrarMode(
   return "session";
 }
 
-export function buildSessionSuccessState(
-  hasCloseoutToday: boolean,
-  summary?: string,
-): RitualSuccessConfig {
+/** Success after saving a session, worded against today's session goal. */
+export function buildSessionSuccessState(day: DayProgress, summary?: string): RitualSuccessConfig {
+  const missing = Math.max(0, day.perDay - day.count);
   return {
     eyebrow: "Sesion guardada",
-    title: hasCloseoutToday
-      ? "La sesion ya quedo registrada y el dia va completo."
-      : "Buen avance. Ahora falta cerrar el dia.",
+    title: day.met ? "Día completo." : `Llevas ${day.count} de ${day.perDay} sesiones hoy.`,
     body:
       summary ??
-      (hasCloseoutToday
+      (day.met
         ? "Tu registro ya entra en el seguimiento de hoy. Puedes revisar patrones o volver a Hoy."
-        : "La respuesta post-terapia ya esta guardada. Cuando termine el dia, completa el cierre nocturno."),
+        : `Te ${missing === 1 ? "falta 1 sesión" : `faltan ${missing} sesiones`} para completar el día.`),
     primaryHref: "/",
     primaryLabel: "Volver a Hoy",
-    secondaryHref: hasCloseoutToday ? "/insights" : "/registrar?mode=closeout",
-    secondaryLabel: hasCloseoutToday ? "Ver insights" : "Hacer el cierre ahora",
+    secondaryHref: day.met ? "/insights" : "/registrar?mode=session",
+    secondaryLabel: day.met ? "Ver insights" : "Registrar otra sesión",
   };
 }
 
+/** Success after saving a closeout; the day is "closed" only when the session goal is met. */
 export function buildCloseoutSuccessState(
-  hasSessionToday: boolean,
+  dayGoalMet: boolean,
   summary?: string,
   areaPhrase?: string,
 ): RitualSuccessConfig {
   return {
     eyebrow: "Cierre guardado",
-    title: hasSessionToday ? "Dia cerrado." : "Cierre guardado.",
+    title: dayGoalMet ? "Dia cerrado." : "Cierre guardado.",
     body:
       summary ??
-      (hasSessionToday
+      (dayGoalMet
         ? `No queda nada pendiente. Hoy también cuidaste ${areaPhrase ?? "tu recuperación"}.`
-        : "El cierre nocturno quedo registrado. Falta la sesion para completar el dia."),
-    primaryHref: hasSessionToday ? "/" : "/registrar?mode=session",
-    primaryLabel: hasSessionToday ? "Hasta manana" : "Registrar sesion",
+        : "El cierre nocturno quedo registrado. Aún te faltan sesiones para completar el día."),
+    primaryHref: dayGoalMet ? "/" : "/registrar?mode=session",
+    primaryLabel: dayGoalMet ? "Hasta manana" : "Registrar sesion",
     secondaryHref: "/insights",
     secondaryLabel: "Ver mi progreso",
   };

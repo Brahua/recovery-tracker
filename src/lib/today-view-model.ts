@@ -1,5 +1,6 @@
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
-import { addRecoveryDays, getRecoveryDateKey, getRecoveryWeekKeys } from "@/lib/recovery-date";
+import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
+import type { DayProgress, GoalDayStatus, WeekProgress } from "@/lib/session-goal-progress";
 
 const weekdayInitials = ["D", "L", "M", "X", "J", "V", "S"] as const;
 
@@ -16,7 +17,8 @@ function buildLoggedDayKeys(sessions: RehabSession[], closeouts: NightlyCloseout
 }
 
 export interface TodayRitualState {
-  progress: 0 | 50 | 100;
+  /** Share of today's session goal, 0–100. */
+  progress: number;
   eyebrow: string;
   title: string;
   body: string;
@@ -27,76 +29,111 @@ export interface TodayRitualState {
   secondaryLabel: string;
 }
 
-export function getTodayRitualState(
-  hasSessionToday: boolean,
-  hasCloseoutToday: boolean,
-  areaPhrase?: string,
-): TodayRitualState {
-  if (!hasSessionToday) {
+interface TodayRitualInput {
+  day: DayProgress;
+  week: WeekProgress;
+  hasCloseoutToday: boolean;
+  areaPhrase?: string;
+}
+
+const sessionHref = "/registrar?mode=session";
+const closeoutHref = "/registrar?mode=closeout";
+
+function sessionsWord(count: number) {
+  return count === 1 ? "sesión" : "sesiones";
+}
+
+// Today's card follows the session goal (docs/specs/morning-checkin-and-daily-goal-spec.md): the
+// day is done with goal.perDay sessions; the nightly closeout is optional.
+export function getTodayRitualState({
+  day,
+  week,
+  hasCloseoutToday,
+  areaPhrase,
+}: TodayRitualInput): TodayRitualState {
+  const progress = Math.min(100, Math.round((day.count / day.perDay) * 100));
+  const optionalCloseout = hasCloseoutToday
+    ? null
+    : { secondaryHref: closeoutHref, secondaryLabel: "Hacer cierre (opcional)" };
+
+  if (day.met) {
     return {
-      progress: 0,
-      eyebrow: "Siguiente paso",
-      title: "Te toca la sesion de hoy",
-      body: areaPhrase
-        ? `Un paso más para ${areaPhrase}.`
-        : "Un paso más cerca de tu recuperación.",
-      primaryHref: "/registrar?mode=session",
-      primaryLabel: "Empezar sesion de hoy",
-      primaryMeta: "20 min",
-      secondaryHref: "/registrar?mode=closeout",
-      secondaryLabel: "Hacer cierre nocturno",
+      progress: 100,
+      eyebrow: "Día completo",
+      title:
+        day.perDay === 1 && day.count === 1
+          ? "Sesión hecha. Día completo."
+          : `${day.count} ${sessionsWord(day.count)}. Día completo.`,
+      body: week.weekMet
+        ? "Semana cumplida. Ya hiciste lo importante."
+        : `Llevas ${week.metDays} de ${week.daysPerWeek} días esta semana.`,
+      primaryHref: "/insights",
+      primaryLabel: "Ver insights",
+      primaryMeta: "Ahora",
+      ...(optionalCloseout ?? {
+        secondaryHref: sessionHref,
+        secondaryLabel: "Registrar otra sesión",
+      }),
     };
   }
 
-  if (!hasCloseoutToday) {
+  if (day.count > 0) {
+    const missing = day.perDay - day.count;
     return {
-      progress: 50,
+      progress,
       eyebrow: "Buen avance",
-      title: "Sesion hecha. Bien ahi.",
-      body: "Esta noche cierras el dia en 1 minuto.",
-      primaryHref: "/registrar?mode=closeout",
-      primaryLabel: "Hacer cierre nocturno",
-      primaryMeta: "1 min",
-      secondaryHref: "/registrar?mode=session",
-      secondaryLabel: "Ver sesion completada",
+      title: `Llevas ${day.count} de ${day.perDay} sesiones.`,
+      body: `Te ${missing === 1 ? "falta 1 sesión" : `faltan ${missing} sesiones`} para completar el día.`,
+      primaryHref: sessionHref,
+      primaryLabel: "Registrar otra sesión",
+      primaryMeta: "20 min",
+      ...(optionalCloseout ?? { secondaryHref: "/insights", secondaryLabel: "Ver insights" }),
+    };
+  }
+
+  if (week.weekMet) {
+    return {
+      progress: 0,
+      eyebrow: "Semana cumplida",
+      title: "Hoy puedes descansar o sumar una sesión.",
+      body: `Ya cumpliste ${week.metDays} de ${week.daysPerWeek} días esta semana.`,
+      primaryHref: sessionHref,
+      primaryLabel: "Registrar una sesión",
+      primaryMeta: "20 min",
+      ...(optionalCloseout ?? { secondaryHref: "/insights", secondaryLabel: "Ver insights" }),
     };
   }
 
   return {
-    progress: 100,
-    eyebrow: "Dia completo",
-    title: "Dia cerrado. Ya hiciste lo importante.",
-    body: "Tus dos rituales quedaron guardados.",
-    primaryHref: "/insights",
-    primaryLabel: "Ver insights",
-    primaryMeta: "Ahora",
-    secondaryHref: "/reporte",
-    secondaryLabel: "Preparar reporte",
+    progress: 0,
+    eyebrow: "Siguiente paso",
+    title: "Te toca la sesión de hoy",
+    body: areaPhrase ? `Un paso más para ${areaPhrase}.` : "Un paso más cerca de tu recuperación.",
+    primaryHref: sessionHref,
+    primaryLabel: "Empezar sesión de hoy",
+    primaryMeta: "20 min",
+    ...(optionalCloseout ?? { secondaryHref: "/insights", secondaryLabel: "Ver insights" }),
   };
 }
 
 export interface RecentWeekDay {
   key: string;
   label: string;
-  completed: boolean;
+  status: GoalDayStatus;
   isToday: boolean;
 }
 
-export function buildRecentWeek(
-  sessions: RehabSession[],
-  closeouts: NightlyCloseout[],
-  now = new Date(),
-): RecentWeekDay[] {
-  const loggedDayKeys = buildLoggedDayKeys(sessions, closeouts);
+/** The current week (Monday to Sunday) with each day's status against the session goal. */
+export function buildRecentWeek(week: WeekProgress, now = new Date()): RecentWeekDay[] {
   const today = dateKey(now);
-  return getRecoveryWeekKeys(now).map((key) => {
-    const value = new Date(`${key}T00:00:00.000Z`);
+  return week.days.map((day) => {
+    const value = new Date(`${day.date}T00:00:00.000Z`);
 
     return {
-      key,
+      key: day.date,
       label: weekdayInitials[value.getUTCDay()],
-      completed: loggedDayKeys.has(key),
-      isToday: key === today,
+      status: day.status,
+      isToday: day.date === today,
     };
   });
 }

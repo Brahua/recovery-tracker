@@ -10,7 +10,8 @@ export default async function Home({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
-  const { supabaseEnv, user, recentSessions, recentCloseouts } = await loadRecoveryPageData();
+  const { supabaseEnv, user, recentSessions, recentCloseouts, rangeSessions, rangeCloseouts } =
+    await loadRecoveryPageData();
 
   if (!supabaseEnv || !user) {
     return (
@@ -30,6 +31,8 @@ export default async function Home({
   return (
     <TodayOverview
       goals={goals}
+      rangeCloseouts={rangeCloseouts}
+      rangeSessions={rangeSessions}
       recentCloseouts={recentCloseouts}
       recentSessions={recentSessions}
       therapistNotes={therapistNotes}

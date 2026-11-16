@@ -9,6 +9,7 @@ import {
 import { appearanceSchema } from "@/lib/validation/appearance";
 import { conditionSchema } from "@/lib/validation/condition";
 import { displayNameSchema } from "@/lib/validation/profile";
+import { sessionGoalSchema } from "@/lib/validation/session-goal";
 
 export interface ProfileActionResult {
   ok: boolean;
@@ -99,6 +100,34 @@ export async function saveConditionAction(input: unknown): Promise<ProfileAction
   }
 
   // Hoy, Registrar and Reporte word their text from the condition.
+  revalidatePath("/", "layout");
+  return { ok: true };
+}
+
+// Saves the session goal in user_metadata.session_goal (its own key: saving the appearance replaces
+// user_metadata.preferences as a whole).
+export async function saveSessionGoalAction(input: unknown): Promise<ProfileActionResult> {
+  const parsed = sessionGoalSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Revisa la meta." };
+  }
+
+  try {
+    const { supabase } = await requireAuthenticatedSupabase();
+    const { error } = await supabase.auth.updateUser({ data: { session_goal: parsed.data } });
+    if (error) throw error;
+  } catch (error) {
+    if (error instanceof AuthenticationRequiredError) {
+      return {
+        ok: false,
+        error: "Tu sesión expiró. Recarga la página e inicia sesión nuevamente.",
+      };
+    }
+    console.error("Failed to save session goal.", error);
+    return { ok: false, error: "No se pudo guardar la meta. Intenta otra vez." };
+  }
+
+  // Hoy, Registrar and Reporte measure progress against the goal.
   revalidatePath("/", "layout");
   return { ok: true };
 }

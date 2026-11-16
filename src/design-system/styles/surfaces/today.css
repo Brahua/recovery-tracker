@@ -43,6 +43,9 @@
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .rr-week-day {
@@ -81,6 +84,12 @@
   color: var(--rr-accent-light);
 }
 
+.rr-week-mark.is-partial {
+  border-style: dashed;
+  border-color: rgb(var(--rr-accent-rgb) / 0.45);
+  color: var(--rr-accent-light);
+}
+
 .rr-week-mark.is-today {
   border: 2px solid var(--rr-accent);
   box-shadow: 0 8px 18px -6px rgb(var(--rr-accent-rgb) / 0.5);
@@ -90,6 +99,14 @@
   border: 0;
   background: var(--rr-accent);
   color: var(--rr-on-accent-mark);
+}
+
+.rr-week-goal {
+  margin-top: 8px;
+  color: var(--rr-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: right;
 }
 
 .rr-mobile-momentum > p {

@@ -44,6 +44,9 @@ export async function loadRecoveryPageData(options: RecoveryPageDataOptions = {}
   return {
     supabaseEnv,
     user,
+    /** Every session and closeout of the range (default: the last 30 days), without the limit. */
+    rangeSessions: sessionRecords,
+    rangeCloseouts: closeoutRecords,
     recentSessions,
     recentCloseouts,
     hasSessionToday,

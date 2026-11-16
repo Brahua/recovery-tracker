@@ -6,6 +6,8 @@ import {
   getTodayRitualState,
   type RecentWeekDay,
 } from "@/lib/today-view-model";
+import { formatSessionGoal, sessionGoalFromMetadata } from "@/lib/session-goal";
+import { getDayProgress, getWeekProgress, type WeekProgress } from "@/lib/session-goal-progress";
 import type { RecoveryGoal } from "@/types/goals";
 import type { LatestTherapistNotes, NightlyCloseout, RehabSession } from "@/types/recovery";
 import { getRecoveryDateKey, recoveryTimeZone } from "@/lib/recovery-date";
@@ -38,30 +40,45 @@ function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function sessionDateKey(session: RehabSession) {
-  return getRecoveryDateKey(session.occurredAt);
-}
+const dayStatusLabels: Record<RecentWeekDay["status"], string> = {
+  full: "meta cumplida",
+  partial: "con sesiones, sin llegar a la meta",
+  empty: "sin sesiones",
+};
 
 function WeekStrip({ days }: { days: RecentWeekDay[] }) {
   return (
-    <div className="rr-week" aria-label="Semana actual, de lunes a domingo">
+    <ol className="rr-week" aria-label="Semana actual, de lunes a domingo">
       {days.map((day) => (
-        <div className="rr-week-day" key={day.key}>
+        <li
+          aria-label={`${day.isToday ? "Hoy" : day.label}: ${dayStatusLabels[day.status]}`}
+          className="rr-week-day"
+          key={day.key}
+        >
           <span
-            className={`rr-week-mark ${day.completed ? "is-complete" : ""} ${
-              day.isToday ? "is-today" : ""
-            }`}
+            aria-hidden="true"
+            className={`rr-week-mark ${day.status === "full" ? "is-complete" : ""} ${
+              day.status === "partial" ? "is-partial" : ""
+            } ${day.isToday ? "is-today" : ""}`}
           >
-            {day.completed ? "✓" : day.isToday ? "·" : ""}
+            {day.status === "full" ? "✓" : day.status === "partial" ? "½" : day.isToday ? "·" : ""}
           </span>
-          <span className={day.isToday ? "is-today" : ""}>{day.isToday ? "Hoy" : day.label}</span>
-        </div>
+          <span aria-hidden="true" className={day.isToday ? "is-today" : ""}>
+            {day.isToday ? "Hoy" : day.label}
+          </span>
+        </li>
       ))}
-    </div>
+    </ol>
   );
 }
 
-function ProgressRing({ progress }: { progress: 0 | 50 | 100 }) {
+function weekGoalLine(week: WeekProgress) {
+  return week.weekMet
+    ? "Semana cumplida."
+    : `${week.metDays} de ${week.daysPerWeek} días esta semana.`;
+}
+
+function ProgressRing({ progress }: { progress: number }) {
   const radius = 41;
   const circumference = 2 * Math.PI * radius;
   const visibleProgress = Math.max(progress, 3);
@@ -125,6 +142,9 @@ function TherapistNotesCard({ notes }: { notes: LatestTherapistNotes }) {
 }
 
 interface TodayOverviewProps {
+  /** Every session and closeout of the last 30 days: the week, the goal and the streak. */
+  rangeSessions: RehabSession[];
+  rangeCloseouts: NightlyCloseout[];
   recentSessions: RehabSession[];
   recentCloseouts: NightlyCloseout[];
   /** Notes from the latest physio session; shown until the next one. */
@@ -134,6 +154,8 @@ interface TodayOverviewProps {
 }
 
 export function TodayOverview({
+  rangeSessions,
+  rangeCloseouts,
   recentSessions,
   recentCloseouts,
   therapistNotes,
@@ -142,18 +164,27 @@ export function TodayOverview({
 }: TodayOverviewProps) {
   const now = new Date();
   const todayKey = getRecoveryDateKey(now);
-  const hasSessionToday = recentSessions.some((session) => sessionDateKey(session) === todayKey);
-  const hasCloseoutToday = recentCloseouts.some((closeout) => closeout.date === todayKey);
+  const hasCloseoutToday = rangeCloseouts.some((closeout) => closeout.date === todayKey);
   const condition = parseCondition(user.user_metadata?.condition);
-  const state = getTodayRitualState(
-    hasSessionToday,
+  const goal = sessionGoalFromMetadata(user.user_metadata);
+  const dayProgress = getDayProgress(rangeSessions, todayKey, goal);
+  const weekProgress = getWeekProgress(rangeSessions, goal, now);
+  const state = getTodayRitualState({
+    day: dayProgress,
+    week: weekProgress,
     hasCloseoutToday,
-    conditionAreaPhrase(condition),
-  );
+    areaPhrase: conditionAreaPhrase(condition),
+  });
   const conditionLine = conditionSummary(condition, todayKey);
-  const week = buildRecentWeek(recentSessions, recentCloseouts, now);
-  const streak = calculateLoggingStreak(recentSessions, recentCloseouts, now);
-  const loggedDays = week.filter((day) => day.completed).length;
+  const week = buildRecentWeek(weekProgress, now);
+  const streak = calculateLoggingStreak(rangeSessions, rangeCloseouts, now);
+  const loggedDays = Math.min(
+    30,
+    new Set([
+      ...rangeSessions.map((session) => getRecoveryDateKey(session.occurredAt)),
+      ...rangeCloseouts.map((closeout) => closeout.date),
+    ]).size,
+  );
   const milestoneProgress = Math.round((loggedDays / 30) * 100);
   const latestSession = recentSessions[0];
   const latestCloseout = recentCloseouts[0];
@@ -172,13 +203,14 @@ export function TodayOverview({
         </Link>
         <div className="rr-desktop-week">
           <WeekStrip days={week} />
+          <p className="rr-week-goal">{weekGoalLine(weekProgress)}</p>
         </div>
       </header>
 
       <section className="rr-mobile-momentum">
         <WeekStrip days={week} />
         <p>
-          <strong>{streak} dias seguidos.</strong> La constancia tambien cuenta.
+          <strong>{weekGoalLine(weekProgress)}</strong> {streak} días seguidos con registro.
         </p>
       </section>
 
@@ -194,24 +226,32 @@ export function TodayOverview({
           </div>
 
           <div className="rr-ritual-list">
-            <article className={hasSessionToday ? "is-complete" : "is-current"}>
-              <span className="rr-ritual-dot">{hasSessionToday ? "✓" : ""}</span>
+            <article className={dayProgress.met ? "is-complete" : "is-current"}>
+              <span className="rr-ritual-dot">{dayProgress.met ? "✓" : ""}</span>
               <div>
-                <strong>Sesion de ejercicios</strong>
-                <small>
-                  {hasSessionToday ? "Completada hoy" : "Registra dolor, carga y ejercicios"}
-                </small>
+                <strong>
+                  {dayProgress.perDay === 1
+                    ? "Sesión de hoy"
+                    : `${dayProgress.perDay} sesiones hoy`}
+                </strong>
+                <small>Meta: {formatSessionGoal(goal)}</small>
               </div>
-              <b>{hasSessionToday ? "Hecha" : "Ahora"}</b>
+              <b>
+                {dayProgress.met
+                  ? "Hecho"
+                  : dayProgress.perDay === 1
+                    ? "Ahora"
+                    : `${dayProgress.count} de ${dayProgress.perDay}`}
+              </b>
             </article>
 
             <article className={hasCloseoutToday ? "is-complete" : "is-pending"}>
               <span className="rr-ritual-dot">{hasCloseoutToday ? "✓" : ""}</span>
               <div>
                 <strong>Cierre nocturno</strong>
-                <small>Dolor, energia, sueno y rebote</small>
+                <small>Opcional · dolor, sueño y rebote</small>
               </div>
-              <b>{hasCloseoutToday ? "Hecho" : "Esta noche"}</b>
+              <b>{hasCloseoutToday ? "Hecho" : "Opcional"}</b>
             </article>
           </div>
 

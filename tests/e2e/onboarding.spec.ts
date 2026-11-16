@@ -40,6 +40,8 @@ test.describe("onboarding", () => {
     await page.getByLabel("¿Cómo quieres que te llamemos?").fill(name);
     await page.getByRole("radio", { name: "Claro", exact: true }).check();
     await page.getByRole("radio", { name: "Ámbar", exact: true }).check();
+    await page.getByLabel("¿Cuántas sesiones al día?").selectOption("2");
+    await page.getByLabel("¿Cuántos días a la semana?").selectOption("5");
     await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
     await expect(page.getByRole("button", { name: "Empezar" })).toBeDisabled();
     await page.getByRole("checkbox").check();
@@ -47,6 +49,7 @@ test.describe("onboarding", () => {
     await page.getByRole("button", { name: "Empezar" }).click();
 
     await expect(page.getByRole("heading", { name: `Hola, ${name}` })).toBeVisible();
+    await expect(page.getByText("Meta: 2 sesiones al día, 5 días a la semana")).toBeVisible();
     await expect(page.locator("html")).toHaveAttribute("data-accent", "amber");
 
     // Done: /bienvenida no longer shows the first-run tour.

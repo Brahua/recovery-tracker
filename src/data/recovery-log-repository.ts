@@ -14,11 +14,14 @@ import {
 } from "@/lib/supabase/authenticated";
 import { getRecoveryUtcRange } from "@/lib/recovery-date";
 import {
+  createMorningCheckinInputSchema,
   createNightlyCloseoutInputSchema,
   createRehabSessionInputSchema,
 } from "@/lib/validation/recovery";
 import type {
+  CreateMorningCheckinInput,
   CreateNightlyCloseoutInput,
+  MorningCheckin,
   CreateRehabSessionInput,
   DateRangeParams,
   LatestTherapistNotes,
@@ -58,6 +61,20 @@ type NightlyCloseoutRow = {
   updated_at: string;
 };
 
+type MorningCheckinRow = {
+  id: string;
+  user_id: string;
+  date: string;
+  sleep_hours: number | string;
+  sleep_quality: MorningCheckin["sleepQuality"];
+  waking_pain: MorningCheckin["wakingPain"];
+  stiffness_level: MorningCheckin["stiffnessLevel"];
+  rebound_pain_level: NonNullable<MorningCheckin["reboundPainLevel"]> | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export interface RecoveryLogRepository {
   createRehabSession(input: CreateRehabSessionInput): Promise<RehabSession>;
   getRehabSession(id: string): Promise<RehabSession | null>;
@@ -70,6 +87,11 @@ export interface RecoveryLogRepository {
   updateNightlyCloseout(id: string, input: CreateNightlyCloseoutInput): Promise<NightlyCloseout>;
   deleteNightlyCloseout(id: string): Promise<void>;
   listNightlyCloseouts(params: DateRangeParams): Promise<NightlyCloseout[]>;
+  createMorningCheckin(input: CreateMorningCheckinInput): Promise<MorningCheckin>;
+  getMorningCheckin(id: string): Promise<MorningCheckin | null>;
+  updateMorningCheckin(id: string, input: CreateMorningCheckinInput): Promise<MorningCheckin>;
+  deleteMorningCheckin(id: string): Promise<void>;
+  listMorningCheckins(params: DateRangeParams): Promise<MorningCheckin[]>;
 }
 
 class RecoveryRepositoryError extends Error {
@@ -84,6 +106,14 @@ export class RecordNotFoundError extends Error {
   constructor() {
     super("Record not found.");
     this.name = "RecordNotFoundError";
+  }
+}
+
+// Another morning check-in already uses that date (unique user_id + date).
+export class DuplicateMorningCheckinDateError extends Error {
+  constructor() {
+    super("Another morning check-in already uses that date.");
+    this.name = "DuplicateMorningCheckinDateError";
   }
 }
 
@@ -152,6 +182,37 @@ function mapNightlyCloseoutRow(row: NightlyCloseoutRow): NightlyCloseout {
     closedTime: row.closed_time ? row.closed_time.slice(0, 5) : undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
+  };
+}
+
+export function mapMorningCheckinRow(row: MorningCheckinRow): MorningCheckin {
+  return {
+    id: row.id,
+    date: row.date,
+    // numeric(4,1) can arrive as a string.
+    sleepHours: Number(row.sleep_hours),
+    sleepQuality: row.sleep_quality,
+    wakingPain: row.waking_pain,
+    stiffnessLevel: row.stiffness_level,
+    reboundPainLevel: row.rebound_pain_level ?? undefined,
+    notes: row.notes ?? undefined,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+}
+
+const morningCheckinColumns =
+  "id, user_id, date, sleep_hours, sleep_quality, waking_pain, stiffness_level, rebound_pain_level, notes, created_at, updated_at";
+
+function toMorningCheckinRow(input: CreateMorningCheckinInput) {
+  return {
+    date: input.date,
+    sleep_hours: input.sleepHours,
+    sleep_quality: input.sleepQuality,
+    waking_pain: input.wakingPain,
+    stiffness_level: input.stiffnessLevel,
+    rebound_pain_level: input.reboundPainLevel ?? null,
+    notes: input.notes ?? null,
   };
 }
 
@@ -513,6 +574,101 @@ export async function createRecoveryLogRepository(): Promise<RecoveryLogReposito
       }
 
       return ((data ?? []) as NightlyCloseoutRow[]).map(mapNightlyCloseoutRow);
+    },
+
+    async createMorningCheckin(input) {
+      const parsed = createMorningCheckinInputSchema.parse(input);
+      const { supabase, userId } = await requireAuthenticatedSupabase();
+
+      const { data, error } = await supabase
+        .from("morning_checkins")
+        .insert({ user_id: userId, ...toMorningCheckinRow(parsed) })
+        .select(morningCheckinColumns)
+        .single();
+
+      if (error?.code === uniqueViolationCode) {
+        throw new DuplicateMorningCheckinDateError();
+      }
+
+      if (error || !data) {
+        throw new RecoveryRepositoryError(error?.message ?? "Failed to create morning check-in.");
+      }
+
+      return mapMorningCheckinRow(data as MorningCheckinRow);
+    },
+
+    async getMorningCheckin(id) {
+      const { supabase } = await requireAuthenticatedSupabase();
+      const { data, error } = await supabase
+        .from("morning_checkins")
+        .select(morningCheckinColumns)
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error) {
+        throw new RecoveryRepositoryError(error.message);
+      }
+
+      return data ? mapMorningCheckinRow(data as MorningCheckinRow) : null;
+    },
+
+    async updateMorningCheckin(id, input) {
+      const parsed = createMorningCheckinInputSchema.parse(input);
+      const { supabase } = await requireAuthenticatedSupabase();
+
+      const { data, error } = await supabase
+        .from("morning_checkins")
+        .update(toMorningCheckinRow(parsed))
+        .eq("id", id)
+        .select(morningCheckinColumns)
+        .maybeSingle();
+
+      if (error?.code === uniqueViolationCode) {
+        throw new DuplicateMorningCheckinDateError();
+      }
+
+      if (error) {
+        throw new RecoveryRepositoryError(error.message);
+      }
+
+      if (!data) {
+        throw new RecordNotFoundError();
+      }
+
+      return mapMorningCheckinRow(data as MorningCheckinRow);
+    },
+
+    async deleteMorningCheckin(id) {
+      const { supabase } = await requireAuthenticatedSupabase();
+      const { data, error } = await supabase
+        .from("morning_checkins")
+        .delete()
+        .eq("id", id)
+        .select("id");
+
+      if (error) {
+        throw new RecoveryRepositoryError(error.message);
+      }
+
+      if (!data || data.length === 0) {
+        throw new RecordNotFoundError();
+      }
+    },
+
+    async listMorningCheckins(params) {
+      const { supabase } = await requireAuthenticatedSupabase();
+      const { data, error } = await supabase
+        .from("morning_checkins")
+        .select(morningCheckinColumns)
+        .gte("date", params.from)
+        .lte("date", params.to)
+        .order("date", { ascending: false });
+
+      if (error) {
+        throw new RecoveryRepositoryError(error.message);
+      }
+
+      return ((data ?? []) as MorningCheckinRow[]).map(mapMorningCheckinRow);
     },
   };
 }

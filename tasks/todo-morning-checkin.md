@@ -57,13 +57,13 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
 
 ## Fase 2: registro de la mañana
 
-- [ ] **M1: Tabla, tipos y repositorio** (M)
+- [x] **M1: Tabla, tipos y repositorio** (M)
   - Acceptance:
     - migración aditiva `morning_checkins` (columnas de la spec, `unique (user_id, date)`, RLS de 4 políticas, trigger `updated_at`, grants como las demás tablas)
     - tipo `MorningCheckin`, esquema Zod (horas 0–24 de 0,5 en 0,5; calidad 1–5; dolor 0–10; rigidez; rebote opcional; notas)
     - repositorio: listar por rango, obtener, crear, actualizar, eliminar; duplicado de fecha → error legible
   - Verify: unitarios de validación y mappers; CI aplica la migración.
-  - Files: `supabase/migrations/2026111…_morning_checkins.sql`, `src/types/recovery.ts`, `src/lib/validation/recovery.ts` (+ test), `src/data/recovery-log-repository.ts`, `src/data/recovery-log-mappers.ts` (+ test)
+  - Files: `supabase/migrations/20261117000000_morning_checkins.sql`, `src/types/recovery.ts`, `src/lib/validation/recovery.ts` (+ test), `src/data/recovery-log-repository.ts`, `src/data/recovery-log-mappers.ts` (+ test)
   - Deps: Checkpoint A
 
 - [ ] **M2: Formulario "¿Cómo amaneciste?"** (M)

@@ -173,6 +173,26 @@ export interface NightlyCloseout {
   updatedAt: ISODateTimeString;
 }
 
+/**
+ * "¿Cómo amaneciste?" (docs/specs/morning-checkin-and-daily-goal-spec.md). `date` is the day the
+ * patient wakes up: the sleep is the night before and the rebound answers to the sessions of the
+ * day before (absent when that day had none).
+ */
+export interface MorningCheckin {
+  id: string;
+  date: ISODateString;
+  sleepHours: number;
+  sleepQuality: Rating1To5;
+  wakingPain: PainScore;
+  stiffnessLevel: StiffnessLevel;
+  reboundPainLevel?: ReboundLevel;
+  notes?: string;
+  createdAt: ISODateTimeString;
+  updatedAt: ISODateTimeString;
+}
+
+export type CreateMorningCheckinInput = Omit<MorningCheckin, "id" | "createdAt" | "updatedAt">;
+
 export interface DateRangeParams {
   from: ISODateString;
   to: ISODateString;

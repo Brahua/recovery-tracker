@@ -6,6 +6,7 @@ import {
   recordIdSchema,
   sessionExerciseSchema,
   sessionTreatmentSchema,
+  createMorningCheckinInputSchema,
 } from "@/lib/validation/recovery";
 
 const physioBase = {
@@ -370,5 +371,48 @@ describe("isometric exercises", () => {
         sets: [{ position: 0, reps: 1 }],
       }).success,
     ).toBe(false);
+  });
+});
+
+describe("createMorningCheckinInputSchema", () => {
+  const checkin = {
+    date: "2026-11-17",
+    sleepHours: 7.5,
+    sleepQuality: 4,
+    wakingPain: 2,
+    stiffnessLevel: "MILD",
+    reboundPainLevel: "NONE",
+    notes: "  Dormí bien.  ",
+  };
+
+  it("accepts a full check-in", () => {
+    expect(createMorningCheckinInputSchema.parse(checkin)).toMatchObject({
+      date: "2026-11-17",
+      sleepHours: 7.5,
+      stiffnessLevel: "MILD",
+      reboundPainLevel: "NONE",
+    });
+  });
+
+  it("leaves the rebound out when the day before had no sessions", () => {
+    expect(
+      createMorningCheckinInputSchema.parse({ ...checkin, reboundPainLevel: undefined })
+        .reboundPainLevel,
+    ).toBeUndefined();
+  });
+
+  it("rejects sleep out of range or not in half hours, and a missing stiffness", () => {
+    expect(createMorningCheckinInputSchema.safeParse({ ...checkin, sleepHours: 25 }).success).toBe(
+      false,
+    );
+    expect(
+      createMorningCheckinInputSchema.safeParse({ ...checkin, sleepHours: 7.25 }).success,
+    ).toBe(false);
+    expect(
+      createMorningCheckinInputSchema.safeParse({ ...checkin, stiffnessLevel: undefined }).success,
+    ).toBe(false);
+    expect(createMorningCheckinInputSchema.safeParse({ ...checkin, wakingPain: 11 }).success).toBe(
+      false,
+    );
   });
 });

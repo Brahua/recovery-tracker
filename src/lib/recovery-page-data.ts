@@ -31,7 +31,12 @@ export async function loadRecoveryPageData(options: RecoveryPageDataOptions = {}
   const repository = user ? await createRecoveryLogRepository() : null;
   const recentRange = getRecentDateRange(options.from, options.to);
   const sessionRecords = repository ? await repository.listRehabSessions(recentRange) : [];
-  const closeoutRecords = repository ? await repository.listNightlyCloseouts(recentRange) : [];
+  const [closeoutRecords, checkinRecords] = repository
+    ? await Promise.all([
+        repository.listNightlyCloseouts(recentRange),
+        repository.listMorningCheckins(recentRange),
+      ])
+    : [[], []];
   const limit = options.limit === undefined ? 4 : options.limit;
   const recentSessions = limit === null ? sessionRecords : sessionRecords.slice(0, limit);
   const recentCloseouts = limit === null ? closeoutRecords : closeoutRecords.slice(0, limit);
@@ -40,6 +45,7 @@ export async function loadRecoveryPageData(options: RecoveryPageDataOptions = {}
     (session) => getRecoveryDateKey(session.occurredAt) === today,
   );
   const hasCloseoutToday = recentCloseouts.some((closeout) => closeout.date === today);
+  const todayCheckin = checkinRecords.find((checkin) => checkin.date === today);
 
   return {
     supabaseEnv,
@@ -47,6 +53,9 @@ export async function loadRecoveryPageData(options: RecoveryPageDataOptions = {}
     /** Every session and closeout of the range (default: the last 30 days), without the limit. */
     rangeSessions: sessionRecords,
     rangeCloseouts: closeoutRecords,
+    /** Morning check-ins of the range, newest first (never limited: one per day). */
+    rangeCheckins: checkinRecords,
+    todayCheckin,
     recentSessions,
     recentCloseouts,
     hasSessionToday,

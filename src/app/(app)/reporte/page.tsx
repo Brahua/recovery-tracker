@@ -4,6 +4,7 @@ import { createGoalsRepository } from "@/data/goals-repository";
 import { MedicalReport } from "@/features/reports/medical-report";
 import { parseCondition } from "@/lib/validation/condition";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
+import { sessionGoalFromMetadata } from "@/lib/session-goal";
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -32,6 +33,7 @@ export default async function ReportePage({
       now={new Date().toISOString()}
       recentCloseouts={recentCloseouts}
       recentSessions={recentSessions}
+      sessionGoal={sessionGoalFromMetadata(user.user_metadata)}
       windowDays={windowDays}
     />
   );

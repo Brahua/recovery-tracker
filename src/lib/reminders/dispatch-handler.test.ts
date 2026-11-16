@@ -5,7 +5,8 @@ import { createDispatchHandler, isAuthorizedDispatch } from "@/lib/reminders/dis
 
 const emptyStore: DispatchStore = {
   listActiveSettings: async () => [],
-  usersWithSessionOn: async () => new Set(),
+  sessionsInWeekOf: async () => new Map(),
+  sessionGoalsFor: async () => new Map(),
   usersWithCloseoutOn: async () => new Set(),
   deliveriesOn: async () => new Map(),
   subscriptionsFor: async () => new Map(),

@@ -1,12 +1,20 @@
 import type { PushResult, PushSender } from "@/lib/push/sender";
 import { dueReminders, openReminderWindows } from "@/lib/reminders/due-reminders";
 import { reminderMessages } from "@/lib/reminders/messages";
+import { defaultSessionGoal, type SessionGoal } from "@/lib/session-goal";
+import { getDayProgress, getWeekProgress } from "@/lib/session-goal-progress";
 import type { ReminderKind, ReminderSettings, StoredPushSubscription } from "@/types/reminders";
 
 /** Data access the dispatcher needs (service_role in production, a fake in tests). Reads are batched. */
 export interface DispatchStore {
   listActiveSettings(): Promise<Array<{ userId: string; settings: ReminderSettings }>>;
-  usersWithSessionOn(userIds: string[], localDate: string): Promise<Set<string>>;
+  /** Sessions of each user in the week (Monday to Sunday, Lima) that holds localDate. */
+  sessionsInWeekOf(
+    userIds: string[],
+    localDate: string,
+  ): Promise<Map<string, Array<{ occurredAt: string }>>>;
+  /** user_metadata.session_goal of each user (missing users get the default goal). */
+  sessionGoalsFor(userIds: string[]): Promise<Map<string, SessionGoal>>;
   usersWithCloseoutOn(userIds: string[], localDate: string): Promise<Set<string>>;
   deliveriesOn(userIds: string[], localDate: string): Promise<Map<string, ReminderKind[]>>;
   subscriptionsFor(userIds: string[]): Promise<Map<string, StoredPushSubscription[]>>;
@@ -57,22 +65,39 @@ export async function dispatchReminders({
 
   for (const [localDate, group] of byDate) {
     const userIds = group.map(({ userId }) => userId);
-    const [withSession, withCloseout, delivered, subscriptions] = await Promise.all([
-      store.usersWithSessionOn(userIds, localDate),
+    const [weekSessions, withCloseout, delivered, subscriptions] = await Promise.all([
+      store.sessionsInWeekOf(userIds, localDate),
       store.usersWithCloseoutOn(userIds, localDate),
       store.deliveriesOn(userIds, localDate),
       store.subscriptionsFor(userIds),
     ]);
+    // The goal lives in auth user metadata: only read it for users who have a device to notify
+    // and an open session window.
+    const goalUserIds = group
+      .filter(
+        ({ userId, settings }) =>
+          (subscriptions.get(userId) ?? []).length > 0 &&
+          openReminderWindows(now, settings).kinds.includes("session"),
+      )
+      .map(({ userId }) => userId);
+    const goals =
+      goalUserIds.length > 0
+        ? await store.sessionGoalsFor(goalUserIds)
+        : new Map<string, SessionGoal>();
 
     for (const { userId, settings } of group) {
       const devices = subscriptions.get(userId) ?? [];
       // Without a device there is nobody to notify; do not burn today's reminder.
       if (devices.length === 0) continue;
 
+      const sessions = weekSessions.get(userId) ?? [];
+      const goal = goals.get(userId) ?? defaultSessionGoal;
       const { kinds } = dueReminders({
         now,
         settings,
-        hasSessionToday: withSession.has(userId),
+        sessionGoalPending:
+          !getDayProgress(sessions, localDate, goal).met &&
+          !getWeekProgress(sessions, goal, localDate).weekMet,
         hasCloseoutToday: withCloseout.has(userId),
         deliveredToday: delivered.get(userId) ?? [],
       });

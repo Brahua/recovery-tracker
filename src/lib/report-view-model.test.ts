@@ -123,4 +123,34 @@ describe("createReportViewModel", () => {
       text: "Bajar carga en sentadilla.",
     });
   });
+
+  it("adds the weekly adherence of full weeks when a session goal is given", () => {
+    // 2026-07-16 is a Thursday: the 14-day window (Jul 3–16) holds one full week, Jul 6–12.
+    const weekSessions = ["2026-07-06", "2026-07-08"].map((date, index) => ({
+      ...sessions[0],
+      id: `week-${index}`,
+      occurredAt: `${date}T15:00:00.000Z`,
+    }));
+    const report = createReportViewModel(weekSessions, [], 14, "2026-07-16T12:00:00.000Z", {
+      perDay: 1,
+      daysPerWeek: 2,
+    });
+
+    expect(report.adherence).toEqual({
+      goalText: "1 sesión al día, 2 días a la semana",
+      weeks: 1,
+      metWeeks: 1,
+    });
+    expect(createReportViewModel(weekSessions, [], 14, "2026-07-16T12:00:00.000Z").adherence).toBe(
+      undefined,
+    );
+  });
+
+  it("leaves the adherence out without a full week in the range", () => {
+    const report = createReportViewModel(sessions, [], 7, "2026-07-16T12:00:00.000Z", {
+      perDay: 1,
+      daysPerWeek: 7,
+    });
+    expect(report.adherence).toBeUndefined();
+  });
 });

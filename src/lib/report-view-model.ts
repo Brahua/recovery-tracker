@@ -7,6 +7,8 @@ import { createMedicalReportSummary, type MedicalReportSummary } from "@/lib/rec
 import { calculateTreatmentFrequency, type TreatmentFrequencyItem } from "@/lib/treatment-insights";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
 import { getRecoveryDateKey } from "@/lib/recovery-date";
+import { formatSessionGoal, type SessionGoal } from "@/lib/session-goal";
+import { getWeeklyAdherence } from "@/lib/session-goal-progress";
 
 export interface ReportNote {
   date: string;
@@ -25,6 +27,8 @@ export interface ReportViewModel {
   physioSessionCount: number;
   treatments: TreatmentFrequencyItem[];
   notes: ReportNote[];
+  /** Full weeks of the range that met the session goal; absent without a full week. */
+  adherence?: { goalText: string; weeks: number; metWeeks: number };
 }
 
 function average(values: number[]) {
@@ -37,8 +41,18 @@ export function createReportViewModel(
   closeouts: NightlyCloseout[],
   windowDays: number,
   referenceDate?: Date | string,
+  sessionGoal?: SessionGoal,
 ): ReportViewModel {
   const range = getDateRangeForLastDays(windowDays, referenceDate);
+  const weekly = sessionGoal
+    ? getWeeklyAdherence(
+        sessions,
+        sessionGoal,
+        range.from,
+        range.to,
+        getRecoveryDateKey(referenceDate ?? new Date()),
+      )
+    : null;
   const filteredSessions = filterSessionsByRange(sessions, range);
   const filteredCloseouts = filterCloseoutsByRange(closeouts, range);
   const notes: ReportNote[] = [
@@ -89,5 +103,8 @@ export function createReportViewModel(
     ).length,
     treatments: calculateTreatmentFrequency(filteredSessions),
     notes,
+    ...(sessionGoal && weekly && weekly.weeks > 0
+      ? { adherence: { goalText: formatSessionGoal(sessionGoal), ...weekly } }
+      : {}),
   };
 }

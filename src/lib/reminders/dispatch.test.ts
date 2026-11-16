@@ -21,7 +21,8 @@ function fakeStore(overrides: Partial<DispatchStore> = {}) {
       { userId: "ana", settings: { ...defaultReminderSettings } }, // closeout 21:30 on
       { userId: "beto", settings: { ...defaultReminderSettings, closeoutTime: "23:00" } }, // not yet
     ],
-    usersWithSessionOn: async () => new Set(),
+    sessionsInWeekOf: async () => new Map(),
+    sessionGoalsFor: vi.fn(async () => new Map()),
     usersWithCloseoutOn: async () => new Set(),
     deliveriesOn: async () => new Map<string, ReminderKind[]>(),
     subscriptionsFor: async () => new Map([["ana", [device("d1", "ana"), device("d2", "ana")]]]),
@@ -107,13 +108,68 @@ describe("dispatchReminders", () => {
   });
 
   it("does not query per-user data when no window is open", async () => {
-    const store = fakeStore({ usersWithSessionOn: vi.fn(async () => new Set<string>()) });
+    const store = fakeStore({ sessionsInWeekOf: vi.fn(async () => new Map()) });
     const summary = await dispatchReminders({
       now: new Date("2026-10-01T10:00:00-05:00"),
       store,
       sendPush: sendAll(),
     });
     expect(summary.candidates).toBe(0);
-    expect(store.usersWithSessionOn).not.toHaveBeenCalled();
+    expect(store.sessionsInWeekOf).not.toHaveBeenCalled();
+  });
+
+  describe("session reminder and the session goal", () => {
+    // 2026-10-01 is a Thursday; ana has the session reminder at 21:00 and the closeout off.
+    const sessionAt = {
+      listActiveSettings: async () => [
+        {
+          userId: "ana",
+          settings: {
+            ...defaultReminderSettings,
+            sessionEnabled: true,
+            sessionTime: "21:00",
+            closeoutEnabled: false,
+          },
+        },
+      ],
+    };
+    const at = (date: string) => ({ occurredAt: `${date}T15:00:00.000Z` });
+
+    it("reminds while today's sessions are below the goal", async () => {
+      const store = fakeStore({
+        ...sessionAt,
+        sessionsInWeekOf: async () => new Map([["ana", [at("2026-10-01")]]]),
+        sessionGoalsFor: vi.fn(async () => new Map([["ana", { perDay: 2, daysPerWeek: 5 }]])),
+      });
+      const sendPush = sendAll();
+      expect((await dispatchReminders({ now, store, sendPush })).remindersSent).toBe(1);
+      expect(sendPush).toHaveBeenCalledWith(device("d1", "ana"), reminderMessages.session);
+      expect(store.sessionGoalsFor).toHaveBeenCalledWith(["ana"]);
+    });
+
+    it("does not remind once today's goal is met", async () => {
+      const store = fakeStore({
+        ...sessionAt,
+        sessionsInWeekOf: async () => new Map([["ana", [at("2026-10-01")]]]),
+      });
+      expect((await dispatchReminders({ now, store, sendPush: sendAll() })).remindersSent).toBe(0);
+    });
+
+    it("does not remind on a rest day once the week is met", async () => {
+      const store = fakeStore({
+        ...sessionAt,
+        // Monday to Wednesday of that week.
+        sessionsInWeekOf: async () =>
+          new Map([["ana", [at("2026-09-28"), at("2026-09-29"), at("2026-09-30")]]]),
+        sessionGoalsFor: vi.fn(async () => new Map([["ana", { perDay: 1, daysPerWeek: 3 }]])),
+      });
+      expect((await dispatchReminders({ now, store, sendPush: sendAll() })).remindersSent).toBe(0);
+    });
+
+    it("only reads goals for users with a device and an open session window", async () => {
+      const store = fakeStore();
+      await dispatchReminders({ now, store, sendPush: sendAll() });
+      expect(store.sessionGoalsFor).not.toHaveBeenCalled();
+    });
   });
 });

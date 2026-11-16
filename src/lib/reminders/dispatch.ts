@@ -15,7 +15,8 @@ export interface DispatchStore {
   ): Promise<Map<string, Array<{ occurredAt: string }>>>;
   /** user_metadata.session_goal of each user (missing users get the default goal). */
   sessionGoalsFor(userIds: string[]): Promise<Map<string, SessionGoal>>;
-  usersWithCloseoutOn(userIds: string[], localDate: string): Promise<Set<string>>;
+  /** Users with a morning check-in for localDate (the stored "closeout" reminder kind). */
+  usersWithCheckinOn(userIds: string[], localDate: string): Promise<Set<string>>;
   deliveriesOn(userIds: string[], localDate: string): Promise<Map<string, ReminderKind[]>>;
   subscriptionsFor(userIds: string[]): Promise<Map<string, StoredPushSubscription[]>>;
   /** Records the delivery; false when it was already recorded (another run sent it). */
@@ -65,9 +66,9 @@ export async function dispatchReminders({
 
   for (const [localDate, group] of byDate) {
     const userIds = group.map(({ userId }) => userId);
-    const [weekSessions, withCloseout, delivered, subscriptions] = await Promise.all([
+    const [weekSessions, withCheckin, delivered, subscriptions] = await Promise.all([
       store.sessionsInWeekOf(userIds, localDate),
-      store.usersWithCloseoutOn(userIds, localDate),
+      store.usersWithCheckinOn(userIds, localDate),
       store.deliveriesOn(userIds, localDate),
       store.subscriptionsFor(userIds),
     ]);
@@ -98,7 +99,7 @@ export async function dispatchReminders({
         sessionGoalPending:
           !getDayProgress(sessions, localDate, goal).met &&
           !getWeekProgress(sessions, goal, localDate).weekMet,
-        hasCloseoutToday: withCloseout.has(userId),
+        hasCheckinToday: withCheckin.has(userId),
         deliveredToday: delivered.get(userId) ?? [],
       });
 

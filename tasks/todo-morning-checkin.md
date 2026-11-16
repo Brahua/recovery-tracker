@@ -104,7 +104,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/lib/daily-signals.ts` (+ test), `src/lib/recovery-insights.ts`, `src/lib/recovery-calculations.ts`, `src/lib/insights-view-model.ts`, `src/lib/report-view-model.ts`, `src/features/dashboard/overview.tsx` (+ tests)
   - Deps: M1
 
-- [ ] **M6: Recordatorio de la mañana** (S)
+- [x] **M6: Recordatorio de la mañana** (S)
   - Acceptance:
     - texto "¿Cómo amaneciste?"; se envía si hoy no hay registro de la mañana
     - hora guardada > 12:00 se interpreta como 08:00 en la app y en el dispatcher; Ajustes muestra la hora efectiva

@@ -70,10 +70,10 @@ export function createDispatchStore(client: SupabaseClient): DispatchStore {
       return goals;
     },
 
-    async usersWithCloseoutOn(userIds, localDate) {
+    async usersWithCheckinOn(userIds, localDate) {
       const rows = check(
         await client
-          .from("nightly_closeouts")
+          .from("morning_checkins")
           .select("user_id")
           .in("user_id", userIds)
           .eq("date", localDate)

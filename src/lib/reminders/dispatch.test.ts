@@ -6,7 +6,7 @@ import { reminderMessages } from "@/lib/reminders/messages";
 import { defaultReminderSettings } from "@/lib/reminders/settings";
 import type { ReminderKind, StoredPushSubscription } from "@/types/reminders";
 
-const now = new Date("2026-10-01T21:35:00-05:00"); // Lima
+const now = new Date("2026-10-01T08:05:00-05:00"); // Lima
 const device = (id: string, userId: string): StoredPushSubscription => ({
   id,
   userId,
@@ -18,12 +18,12 @@ function fakeStore(overrides: Partial<DispatchStore> = {}) {
   const reserved = new Set<string>();
   const store: DispatchStore = {
     listActiveSettings: async () => [
-      { userId: "ana", settings: { ...defaultReminderSettings } }, // closeout 21:30 on
-      { userId: "beto", settings: { ...defaultReminderSettings, closeoutTime: "23:00" } }, // not yet
+      { userId: "ana", settings: { ...defaultReminderSettings } }, // morning 08:00 on
+      { userId: "beto", settings: { ...defaultReminderSettings, closeoutTime: "09:30" } }, // not yet
     ],
     sessionsInWeekOf: async () => new Map(),
     sessionGoalsFor: vi.fn(async () => new Map()),
-    usersWithCloseoutOn: async () => new Set(),
+    usersWithCheckinOn: async () => new Set(),
     deliveriesOn: async () => new Map<string, ReminderKind[]>(),
     subscriptionsFor: async () => new Map([["ana", [device("d1", "ana"), device("d2", "ana")]]]),
     reserveDelivery: vi.fn(async (userId, kind, date) => {
@@ -68,7 +68,7 @@ describe("dispatchReminders", () => {
   });
 
   it("skips what is already done today or already delivered", async () => {
-    const done = fakeStore({ usersWithCloseoutOn: async () => new Set(["ana"]) });
+    const done = fakeStore({ usersWithCheckinOn: async () => new Set(["ana"]) });
     expect((await dispatchReminders({ now, store: done, sendPush: sendAll() })).remindersSent).toBe(
       0,
     );
@@ -110,7 +110,7 @@ describe("dispatchReminders", () => {
   it("does not query per-user data when no window is open", async () => {
     const store = fakeStore({ sessionsInWeekOf: vi.fn(async () => new Map()) });
     const summary = await dispatchReminders({
-      now: new Date("2026-10-01T10:00:00-05:00"),
+      now: new Date("2026-10-01T12:00:00-05:00"),
       store,
       sendPush: sendAll(),
     });
@@ -119,7 +119,7 @@ describe("dispatchReminders", () => {
   });
 
   describe("session reminder and the session goal", () => {
-    // 2026-10-01 is a Thursday; ana has the session reminder at 21:00 and the closeout off.
+    // 2026-10-01 is a Thursday; ana has the session reminder at 08:00 and the morning one off.
     const sessionAt = {
       listActiveSettings: async () => [
         {
@@ -127,7 +127,7 @@ describe("dispatchReminders", () => {
           settings: {
             ...defaultReminderSettings,
             sessionEnabled: true,
-            sessionTime: "21:00",
+            sessionTime: "08:00",
             closeoutEnabled: false,
           },
         },

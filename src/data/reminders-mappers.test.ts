@@ -8,7 +8,7 @@ describe("reminders mappers", () => {
       sessionEnabled: false,
       sessionTime: "18:00",
       closeoutEnabled: true,
-      closeoutTime: "21:30",
+      closeoutTime: "08:00",
       timeZone: "America/Lima",
     });
   });
@@ -27,7 +27,8 @@ describe("reminders mappers", () => {
       sessionEnabled: true,
       sessionTime: "07:15",
       closeoutEnabled: false,
-      closeoutTime: "22:00",
+      // A night time from the nightly closeout reads as the 08:00 morning reminder.
+      closeoutTime: "08:00",
       timeZone: "America/Lima",
     });
   });

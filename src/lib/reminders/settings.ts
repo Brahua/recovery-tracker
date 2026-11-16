@@ -3,14 +3,28 @@ import { z } from "zod";
 import { recoveryTimeZone } from "@/lib/recovery-date";
 import type { ReminderKind, ReminderSettings } from "@/types/reminders";
 
-/** Starting point until the user saves their own (spec: session off at 18:00, closeout on at 21:30). */
+/**
+ * Starting point until the user saves their own: session off at 18:00, morning check-in on at
+ * 08:00 (the stored "closeout" kind reminds "¿Cómo amaneciste?").
+ */
 export const defaultReminderSettings: ReminderSettings = {
   sessionEnabled: false,
   sessionTime: "18:00",
   closeoutEnabled: true,
-  closeoutTime: "21:30",
+  closeoutTime: "08:00",
   timeZone: recoveryTimeZone,
 };
+
+export const MORNING_REMINDER_FALLBACK_TIME = "08:00";
+
+/**
+ * The morning check-in reminder keeps the nightly closeout's column. A time saved after noon was
+ * meant for the night, so the app reads it as 08:00 until the user picks a new one (no data
+ * migration: saving the settings writes the effective time).
+ */
+export function effectiveMorningReminderTime(time: string) {
+  return minutesOfDay(time) > minutesOfDay("12:00") ? MORNING_REMINDER_FALLBACK_TIME : time;
+}
 
 const timeSchema = z
   .string({ error: "Elige una hora." })
@@ -65,5 +79,5 @@ export function localClock(now: Date, timeZone: string) {
 
 export const reminderLabels: Record<ReminderKind, string> = {
   session: "Sesión del día",
-  closeout: "Cierre nocturno",
+  closeout: "Cómo amaneciste",
 };

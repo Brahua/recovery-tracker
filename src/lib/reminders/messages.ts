@@ -8,10 +8,12 @@ export const reminderMessages: Record<ReminderKind, PushPayload> = {
     url: "/registrar?mode=session",
     tag: "reminder-session",
   },
+  // "closeout" is the stored kind; since the morning check-in replaced the nightly closeout it
+  // reminds "¿Cómo amaneciste?".
   closeout: {
-    title: "Cierra el día",
-    body: "Dolor, energía y sueño antes de dormir.",
-    url: "/registrar?mode=closeout",
+    title: "¿Cómo amaneciste?",
+    body: "Sueño, dolor y rigidez al despertar, en un minuto.",
+    url: "/registrar?mode=morning",
     tag: "reminder-closeout",
   },
 };

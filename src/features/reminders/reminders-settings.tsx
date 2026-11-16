@@ -250,7 +250,7 @@ interface ReminderRowProps {
 
 const reminderDescriptions: Record<ReminderKind, string> = {
   session: "Si a esta hora no registraste ninguna sesión.",
-  closeout: "Si a esta hora no hiciste el cierre del día.",
+  closeout: "Si a esta hora no registraste cómo amaneciste.",
 };
 
 function ReminderRow({ kind, enabled, time, onEnabledChange, onTimeChange }: ReminderRowProps) {

@@ -1,13 +1,6 @@
-"use client";
-
 import Link from "@/components/app-link";
-import { useState } from "react";
 
-import { DeleteRecordDialog } from "@/components/delete-record-dialog";
-import { useActionFeedback } from "@/components/feedback/use-action-feedback";
-import { deleteMorningCheckinAction } from "@/features/check-in/morning-checkin/actions";
 import {
-  formatHistoryDay,
   formatHistoryNumber,
   reboundLabels,
   sleepQualityLabels,
@@ -15,21 +8,8 @@ import {
 } from "@/features/history/history-formatters";
 import type { MorningCheckin } from "@/types/recovery";
 
+// Deleting happens from the edit screen, after a confirmation, like every other record.
 export function HistoryMorningCard({ checkin }: { checkin: MorningCheckin }) {
-  const [confirmDelete, setConfirmDelete] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-  const { pending: deletePending, run } = useActionFeedback();
-
-  function deleteCheckin() {
-    // The action revalidates Historial, so the card disappears on the refreshed page.
-    run(() => deleteMorningCheckinAction(checkin.id), {
-      success: "Registro de la mañana eliminado",
-      fallbackError: "No se pudo eliminar el registro de la mañana.",
-      onSuccess: () => setConfirmDelete(false),
-      onError: (message) => setDeleteError(message || null),
-    });
-  }
-
   return (
     <section className="rr-history-closeout" data-morning-checkin-id={checkin.id}>
       <header>
@@ -53,35 +33,13 @@ export function HistoryMorningCard({ checkin }: { checkin: MorningCheckin }) {
         ) : null}
       </div>
       {checkin.notes && <p>{checkin.notes}</p>}
-      <div className="rr-history-record-actions">
-        <button
-          aria-label="Eliminar registro de la mañana"
-          className="rr-history-edit"
-          onClick={() => {
-            setDeleteError(null);
-            setConfirmDelete(true);
-          }}
-          type="button"
-        >
-          Eliminar
-        </button>
-        <Link
-          aria-label="Editar registro de la mañana"
-          className="rr-history-edit"
-          href={`/registrar/manana/${checkin.id}`}
-        >
-          Editar
-        </Link>
-      </div>
-      <DeleteRecordDialog
-        description={`Cómo amaneciste · ${formatHistoryDay(checkin.date)}`}
-        error={deleteError}
-        onClose={() => setConfirmDelete(false)}
-        onConfirm={deleteCheckin}
-        open={confirmDelete}
-        pending={deletePending}
-        title="¿Eliminar este registro?"
-      />
+      <Link
+        aria-label="Editar registro de la mañana"
+        className="rr-history-edit"
+        href={`/registrar/manana/${checkin.id}`}
+      >
+        Editar
+      </Link>
     </section>
   );
 }

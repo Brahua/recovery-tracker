@@ -145,8 +145,9 @@ test.describe("morning check-in", () => {
     await expect(toast(page, "Registro de la mañana actualizado")).toBeVisible();
     await expect(card.getByText("Dolor al despertar 5/10")).toBeVisible();
 
-    await card.getByRole("button", { name: "Eliminar registro de la mañana" }).click();
-    const dialog = page.getByRole("dialog", { name: "¿Eliminar este registro?" });
+    await card.getByRole("link", { name: "Editar registro de la mañana" }).click();
+    await page.getByRole("button", { name: "Eliminar registro" }).click();
+    const dialog = page.getByRole("dialog", { name: "¿Eliminar este registro de la mañana?" });
     await expect(dialog).toBeVisible();
     await dialog.getByRole("button", { name: "Eliminar", exact: true }).click();
     await expect(toast(page, "Registro de la mañana eliminado")).toBeVisible();

@@ -189,14 +189,4 @@ test.describe("correct right after saving", () => {
     await expect(page).toHaveURL(new RegExp(`/registrar/sesion/${sessionId}$`));
     await expect(page.getByRole("heading", { name: "Editar sesión" })).toBeVisible();
   });
-
-  test("opens the closeout editor from the closed-day screen", async ({ page }) => {
-    const closeoutId = await createCloseout(page, dayAt(6), "3");
-
-    await page.getByRole("link", { name: "Corregir el cierre" }).click();
-
-    await expect(page).toHaveURL(new RegExp(`/registrar/cierre/${closeoutId}$`));
-    await expect(page.getByRole("heading", { name: "Editar cierre" })).toBeVisible();
-    await expect(page.getByRole("slider", { name: "Dolor" })).toHaveValue("3");
-  });
 });

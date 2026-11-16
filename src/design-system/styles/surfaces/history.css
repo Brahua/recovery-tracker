@@ -468,12 +468,6 @@
 }
 
 /* Edit and delete side by side on the morning check-in card. */
-.rr-history-record-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-left: auto;
-}
 
 .rr-history-empty {
   border: 1px solid var(--rr-border);

@@ -25,7 +25,7 @@ Brief original: `recovery_tracker_app_brief.md`. Visión del producto: `docs/ide
 | Backend y datos | **Supabase** (Postgres con RLS, Auth solo con Google OAuth; login anónimo solo en el Supabase local de los tests), usando `@supabase/ssr` directamente, sin API propia |
 | Tests | Vitest (313 tests unitarios), Playwright (E2E críticos, incluido axe de accesibilidad) |
 | CI/CD | GitHub Actions → Supabase + Vercel (trunk-based, igual que `brahua-os`) |
-| Hosting | Vercel: `brahua-lab/recovery-tracker`, en **https://recovery-tracker.brahua.com** |
+| Hosting | Vercel: `brahua-lab/recovery-tracker`, en **https://recovery.brahua.com** |
 | Node | 24 (`.nvmrc`) |
 
 ⚠️ `AGENTS.md` pide leer `node_modules/next/dist/docs/` antes de tocar rutas, formularios o Server Actions, porque Next 16 cambia varias APIs.
@@ -68,7 +68,7 @@ Vienen de `docs/archive/handoffs/session-handoff-2026-07-17.md`:
 - **Última verificación documentada (2026-10-02):** CI en verde en `main` (lint, typecheck, unitarios, E2E críticos con axe) y deploy a producción correcto.
 - **Fase actual:** la validación de uso real se cerró (2026-10-01) y de ella salieron las features ya entregadas. La app de rehabilitación en general (lesión activa, rigidez, tipos de sesión y metas) se entregó el 2026-10-02. El modo demo público (botón en la landing, tres pacientes de ejemplo; `docs/specs/demo-mode-spec.md`) se entregó el 2026-10-03. **No hay una próxima feature elegida**; el portal para fisios tendrá su propia spec.
 - **Backlog:** todo lo pendiente (producto, diseño y técnico), con lo ya hecho verificado contra el código, está en `docs/ideas/recovery-ritual-backlog.md`.
-- **Entornos:** desde el 2026-09-30 el antiguo staging **es producción** (ADR-004). Hay un solo entorno hospedado: Supabase `pevrupenrzueyzidfeah` y https://recovery-tracker.brahua.com (la URL `recovery-tracker-brahua-lab.vercel.app` sigue funcionando). Tiene los datos reales. Para desarrollar y probar se usa Supabase local.
+- **Entornos:** desde el 2026-09-30 el antiguo staging **es producción** (ADR-004). Hay un solo entorno hospedado: Supabase `pevrupenrzueyzidfeah` y https://recovery.brahua.com (la URL `recovery-tracker-brahua-lab.vercel.app` sigue funcionando). Tiene los datos reales. Para desarrollar y probar se usa Supabase local.
 
 ## 5. Cómo empezar a desarrollar
 

@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # recovery-tracker (Recovery Ritual)
 
-Spanish, mobile-first knee rehab tracker. Production: https://recovery-tracker.brahua.com
+Spanish, mobile-first knee rehab tracker. Production: https://recovery.brahua.com
 
 Read first when resuming: `docs/HANDOFF.md` (exact status, work in flight and machine limits), then `RECAP.md`, `docs/deployment.md`, `tasks/todo.md` and the spec of the feature in progress.
 

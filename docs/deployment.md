@@ -13,7 +13,7 @@ Decisión: `docs/decisions/ADR-004-promote-staging-to-production.md`.
 
 | Qué | Valor |
 |---|---|
-| URL pública | https://recovery-tracker.brahua.com |
+| URL pública | https://recovery.brahua.com |
 | URL de Vercel (sigue funcionando) | https://recovery-tracker-brahua-lab.vercel.app |
 | Proyecto de Vercel | `brahua-lab/recovery-tracker` |
 | Proyecto de Supabase | `pevrupenrzueyzidfeah` (antes `recovery-tracker-staging`; ahora es producción) |
@@ -78,7 +78,7 @@ Project → Settings → Environment Variables. Deben ser de tipo **config** (an
 |---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | `https://pevrupenrzueyzidfeah.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | publishable key del proyecto (`sb_publishable_…`) |
-| `NEXT_PUBLIC_SITE_URL` | `https://recovery-tracker.brahua.com` |
+| `NEXT_PUBLIC_SITE_URL` | `https://recovery.brahua.com` |
 
 Como `NEXT_PUBLIC_*` se incrusta en el build, cambiar una de estas variables requiere un deploy nuevo.
 
@@ -100,19 +100,19 @@ y se cargan en Vercel → Project → Settings → Environment Variables, o con 
 
 ### Envío programado de recordatorios
 
-Cada 5 minutos, `pg_cron` en Supabase ejecuta `public.dispatch_reminders()`, que hace `POST https://recovery-tracker.brahua.com/api/reminders/dispatch` con `Authorization: Bearer <secreto>`. El endpoint (con `service_role`) decide a quién avisar y envía. Sin los secretos de Vault la función no hace nada (así es en local y en CI).
+Cada 5 minutos, `pg_cron` en Supabase ejecuta `public.dispatch_reminders()`, que hace `POST https://recovery.brahua.com/api/reminders/dispatch` con `Authorization: Bearer <secreto>`. El endpoint (con `service_role`) decide a quién avisar y envía. Sin los secretos de Vault la función no hace nada (así es en local y en CI).
 
 | Dónde | Nombre | Tipo / valor |
 |---|---|---|
 | Vercel (Production) | `SUPABASE_SERVICE_ROLE_KEY` | **sensitive** · Supabase → Project Settings → API → `service_role` |
 | Vercel (Production) | `REMINDERS_DISPATCH_SECRET` | **sensitive** · `openssl rand -base64 32` |
 | Supabase Vault | `reminders_dispatch_secret` | el mismo valor que `REMINDERS_DISPATCH_SECRET` |
-| Supabase Vault | `reminders_dispatch_url` | `https://recovery-tracker.brahua.com/api/reminders/dispatch` |
+| Supabase Vault | `reminders_dispatch_url` | `https://recovery.brahua.com/api/reminders/dispatch` |
 
 Configurado el 2026-10-01. Vault se carga con la API de administración de Supabase o desde el SQL Editor; el valor nunca va al repo ni se muestra en la conversación:
 
 ```sql
-select vault.create_secret('https://recovery-tracker.brahua.com/api/reminders/dispatch', 'reminders_dispatch_url', 'Reminders endpoint');
+select vault.create_secret('https://recovery.brahua.com/api/reminders/dispatch', 'reminders_dispatch_url', 'Reminders endpoint');
 select vault.create_secret('<EL_MISMO_SECRETO_DE_VERCEL>', 'reminders_dispatch_secret', 'Bearer secret for the reminders endpoint');
 
 -- Para cambiarlo más adelante (y actualizar Vercel con el mismo valor):
@@ -135,17 +135,19 @@ select status_code, content, created from net._http_response order by created de
 select * from public.reminder_deliveries order by sent_at desc limit 20;
 ```
 
-## Dominio `recovery-tracker.brahua.com`
+## Dominio `recovery.brahua.com`
 
-- Agregado al proyecto de Vercel con `vercel domains add recovery-tracker.brahua.com recovery-tracker`.
+- Agregado al proyecto de Vercel con `vercel domains add recovery.brahua.com recovery-tracker` (2026-11-16). Antes la app vivía en `recovery-tracker.brahua.com` (ADR-004); ese registro DNS se renombró y la URL vieja ya no resuelve.
 - El DNS de `brahua.com` está en Hostinger (nameservers `dns-parking.com`), no en Vercel. Registro necesario:
 
   | Tipo | Nombre | Valor |
   |---|---|---|
-  | `CNAME` | `recovery-tracker` | `29be00a8d3fe7ba0.vercel-dns-017.com.` |
+  | `CNAME` | `recovery` | `29be00a8d3fe7ba0.vercel-dns-017.com.` |
 
-  El valor exacto lo da `vercel domains verify recovery-tracker.brahua.com`.
+  El valor exacto lo da `vercel domains verify recovery.brahua.com`.
 - Vercel emite el certificado HTTPS solo cuando el DNS ya apunta a Vercel.
+- `NEXT_PUBLIC_SITE_URL` se incrusta en el build: tras cambiarla en Vercel hace falta un deploy nuevo.
+- Las cookies de sesión, la PWA instalada y las suscripciones push son por dominio: al cambiar de dominio hay que volver a entrar, reinstalar la app y reactivar los avisos.
 
 ## URLs de Auth en Supabase
 
@@ -153,9 +155,9 @@ Google OAuth vuelve a través de Supabase, que valida la URL de retorno. Si la U
 
 Dashboard → Authentication → URL Configuration:
 
-- **Site URL**: `https://recovery-tracker.brahua.com`
+- **Site URL**: `https://recovery.brahua.com`
 - **Redirect URLs**:
-  - `https://recovery-tracker.brahua.com/**`
+  - `https://recovery.brahua.com/**`
   - `https://recovery-tracker-brahua-lab.vercel.app/**` (mientras se use la URL de Vercel)
   - `http://localhost:3000/**` (solo si se quiere hacer login local contra producción)
 
@@ -190,14 +192,14 @@ Solo se crean cuentas de correos invitados (ADR-005). Lo aplica el hook `before_
 
 ## Cabeceras de seguridad
 
-`next.config.ts` aplica a todas las rutas `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Content-Type-Options: nosniff` y `Permissions-Policy`, y quita `X-Powered-By`. Vercel agrega `Strict-Transport-Security`. Comprobar con `curl -sI https://recovery-tracker.brahua.com/`.
+`next.config.ts` aplica a todas las rutas `Content-Security-Policy: frame-ancestors 'none'`, `X-Frame-Options: DENY`, `Referrer-Policy: strict-origin-when-cross-origin`, `X-Content-Type-Options: nosniff` y `Permissions-Policy`, y quita `X-Powered-By`. Vercel agrega `Strict-Transport-Security`. Comprobar con `curl -sI https://recovery.brahua.com/`.
 
 ## Vencimientos y renovaciones
 
 | Qué | Vence | Cómo renovar |
 |---|---|---|
 | `SUPABASE_ACCESS_TOKEN` (secret de GitHub) | **~30 sep 2027** (creado el 2026-10-01 con 1 año; la fecha exacta está en Supabase → Account → Access Tokens) | Ver abajo. Renovar **un mes antes** (inicio de septiembre de 2027) |
-| Certificado HTTPS del dominio | Cada ~90 días | Automático en Vercel mientras el `CNAME` apunte a Vercel. Si el dominio deja de responder por HTTPS: `vercel certs issue recovery-tracker.brahua.com` |
+| Certificado HTTPS del dominio | Cada ~90 días | Automático en Vercel mientras el `CNAME` apunte a Vercel. Si el dominio deja de responder por HTTPS: `vercel certs issue recovery.brahua.com` |
 | Claves VAPID, `SUPABASE_SERVICE_ROLE_KEY`, `REMINDERS_DISPATCH_SECRET` | No vencen | Solo si se filtran: VAPID → regenerar (los dispositivos vuelven a activar notificaciones); `service_role` → rotar en Supabase y actualizar Vercel; secreto del endpoint → `openssl rand -base64 32` en Vercel **y** en Vault (`vault.update_secret`) |
 | `VERCEL_TOKEN` (secret de GitHub) | **No vence** (token `recovery-tracker-staging` en https://vercel.com/account/tokens, creado el 2026-07-18) | Solo si se filtra o se revoca: crear uno nuevo, actualizar el secret, revocar el viejo |
 

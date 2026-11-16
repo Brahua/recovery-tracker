@@ -2,7 +2,7 @@ name: CI/CD
 
 # Trunk-based: short-lived feature branches open PRs against main (CI only).
 # Every push to main runs the same checks and, only if all of them pass, migrates the
-# production Supabase project and deploys to production (https://recovery-tracker.brahua.com).
+# production Supabase project and deploys to production (https://recovery.brahua.com).
 on:
   push:
     branches: [main]

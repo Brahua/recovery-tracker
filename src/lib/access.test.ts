@@ -36,8 +36,8 @@ describe("access", () => {
   });
 
   it("builds the invitation with the email to use and the app link", () => {
-    const message = buildInviteMessage("b@gmail.com", "https://recovery-tracker.brahua.com");
+    const message = buildInviteMessage("b@gmail.com", "https://recovery.brahua.com");
     expect(message).toContain("cuenta de Google (b@gmail.com)");
-    expect(message).toContain("https://recovery-tracker.brahua.com");
+    expect(message).toContain("https://recovery.brahua.com");
   });
 });

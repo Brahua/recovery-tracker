@@ -1,4 +1,4 @@
-import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import type { MorningCheckin, NightlyCloseout, RehabSession } from "@/types/recovery";
 import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 import type { DayProgress, GoalDayStatus, WeekProgress } from "@/lib/session-goal-progress";
 
@@ -12,8 +12,16 @@ function sessionDateKey(session: RehabSession) {
   return getRecoveryDateKey(session.occurredAt);
 }
 
-function buildLoggedDayKeys(sessions: RehabSession[], closeouts: NightlyCloseout[]) {
-  return new Set([...sessions.map(sessionDateKey), ...closeouts.map((closeout) => closeout.date)]);
+function buildLoggedDayKeys(
+  sessions: RehabSession[],
+  closeouts: NightlyCloseout[],
+  checkins: Pick<MorningCheckin, "date">[] = [],
+) {
+  return new Set([
+    ...sessions.map(sessionDateKey),
+    ...closeouts.map((closeout) => closeout.date),
+    ...checkins.map((checkin) => checkin.date),
+  ]);
 }
 
 export interface TodayRitualState {
@@ -142,8 +150,10 @@ export function calculateLoggingStreak(
   sessions: RehabSession[],
   closeouts: NightlyCloseout[],
   now = new Date(),
+  checkins: Pick<MorningCheckin, "date">[] = [],
 ) {
-  const loggedDayKeys = buildLoggedDayKeys(sessions, closeouts);
+  // Soft streak: any record counts (session, morning check-in or an older nightly closeout).
+  const loggedDayKeys = buildLoggedDayKeys(sessions, closeouts, checkins);
   let cursor = dateKey(now);
   let streak = 0;
 

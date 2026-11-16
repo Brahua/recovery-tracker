@@ -1,33 +1,35 @@
 import { describe, expect, it } from "vitest";
 
 import {
-  buildCloseoutSuccessState,
+  buildMorningSuccessState,
   buildSessionSuccessState,
-  resolveSavedCloseout,
   resolveSavedSession,
   resolveRegistrarMode,
 } from "@/lib/registrar-flow";
 import type { DayProgress } from "@/lib/session-goal-progress";
-import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import type { RehabSession } from "@/types/recovery";
 
 const sessions = [{ id: "latest" }, { id: "saved" }] as RehabSession[];
-const closeouts = [{ id: "latest" }, { id: "saved" }] as NightlyCloseout[];
 
 describe("resolveRegistrarMode", () => {
   it("keeps a valid requested mode", () => {
     expect(resolveRegistrarMode("session", false, false)).toBe("session");
-    expect(resolveRegistrarMode("closeout", true, false)).toBe("closeout");
+    expect(resolveRegistrarMode("morning", false, false)).toBe("morning");
+  });
+
+  it("sends old closeout links to the morning check-in", () => {
+    expect(resolveRegistrarMode("closeout", true, false)).toBe("morning");
   });
 
   it("defaults to session while today's session goal is not met", () => {
     expect(resolveRegistrarMode(undefined, false, false)).toBe("session");
   });
 
-  it("defaults to the optional closeout once the goal is met", () => {
-    expect(resolveRegistrarMode(undefined, true, false)).toBe("closeout");
+  it("defaults to the morning check-in once the goal is met and it is missing", () => {
+    expect(resolveRegistrarMode(undefined, true, false)).toBe("morning");
   });
 
-  it("falls back to session when both rituals are already done", () => {
+  it("falls back to session when both are done", () => {
     expect(resolveRegistrarMode(undefined, true, true)).toBe("session");
   });
 });
@@ -39,16 +41,6 @@ describe("resolveSavedSession", () => {
 
   it("keeps backward-compatible latest-session behavior without an id", () => {
     expect(resolveSavedSession(sessions, undefined)?.id).toBe("latest");
-  });
-});
-
-describe("resolveSavedCloseout", () => {
-  it("selects the closeout identified by the save redirect", () => {
-    expect(resolveSavedCloseout(closeouts, "saved")?.id).toBe("saved");
-  });
-
-  it("keeps backward-compatible latest-closeout behavior without an id", () => {
-    expect(resolveSavedCloseout(closeouts, undefined)?.id).toBe("latest");
   });
 });
 
@@ -81,35 +73,20 @@ describe("buildSessionSuccessState", () => {
   });
 });
 
-describe("buildCloseoutSuccessState", () => {
-  it("returns home and offers insights after a complete day", () => {
-    const state = buildCloseoutSuccessState(true, "Resumen del cierre");
+describe("buildMorningSuccessState", () => {
+  it("sends to the session when today has none yet", () => {
+    const state = buildMorningSuccessState(false, "Listo. Amaneciste bastante bien.");
 
-    expect(state.title).toBe("Dia cerrado.");
-    expect(state.body).toBe("Resumen del cierre");
-    expect(state.primaryHref).toBe("/");
-    expect(state.primaryLabel).toBe("Hasta manana");
-    expect(state.secondaryHref).toBe("/insights");
-    expect(state.secondaryLabel).toBe("Ver mi progreso");
-  });
-
-  it("does not describe an incomplete day as closed", () => {
-    const state = buildCloseoutSuccessState(false);
-
-    expect(state.title).toBe("Cierre guardado.");
+    expect(state.title).toBe("Que tengas buen día.");
+    expect(state.body).toBe("Listo. Amaneciste bastante bien.");
     expect(state.primaryHref).toBe("/registrar?mode=session");
-    expect(state.primaryLabel).toBe("Registrar sesion");
-    expect(state.secondaryHref).toBe("/insights");
+    expect(state.primaryLabel).toBe("Empezar sesión");
   });
-});
 
-describe("buildCloseoutSuccessState with a condition", () => {
-  it("names the area of the injury once the day is closed", () => {
-    expect(buildCloseoutSuccessState(true, undefined, "tu rodilla derecha").body).toBe(
-      "No queda nada pendiente. Hoy también cuidaste tu rodilla derecha.",
-    );
-    expect(buildCloseoutSuccessState(true).body).toBe(
-      "No queda nada pendiente. Hoy también cuidaste tu recuperación.",
-    );
+  it("goes back to Hoy when today already has sessions", () => {
+    const state = buildMorningSuccessState(true);
+
+    expect(state.primaryHref).toBe("/");
+    expect(state.secondaryHref).toBe("/insights");
   });
 });

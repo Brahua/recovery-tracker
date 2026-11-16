@@ -71,6 +71,6 @@ describe("createPushSender", () => {
 describe("reminder messages", () => {
   it("open the matching Registrar mode", () => {
     expect(reminderMessages.session.url).toBe("/registrar?mode=session");
-    expect(reminderMessages.closeout.url).toBe("/registrar?mode=closeout");
+    expect(reminderMessages.closeout.url).toBe("/registrar?mode=morning");
   });
 });

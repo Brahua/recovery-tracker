@@ -1,7 +1,7 @@
 import type { DayProgress } from "@/lib/session-goal-progress";
-import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import type { RehabSession } from "@/types/recovery";
 
-export type RegistrarMode = "session" | "closeout";
+export type RegistrarMode = "session" | "morning";
 
 export interface RitualSuccessConfig {
   eyebrow: string;
@@ -17,30 +17,25 @@ export function resolveSavedSession(sessions: RehabSession[], savedSessionId?: s
   return savedSessionId ? sessions.find((session) => session.id === savedSessionId) : sessions[0];
 }
 
-export function resolveSavedCloseout(closeouts: NightlyCloseout[], savedCloseoutId?: string) {
-  return savedCloseoutId
-    ? closeouts.find((closeout) => closeout.id === savedCloseoutId)
-    : closeouts[0];
-}
-
 export function resolveRegistrarMode(
   requestedMode: string | undefined,
   dayGoalMet: boolean,
-  hasCloseoutToday: boolean,
+  hasCheckinToday: boolean,
 ): RegistrarMode {
-  if (requestedMode === "session" || requestedMode === "closeout") {
+  if (requestedMode === "session" || requestedMode === "morning") {
     return requestedMode;
+  }
+
+  // Old links (reminders, bookmarks) still ask for the nightly closeout: it became the morning.
+  if (requestedMode === "closeout") {
+    return "morning";
   }
 
   if (!dayGoalMet) {
     return "session";
   }
 
-  if (!hasCloseoutToday) {
-    return "closeout";
-  }
-
-  return "session";
+  return hasCheckinToday ? "session" : "morning";
 }
 
 /** Success after saving a session, worded against today's session goal. */
@@ -61,23 +56,18 @@ export function buildSessionSuccessState(day: DayProgress, summary?: string): Ri
   };
 }
 
-/** Success after saving a closeout; the day is "closed" only when the session goal is met. */
-export function buildCloseoutSuccessState(
-  dayGoalMet: boolean,
+/** Success after "¿Cómo amaneciste?": back to the day, or straight to the session. */
+export function buildMorningSuccessState(
+  hasSessionToday: boolean,
   summary?: string,
-  areaPhrase?: string,
 ): RitualSuccessConfig {
   return {
-    eyebrow: "Cierre guardado",
-    title: dayGoalMet ? "Dia cerrado." : "Cierre guardado.",
-    body:
-      summary ??
-      (dayGoalMet
-        ? `No queda nada pendiente. Hoy también cuidaste ${areaPhrase ?? "tu recuperación"}.`
-        : "El cierre nocturno quedo registrado. Aún te faltan sesiones para completar el día."),
-    primaryHref: dayGoalMet ? "/" : "/registrar?mode=session",
-    primaryLabel: dayGoalMet ? "Hasta manana" : "Registrar sesion",
-    secondaryHref: "/insights",
-    secondaryLabel: "Ver mi progreso",
+    eyebrow: "Mañana guardada",
+    title: "Que tengas buen día.",
+    body: summary ?? "Listo. Tu mañana quedó registrada.",
+    primaryHref: hasSessionToday ? "/" : "/registrar?mode=session",
+    primaryLabel: hasSessionToday ? "Volver a Hoy" : "Empezar sesión",
+    secondaryHref: hasSessionToday ? "/insights" : "/",
+    secondaryLabel: hasSessionToday ? "Ver insights" : "Volver a Hoy",
   };
 }

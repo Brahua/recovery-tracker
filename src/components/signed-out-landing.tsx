@@ -11,9 +11,9 @@ const benefits = [
     description: "Ejercicios del dia en dos toques.",
   },
   {
-    icon: "moon",
-    title: "Cierre nocturno",
-    description: "Dolor, energia y sueno antes de dormir.",
+    icon: "sun",
+    title: "Cómo amaneciste",
+    description: "Sueño, dolor y rigidez al despertar.",
   },
   {
     icon: "insights",
@@ -53,10 +53,11 @@ function GoogleIcon() {
 }
 
 function BenefitIcon({ name }: { name: BenefitIcon }) {
-  if (name === "moon") {
+  if (name === "sun") {
     return (
       <svg aria-hidden="true" viewBox="0 0 24 24">
-        <path d="M20 15.4A8.5 8.5 0 0 1 8.6 4a8.5 8.5 0 1 0 11.4 11.4Z" />
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4 7 17M17 7l1.4-1.4" />
       </svg>
     );
   }

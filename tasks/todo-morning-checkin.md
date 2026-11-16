@@ -57,16 +57,16 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
 
 ## Fase 2: registro de la mañana
 
-- [ ] **M1: Tabla, tipos y repositorio** (M)
+- [x] **M1: Tabla, tipos y repositorio** (M)
   - Acceptance:
     - migración aditiva `morning_checkins` (columnas de la spec, `unique (user_id, date)`, RLS de 4 políticas, trigger `updated_at`, grants como las demás tablas)
     - tipo `MorningCheckin`, esquema Zod (horas 0–24 de 0,5 en 0,5; calidad 1–5; dolor 0–10; rigidez; rebote opcional; notas)
     - repositorio: listar por rango, obtener, crear, actualizar, eliminar; duplicado de fecha → error legible
   - Verify: unitarios de validación y mappers; CI aplica la migración.
-  - Files: `supabase/migrations/2026111…_morning_checkins.sql`, `src/types/recovery.ts`, `src/lib/validation/recovery.ts` (+ test), `src/data/recovery-log-repository.ts`, `src/data/recovery-log-mappers.ts` (+ test)
+  - Files: `supabase/migrations/20261117000000_morning_checkins.sql`, `src/types/recovery.ts`, `src/lib/validation/recovery.ts` (+ test), `src/data/recovery-log-repository.ts`, `src/data/recovery-log-mappers.ts` (+ test)
   - Deps: Checkpoint A
 
-- [ ] **M2: Formulario "¿Cómo amaneciste?"** (M)
+- [x] **M2: Formulario "¿Cómo amaneciste?"** (M)
   - Acceptance:
     - `/registrar?mode=morning` reemplaza la pestaña "Cierre"; edición en `/registrar/manana/[id]`
     - fecha por defecto hoy, pasadas permitidas, futuras no; una por día
@@ -77,7 +77,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/features/check-in/morning-checkin/{form.tsx,actions.ts}`, `src/lib/morning-checkin-form-state.ts` (+ test), `src/app/(app)/registrar/page.tsx`, `src/app/(app)/registrar/manana/[id]/page.tsx`, `src/design-system/styles/surfaces/closeout.css`
   - Deps: M1
 
-- [ ] **M3: Hoy con el registro de la mañana** (S)
+- [x] **M3: Hoy con el registro de la mañana** (S)
   - Acceptance:
     - tarjeta secundaria "¿Cómo amaneciste? · 1 min" todo el día mientras no exista el de hoy
     - Hoy ya no ofrece el cierre nocturno
@@ -89,13 +89,13 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
 ### Checkpoint B1
 - [ ] PR 3 con CI en verde: el registro de la mañana se guarda y Hoy lo muestra
 
-- [ ] **M4: Historial** (S)
+- [x] **M4: Historial** (S)
   - Acceptance: registros de la mañana como "Cómo amaneciste" en su día, con editar y eliminar; cierres viejos sin cambios.
   - Verify: unitarios de `history-view-model`; e2e en M8.
   - Files: `src/lib/history-view-model.ts` (+ test), `src/features/history/history-morning-card.tsx`, `src/features/history/history-list.tsx`, `src/design-system/styles/surfaces/history.css`
   - Deps: M1
 
-- [ ] **M5: Insights, dashboard y Reporte con ambas fuentes** (L → dividir si pasa de 5 archivos de lógica)
+- [x] **M5: Insights, dashboard y Reporte con ambas fuentes** (L → dividir si pasa de 5 archivos de lógica)
   - Acceptance:
     - `toDailySignals(closeouts, checkins)` alinea rebote (D-1), sueño (D-1→D), dolor y rigidez según la tabla de la spec
     - Insights, gráfico sueño vs. dolor y Reporte consumen `DailySignal`; textos "al despertar" / "al final del día" según el origen
@@ -104,7 +104,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/lib/daily-signals.ts` (+ test), `src/lib/recovery-insights.ts`, `src/lib/recovery-calculations.ts`, `src/lib/insights-view-model.ts`, `src/lib/report-view-model.ts`, `src/features/dashboard/overview.tsx` (+ tests)
   - Deps: M1
 
-- [ ] **M6: Recordatorio de la mañana** (S)
+- [x] **M6: Recordatorio de la mañana** (S)
   - Acceptance:
     - texto "¿Cómo amaneciste?"; se envía si hoy no hay registro de la mañana
     - hora guardada > 12:00 se interpreta como 08:00 en la app y en el dispatcher; Ajustes muestra la hora efectiva
@@ -112,7 +112,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/lib/reminders/{settings,due-reminders,messages}.ts` (+ tests), `src/data/reminders-dispatch-store.ts`, `src/features/reminders/reminders-settings.tsx`
   - Deps: M1, G4
 
-- [ ] **M7: Textos, onboarding y demo** (S)
+- [x] **M7: Textos, onboarding y demo** (S)
   - Acceptance:
     - onboarding, tour, landing y manifest explican el registro de la mañana y la meta; no se habla de "cerrar el día"
     - `seed-data.mjs` genera registros de la mañana y metas 1×7, 2×5 y 1×3
@@ -120,7 +120,7 @@ Regla: en la PC solo `npm run format`, `npm run lint`, `npm run design:check`, `
   - Files: `src/features/onboarding/{onboarding.tsx,tour-steps.ts}`, `src/components/signed-out-landing.tsx`, `src/app/manifest.ts`, `scripts/demo/seed-data.mjs` (+ test)
   - Deps: M2
 
-- [ ] **M8: E2E** (M)
+- [x] **M8: E2E** (M)
   - Acceptance:
     - `morning-checkin.spec.ts`: guardar, rebote condicional, duplicado de fecha, editar
     - `nightly-closeout.spec.ts` pasa a cubrir solo ver y editar un cierre viejo

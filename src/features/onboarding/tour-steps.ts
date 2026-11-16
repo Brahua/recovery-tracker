@@ -1,5 +1,5 @@
 // The tour shown on /bienvenida: one card per part of the app, in the order a day goes.
-export type TourIcon = "today" | "session" | "closeout" | "history" | "insights" | "install";
+export type TourIcon = "today" | "session" | "morning" | "history" | "insights" | "install";
 
 export interface TourStep {
   icon: TourIcon;
@@ -13,7 +13,7 @@ export const tourSteps: TourStep[] = [
     icon: "today",
     kicker: "Hoy",
     title: "Tu día en un vistazo.",
-    body: "Hoy te dice qué toca: la sesión de ejercicios y el cierre de la noche. El anillo se completa con las dos y la racha suma cada día que registras.",
+    body: "Hoy te dice qué toca según tu meta: cuántas sesiones al día y cuántos días a la semana. El anillo se llena con las sesiones del día y la racha suma cada día que registras algo.",
   },
   {
     icon: "session",
@@ -22,16 +22,16 @@ export const tourSteps: TourStep[] = [
     body: "Empieza desde una rutina o agrega ejercicios del catálogo, con series, repeticiones y peso. Si fuiste al centro, marca los tratamientos que te hicieron.",
   },
   {
-    icon: "closeout",
-    kicker: "Cierre nocturno",
-    title: "Cierra el día antes de dormir.",
-    body: "Dolor, rigidez, ánimo y sueño en un minuto. Así ves cómo responde tu cuerpo a lo que hiciste.",
+    icon: "morning",
+    kicker: "Cómo amaneciste",
+    title: "Un minuto al despertar.",
+    body: "Cómo dormiste, cómo amaneció tu cuerpo y si se resintió por la sesión de ayer. Es opcional, pero así ves cómo responde a lo que hiciste.",
   },
   {
     icon: "history",
     kicker: "Historial",
     title: "Todo queda guardado.",
-    body: "Cada sesión y cada cierre quedan en Historial. Si te equivocaste en algo, ábrelo y corrígelo.",
+    body: "Cada sesión y cada mañana quedan en Historial. Si te equivocaste en algo, ábrelo y corrígelo.",
   },
   {
     icon: "insights",
@@ -43,6 +43,6 @@ export const tourSteps: TourStep[] = [
     icon: "install",
     kicker: "Ajustes",
     title: "Tenla siempre a mano.",
-    body: "Agrégala a la pantalla de inicio y activa los recordatorios para no olvidar la sesión ni el cierre. Un día a la vez.",
+    body: "Agrégala a la pantalla de inicio, ajusta tu meta de sesiones y activa los recordatorios. Un día a la vez.",
   },
 ];

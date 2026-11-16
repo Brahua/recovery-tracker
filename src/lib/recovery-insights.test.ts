@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { toDailySignals } from "@/lib/daily-signals";
 
 import {
   buildAppointmentQuestions,
@@ -78,42 +79,56 @@ describe("medical report insights", () => {
   });
 
   it("detects rebound-related exercise repetition", () => {
-    const text = buildReboundAssociationReport(sessions, closeouts, 7, "2026-07-10T12:00:00.000Z");
+    const text = buildReboundAssociationReport(
+      sessions,
+      toDailySignals(closeouts),
+      7,
+      "2026-07-10T12:00:00.000Z",
+    );
 
     expect(text).toContain("coincidieron con rebote");
     expect(text).toContain("Step-up");
   });
 
   it("summarizes sleep and energy conservatively", () => {
-    const text = buildSleepEnergyReport(closeouts, 7, "2026-07-10T12:00:00.000Z");
+    const text = buildSleepEnergyReport(toDailySignals(closeouts), 7, "2026-07-10T12:00:00.000Z");
 
     expect(text).toContain("sueno promedio");
     expect(text).toContain("energia promedio");
   });
 
   it("summarizes stiffness only from closeouts that recorded it", () => {
-    expect(buildStiffnessReport(closeouts, 7, "2026-07-10T12:00:00.000Z")).toBeUndefined();
+    expect(
+      buildStiffnessReport(toDailySignals(closeouts), 7, "2026-07-10T12:00:00.000Z"),
+    ).toBeUndefined();
 
     const withStiffness: NightlyCloseout[] = [
       { ...closeouts[0]!, stiffnessLevel: "STRONG" },
       { ...closeouts[1]!, stiffnessLevel: "MILD" },
     ];
-    expect(buildStiffnessReport(withStiffness, 7, "2026-07-10T12:00:00.000Z")).toBe(
-      "La rigidez fue bastante o mucha en 1 de 2 cierres con rigidez registrada.",
+    expect(buildStiffnessReport(toDailySignals(withStiffness), 7, "2026-07-10T12:00:00.000Z")).toBe(
+      "La rigidez fue bastante o mucha en 1 de 2 registros con rigidez registrada.",
     );
     expect(
       buildStiffnessReport(
-        [{ ...closeouts[1]!, stiffnessLevel: "NONE" }],
+        toDailySignals([{ ...closeouts[1]!, stiffnessLevel: "NONE" }]),
         7,
         "2026-07-10T12:00:00.000Z",
       ),
-    ).toBe("No hubo rigidez marcada (bastante o mucha) en 1 cierre con rigidez registrada.");
+    ).toBe("No hubo rigidez marcada (bastante o mucha) en 1 registro con rigidez registrada.");
   });
 
   it("creates a medical report summary with questions and notes", () => {
-    const summary = createMedicalReportSummary(sessions, closeouts, 7, "2026-07-10T12:00:00.000Z");
+    const summary = createMedicalReportSummary(
+      sessions,
+      toDailySignals(closeouts),
+      7,
+      "2026-07-10T12:00:00.000Z",
+    );
 
-    expect(summary.highPainDays).toEqual([{ date: "2026-07-08", pain: 6 }]);
+    expect(summary.highPainDays).toEqual([
+      { date: "2026-07-08", pain: 6, source: "closeout", label: "Dolor al final del día" },
+    ]);
     expect(summary.noteHighlights[0]).toContain("Dolor alto");
     expect(summary.appointmentQuestions.length).toBeGreaterThan(0);
   });
@@ -137,7 +152,9 @@ describe("medical report insights", () => {
         ],
       },
       averagePain: 6,
-      highPainDays: [{ date: "2026-07-10", pain: 7 }],
+      highPainDays: [
+        { date: "2026-07-10", pain: 7, source: "closeout", label: "Dolor al final del día" },
+      ],
       sessionResponseText: "En 7 dias hubo 2 sesiones.",
       reboundAssociationText:
         "Las sesiones que coincidieron con rebote fueron 1. Los ejercicios que mas se repiten en ese grupo son: Step-up.",
@@ -146,9 +163,7 @@ describe("medical report insights", () => {
       appointmentQuestions: [],
     });
 
-    expect(questions).toContain(
-      "Que cambios recientes conviene revisar si el dolor de cierre va subiendo?",
-    );
+    expect(questions).toContain("Que cambios recientes conviene revisar si el dolor va subiendo?");
     expect(questions).toContain(
       "Estos ejercicios o combinaciones merecen algun ajuste cuando aparece rebote?",
     );

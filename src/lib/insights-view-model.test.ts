@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { toDailySignals } from "@/lib/daily-signals";
 
 import { buildFourWeekSessionCounts, buildReboundDistribution } from "@/lib/insights-view-model";
 import type { NightlyCloseout, RehabSession } from "@/types/recovery";
@@ -60,13 +61,15 @@ describe("buildFourWeekSessionCounts", () => {
 
 describe("buildReboundDistribution", () => {
   it("combines moderate and strong rebound into the affirmative bucket", () => {
-    const result = buildReboundDistribution([
-      closeoutWith("1", "NONE"),
-      closeoutWith("2", "NONE"),
-      closeoutWith("3", "MILD"),
-      closeoutWith("4", "MODERATE"),
-      closeoutWith("5", "STRONG"),
-    ]);
+    const result = buildReboundDistribution(
+      toDailySignals([
+        closeoutWith("1", "NONE"),
+        closeoutWith("2", "NONE"),
+        closeoutWith("3", "MILD"),
+        closeoutWith("4", "MODERATE"),
+        closeoutWith("5", "STRONG"),
+      ]),
+    );
 
     expect(result).toEqual([
       { label: "Sin rebote", count: 2, percentage: 40, tone: "none" },

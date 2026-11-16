@@ -2,24 +2,22 @@ import { redirect } from "next/navigation";
 
 import { ImmersiveMarker } from "@/components/app-shell";
 import { ToastOnMount } from "@/components/feedback/toast-on-mount";
-import { DayClosedState } from "@/components/day-closed-state";
+import { MorningSavedState } from "@/components/morning-saved-state";
 import { SessionSavedState } from "@/components/session-saved-state";
-import { NightlyCloseoutForm } from "@/features/check-in/nightly-closeout/form";
+import { MorningCheckinForm } from "@/features/check-in/morning-checkin/form";
 import { PostTherapyForm } from "@/features/check-in/post-therapy/form";
 import { parseCondition } from "@/lib/validation/condition";
-import { conditionAreaPhrase } from "@/lib/condition";
 import { loadExerciseLibrary } from "@/lib/exercise-library";
+import { getMorningCheckinDateError } from "@/lib/morning-checkin-date";
 import { loadRecoveryPageData } from "@/lib/recovery-page-data";
-import { getCloseoutDateError } from "@/lib/closeout-date";
 import {
-  buildCloseoutSuccessState,
+  buildMorningSuccessState,
   buildSessionSuccessState,
-  resolveSavedCloseout,
   resolveSavedSession,
   resolveRegistrarMode,
 } from "@/lib/registrar-flow";
 import { calculateLoggingStreak } from "@/lib/today-view-model";
-import { getRecoveryDateKey } from "@/lib/recovery-date";
+import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 import { sessionGoalFromMetadata } from "@/lib/session-goal";
 import { getDayProgress } from "@/lib/session-goal-progress";
 
@@ -37,7 +35,8 @@ export default async function RegistrarPage({
 }) {
   const resolvedSearchParams = await searchParams;
   const pageData = await loadRecoveryPageData({ limit: null });
-  const { supabaseEnv, user, recentSessions, recentCloseouts, hasCloseoutToday } = pageData;
+  const { supabaseEnv, user, recentSessions, rangeCloseouts, rangeCheckins, todayCheckin } =
+    pageData;
 
   if (!supabaseEnv || !user) {
     redirect("/");
@@ -50,97 +49,67 @@ export default async function RegistrarPage({
     today,
     sessionGoalFromMetadata(user.user_metadata),
   );
-  const requestedCloseoutDate = getSingleSearchParam(resolvedSearchParams, "date");
-  const selectedCloseoutDate =
-    requestedCloseoutDate && !getCloseoutDateError(requestedCloseoutDate, today)
-      ? requestedCloseoutDate
-      : today;
-  const selectedDayData =
-    selectedCloseoutDate === today
-      ? pageData
-      : await loadRecoveryPageData({
-          from: selectedCloseoutDate,
-          limit: null,
-          to: selectedCloseoutDate,
-        });
-  const selectedSession = selectedDayData.recentSessions.find(
-    (session) => getRecoveryDateKey(session.occurredAt) === selectedCloseoutDate,
-  );
-  const selectedCloseout = selectedDayData.recentCloseouts.find(
-    (closeout) => closeout.date === selectedCloseoutDate,
-  );
-
   const requestedMode = getSingleSearchParam(resolvedSearchParams, "mode");
-  const mode = resolveRegistrarMode(requestedMode, todayProgress.met, hasCloseoutToday);
+  const mode = resolveRegistrarMode(requestedMode, todayProgress.met, Boolean(todayCheckin));
+
   const sessionSuccessMessage = getSingleSearchParam(resolvedSearchParams, "sessionSummary");
   const sessionSaved = getSingleSearchParam(resolvedSearchParams, "sessionSaved") === "1";
   const savedSessionId = getSingleSearchParam(resolvedSearchParams, "sessionId");
   const sessionErrorMessage = getSingleSearchParam(resolvedSearchParams, "sessionError");
-  const nightlySuccessMessage = getSingleSearchParam(resolvedSearchParams, "nightlySummary");
-  const nightlySaved = getSingleSearchParam(resolvedSearchParams, "nightlySaved") === "1";
-  const savedCloseoutId = getSingleSearchParam(resolvedSearchParams, "closeoutId");
-  const nightlyErrorMessage = getSingleSearchParam(resolvedSearchParams, "nightlyError");
+  const morningSaved = getSingleSearchParam(resolvedSearchParams, "morningSaved") === "1";
+  const savedCheckinId = getSingleSearchParam(resolvedSearchParams, "checkinId");
+  const morningSummary = getSingleSearchParam(resolvedSearchParams, "morningSummary");
   const showSessionSuccess = mode === "session" && sessionSaved && !sessionErrorMessage;
-  const showNightlySuccess = mode === "closeout" && nightlySaved && !nightlyErrorMessage;
-  const streak = calculateLoggingStreak(recentSessions, recentCloseouts);
+  const showMorningSuccess = mode === "morning" && morningSaved;
+  const streak = calculateLoggingStreak(recentSessions, rangeCloseouts, new Date(), rangeCheckins);
   const savedSession = resolveSavedSession(recentSessions, savedSessionId);
-  const savedCloseout = resolveSavedCloseout(
-    [...recentCloseouts, ...selectedDayData.recentCloseouts],
-    savedCloseoutId,
+
+  // The morning form asks about the day the patient woke up (?date=, never in the future).
+  const requestedDate = getSingleSearchParam(resolvedSearchParams, "date");
+  const selectedDate =
+    mode === "morning" && requestedDate && !getMorningCheckinDateError(requestedDate, today)
+      ? requestedDate
+      : today;
+  const dayBefore = addRecoveryDays(selectedDate, -1);
+  // The default range covers the last 30 days; an older date needs its own small query.
+  const olderDateData =
+    mode === "morning" && !showMorningSuccess && selectedDate < addRecoveryDays(today, -29)
+      ? await loadRecoveryPageData({ from: dayBefore, to: selectedDate, limit: null })
+      : null;
+  const sessionsAround = olderDateData?.rangeSessions ?? pageData.rangeSessions;
+  const checkinsAround = olderDateData?.rangeCheckins ?? rangeCheckins;
+  const hadSessionsDayBefore = sessionsAround.some(
+    (session) => getRecoveryDateKey(session.occurredAt) === dayBefore,
   );
-  const closeoutSession = savedCloseout
-    ? [...recentSessions, ...selectedDayData.recentSessions].find(
-        (session) => getRecoveryDateKey(session.occurredAt) === savedCloseout.date,
-      )
-    : undefined;
-  const showSessionForm = mode === "session" && !showSessionSuccess && !showNightlySuccess;
+  const existingCheckin = checkinsAround.find((checkin) => checkin.date === selectedDate);
+
+  const showSessionForm = mode === "session" && !showSessionSuccess;
   const { catalog, routines } = showSessionForm
     ? await loadExerciseLibrary()
     : { catalog: [], routines: [] };
-  const successState = showSessionSuccess
-    ? buildSessionSuccessState(todayProgress, sessionSuccessMessage)
-    : showNightlySuccess
-      ? buildCloseoutSuccessState(
-          savedCloseout
-            ? getDayProgress(
-                savedCloseout.date === selectedCloseoutDate
-                  ? selectedDayData.recentSessions
-                  : recentSessions,
-                savedCloseout.date,
-                sessionGoalFromMetadata(user.user_metadata),
-              ).met
-            : false,
-          nightlySuccessMessage,
-          conditionAreaPhrase(condition),
-        )
-      : null;
+  const hasSessionToday = todayProgress.count > 0;
 
   return (
     <>
-      {showSessionSuccess || showNightlySuccess ? <ImmersiveMarker /> : null}
+      {showSessionSuccess || showMorningSuccess ? <ImmersiveMarker /> : null}
       {showSessionSuccess ? (
         <ToastOnMount message="Sesión guardada" onceKey={`session:${savedSessionId ?? "latest"}`} />
       ) : null}
-      {showNightlySuccess ? (
+      {showMorningSuccess ? (
         <ToastOnMount
-          message="Cierre guardado"
-          onceKey={`closeout:${savedCloseoutId ?? selectedCloseoutDate}`}
+          message="Mañana guardada"
+          onceKey={`morning:${savedCheckinId ?? selectedDate}`}
         />
       ) : null}
-      {showSessionSuccess && successState ? (
+      {showSessionSuccess ? (
         <SessionSavedState
-          {...successState}
+          {...buildSessionSuccessState(todayProgress, sessionSuccessMessage)}
           dayProgress={todayProgress}
           session={savedSession}
           streak={streak}
         />
-      ) : showNightlySuccess && successState && savedCloseout ? (
-        <DayClosedState
-          {...successState}
-          closeout={savedCloseout}
-          session={closeoutSession}
-          streak={streak}
-        />
+      ) : showMorningSuccess ? (
+        <MorningSavedState {...buildMorningSuccessState(hasSessionToday, morningSummary)} />
       ) : (
         <div>
           {mode === "session" ? (
@@ -153,14 +122,12 @@ export default async function RegistrarPage({
               recentSessions={recentSessions}
             />
           ) : (
-            <NightlyCloseoutForm
+            <MorningCheckinForm
               condition={condition}
-              defaultOccurredAt={new Date().toISOString()}
-              errorMessage={nightlyErrorMessage}
-              recentCloseouts={recentCloseouts}
-              selectedCloseout={selectedCloseout}
-              selectedDate={selectedCloseoutDate}
-              selectedSession={selectedSession}
+              existingCheckin={existingCheckin}
+              hadSessionsDayBefore={hadSessionsDayBefore}
+              selectedDate={selectedDate}
+              today={today}
             />
           )}
         </div>

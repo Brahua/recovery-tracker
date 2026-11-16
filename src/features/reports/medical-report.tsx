@@ -9,7 +9,8 @@ import type { SessionGoal } from "@/lib/session-goal";
 import { splitGoals } from "@/lib/goals";
 import { getRecoveryDateKey } from "@/lib/recovery-date";
 import type { RecoveryGoal } from "@/types/goals";
-import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import type { DailySignal } from "@/lib/daily-signals";
+import type { RehabSession } from "@/types/recovery";
 
 const shortDateFormatter = new Intl.DateTimeFormat("es-PE", {
   day: "numeric",
@@ -73,7 +74,8 @@ function ReportCard({
 interface MedicalReportProps {
   now: string;
   recentSessions: RehabSession[];
-  recentCloseouts: NightlyCloseout[];
+  /** Older nightly closeouts and morning check-ins, as one series (lib/daily-signals). */
+  signals: DailySignal[];
   windowDays: 7 | 14 | 30;
   /** The injury of the account; shown under the title. */
   condition?: Condition | null;
@@ -86,19 +88,13 @@ interface MedicalReportProps {
 export function MedicalReport({
   now,
   recentSessions,
-  recentCloseouts,
+  signals,
   windowDays,
   condition,
   goals = [],
   sessionGoal,
 }: MedicalReportProps) {
-  const report = createReportViewModel(
-    recentSessions,
-    recentCloseouts,
-    windowDays,
-    now,
-    sessionGoal,
-  );
+  const report = createReportViewModel(recentSessions, signals, windowDays, now, sessionGoal);
   const { summary } = report;
   const line = painPolyline(summary.painTrend.points);
   const conditionLine = conditionSummary(condition, getRecoveryDateKey(now));
@@ -194,7 +190,7 @@ export function MedicalReport({
                   <div key={day.date}>
                     <strong>{day.pain}</strong>
                     <span>{formatDate(day.date, "long")}</span>
-                    <small>Dolor de cierre registrado</small>
+                    <small>{day.label}</small>
                   </div>
                 ))
               ) : (
@@ -253,16 +249,21 @@ export function MedicalReport({
             <p className="rr-report-copy">{summary.reboundAssociationText}</p>
           </ReportCard>
 
-          <ReportCard number="04" title="Sueno y energia">
+          <ReportCard
+            number="04"
+            title={report.averageEnergy === undefined ? "Sueño" : "Sueño y energía"}
+          >
             <div className="rr-report-stats">
               <div>
                 <strong>{formatNumber(report.averageSleepHours)} h</strong>
                 <span>sueno medio</span>
               </div>
-              <div>
-                <strong>{formatNumber(report.averageEnergy)}/5</strong>
-                <span>energia media al cierre</span>
-              </div>
+              {report.averageEnergy === undefined ? null : (
+                <div>
+                  <strong>{formatNumber(report.averageEnergy)}/5</strong>
+                  <span>energia media al cierre</span>
+                </div>
+              )}
             </div>
             <p className="rr-report-copy">{summary.sleepEnergyText}</p>
             {summary.stiffnessText ? (

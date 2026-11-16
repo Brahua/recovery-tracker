@@ -8,7 +8,7 @@ import { toast } from "./exercise-helpers";
 const SCREENS = [
   "/",
   "/registrar?mode=session",
-  "/registrar?mode=closeout",
+  "/registrar?mode=morning",
   "/historial",
   "/insights",
   "/reporte",

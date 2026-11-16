@@ -467,6 +467,8 @@
   line-height: 1.5;
 }
 
+/* Edit and delete side by side on the morning check-in card. */
+
 .rr-history-empty {
   border: 1px solid var(--rr-border);
   border-radius: 17px;

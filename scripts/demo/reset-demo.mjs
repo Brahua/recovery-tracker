@@ -97,6 +97,7 @@ async function wipeUserData(userId) {
   for (const table of [
     "rehab_sessions",
     "nightly_closeouts",
+    "morning_checkins",
     "routines",
     "recovery_goals",
     "exercises",
@@ -241,6 +242,20 @@ async function loadDataset(userId, data) {
   );
 
   await insertRows(
+    "morning_checkins",
+    data.checkins.map((checkin) => ({
+      user_id: userId,
+      date: checkin.date,
+      sleep_hours: checkin.sleepHours,
+      sleep_quality: checkin.sleepQuality,
+      waking_pain: checkin.wakingPain,
+      stiffness_level: checkin.stiffnessLevel,
+      rebound_pain_level: checkin.reboundPainLevel,
+      notes: checkin.notes ?? null,
+    })),
+  );
+
+  await insertRows(
     "recovery_goals",
     data.goals.map((goal) => ({
       user_id: userId,
@@ -254,7 +269,7 @@ async function loadDataset(userId, data) {
 async function resetProfile(profileId) {
   const profile = demoProfiles[profileId];
   const data = buildDemoDataset(profileId, today);
-  const counts = `${data.sessions.length} sesiones, ${data.closeouts.length} cierres, ${data.catalog.length} ejercicios, ${data.routines.length} rutinas, ${data.goals.length} metas`;
+  const counts = `${data.sessions.length} sesiones, ${data.closeouts.length} cierres, ${data.checkins.length} registros de la mañana, ${data.catalog.length} ejercicios, ${data.routines.length} rutinas, ${data.goals.length} metas`;
 
   if (dryRun) {
     console.log(`[dry-run] ${profile.title}: ${counts}`);
@@ -277,6 +292,7 @@ async function resetProfile(profileId) {
         kind: profile.condition.kind,
         startedOn: addDays(today, -profile.condition.startedDaysAgo),
       },
+      session_goal: data.sessionGoal,
       onboarding_completed_at: new Date().toISOString(),
       preferences: { theme: "dark", accent: "green" },
     },

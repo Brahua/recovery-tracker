@@ -25,7 +25,7 @@ export function DemoPicker({ disabled }: { disabled: boolean }) {
       <ModalSheet onClose={() => setOpen(false)} open={open} title="Modo demo">
         <p className="rr-demo-intro">
           Elige un paciente y recorre la app con semanas de registros ya cargados: sesiones,
-          cierres, historial, insights y reporte.
+          mañanas, historial, insights y reporte.
         </p>
         <ul className="rr-demo-list">
           {demoProfileIds.map((id) => {

@@ -1,5 +1,6 @@
 import { normalizeExerciseName } from "@/lib/exercise-name";
-import type { NightlyCloseout, RehabSession, ReboundLevel } from "@/types/recovery";
+import { hasRebound, type DailySignal } from "@/lib/daily-signals";
+import type { RehabSession, ReboundLevel } from "@/types/recovery";
 import { addRecoveryDays, getRecoveryDateKey } from "@/lib/recovery-date";
 
 export type TrendDirection = "UP" | "DOWN" | "STABLE" | "NO_DATA";
@@ -37,6 +38,7 @@ export interface WeeklyLoadSummary {
 export interface ReboundSummary {
   windowDays: number;
   sessionCount: number;
+  /** Signals in the window that answered the rebound question. */
   closeoutCount: number;
   reboundCount: number;
   strongReboundCount: number;
@@ -100,22 +102,22 @@ export function filterSessionsByRange(sessions: RehabSession[], range: DateRange
   return sessions.filter((session) => inRange(getSessionDateKey(session), range));
 }
 
-export function filterCloseoutsByRange(closeouts: NightlyCloseout[], range: DateRangeWindow) {
-  return closeouts.filter((closeout) => inRange(closeout.date, range));
+export function filterSignalsByRange(signals: DailySignal[], range: DateRangeWindow) {
+  return signals.filter((signal) => inRange(signal.date, range));
 }
 
 export function calculatePainTrend(
-  closeouts: NightlyCloseout[],
+  signals: DailySignal[],
   windowDays: number,
   referenceDate?: Date | string,
 ): PainTrendSummary {
   const range = getDateRangeForLastDays(windowDays, referenceDate);
-  const filtered = filterCloseoutsByRange(closeouts, range).sort((left, right) =>
+  const filtered = filterSignalsByRange(signals, range).sort((left, right) =>
     left.date.localeCompare(right.date),
   );
-  const points = filtered.map((closeout) => ({
-    date: closeout.date,
-    pain: closeout.endOfDayPain,
+  const points = filtered.map((signal) => ({
+    date: signal.date,
+    pain: signal.pain,
   }));
 
   if (points.length === 0) {
@@ -171,45 +173,44 @@ export function calculateWeeklyLoad(
 
 export function calculateReboundSummary(
   sessions: RehabSession[],
-  closeouts: NightlyCloseout[],
+  signals: DailySignal[],
   windowDays = 7,
   referenceDate?: Date | string,
 ): ReboundSummary {
   const range = getDateRangeForLastDays(windowDays, referenceDate);
   const recentSessions = filterSessionsByRange(sessions, range);
-  const recentCloseouts = filterCloseoutsByRange(closeouts, range).sort((left, right) =>
-    right.date.localeCompare(left.date),
-  );
-  const reboundCloseouts = recentCloseouts.filter(
-    (closeout) => closeout.reboundPainLevel !== "NONE",
-  );
+  // A rebound belongs to the day of the sessions it answers to (the day before, for a morning).
+  const answered = signals
+    .filter((signal) => signal.rebound !== undefined && inRange(signal.reboundDate ?? "", range))
+    .sort((left, right) => (right.reboundDate ?? "").localeCompare(left.reboundDate ?? ""));
+  const withRebound = answered.filter(hasRebound);
 
   return {
     windowDays,
     sessionCount: recentSessions.length,
-    closeoutCount: recentCloseouts.length,
-    reboundCount: reboundCloseouts.length,
-    strongReboundCount: reboundCloseouts.filter(
-      (closeout) => closeout.reboundPainLevel === "STRONG",
-    ).length,
+    closeoutCount: answered.length,
+    reboundCount: withRebound.length,
+    strongReboundCount: withRebound.filter((signal) => signal.rebound === "STRONG").length,
     reboundRate: roundToOneDecimal(
-      recentSessions.length > 0 ? reboundCloseouts.length / recentSessions.length : undefined,
+      recentSessions.length > 0 ? withRebound.length / recentSessions.length : undefined,
     ),
-    latestReboundLevel: recentCloseouts[0]?.reboundPainLevel,
+    latestReboundLevel: answered[0]?.rebound,
   };
 }
 
 export function calculateSleepPainComparison(
-  closeouts: NightlyCloseout[],
+  signals: DailySignal[],
   windowDays = 14,
   referenceDate?: Date | string,
 ): SleepPainSummary {
   const range = getDateRangeForLastDays(windowDays, referenceDate);
-  const filtered = filterCloseoutsByRange(closeouts, range);
-  const lowSleep = filtered.filter((closeout) => closeout.sleepHours < 6);
-  const adequateSleep = filtered.filter((closeout) => closeout.sleepHours >= 6);
-  const lowSleepPainAverage = average(lowSleep.map((closeout) => closeout.endOfDayPain));
-  const adequateSleepPainAverage = average(adequateSleep.map((closeout) => closeout.endOfDayPain));
+  // Each signal pairs a night with the pain that followed it (on waking, or at the end of an older
+  // closeout's day).
+  const filtered = filterSignalsByRange(signals, range);
+  const lowSleep = filtered.filter((signal) => signal.sleepHours < 6);
+  const adequateSleep = filtered.filter((signal) => signal.sleepHours >= 6);
+  const lowSleepPainAverage = average(lowSleep.map((signal) => signal.pain));
+  const adequateSleepPainAverage = average(adequateSleep.map((signal) => signal.pain));
   const painDelta =
     typeof lowSleepPainAverage === "number" && typeof adequateSleepPainAverage === "number"
       ? lowSleepPainAverage - adequateSleepPainAverage

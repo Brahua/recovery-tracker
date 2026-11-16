@@ -1,4 +1,8 @@
-import { defaultReminderSettings, toReminderTime } from "@/lib/reminders/settings";
+import {
+  defaultReminderSettings,
+  effectiveMorningReminderTime,
+  toReminderTime,
+} from "@/lib/reminders/settings";
 import type { ReminderSettings, StoredPushSubscription } from "@/types/reminders";
 
 export const reminderSettingsColumns =
@@ -32,7 +36,7 @@ export function mapReminderSettingsRow(
     sessionEnabled: row.session_enabled,
     sessionTime: toReminderTime(row.session_time),
     closeoutEnabled: row.closeout_enabled,
-    closeoutTime: toReminderTime(row.closeout_time),
+    closeoutTime: effectiveMorningReminderTime(toReminderTime(row.closeout_time)),
     timeZone: row.timezone,
   };
 }

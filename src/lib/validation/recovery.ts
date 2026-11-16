@@ -214,6 +214,20 @@ export const createNightlyCloseoutInputSchema = z.object({
     .optional(),
 });
 
+export const createMorningCheckinInputSchema = z.object({
+  date: requiredDateSchema,
+  sleepHours: z
+    .number()
+    .min(0)
+    .max(24)
+    .refine((value) => Number.isInteger(value * 2), "Usa pasos de media hora."),
+  sleepQuality: rating1To5Schema,
+  wakingPain: painScoreSchema,
+  stiffnessLevel: z.enum(stiffnessLevels),
+  reboundPainLevel: reboundLevelSchema.optional(),
+  notes: optionalTextSchema,
+});
+
 // Ids of saved sessions and closeouts that arrive from the client.
 export const recordIdSchema = z.uuid();
 

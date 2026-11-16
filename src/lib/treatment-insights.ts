@@ -1,6 +1,7 @@
 import { getRecoveryDateKey } from "@/lib/recovery-date";
 import { treatmentLabel } from "@/lib/treatments";
-import type { NightlyCloseout, RehabSession, SessionTreatment } from "@/types/recovery";
+import { hasRebound, type DailySignal } from "@/lib/daily-signals";
+import type { RehabSession, SessionTreatment } from "@/types/recovery";
 
 /** Sessions needed with a treatment before comparing it against physio sessions without it. */
 export const minTreatmentSessionsForComparison = 3;
@@ -21,7 +22,7 @@ export interface TreatmentResponseItem {
   painDeltaWith?: number;
   /** Same, in physio sessions without it. */
   painDeltaWithout?: number;
-  /** Share (0–100) of sessions with a closeout that day reporting rebound. */
+  /** Share (0–100) of sessions with a rebound answer for that day that report rebound. */
   reboundRateWith?: number;
   reboundRateWithout?: number;
 }
@@ -82,16 +83,20 @@ export function calculateTreatmentFrequency(sessions: RehabSession[]): Treatment
 }
 
 /**
- * Compares each treatment against the other physio sessions: pain change during
- * the session and rebound reported in that day's closeout.
+ * Compares each treatment against the other physio sessions: pain change during the session and
+ * the rebound reported for that day (in its closeout, or the next morning's check-in).
  */
 export function calculateTreatmentResponse(
   sessions: RehabSession[],
-  closeouts: NightlyCloseout[],
+  signals: DailySignal[],
 ): TreatmentResponseItem[] {
   const physioSessions = sessions.filter((session) => session.sessionType === "PHYSIOTHERAPY");
   const reboundByDate = new Map(
-    closeouts.map((closeout) => [closeout.date, closeout.reboundPainLevel !== "NONE"]),
+    signals.flatMap((signal) =>
+      signal.rebound && signal.reboundDate
+        ? [[signal.reboundDate, hasRebound(signal)] as const]
+        : [],
+    ),
   );
 
   function summarize(group: RehabSession[]) {

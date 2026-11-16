@@ -9,7 +9,12 @@ import {
 import { formatSessionGoal, sessionGoalFromMetadata } from "@/lib/session-goal";
 import { getDayProgress, getWeekProgress, type WeekProgress } from "@/lib/session-goal-progress";
 import type { RecoveryGoal } from "@/types/goals";
-import type { LatestTherapistNotes, NightlyCloseout, RehabSession } from "@/types/recovery";
+import type {
+  LatestTherapistNotes,
+  MorningCheckin,
+  NightlyCloseout,
+  RehabSession,
+} from "@/types/recovery";
 import { getRecoveryDateKey, recoveryTimeZone } from "@/lib/recovery-date";
 import { formatTreatmentCount } from "@/lib/treatments";
 import { GoalsCard } from "@/features/goals/goals-card";
@@ -29,12 +34,16 @@ const shortDateFormatter = new Intl.DateTimeFormat("es-PE", {
   month: "short",
 });
 
-const reboundLabels: Record<NightlyCloseout["reboundPainLevel"], string> = {
-  NONE: "sin rebote",
-  MILD: "rebote leve",
-  MODERATE: "rebote moderado",
-  STRONG: "rebote fuerte",
+const stiffnessLabels: Record<MorningCheckin["stiffnessLevel"], string> = {
+  NONE: "sin rigidez",
+  MILD: "un poco de rigidez",
+  MODERATE: "bastante rigidez",
+  STRONG: "mucha rigidez",
 };
+
+function formatHours(value: number) {
+  return Number.isInteger(value) ? `${value}` : value.toFixed(1).replace(".", ",");
+}
 
 function capitalize(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
@@ -145,8 +154,9 @@ interface TodayOverviewProps {
   /** Every session and closeout of the last 30 days: the week, the goal and the streak. */
   rangeSessions: RehabSession[];
   rangeCloseouts: NightlyCloseout[];
+  /** Morning check-ins of the last 30 days, newest first. */
+  rangeCheckins: MorningCheckin[];
   recentSessions: RehabSession[];
-  recentCloseouts: NightlyCloseout[];
   /** Notes from the latest physio session; shown until the next one. */
   therapistNotes: LatestTherapistNotes | null;
   goals: RecoveryGoal[];
@@ -156,15 +166,15 @@ interface TodayOverviewProps {
 export function TodayOverview({
   rangeSessions,
   rangeCloseouts,
+  rangeCheckins,
   recentSessions,
-  recentCloseouts,
   therapistNotes,
   goals,
   user,
 }: TodayOverviewProps) {
   const now = new Date();
   const todayKey = getRecoveryDateKey(now);
-  const hasCloseoutToday = rangeCloseouts.some((closeout) => closeout.date === todayKey);
+  const todayCheckin = rangeCheckins.find((checkin) => checkin.date === todayKey);
   const condition = parseCondition(user.user_metadata?.condition);
   const goal = sessionGoalFromMetadata(user.user_metadata);
   const dayProgress = getDayProgress(rangeSessions, todayKey, goal);
@@ -172,22 +182,23 @@ export function TodayOverview({
   const state = getTodayRitualState({
     day: dayProgress,
     week: weekProgress,
-    hasCloseoutToday,
+    hasCheckinToday: Boolean(todayCheckin),
     areaPhrase: conditionAreaPhrase(condition),
   });
   const conditionLine = conditionSummary(condition, todayKey);
   const week = buildRecentWeek(weekProgress, now);
-  const streak = calculateLoggingStreak(rangeSessions, rangeCloseouts, now);
+  const streak = calculateLoggingStreak(rangeSessions, rangeCloseouts, now, rangeCheckins);
   const loggedDays = Math.min(
     30,
     new Set([
       ...rangeSessions.map((session) => getRecoveryDateKey(session.occurredAt)),
       ...rangeCloseouts.map((closeout) => closeout.date),
+      ...rangeCheckins.map((checkin) => checkin.date),
     ]).size,
   );
   const milestoneProgress = Math.round((loggedDays / 30) * 100);
   const latestSession = recentSessions[0];
-  const latestCloseout = recentCloseouts[0];
+  const latestCheckin = rangeCheckins[0];
   const firstName = getUserDisplayName(user) ?? "Tu";
 
   return (
@@ -245,13 +256,13 @@ export function TodayOverview({
               </b>
             </article>
 
-            <article className={hasCloseoutToday ? "is-complete" : "is-pending"}>
-              <span className="rr-ritual-dot">{hasCloseoutToday ? "✓" : ""}</span>
+            <article className={todayCheckin ? "is-complete" : "is-pending"}>
+              <span className="rr-ritual-dot">{todayCheckin ? "✓" : ""}</span>
               <div>
-                <strong>Cierre nocturno</strong>
-                <small>Opcional · dolor, sueño y rebote</small>
+                <strong>Cómo amaneciste</strong>
+                <small>Opcional · sueño, dolor y rigidez</small>
               </div>
-              <b>{hasCloseoutToday ? "Hecho" : "Opcional"}</b>
+              <b>{todayCheckin ? "Hecho" : "1 min"}</b>
             </article>
           </div>
 
@@ -270,6 +281,15 @@ export function TodayOverview({
         </section>
 
         <aside className="rr-today-rail">
+          {todayCheckin ? null : (
+            <PreviewLink
+              glyph="☀"
+              href="/registrar?mode=morning"
+              subtitle="Sueño, dolor y rigidez al despertar · 1 min"
+              title="¿Cómo amaneciste?"
+            />
+          )}
+
           {therapistNotes ? <TherapistNotesCard notes={therapistNotes} /> : null}
 
           <GoalsCard goals={goals} />
@@ -305,16 +325,16 @@ export function TodayOverview({
               </span>
             </article>
             <article>
-              <small>Ultimo cierre</small>
+              <small>Última mañana</small>
               <strong>
-                {latestCloseout
-                  ? shortDateFormatter.format(new Date(`${latestCloseout.date}T00:00:00`))
-                  : "Sin cierres"}
+                {latestCheckin
+                  ? shortDateFormatter.format(new Date(`${latestCheckin.date}T00:00:00`))
+                  : "Sin registros"}
               </strong>
               <span>
-                {latestCloseout
-                  ? `Dolor ${latestCloseout.endOfDayPain}/10 · ${reboundLabels[latestCloseout.reboundPainLevel]}`
-                  : "Tu primer cierre aparecera aqui."}
+                {latestCheckin
+                  ? `Dormiste ${formatHours(latestCheckin.sleepHours)} h · dolor ${latestCheckin.wakingPain}/10 · ${stiffnessLabels[latestCheckin.stiffnessLevel]}`
+                  : "Cuéntanos cómo amaneciste y aparecerá aquí."}
               </span>
             </article>
           </section>

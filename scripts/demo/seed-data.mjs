@@ -2,10 +2,17 @@
 // the same profile and the same "today" always give the same data, and every date is relative to
 // today, so the demo never looks stale. Plain ESM so it runs under `node`; covered by
 // scripts/demo/seed-data.test.mjs, which checks every row against the database constraints.
+//
+// Daily check-ins: days older than CHECKIN_WINDOW_DAYS get a nightly closeout (the legacy history
+// the app still reads); the last CHECKIN_WINDOW_DAYS days, up to yesterday, get a morning check-in
+// instead (docs/specs/morning-checkin-and-daily-goal-spec.md). Today stays free to log.
 
 /** @typedef {"knee" | "ankle" | "shoulder"} ProfileId */
 
 const LIMA_UTC_OFFSET = "-05:00";
+
+/** Morning check-ins cover the last 14 days (today-14 … yesterday); older days have closeouts. */
+export const CHECKIN_WINDOW_DAYS = 14;
 
 // ---------------------------------------------------------------- dates and randomness
 
@@ -20,8 +27,21 @@ export function addDays(dateKey, days) {
 }
 
 /** 0 = Monday … 6 = Sunday. */
-function weekday(dateKey) {
+export function weekday(dateKey) {
   return (new Date(`${dateKey}T00:00:00.000Z`).getUTCDay() + 6) % 7;
+}
+
+/** Monday of the (Monday to Sunday) week of the day. */
+export function weekStart(dateKey) {
+  return addDays(dateKey, -weekday(dateKey));
+}
+
+/** Whole weeks between the week of `dateKey` and the week of `today` (0 = this week). */
+function weeksAgo(dateKey, today) {
+  const days =
+    (Date.parse(`${weekStart(today)}T00:00:00Z`) - Date.parse(`${weekStart(dateKey)}T00:00:00Z`)) /
+    86_400_000;
+  return Math.round(days / 7);
 }
 
 function mulberry32(seed) {
@@ -90,6 +110,9 @@ const profiles = {
     sleepQuality: [2.0, 4.0],
     energy: [2.4, 4.0],
     flares: [{ daysAgo: 22, length: 3, bump: 2.2, note: "Me pasé caminando y se hinchó." }],
+    // Weeks (0 = this one) in which only the physio visits happen: the session goal is missed.
+    lapseWeeksAgo: [3],
+    sessionGoal: { perDay: 1, daysPerWeek: 5 },
     catalog: {
       heel_slide: {
         name: "Deslizamiento de talón",
@@ -227,6 +250,13 @@ const profiles = {
       "Dormí con una almohada bajo la rodilla.",
       "Caminé más de lo planeado, mañana descanso.",
     ],
+    morningNotes: [
+      "Desperté con la rodilla algo hinchada, se fue al rato.",
+      "Dormí de corrido, sin almohada bajo la rodilla.",
+      "Me costó doblarla los primeros minutos.",
+      "Bajé las escaleras sin agarrarme de la baranda.",
+      "Me desperté una vez por una puntada, después nada.",
+    ],
     goals: [
       { title: "Caminar 30 minutos seguidos", createdDaysAgo: 40, achievedDaysAgo: 12 },
       { title: "Dormir sin molestia en la rodilla", createdDaysAgo: 40, achievedDaysAgo: 5 },
@@ -244,6 +274,10 @@ const profiles = {
     sleepQuality: [2.4, 4.0],
     energy: [2.6, 4.0],
     flares: [{ daysAgo: 13, length: 2, bump: 2.4, note: "Pisé mal en una vereda y se hinchó." }],
+    lapseWeeksAgo: [2],
+    // Two blocks a day: skipping one already misses the day, so they skip less.
+    skipRate: 0.05,
+    sessionGoal: { perDay: 2, daysPerWeek: 5 },
     catalog: {
       abc: { name: "Alfabeto con el pie", sets: 2, reps: [2, 3], to: 0.5 },
       circles: { name: "Círculos de tobillo", sets: 3, reps: [10, 20] },
@@ -291,9 +325,27 @@ const profiles = {
       ];
       const strength = ["bike", "squat", "calf_raise", "balance", "unstable", "hop"];
       const home = p < 0.3 ? early : band;
-      if (day === 0 || day === 2) return [{ type: "HOME", at: [8, 0], keys: home }];
+      // After the first days the physio asks for two short blocks a day on weekdays (the goal
+      // is 2 × 5): a morning mobility block and an evening one, balance once out of the boot.
+      const twice = p > 0.15;
+      const mobility = {
+        type: "MOBILITY",
+        at: [7, 30],
+        keys: ["circles", "dorsi", "calf_stretch"],
+      };
+      const balance =
+        p > 0.3
+          ? {
+              type: "BALANCE",
+              at: [20, 0],
+              keys: ["balance", "unstable", "calf_raise", "calf_stretch"],
+            }
+          : { type: "MOBILITY", at: [20, 0], keys: ["abc", "towel", "calf_stretch"] };
+      if (day === 0 || day === 2)
+        return [{ type: "HOME", at: [8, 0], keys: home }, ...(twice ? [balance] : [])];
       if (day === 1 || day === 3)
         return [
+          ...(twice ? [mobility] : []),
           {
             type: "PHYSIOTHERAPY",
             at: [16, 30],
@@ -301,13 +353,9 @@ const profiles = {
           },
         ];
       if (day === 4)
-        return [
-          {
-            type: p > 0.75 ? "GYM" : "HOME",
-            at: [p > 0.75 ? 18 : 8, 0],
-            keys: p > 0.75 ? strength : home,
-          },
-        ];
+        return p > 0.75
+          ? [mobility, { type: "GYM", at: [18, 0], keys: strength }]
+          : [{ type: "HOME", at: [8, 0], keys: home }, ...(twice ? [balance] : [])];
       if (day === 5) {
         return p > 0.3 && p < 0.85
           ? [{ type: "HYDROTHERAPY", at: [10, 30], keys: ["pool_walk"] }]
@@ -389,6 +437,13 @@ const profiles = {
       "Un poco de calor y dolor por la tarde.",
       "Caminé sin cojear por primera vez.",
     ],
+    morningNotes: [
+      "El tobillo amaneció rígido, se soltó con los círculos.",
+      "Pisé firme al levantarme, sin dolor.",
+      "Algo hinchado por la mañana, nada raro.",
+      "Me desperté con calambre en el gemelo.",
+      "Primeros pasos con cuidado, después bien.",
+    ],
     goals: [
       { title: "Caminar sin muletas", createdDaysAgo: 34, achievedDaysAgo: 20 },
       { title: "Estar de pie en el trabajo sin dolor", createdDaysAgo: 30, achievedDaysAgo: 4 },
@@ -406,6 +461,8 @@ const profiles = {
     sleepQuality: [1.5, 3.5],
     energy: [2.2, 3.6],
     flares: [{ daysAgo: 30, length: 4, bump: 1.8, note: "Dormí mal y cargué una bolsa pesada." }],
+    lapseWeeksAgo: [1],
+    sessionGoal: { perDay: 1, daysPerWeek: 3 },
     catalog: {
       pendulum: { name: "Péndulo de Codman", sets: 2, reps: [15, 20], to: 0.55 },
       scap_ret: { name: "Retracción escapular", sets: 3, reps: [12, 15] },
@@ -570,6 +627,13 @@ const profiles = {
       "Noche mejor, sin despertares.",
       "Cargué la mochila y lo noté en la noche.",
     ],
+    morningNotes: [
+      "Me desperté dos veces por el hombro.",
+      "Pude dormir un rato de lado.",
+      "Hombro duro al despertar, mejoró con la ducha caliente.",
+      "Dormí con la almohada bajo el brazo y amanecí mejor.",
+      "Sin dolor al levantar el brazo para vestirme.",
+    ],
     goals: [
       { title: "Peinarme sin dolor", createdDaysAgo: 60, achievedDaysAgo: 18 },
       { title: "Dormir de lado sin despertarme", createdDaysAgo: 60, achievedDaysAgo: null },
@@ -617,6 +681,43 @@ export function buildDemoDataset(profileId, today = limaToday()) {
   const random = mulberry32(hashString(`${profileId}:${today}`));
   const sessions = [];
   const closeouts = [];
+  const checkins = [];
+  /** The day before, for the rebound of a morning check-in. */
+  let previous = null;
+
+  const sleepHours = (p, poorNight) =>
+    clamp(
+      Math.round(
+        (lerp(config.sleepHours[0], config.sleepHours[1], p) -
+          (poorNight ? 0.8 : 0) +
+          (random() - 0.5) * 1.4) *
+          2,
+      ) / 2,
+      3,
+      10,
+    );
+  const sleepQuality = (p, poorNight) =>
+    clamp(
+      Math.round(
+        lerp(config.sleepQuality[0], config.sleepQuality[1], p) -
+          (poorNight ? 1 : 0) +
+          (random() - 0.5) * 1.4,
+      ),
+      1,
+      5,
+    );
+  const stiffness = (p, flaring) =>
+    rebound[
+      clamp(
+        Math.round(
+          lerp(config.stiffness[0], config.stiffness[1], p) +
+            (flaring ? 1 : 0) +
+            (random() - 0.5) * 1.2,
+        ),
+        0,
+        3,
+      )
+    ];
 
   for (let daysAgo = config.span; daysAgo >= 1; daysAgo -= 1) {
     const date = addDays(today, -daysAgo);
@@ -629,10 +730,16 @@ export function buildDemoDataset(profileId, today = limaToday()) {
       lerp(config.pain[0], config.pain[1], 1 - (1 - p) ** 1.8) + bump + (random() - 0.5) * 0.8;
 
     const day = weekday(date);
-    // Rest days happen: a few planned home sessions are skipped, but never the physio visits.
+    // Rest days happen: a few planned home sessions are skipped, but never the physio visits. In a
+    // lapse week (a busy one) only the physio visits happen, so the session goal is missed.
+    const lapse = config.lapseWeeksAgo.includes(weeksAgo(date, today));
     const planned = config
       .plan(p, day)
-      .filter((item) => item.type === "PHYSIOTHERAPY" || random() > 0.1 || Boolean(flare));
+      .filter(
+        (item) =>
+          item.type === "PHYSIOTHERAPY" ||
+          (!lapse && (random() > (config.skipRate ?? 0.1) || Boolean(flare))),
+      );
 
     let lastAfter;
     planned.forEach((item, index) => {
@@ -660,6 +767,7 @@ export function buildDemoDataset(profileId, today = limaToday()) {
             WALK: 2,
             HYDROTHERAPY: 2,
             MOBILITY: 1.6,
+            BALANCE: 2.2,
             BREATHING: 1,
           }[item.type] +
             p * 0.8 +
@@ -695,13 +803,50 @@ export function buildDemoDataset(profileId, today = limaToday()) {
       });
     });
 
-    // The closeout skips the odd night, except yesterday's and around a flare.
+    const hadSessions = planned.length > 0;
+    const yesterday = previous;
+    previous = {
+      hadSessions,
+      lastAfter,
+      flare: Boolean(flare),
+      flareNote: flare && daysAgo === flare.daysAgo ? flare.note : undefined,
+    };
+
+    // Both kinds of check-in skip the odd day, except yesterday's and around a flare.
     if (!flare && daysAgo > 1 && random() < 0.08) continue;
-    const endPain = clamp(
-      Math.round(base + (planned.length > 0 ? 0.3 : 0) + (random() - 0.5)),
-      0,
-      10,
-    );
+
+    if (daysAgo <= CHECKIN_WINDOW_DAYS) {
+      // The morning of `date`: the sleep is the night before, the pain is on waking (a little
+      // below the day's level) and the rebound answers to yesterday's sessions, if there were any.
+      const poorNight = Boolean(flare) || Boolean(yesterday?.flare);
+      const wakingPain = clamp(Math.round(base - 0.4 + (random() - 0.5)), 0, 10);
+      const reboundPainLevel = yesterday?.hadSessions
+        ? rebound[
+            clamp(
+              wakingPain - (yesterday.lastAfter ?? wakingPain) + (yesterday.flare ? 1 : 0),
+              0,
+              3,
+            )
+          ]
+        : null;
+      checkins.push({
+        date,
+        sleepHours: sleepHours(p, poorNight),
+        sleepQuality: sleepQuality(p, poorNight),
+        wakingPain,
+        stiffnessLevel: stiffness(p, Boolean(flare)),
+        reboundPainLevel,
+        // What set off a flare is told the morning after.
+        notes: yesterday?.flareNote
+          ? yesterday.flareNote
+          : random() < 0.22
+            ? pick(random, config.morningNotes)
+            : undefined,
+      });
+      continue;
+    }
+
+    const endPain = clamp(Math.round(base + (hadSessions ? 0.3 : 0) + (random() - 0.5)), 0, 10);
     const diff = endPain - (lastAfter ?? endPain);
     const closedHour = 21 + Math.floor(random() * 3);
     closeouts.push({
@@ -714,38 +859,10 @@ export function buildDemoDataset(profileId, today = limaToday()) {
         1,
         5,
       ),
-      sleepHours: clamp(
-        Math.round(
-          (lerp(config.sleepHours[0], config.sleepHours[1], p) -
-            (flare ? 0.8 : 0) +
-            (random() - 0.5) * 1.4) *
-            2,
-        ) / 2,
-        3,
-        10,
-      ),
-      sleepQuality: clamp(
-        Math.round(
-          lerp(config.sleepQuality[0], config.sleepQuality[1], p) -
-            (flare ? 1 : 0) +
-            (random() - 0.5) * 1.4,
-        ),
-        1,
-        5,
-      ),
+      sleepHours: sleepHours(p, Boolean(flare)),
+      sleepQuality: sleepQuality(p, Boolean(flare)),
       reboundPainLevel: rebound[clamp(diff + (flare ? 1 : 0), 0, 3)],
-      stiffnessLevel:
-        rebound[
-          clamp(
-            Math.round(
-              lerp(config.stiffness[0], config.stiffness[1], p) +
-                (flare ? 1 : 0) +
-                (random() - 0.5) * 1.2,
-            ),
-            0,
-            3,
-          )
-        ],
+      stiffnessLevel: stiffness(p, Boolean(flare)),
       closedTime: `${pad(closedHour)}:${pad(Math.floor(random() * 60))}:00`,
       notes:
         flare && daysAgo === flare.daysAgo
@@ -798,5 +915,13 @@ export function buildDemoDataset(profileId, today = limaToday()) {
         : `${addDays(today, -goal.achievedDaysAgo)}T20:00:00${LIMA_UTC_OFFSET}`,
   }));
 
-  return { catalog, routines, sessions, closeouts, goals };
+  return {
+    catalog,
+    routines,
+    sessions,
+    closeouts,
+    checkins,
+    goals,
+    sessionGoal: { ...config.sessionGoal },
+  };
 }

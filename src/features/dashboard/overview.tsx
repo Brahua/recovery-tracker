@@ -5,8 +5,8 @@ import {
   calculateRecentExerciseFrequency,
   calculateReboundSummary,
   calculateSleepPainComparison,
-  filterCloseoutsByRange,
   filterSessionsByRange,
+  filterSignalsByRange,
   getDateRangeForLastDays,
   type PainTrendPoint,
 } from "@/lib/recovery-calculations";
@@ -21,7 +21,8 @@ import {
   minTreatmentSessionsForComparison,
   type TreatmentResponseItem,
 } from "@/lib/treatment-insights";
-import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import type { DailySignal } from "@/lib/daily-signals";
+import type { RehabSession } from "@/types/recovery";
 
 type InsightsRange = "four-weeks" | "all";
 
@@ -138,8 +139,9 @@ function WeeklyLoadChart({ sessions, now }: { sessions: RehabSession[]; now: str
   );
 }
 
-function ReboundChart({ closeouts }: { closeouts: NightlyCloseout[] }) {
-  const distribution = buildReboundDistribution(closeouts);
+function ReboundChart({ signals }: { signals: DailySignal[] }) {
+  const distribution = buildReboundDistribution(signals);
+  const answered = signals.filter((signal) => signal.rebound !== undefined).length;
 
   return (
     <div>
@@ -158,20 +160,22 @@ function ReboundChart({ closeouts }: { closeouts: NightlyCloseout[] }) {
       </div>
       <p className="rr-insights-caption">
         <strong>
-          {distribution[0]?.count ?? 0} de {closeouts.length}
+          {distribution[0]?.count ?? 0} de {answered}
         </strong>{" "}
-        cierres sin rebote
+        registros sin rebote
       </p>
     </div>
   );
 }
 
-function SleepPainChart({ closeouts }: { closeouts: NightlyCloseout[] }) {
-  if (closeouts.length < 2) {
-    return <EmptyChart>Se necesitan al menos dos cierres para comparar sueño y dolor.</EmptyChart>;
+function SleepPainChart({ signals }: { signals: DailySignal[] }) {
+  if (signals.length < 2) {
+    return (
+      <EmptyChart>Se necesitan al menos dos registros para comparar sueño y dolor.</EmptyChart>
+    );
   }
 
-  const ordered = [...closeouts].sort((left, right) => left.date.localeCompare(right.date));
+  const ordered = [...signals].sort((left, right) => left.date.localeCompare(right.date));
   const sleepLine = buildPolyline(
     ordered.map((item) => item.sleepHours),
     420,
@@ -180,7 +184,7 @@ function SleepPainChart({ closeouts }: { closeouts: NightlyCloseout[] }) {
     9,
   );
   const painLine = buildPolyline(
-    ordered.map((item) => item.endOfDayPain),
+    ordered.map((item) => item.pain),
     420,
     90,
     0,
@@ -296,31 +300,27 @@ interface RecoveryDashboardProps {
   now: string;
   range: InsightsRange;
   recentSessions: RehabSession[];
-  recentCloseouts: NightlyCloseout[];
+  /** Older nightly closeouts and morning check-ins, as one series (lib/daily-signals). */
+  signals: DailySignal[];
 }
 
-export function RecoveryDashboard({
-  now,
-  range,
-  recentSessions,
-  recentCloseouts,
-}: RecoveryDashboardProps) {
+export function RecoveryDashboard({ now, range, recentSessions, signals }: RecoveryDashboardProps) {
   const rangeDays = range === "all" ? 36_500 : 28;
   const selectedWindow = getDateRangeForLastDays(rangeDays, now);
   const selectedSessions = filterSessionsByRange(recentSessions, selectedWindow);
-  const selectedCloseouts = filterCloseoutsByRange(recentCloseouts, selectedWindow);
-  const pain = calculatePainTrend(selectedCloseouts, rangeDays, now);
+  const selectedSignals = filterSignalsByRange(signals, selectedWindow);
+  const pain = calculatePainTrend(selectedSignals, rangeDays, now);
   const sleepWindow = getDateRangeForLastDays(14, now);
-  const sleepCloseouts = filterCloseoutsByRange(selectedCloseouts, sleepWindow);
-  const sleepPain = calculateSleepPainComparison(selectedCloseouts, 14, now);
+  const sleepSignals = filterSignalsByRange(selectedSignals, sleepWindow);
+  const sleepPain = calculateSleepPainComparison(selectedSignals, 14, now);
   const exercises = calculateRecentExerciseFrequency(selectedSessions, rangeDays, now);
   const hasPhysioSessions = selectedSessions.some(
     (session) => session.sessionType === "PHYSIOTHERAPY",
   );
-  const treatmentResponse = calculateTreatmentResponse(selectedSessions, selectedCloseouts);
+  const treatmentResponse = calculateTreatmentResponse(selectedSessions, selectedSignals);
   const weeklyStory = [
-    buildPainTrendInsight(calculatePainTrend(recentCloseouts, 7, now)),
-    buildReboundInsight(calculateReboundSummary(recentSessions, recentCloseouts, 7, now)),
+    buildPainTrendInsight(calculatePainTrend(signals, 7, now)),
+    buildReboundInsight(calculateReboundSummary(recentSessions, signals, 7, now)),
     buildSleepPainInsight(sleepPain),
   ].join(" ");
   const delta = pain.delta;
@@ -377,7 +377,7 @@ export function RecoveryDashboard({
           </InsightCard>
 
           <InsightCard title="Rebote">
-            <ReboundChart closeouts={selectedCloseouts} />
+            <ReboundChart signals={selectedSignals} />
           </InsightCard>
 
           <InsightCard title="Sueño y dolor">
@@ -385,7 +385,7 @@ export function RecoveryDashboard({
               <span>● Sueño</span>
               <span>● Dolor</span>
             </div>
-            <SleepPainChart closeouts={sleepCloseouts} />
+            <SleepPainChart signals={sleepSignals} />
             <p className="rr-insights-caption">{buildSleepPainInsight(sleepPain)}</p>
           </InsightCard>
 
@@ -397,8 +397,8 @@ export function RecoveryDashboard({
             <InsightCard title="Tratamientos del centro">
               <TreatmentResponse items={treatmentResponse} />
               <p className="rr-insights-caption">
-                Cambio medio de dolor (despues − antes) y noches con rebote, en sesiones de fisio
-                con y sin cada tratamiento. Es una coincidencia, no una causa.
+                Cambio medio de dolor (despues − antes) y rebote reportado, en sesiones de fisio con
+                y sin cada tratamiento. Es una coincidencia, no una causa.
               </p>
             </InsightCard>
           ) : null}

@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { HistoryCloseoutCard } from "@/features/history/history-closeout-card";
 import { formatHistoryDay, formatHistoryRange } from "@/features/history/history-formatters";
+import { HistoryMorningCard } from "@/features/history/history-morning-card";
 import { HistorySessionCard } from "@/features/history/history-session-card";
 import { getHistoryDaySummary, type HistoryDay } from "@/lib/history-view-model";
 
@@ -43,7 +44,7 @@ export function HistoryList({
         {days.length === 0 ? (
           <section className="rr-history-empty">
             <strong>No hay actividad en este periodo</strong>
-            <p>Cuando registres una sesión o un cierre del día, aparecerá aquí.</p>
+            <p>Cuando registres una sesión o cómo amaneciste, aparecerá aquí.</p>
           </section>
         ) : (
           <div className="rr-history-days">
@@ -56,6 +57,7 @@ export function HistoryList({
                 </header>
 
                 <div className="rr-history-events">
+                  {day.morningCheckin && <HistoryMorningCard checkin={day.morningCheckin} />}
                   {day.sessions.map((session) => (
                     <HistorySessionCard
                       expanded={expandedSessionId === session.id}

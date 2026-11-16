@@ -6,7 +6,7 @@ import {
   getHistoryHrefForDate,
   getHistoryWindow,
 } from "@/lib/history-view-model";
-import type { NightlyCloseout, RehabSession } from "@/types/recovery";
+import type { MorningCheckin, NightlyCloseout, RehabSession } from "@/types/recovery";
 
 function session(
   id: string,
@@ -40,6 +40,19 @@ function closeout(date: string): NightlyCloseout {
     reboundPainLevel: "MILD",
     createdAt: `${date}T23:30:00.000Z`,
     updatedAt: `${date}T23:30:00.000Z`,
+  };
+}
+
+function checkin(date: string): MorningCheckin {
+  return {
+    id: `checkin-${date}`,
+    date,
+    sleepHours: 7,
+    sleepQuality: 4,
+    wakingPain: 2,
+    stiffnessLevel: "MILD",
+    createdAt: `${date}T12:30:00.000Z`,
+    updatedAt: `${date}T12:30:00.000Z`,
   };
 }
 
@@ -90,10 +103,24 @@ describe("buildHistoryDays", () => {
   it("includes days that only contain a nightly closeout", () => {
     expect(buildHistoryDays([], [closeout("2026-07-10")])).toHaveLength(1);
   });
+
+  it("puts each morning check-in on the day it was recorded", () => {
+    const days = buildHistoryDays(
+      [session("one", "2026-07-16T14:00:00.000Z")],
+      [],
+      [checkin("2026-07-16"), checkin("2026-07-18")],
+    );
+
+    expect(days.map((day) => day.date)).toEqual(["2026-07-18", "2026-07-16"]);
+    expect(days[0]?.morningCheckin?.id).toBe("checkin-2026-07-18");
+    expect(days[0]?.sessions).toEqual([]);
+    expect(days[1]?.morningCheckin?.id).toBe("checkin-2026-07-16");
+    expect(days[1]?.sessions.map((item) => item.id)).toEqual(["one"]);
+  });
 });
 
 describe("getHistoryDaySummary", () => {
-  it("summarizes sessions, exercises, and closeout presence", () => {
+  it("summarizes sessions, exercises, and a legacy closeout", () => {
     const day = buildHistoryDays(
       [
         session("one", "2026-07-16T14:00:00.000Z", {
@@ -109,6 +136,16 @@ describe("getHistoryDaySummary", () => {
       [closeout("2026-07-16")],
     )[0];
 
-    expect(day && getHistoryDaySummary(day)).toBe("2 sesiones · 3 ejercicios · cierre listo");
+    expect(day && getHistoryDaySummary(day)).toBe("2 sesiones · 3 ejercicios · cierre");
+  });
+
+  it("mentions the morning check-in and never asks for a closeout", () => {
+    const [withCheckin] = buildHistoryDays([], [], [checkin("2026-07-16")]);
+    const [onlySession] = buildHistoryDays([session("one", "2026-07-16T14:00:00.000Z")], []);
+
+    expect(withCheckin && getHistoryDaySummary(withCheckin)).toBe(
+      "Sin sesiones · mañana registrada",
+    );
+    expect(onlySession && getHistoryDaySummary(onlySession)).toBe("1 sesión · 0 ejercicios");
   });
 });

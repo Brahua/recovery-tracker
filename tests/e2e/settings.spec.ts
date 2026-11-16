@@ -116,7 +116,7 @@ test.describe("settings", () => {
     ).toBeVisible();
 
     const session = page.getByRole("switch", { name: "Sesión del día" });
-    const closeout = page.getByRole("switch", { name: "Cierre nocturno" });
+    const closeout = page.getByRole("switch", { name: "Cómo amaneciste" });
     const sessionTime = page.getByLabel("Hora del recordatorio de sesión del día");
 
     await session.check();
@@ -129,7 +129,7 @@ test.describe("settings", () => {
     await expect(session).toBeChecked();
     await expect(sessionTime).toHaveValue("07:30");
     await expect(closeout).not.toBeChecked();
-    await expect(page.getByLabel("Hora del recordatorio de cierre nocturno")).toBeDisabled();
+    await expect(page.getByLabel("Hora del recordatorio de cómo amaneciste")).toBeDisabled();
 
     await closeout.check();
     await page.getByRole("button", { name: "Guardar recordatorios" }).click();

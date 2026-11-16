@@ -286,7 +286,7 @@ export function PostTherapyForm({
                 <Link aria-current="page" className="is-active" href="/registrar?mode=session">
                   Sesion
                 </Link>
-                <Link href="/registrar?mode=closeout">Cierre del dia</Link>
+                <Link href="/registrar?mode=morning">Mañana</Link>
               </nav>
             )}
             <div className="rr-form-progress" aria-live="polite">

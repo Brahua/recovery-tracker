@@ -31,19 +31,20 @@ export interface DueRemindersInput {
   settings: ReminderSettings;
   /** True while today's session goal is not met and the week's goal is not met either. */
   sessionGoalPending: boolean;
-  hasCloseoutToday: boolean;
+  /** Today's morning check-in exists (the stored "closeout" kind reminds it). */
+  hasCheckinToday: boolean;
   deliveredToday: readonly ReminderKind[];
 }
 
 /**
- * Reminders to send now: window open, still pending (session goal not met / no closeout today) and
+ * Reminders to send now: window open, still pending (session goal not met / no morning check-in) and
  * not sent yet today. A met week means a rest day is fine, so no session reminder.
  */
 export function dueReminders({
   now,
   settings,
   sessionGoalPending,
-  hasCloseoutToday,
+  hasCheckinToday,
   deliveredToday,
 }: DueRemindersInput) {
   const { localDate, kinds } = openReminderWindows(now, settings);
@@ -51,7 +52,7 @@ export function dueReminders({
     localDate,
     kinds: kinds.filter((kind) => {
       if (deliveredToday.includes(kind)) return false;
-      return kind === "session" ? sessionGoalPending : !hasCloseoutToday;
+      return kind === "session" ? sessionGoalPending : !hasCheckinToday;
     }),
   };
 }

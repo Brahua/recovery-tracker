@@ -7,15 +7,16 @@ import {
   pushSubscriptionInputSchema,
   reminderSettingsInputSchema,
   toReminderTime,
+  effectiveMorningReminderTime,
 } from "@/lib/reminders/settings";
 
 describe("reminder settings", () => {
-  it("defaults to the closeout reminder at 21:30 and the session one off at 18:00", () => {
+  it("defaults to the morning reminder at 08:00 and the session one off at 18:00", () => {
     expect(defaultReminderSettings).toMatchObject({
       sessionEnabled: false,
       sessionTime: "18:00",
       closeoutEnabled: true,
-      closeoutTime: "21:30",
+      closeoutTime: "08:00",
       timeZone: "America/Lima",
     });
   });
@@ -67,5 +68,12 @@ describe("time helpers", () => {
       date: "2026-10-02",
       minutes: 0,
     });
+  });
+
+  it("reads a closeout time after noon as the 08:00 morning reminder", () => {
+    expect(effectiveMorningReminderTime("21:30")).toBe("08:00");
+    expect(effectiveMorningReminderTime("12:01")).toBe("08:00");
+    expect(effectiveMorningReminderTime("12:00")).toBe("12:00");
+    expect(effectiveMorningReminderTime("07:15")).toBe("07:15");
   });
 });
